@@ -1,0 +1,43 @@
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+body{
+  background:#050816;
+  color:white;
+  font-family:Arial, sans-serif;
+}
+
+.hero{
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+  padding:20px;
+}
+
+h1{
+  font-size:80px;
+  margin-bottom:20px;
+}
+
+p{
+  max-width:700px;
+  line-height:1.8;
+  font-size:20px;
+  opacity:.8;
+}
+
+button{
+  margin-top:30px;
+  padding:14px 30px;
+  border:none;
+  background:white;
+  color:black;
+  border-radius:10px;
+  cursor:pointer;
+}
