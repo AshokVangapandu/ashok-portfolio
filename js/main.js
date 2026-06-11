@@ -350,11 +350,11 @@ const renderProjectActions = () => {
     "Smart Dashboards": "Open Analytics System"
   };
   const actionLinks = {
-    "Medi Connect": "medi-connect.html",
-    "Vantage Nutrition R&D": "vantage-rnd.html",
-    "Field Survey Personnel": "field-survey.html",
-    "Edith Design System": "design-system.html",
-    "Smart Dashboards": "smart-dashboard.html"
+    "Medi Connect": "pages/projects/medi-connect.html",
+    "Vantage Nutrition R&D": "pages/projects/vantage-rnd.html",
+    "Field Survey Personnel": "pages/projects/field-survey.html",
+    "Edith Design System": "pages/projects/design-system.html",
+    "Smart Dashboards": "pages/projects/smart-dashboard.html"
   };
 
   workCopies.forEach((copy) => {
