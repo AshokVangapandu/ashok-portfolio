@@ -7194,7 +7194,163 @@ h1.reveal {
   }
 
   .build-visual {
-    min-height: 250px;
+    display: none;
+  }
+
+  .behind-build {
+    overflow: hidden;
+  }
+
+  .behind-build-shell {
+    position: relative;
+  }
+
+  .build-heading {
+    margin-bottom: 24px;
+  }
+
+  .build-heading .section-subtitle {
+    color: rgba(220, 229, 247, 0.74);
+  }
+
+  .build-stage {
+    position: relative;
+    display: block;
+  }
+
+  .build-stage::before {
+    content: "";
+    position: absolute;
+    left: 25px;
+    top: 18px;
+    bottom: 18px;
+    width: 1px;
+    background: linear-gradient(
+      180deg,
+      rgba(101, 230, 196, 0),
+      rgba(101, 230, 196, 0.58) 14%,
+      rgba(159, 184, 255, 0.42) 52%,
+      rgba(184, 156, 255, 0.3) 82%,
+      rgba(184, 156, 255, 0)
+    );
+  }
+
+  .build-flow {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .build-node,
+  .build-node-3 {
+    position: relative;
+    display: grid;
+    grid-template-columns: 52px minmax(0, 1fr);
+    gap: 14px;
+    min-height: 0;
+    padding: 15px 15px 15px 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    transform: none;
+    animation: none;
+    transition: none;
+    contain: content;
+  }
+
+  .build-node::before,
+  .build-node::after,
+  .build-node-3::before,
+  .build-node-3::after {
+    display: none;
+  }
+
+  .build-step-index {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    width: 52px;
+    height: 52px;
+    place-items: center;
+    border: 1px solid rgba(189, 216, 255, 0.2);
+    border-radius: 17px;
+    background:
+      radial-gradient(circle at 34% 22%, rgba(255, 255, 255, 0.18), transparent 34%),
+      linear-gradient(145deg, rgba(14, 25, 45, 0.94), rgba(8, 12, 24, 0.98));
+    color: rgba(235, 244, 255, 0.88);
+    box-shadow:
+      0 12px 28px rgba(0, 0, 0, 0.26),
+      0 0 0 5px rgba(101, 230, 196, 0.035),
+      inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    font-size: 12px;
+    font-weight: 850;
+    letter-spacing: 0;
+  }
+
+  .build-icon,
+  .build-node-3 .build-icon {
+    position: absolute;
+    left: 27px;
+    top: 54px;
+    z-index: 3;
+    width: 22px;
+    height: 22px;
+    border: 1px solid rgba(101, 230, 196, 0.24);
+    border-radius: 999px;
+    background: rgba(7, 14, 25, 0.94);
+    color: rgba(101, 230, 196, 0.86);
+    box-shadow: 0 0 16px rgba(101, 230, 196, 0.12);
+    animation: none;
+    transform: translateX(-50%);
+  }
+
+  .build-icon svg,
+  .build-node-3 .build-icon svg {
+    width: 12px;
+    height: 12px;
+    filter: none;
+    stroke-width: 2.2;
+  }
+
+  .build-card-copy,
+  .build-node-3 .build-card-copy {
+    min-width: 0;
+    padding: 17px;
+    border: 1px solid rgba(220, 231, 255, 0.11);
+    border-radius: 18px;
+    background:
+      linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.025)),
+      rgba(8, 13, 25, 0.74);
+    box-shadow:
+      0 18px 42px rgba(0, 0, 0, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.09);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+
+  .build-card-copy h3,
+  .build-node-3 .build-card-copy h3 {
+    margin: 0 0 7px;
+    color: #ffffff;
+    font-size: 18px;
+    line-height: 1.18;
+    font-weight: 820;
+  }
+
+  .build-card-copy p,
+  .build-node-3 .build-card-copy p {
+    margin: 0;
+    color: rgba(218, 227, 244, 0.72);
+    font-size: 13px;
+    line-height: 1.58;
+  }
+
+  .build-node:hover,
+  .build-node-3:hover,
+  .build-node:hover .build-icon,
+  .build-node-3:hover .build-icon {
+    transform: none;
   }
 
   .work-projects {
