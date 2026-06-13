@@ -97,25 +97,25 @@ const expertise = [
 const buildSteps = [
   {
     title: "Analyze",
-    icon: "scan-search",
+    icon: "target-scan",
     description: "Understanding business problems, user needs, behavior, workflows, and strategic product goals.",
     meta: "01"
   },
   {
     title: "Design",
-    icon: "wand",
+    icon: "pen-tool",
     description: "Wireframes, UI systems, interaction design, user experience flows, accessibility, and visual hierarchy.",
     meta: "02"
   },
   {
     title: "Build",
-    icon: "terminal",
+    icon: "component",
     description: "Transforming designs into scalable digital products through clean systems and reusable components.",
     meta: "03"
   },
   {
     title: "Refine",
-    icon: "refresh-cw",
+    icon: "sliders",
     description: "Polishing interactions, optimizing performance, collecting feedback, and iterating based on behavior.",
     meta: "04"
   },
@@ -189,6 +189,14 @@ const iconPaths = {
     <path d="M15 15.5 19.5 20"/>
     <path d="M11 16a5 5 0 1 0 0-10 5 5 0 0 0 0 10Z"/>
   `,
+  "target-scan": `
+    <circle cx="12" cy="12" r="7"/>
+    <circle cx="12" cy="12" r="2.4"/>
+    <path d="M12 2.8V5"/>
+    <path d="M12 19v2.2"/>
+    <path d="M2.8 12H5"/>
+    <path d="M19 12h2.2"/>
+  `,
   wand: `
     <path d="M15 4V2"/>
     <path d="M15 10V8"/>
@@ -207,6 +215,14 @@ const iconPaths = {
     <path d="M3 12A9 9 0 0 1 18.5 5.8"/>
     <path d="M18 2v4h4"/>
     <path d="M6 22v-4H2"/>
+  `,
+  sliders: `
+    <path d="M4 7h10"/>
+    <path d="M18 7h2"/>
+    <circle cx="16" cy="7" r="2"/>
+    <path d="M4 17h2"/>
+    <path d="M10 17h10"/>
+    <circle cx="8" cy="17" r="2"/>
   `,
   "badge-check": `
     <path d="M12 2.5 14.8 5l3.8-.2.9 3.7 3 2.3-1.5 3.5.9 3.7-3.6 1.5-2 3.2-3.3-.8-3.3.8-2-3.2L4 18l.9-3.7-1.5-3.5 3-2.3.9-3.7 3.8.2L12 2.5Z"/>
