@@ -5,18 +5,168 @@ const cursorLight = document.querySelector(".cursor-light");
 const magneticItems = document.querySelectorAll(".magnetic");
 const expertiseGrid = document.querySelector("[data-expertise-grid]");
 const buildFlow = document.querySelector("[data-build-flow]");
-const animatedSectionNodes = document.querySelectorAll("[data-animated-section]");
 const anchorLinks = document.querySelectorAll('a[href^="#"]');
 const navSectionLinks = document.querySelectorAll('.nav-links a[href^="#"]');
 const projectNavLinks = document.querySelectorAll('.project-nav a[href^="#"]');
 const floatingProjectNav = document.querySelector(".medi-subnav, .ds-subnav");
 const whatsappLinks = document.querySelectorAll("[data-whatsapp-link]");
+const contactForm = document.querySelector("[data-contact-form]");
 
 const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const prefersMobileWhatsApp = window.matchMedia("(max-width: 768px), (hover: none) and (pointer: coarse)").matches;
+const themeStorageKey = "ashok-portfolio-theme";
+const availableThemes = ["ocean", "amber"];
+
+const readStoredTheme = () => {
+  try {
+    return localStorage.getItem(themeStorageKey);
+  } catch (error) {
+    return null;
+  }
+};
+
+const storeTheme = (theme) => {
+  try {
+    localStorage.setItem(themeStorageKey, theme);
+  } catch (error) {
+    return;
+  }
+};
+
+const createThemeSwitcher = () => {
+  let activeTheme = readStoredTheme();
+
+  if (!availableThemes.includes(activeTheme)) {
+    activeTheme = "ocean";
+  }
+
+  document.documentElement.dataset.theme = activeTheme;
+
+  const switcher = document.createElement("div");
+  switcher.className = "theme-switcher";
+  switcher.setAttribute("aria-label", "Color theme");
+
+  availableThemes.forEach((theme) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.dataset.themeChoice = theme;
+    button.setAttribute("aria-label", theme === "amber" ? "Use amber theme" : "Use ocean theme");
+    button.setAttribute("aria-pressed", String(theme === activeTheme));
+    switcher.appendChild(button);
+  });
+
+  switcher.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-theme-choice]");
+    if (!button) return;
+
+    const nextTheme = button.dataset.themeChoice;
+    if (!availableThemes.includes(nextTheme)) return;
+
+    document.documentElement.dataset.theme = nextTheme;
+    storeTheme(nextTheme);
+
+    switcher.querySelectorAll("[data-theme-choice]").forEach((themeButton) => {
+      themeButton.setAttribute("aria-pressed", String(themeButton.dataset.themeChoice === nextTheme));
+    });
+  });
+
+  document.body.appendChild(switcher);
+};
+
+createThemeSwitcher();
 
 whatsappLinks.forEach((link) => {
   link.href = prefersMobileWhatsApp ? link.dataset.mobileHref : link.dataset.desktopHref;
+});
+
+const contactToast = document.createElement("div");
+contactToast.className = "contact-toast";
+contactToast.setAttribute("role", "status");
+contactToast.setAttribute("aria-live", "polite");
+
+const showContactToast = (type, title, message) => {
+  contactToast.dataset.status = type;
+  contactToast.innerHTML = `
+    <strong>${title}</strong>
+    <span>${message}</span>
+  `;
+
+  if (!contactToast.isConnected) {
+    document.body.appendChild(contactToast);
+  }
+
+  window.clearTimeout(showContactToast.timeoutId);
+  contactToast.classList.add("is-visible");
+
+  showContactToast.timeoutId = window.setTimeout(() => {
+    contactToast.classList.remove("is-visible");
+  }, 6200);
+};
+
+const setContactSubmitState = (form, isSubmitting) => {
+  const submitButton = form.querySelector(".contact-submit");
+  const submitLabel = submitButton?.querySelector("span");
+
+  if (!submitButton || !submitLabel) return;
+
+  submitButton.disabled = isSubmitting;
+  submitButton.setAttribute("aria-busy", String(isSubmitting));
+  submitLabel.textContent = isSubmitting ? "Sending..." : "Send Message";
+};
+
+contactForm?.addEventListener("submit", async (event) => {
+  event.preventDefault();
+
+  if (!contactForm.checkValidity()) {
+    contactForm.reportValidity();
+    return;
+  }
+
+  const accessKey = contactForm.querySelector('[name="access_key"]')?.value.trim();
+  if (!accessKey || accessKey === "PASTE_WEB3FORMS_ACCESS_KEY_HERE") {
+    showContactToast(
+      "error",
+      "Email key missing.",
+      "Add your Web3Forms access key in the contact form, then messages will come directly to your inbox."
+    );
+    return;
+  }
+
+  setContactSubmitState(contactForm, true);
+
+  try {
+    const formData = new FormData(contactForm);
+    const payload = Object.fromEntries(formData);
+
+    const response = await fetch(contactForm.action, {
+      method: "POST",
+      body: JSON.stringify(payload),
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json"
+      }
+    });
+    const result = await response.json().catch(() => ({}));
+
+    if (!response.ok || result.success === false) {
+      throw new Error(result.message || "Message request failed");
+    }
+
+    contactForm.reset();
+    showContactToast(
+      "success",
+      "Message sent to Ashok.",
+      "You will get a response as soon as possible, so please keep your phone handy."
+    );
+  } catch (error) {
+    showContactToast(
+      "error",
+      "Message did not send.",
+      error.message || "Please try again in a moment, or email Ashok directly at ashokvangapandu45@gmail.com."
+    );
+  } finally {
+    setContactSubmitState(contactForm, false);
+  }
 });
 
 const expertise = [
@@ -24,73 +174,73 @@ const expertise = [
     title: "Mendix",
     icon: "mendix-brand",
     signal: "Low-code delivery",
-    desc1: "Experienced in building scalable apps using Mendix.",
-    desc2: "Skilled in customizing Atlas UI, integrating logic, and deploying end-to-end solutions.",
+    desc1: "Scalable enterprise apps with Atlas UI, microflows, and end-to-end cloud deployment.",
     chips: ["Atlas UI", "Microflows"],
-    focus: "Apps to launch"
+    score: 92,
+    tone: "#00d6c6"
   },
   {
     title: "Figma",
     icon: "figma-brand",
     signal: "Product design",
-    desc1: "Expert in wireframing, prototyping, and component-based design.",
-    desc2: "Collaborates seamlessly with teams to deliver consistent UI aligned with development needs.",
+    desc1: "Pixel-perfect wireframing, prototyping, and component systems dev-ready from day one.",
     chips: ["Prototypes", "Components"],
-    focus: "Design to build"
-  },
-  {
-    title: "Java",
-    icon: "java-brand",
-    signal: "Backend logic",
-    desc1: "Solid foundation in Java for backend processes.",
-    desc2: "Applies object-oriented principles to build reliable and scalable application logic.",
-    chips: ["OOP", "Services"],
-    focus: "Reliable systems"
-  },
-  {
-    title: "User Interface",
-    icon: "ui-brand",
-    signal: "Experience craft",
-    desc1: "Focused on creating user-friendly, visually appealing layouts.",
-    desc2: "Designs interfaces prioritizing clarity, accessibility, and brand consistency.",
-    chips: ["Layouts", "A11y"],
-    focus: "Clear journeys"
-  },
-  {
-    title: "JavaScript",
-    icon: "javascript-brand",
-    signal: "Interactive UI",
-    desc1: "Proficient in scripting dynamic and interactive UI components.",
-    desc2: "Implements clean modular logic to improve user experience and behavior.",
-    chips: ["DOM", "Modules"],
-    focus: "Fluid behavior"
+    score: 95,
+    tone: "#8f72ff"
   },
   {
     title: "Design System",
     icon: "design-system-brand",
     signal: "Reusable patterns",
-    desc1: "Hands-on experience in creating and maintaining design systems.",
-    desc2: "Drives consistency, scalability, and reusable UI patterns across products.",
+    desc1: "Token architecture to variant logic, building consistency at every scale.",
     chips: ["Tokens", "Variants"],
-    focus: "Consistent scale"
+    score: 90,
+    tone: "#00d6c6"
+  },
+  {
+    title: "Widgets",
+    icon: "component",
+    signal: "Pluggable widgets",
+    desc1: "Custom Mendix widgets built with React and TypeScript, extending platform capabilities.",
+    chips: ["React", "TypeScript"],
+    score: 87,
+    tone: "#409cff"
+  },
+  {
+    title: "Frontend Dev",
+    icon: "layout-dashboard",
+    signal: "Modern interfaces",
+    desc1: "Responsive, accessible, high-performing interfaces with strong usability and visual engagement.",
+    chips: ["Responsive", "Accessibility"],
+    score: 88,
+    tone: "#409cff"
+  },
+  {
+    title: "JavaScript",
+    icon: "javascript-brand",
+    signal: "Interactive UI",
+    desc1: "Dynamic, modular JS architecture for clean interactive components.",
+    chips: ["DOM", "Modules"],
+    score: 85,
+    tone: "#ffd84d"
   },
   {
     title: "SCSS",
     icon: "scss-brand",
     signal: "Style architecture",
-    desc1: "Well-versed in writing modular and maintainable SCSS architecture.",
-    desc2: "Uses mixins, loops, and variables to build scalable responsive systems.",
+    desc1: "Modular, maintainable SCSS with mixins, functions, and scalable responsive systems.",
     chips: ["Mixins", "Responsive"],
-    focus: "Clean styling"
+    score: 80,
+    tone: "#dc66f0"
   },
   {
-    title: "Canva",
-    icon: "canva-brand",
-    signal: "Visual assets",
-    desc1: "Creates quick visuals, mockups, and branding assets using Canva.",
-    desc2: "Useful for social media creatives, presentations, and rapid design iterations.",
-    chips: ["Branding", "Content"],
-    focus: "Rapid visuals"
+    title: "Java",
+    icon: "java-brand",
+    signal: "Backend logic",
+    desc1: "Reliable OOP services and APIs powering scalable application logic.",
+    chips: ["OOP", "Services"],
+    score: 72,
+    tone: "#ff884d"
   }
 ];
 
@@ -99,31 +249,41 @@ const buildSteps = [
     title: "Analyze",
     icon: "target-scan",
     description: "Understanding business problems, user needs, behavior, workflows, and strategic product goals.",
-    meta: "01"
+    meta: "01",
+    tags: ["Research", "Strategy", "Goals"],
+    tone: "#00d6c6"
   },
   {
     title: "Design",
     icon: "pen-tool",
     description: "Wireframes, UI systems, interaction design, user experience flows, accessibility, and visual hierarchy.",
-    meta: "02"
+    meta: "02",
+    tags: ["Wireframes", "UI Systems", "UX"],
+    tone: "#8f72ff"
   },
   {
     title: "Build",
-    icon: "component",
+    icon: "hash",
     description: "Transforming designs into scalable digital products through clean systems and reusable components.",
-    meta: "03"
+    meta: "03",
+    tags: ["Frontend", "Components", "Code"],
+    tone: "#409cff"
   },
   {
     title: "Refine",
     icon: "sliders",
     description: "Polishing interactions, optimizing performance, collecting feedback, and iterating based on behavior.",
-    meta: "04"
+    meta: "04",
+    tags: ["QA", "Performance", "Feedback"],
+    tone: "#ffd84d"
   },
   {
     title: "Deliver",
     icon: "badge-check",
     description: "Deployment, production readiness, developer handoff, final QA, and launching impactful experiences.",
-    meta: "05"
+    meta: "05",
+    tags: ["Launch", "Handoff", "Deploy"],
+    tone: "#dc66f0"
   }
 ];
 
@@ -196,6 +356,12 @@ const iconPaths = {
     <path d="M12 19v2.2"/>
     <path d="M2.8 12H5"/>
     <path d="M19 12h2.2"/>
+  `,
+  hash: `
+    <path d="M8 3 6 21"/>
+    <path d="M18 3l-2 18"/>
+    <path d="M4 9h16"/>
+    <path d="M3 15h16"/>
   `,
   wand: `
     <path d="M15 4V2"/>
@@ -312,21 +478,23 @@ const renderExpertise = () => {
     const stagger = index * 70;
 
     return `
-    <article class="expertise-card tilt-card reveal-on-scroll" data-stagger="${stagger}" style="transition-delay: ${stagger}ms" aria-label="${item.title} expertise">
+    <article class="expertise-card tilt-card reveal-on-scroll" data-stagger="${stagger}" style="--skill-color: ${item.tone}; --skill-score: ${item.score}%; transition-delay: ${stagger}ms" aria-label="${item.title} expertise">
       <div class="expertise-card-top">
-        <span class="expertise-icon">${renderIcon(item.icon)}</span>
-        <span class="expertise-signal">${item.signal}</span>
+        <div class="expertise-card-meta">
+          <span class="expertise-icon">${renderIcon(item.icon)}</span>
+          <span class="expertise-signal">${item.signal}</span>
+        </div>
+        <span class="expertise-score">${item.score}%</span>
       </div>
       <div class="expertise-card-copy">
         <h3>${item.title}</h3>
         <p>${item.desc1}</p>
-        <p>${item.desc2}</p>
       </div>
       <div class="expertise-card-bottom" aria-label="${item.title} focus areas">
+        <div class="expertise-meter" aria-hidden="true"><span></span></div>
         <div class="expertise-tags">
           ${item.chips.map((chip) => `<span>${chip}</span>`).join("")}
         </div>
-        <span class="expertise-focus">${item.focus}</span>
       </div>
     </article>
   `;
@@ -342,12 +510,15 @@ const renderBuildFlow = () => {
     const stagger = 120 + index * 90;
 
     return `
-    <article class="build-node build-node-${index + 1} reveal-on-scroll" data-stagger="${stagger}" style="transition-delay: ${stagger}ms" aria-label="${step.title} workflow step">
+    <article class="build-node build-node-${index + 1} reveal-on-scroll" data-stagger="${stagger}" style="--build-color: ${step.tone}; transition-delay: ${stagger}ms" aria-label="${step.title} workflow step">
       <div class="build-step-index">${step.meta}</div>
       <span class="build-icon">${renderIcon(step.icon)}</span>
       <div class="build-card-copy">
         <h3>${step.title}</h3>
         <p>${step.description}</p>
+        <ul class="build-tags" aria-label="${step.title} focus points">
+          ${step.tags.map((tag) => `<li>${tag}</li>`).join("")}
+        </ul>
       </div>
     </article>
   `;
@@ -356,60 +527,19 @@ const renderBuildFlow = () => {
 
 renderBuildFlow();
 
-const renderProjectActions = () => {
-  const workCopies = document.querySelectorAll(".work-copy");
-  const actionLabels = {
-    "Medi Connect": "View Healthcare Workflow",
-    "Vantage Nutrition R&D": "See R&D Platform",
-    "Field Survey Personnel": "Explore Field Operations",
-    "Edith Design System": "View Design Architecture",
-    "Smart Dashboards": "Open Analytics System"
-  };
-  const actionLinks = {
-    "Medi Connect": "pages/projects/medi-connect.html",
-    "Vantage Nutrition R&D": "pages/projects/vantage-rnd.html",
-    "Field Survey Personnel": "pages/projects/field-survey.html",
-    "Edith Design System": "pages/projects/design-system.html",
-    "Smart Dashboards": "pages/projects/smart-dashboard.html"
-  };
-
-  workCopies.forEach((copy) => {
-    const projectTitle = copy.querySelector("h3")?.textContent.trim();
-    const actionLabel = actionLabels[projectTitle] || "View Project";
-    const action = document.createElement("a");
-    action.href = actionLinks[projectTitle] || "#work";
-    action.className = "work-action";
-    action.innerHTML = `
-      <span>${actionLabel}</span>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M5 12h14M12 5l7 7-7 7"/>
-      </svg>
-    `;
-    copy.appendChild(action);
-  });
-};
-
-renderProjectActions();
-
 const tiltCards = document.querySelectorAll(".tilt-card");
 const buildNodes = document.querySelectorAll(".build-node");
-const interactiveSurfaces = document.querySelectorAll(".work-project, .profile-action, .contact-panel, .contact-card, .resume-card, .resume-project-card, .resume-identity-card, .work-action");
+const interactiveSurfaces = document.querySelectorAll(".portfolio-display-card, .portfolio-cta, .preview-panel, .profile-action, .contact-panel, .contact-card, .resume-card, .resume-project-card, .resume-identity-card, .widget-teaser-card, .widget-gallery-link, .widget-mockup-frame");
 const scrollRevealItems = document.querySelectorAll(".reveal-on-scroll");
+const trackedSections = Array.from(document.querySelectorAll("main section[id]"));
 
-const AnimatedSection = (section) => {
-  const reveal = () => {
-    section.classList.add("is-section-visible");
-    window.setTimeout(() => {
-      section.classList.add("is-section-settled");
-    }, 720);
-  };
-
-  section.classList.add("animated-section");
-
-  return { section, reveal };
+const showRevealItems = () => {
+  scrollRevealItems.forEach((item) => {
+    item.classList.add("is-visible");
+    item.style.transitionDelay = "0ms";
+    item.style.willChange = "auto";
+  });
 };
-
-const animatedSections = Array.from(animatedSectionNodes, AnimatedSection);
 
 const setHeaderState = () => {
   header.classList.toggle("is-scrolled", window.scrollY > 18);
@@ -419,7 +549,7 @@ const setActiveNavLink = () => {
   const activationLine = header.offsetHeight + window.innerHeight * 0.18;
   let activeId = "";
 
-  animatedSections.forEach(({ section }) => {
+  trackedSections.forEach((section) => {
     if (!section.id) return;
 
     const rect = section.getBoundingClientRect();
@@ -504,6 +634,7 @@ const closeMenu = () => {
 setHeaderState();
 setActiveNavLink();
 setProjectNavVisibility();
+showRevealItems();
 
 window.addEventListener("scroll", requestScrollUpdate, { passive: true });
 window.addEventListener("resize", requestScrollUpdate);
@@ -533,7 +664,7 @@ anchorLinks.forEach((link) => {
 
     window.scrollTo({
       top: Math.max(targetTop, 0),
-      behavior: prefersReducedMotion ? "auto" : "smooth"
+      behavior: "auto"
     });
 
     if (window.history.pushState) {
@@ -541,50 +672,6 @@ anchorLinks.forEach((link) => {
     }
   });
 });
-
-if ("IntersectionObserver" in window && !prefersReducedMotion) {
-  const sectionObserver = new IntersectionObserver((entries, observer) => {
-    entries.forEach((entry) => {
-      if (!entry.isIntersecting) return;
-
-      const animatedSection = animatedSections.find((item) => item.section === entry.target);
-      if (!animatedSection) return;
-
-      animatedSection.reveal();
-      observer.unobserve(entry.target);
-    });
-  }, {
-    threshold: 0.22,
-    rootMargin: "0px 0px -12% 0px"
-  });
-
-  animatedSections.forEach((item) => sectionObserver.observe(item.section));
-} else {
-  animatedSections.forEach((item) => item.reveal());
-}
-
-if ("IntersectionObserver" in window) {
-  const revealObserver = new IntersectionObserver((entries, observer) => {
-    entries.forEach((entry) => {
-      if (!entry.isIntersecting) return;
-
-      entry.target.classList.add("is-visible");
-      const staggerDelay = Number(entry.target.dataset.stagger || 0);
-      window.setTimeout(() => {
-        entry.target.style.transitionDelay = "0ms";
-        entry.target.style.willChange = "auto";
-      }, staggerDelay + 620);
-      observer.unobserve(entry.target);
-    });
-  }, {
-    threshold: 0.14,
-    rootMargin: "0px 0px -6% 0px"
-  });
-
-  scrollRevealItems.forEach((item) => revealObserver.observe(item));
-} else {
-  scrollRevealItems.forEach((item) => item.classList.add("is-visible"));
-}
 
 if (!prefersReducedMotion) {
   window.addEventListener("pointermove", (event) => {
@@ -678,3 +765,145 @@ if (!prefersReducedMotion) {
     });
   });
 }
+
+const initWallOfLoveCarousel = () => {
+  const carousel = document.querySelector("[data-wall-carousel]");
+  const track = document.querySelector("[data-wall-marquee]");
+  if (!carousel || !track) return;
+
+  const prevButton = document.querySelector("[data-wall-prev]");
+  const nextButton = document.querySelector("[data-wall-next]");
+  const toggleButton = document.querySelector("[data-wall-toggle]");
+  const toggleLabel = toggleButton?.querySelector("span");
+  const originalCards = Array.from(track.children);
+  if (!originalCards.length) return;
+
+  originalCards.forEach((card) => {
+    const clone = card.cloneNode(true);
+    clone.setAttribute("aria-hidden", "true");
+    clone.dataset.clone = "true";
+    track.appendChild(clone);
+  });
+
+  let cards = Array.from(track.children);
+  let loopWidth = 0;
+  let offset = 0;
+  let lastTime = performance.now();
+  let isHoverPaused = false;
+  let isUserPaused = false;
+  const speed = 42;
+
+  const setTrackX = () => {
+    if (window.gsap) {
+      window.gsap.set(track, { x: offset });
+    } else {
+      track.style.transform = `translate3d(${offset}px, 0, 0)`;
+    }
+  };
+
+  const wrapOffset = () => {
+    if (!loopWidth) return;
+    while (offset <= -loopWidth) offset += loopWidth;
+    while (offset > 0) offset -= loopWidth;
+  };
+
+  const measure = () => {
+    cards = Array.from(track.children);
+    loopWidth = track.scrollWidth / 2;
+    wrapOffset();
+    setTrackX();
+  };
+
+  const setActiveCard = () => {
+    const carouselRect = carousel.getBoundingClientRect();
+    const center = carouselRect.left + carouselRect.width / 2;
+    let activeCard = null;
+    let activeDistance = Infinity;
+
+    cards.forEach((card) => {
+      const rect = card.getBoundingClientRect();
+      const cardCenter = rect.left + rect.width / 2;
+      const distance = Math.abs(center - cardCenter);
+      if (distance < activeDistance) {
+        activeDistance = distance;
+        activeCard = card;
+      }
+    });
+
+    cards.forEach((card) => {
+      card.classList.toggle("is-active", card === activeCard);
+    });
+  };
+
+  const updateToggle = () => {
+    if (!toggleButton || !toggleLabel) return;
+    toggleButton.setAttribute("aria-pressed", String(isUserPaused));
+    toggleButton.setAttribute("aria-label", isUserPaused ? "Play testimonial autoplay" : "Pause testimonial autoplay");
+    toggleLabel.textContent = isUserPaused ? "Play" : "Pause";
+  };
+
+  const getStepSize = () => {
+    const firstCard = originalCards[0];
+    const secondCard = originalCards[1];
+    if (!firstCard) return 320;
+    if (!secondCard) return firstCard.getBoundingClientRect().width;
+    return secondCard.getBoundingClientRect().left - firstCard.getBoundingClientRect().left;
+  };
+
+  const moveByCard = (direction) => {
+    offset += getStepSize() * direction;
+    wrapOffset();
+    setTrackX();
+    setActiveCard();
+  };
+
+  const tick = (time) => {
+    const delta = Math.min((time - lastTime) / 1000, 0.05);
+    lastTime = time;
+
+    if (!isHoverPaused && !isUserPaused) {
+      offset -= speed * delta;
+      wrapOffset();
+      setTrackX();
+    }
+
+    setActiveCard();
+  };
+
+  carousel.addEventListener("mouseenter", () => {
+    isHoverPaused = true;
+  });
+  carousel.addEventListener("mouseleave", () => {
+    isHoverPaused = false;
+  });
+  carousel.addEventListener("focusin", () => {
+    isHoverPaused = true;
+  });
+  carousel.addEventListener("focusout", () => {
+    isHoverPaused = false;
+  });
+
+  prevButton?.addEventListener("click", () => moveByCard(1));
+  nextButton?.addEventListener("click", () => moveByCard(-1));
+  toggleButton?.addEventListener("click", () => {
+    isUserPaused = !isUserPaused;
+    updateToggle();
+  });
+
+  window.addEventListener("resize", measure);
+  measure();
+  updateToggle();
+  setActiveCard();
+
+  if (window.gsap) {
+    window.gsap.ticker.add(() => tick(performance.now()));
+  } else {
+    const rafTick = (time) => {
+      tick(time);
+      window.requestAnimationFrame(rafTick);
+    };
+    window.requestAnimationFrame(rafTick);
+  }
+};
+
+initWallOfLoveCarousel();

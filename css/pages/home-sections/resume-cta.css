@@ -1,0 +1,203 @@
+/* Home resume CTA */
+.profile-snapshot {
+  overflow: hidden;
+  padding: 74px 0 82px;
+  background:
+    radial-gradient(circle at 50% 4%, rgba(45, 118, 210, 0.18), transparent 24rem),
+    radial-gradient(circle at 18% 88%, rgba(62, 159, 255, 0.07), transparent 26rem),
+    #0b1d38;
+}
+
+.profile-snapshot::before,
+.profile-snapshot::after,
+.profile-ambient,
+.profile-orbit-lines {
+  display: none;
+}
+
+.profile-shell {
+  width: min(980px, calc(100% - 40px));
+}
+
+.resume-download-panel,
+.profile-gateway.resume-download-panel {
+  display: grid;
+  grid-template-columns: 1fr;
+  justify-items: center;
+  gap: 38px;
+  min-height: 0;
+  padding: 0;
+  text-align: center;
+}
+
+.resume-download-panel::before,
+.resume-download-panel::after {
+  display: none;
+}
+
+.resume-file-card {
+  position: relative;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  width: 166px;
+  height: 186px;
+  overflow: hidden;
+  border: 1px solid rgba(64, 156, 255, 0.22);
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(64, 156, 255, 0.16), transparent 54%),
+    linear-gradient(180deg, rgba(17, 49, 91, 0.86), rgba(11, 29, 56, 0.86));
+  box-shadow: 0 22px 70px rgba(0, 0, 0, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.resume-file-lines {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  padding: 22px 22px 0;
+}
+
+.resume-file-lines span {
+  display: block;
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(121, 167, 224, 0.2);
+}
+
+.resume-file-lines span:nth-child(1) {
+  width: 98px;
+  background: rgba(64, 156, 255, 0.38);
+}
+
+.resume-file-lines span:nth-child(2) {
+  width: 122px;
+}
+
+.resume-file-lines span:nth-child(3) {
+  width: 110px;
+}
+
+.resume-file-lines span:nth-child(4) {
+  width: 74px;
+}
+
+.resume-file-lines span:nth-child(5) {
+  width: 124px;
+  margin-top: 14px;
+}
+
+.resume-file-lines span:nth-child(6) {
+  width: 92px;
+}
+
+.resume-file-lines span:nth-child(7) {
+  width: 104px;
+}
+
+.resume-file-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px 20px 15px;
+  border-top: 1px solid rgba(64, 156, 255, 0.12);
+  color: rgba(135, 156, 188, 0.88);
+  font-size: 10px;
+  letter-spacing: 0.02em;
+}
+
+.resume-file-footer span:last-child {
+  color: rgba(64, 156, 255, 0.72);
+}
+
+.resume-download-copy {
+  display: grid;
+  justify-items: center;
+  gap: 20px;
+}
+
+.resume-download-copy h2 {
+  margin: 0;
+  color: #ffffff;
+  font-size: clamp(32px, 3.4vw, 42px);
+  line-height: 1.08;
+  font-weight: 760;
+  letter-spacing: 0;
+}
+
+.resume-download-copy > p:not(.resume-download-meta) {
+  max-width: 590px;
+  margin: 0;
+  color: rgba(157, 169, 194, 0.7);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.resume-download-panel .profile-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.resume-download-panel .profile-action {
+  min-width: 156px;
+  min-height: 50px;
+  border-radius: 12px;
+  font-size: 13px;
+}
+
+.resume-download-panel .profile-action-primary {
+  border-color: rgba(64, 156, 255, 0.48);
+  background: #409cff;
+  box-shadow: 0 18px 46px rgba(64, 156, 255, 0.22);
+}
+
+.resume-download-panel .profile-action-secondary {
+  border-color: rgba(157, 169, 194, 0.2);
+  background: rgba(255, 255, 255, 0.055);
+  color: rgba(226, 234, 255, 0.72);
+}
+
+.resume-download-panel .profile-action svg {
+  width: 16px;
+  height: 16px;
+}
+
+.resume-download-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 0 0;
+  color: rgba(157, 169, 194, 0.48);
+  font-size: 12px;
+}
+
+.resume-download-meta svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+@media (max-width: 640px) {
+  .profile-snapshot {
+    padding: 64px 0 72px;
+  }
+
+  .profile-shell {
+    width: min(100% - 32px, 980px);
+  }
+
+  .resume-download-panel .profile-actions {
+    width: 100%;
+    display: grid;
+  }
+
+  .resume-download-panel .profile-action {
+    width: 100%;
+  }
+}
+
