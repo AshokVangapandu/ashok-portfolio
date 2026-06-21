@@ -14,66 +14,6 @@ const contactForm = document.querySelector("[data-contact-form]");
 
 const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const prefersMobileWhatsApp = window.matchMedia("(max-width: 768px), (hover: none) and (pointer: coarse)").matches;
-const themeStorageKey = "ashok-portfolio-theme";
-const availableThemes = ["ocean", "amber"];
-
-const readStoredTheme = () => {
-  try {
-    return localStorage.getItem(themeStorageKey);
-  } catch (error) {
-    return null;
-  }
-};
-
-const storeTheme = (theme) => {
-  try {
-    localStorage.setItem(themeStorageKey, theme);
-  } catch (error) {
-    return;
-  }
-};
-
-const createThemeSwitcher = () => {
-  let activeTheme = readStoredTheme();
-
-  if (!availableThemes.includes(activeTheme)) {
-    activeTheme = "ocean";
-  }
-
-  document.documentElement.dataset.theme = activeTheme;
-
-  const switcher = document.createElement("div");
-  switcher.className = "theme-switcher";
-  switcher.setAttribute("aria-label", "Color theme");
-
-  availableThemes.forEach((theme) => {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.dataset.themeChoice = theme;
-    button.setAttribute("aria-label", theme === "amber" ? "Use amber theme" : "Use ocean theme");
-    button.setAttribute("aria-pressed", String(theme === activeTheme));
-    switcher.appendChild(button);
-  });
-
-  switcher.addEventListener("click", (event) => {
-    const button = event.target.closest("[data-theme-choice]");
-    if (!button) return;
-
-    const nextTheme = button.dataset.themeChoice;
-    if (!availableThemes.includes(nextTheme)) return;
-
-    document.documentElement.dataset.theme = nextTheme;
-    storeTheme(nextTheme);
-
-    switcher.querySelectorAll("[data-theme-choice]").forEach((themeButton) => {
-      themeButton.setAttribute("aria-pressed", String(themeButton.dataset.themeChoice === nextTheme));
-    });
-  });
-
-  document.body.appendChild(switcher);
-};
-
-createThemeSwitcher();
 
 whatsappLinks.forEach((link) => {
   link.href = prefersMobileWhatsApp ? link.dataset.mobileHref : link.dataset.desktopHref;
@@ -86,10 +26,22 @@ contactToast.setAttribute("aria-live", "polite");
 
 const showContactToast = (type, title, message) => {
   contactToast.dataset.status = type;
+  const iconPath = type === "success"
+    ? '<path d="M20 6 9 17l-5-5"/>'
+    : '<path d="M12 8v5"/><path d="M12 17h.01"/><path d="M10.3 3.9 2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/>';
+
   contactToast.innerHTML = `
-    <strong>${title}</strong>
-    <span>${message}</span>
+    <span class="contact-toast-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24">${iconPath}</svg>
+    </span>
+    <span class="contact-toast-copy">
+      <strong></strong>
+      <span></span>
+    </span>
   `;
+
+  contactToast.querySelector("strong").textContent = title;
+  contactToast.querySelector(".contact-toast-copy span").textContent = message;
 
   if (!contactToast.isConnected) {
     document.body.appendChild(contactToast);
@@ -100,7 +52,7 @@ const showContactToast = (type, title, message) => {
 
   showContactToast.timeoutId = window.setTimeout(() => {
     contactToast.classList.remove("is-visible");
-  }, 6200);
+  }, 5600);
 };
 
 const setContactSubmitState = (form, isSubmitting) => {
@@ -155,8 +107,8 @@ contactForm?.addEventListener("submit", async (event) => {
     contactForm.reset();
     showContactToast(
       "success",
-      "Message sent to Ashok.",
-      "You will get a response as soon as possible, so please keep your phone handy."
+      "Message sent successfully.",
+      "Thanks for reaching out. I'll review your message and get back to you as soon as possible."
     );
   } catch (error) {
     showContactToast(
@@ -177,7 +129,7 @@ const expertise = [
     desc1: "Scalable enterprise apps with Atlas UI, microflows, and end-to-end cloud deployment.",
     chips: ["Atlas UI", "Microflows"],
     score: 92,
-    tone: "#00d6c6"
+    tone: "#8f85ff"
   },
   {
     title: "Figma",
@@ -186,7 +138,7 @@ const expertise = [
     desc1: "Pixel-perfect wireframing, prototyping, and component systems dev-ready from day one.",
     chips: ["Prototypes", "Components"],
     score: 95,
-    tone: "#8f72ff"
+    tone: "#8f85ff"
   },
   {
     title: "Design System",
@@ -195,7 +147,7 @@ const expertise = [
     desc1: "Token architecture to variant logic, building consistency at every scale.",
     chips: ["Tokens", "Variants"],
     score: 90,
-    tone: "#00d6c6"
+    tone: "#8f85ff"
   },
   {
     title: "Widgets",
@@ -204,7 +156,7 @@ const expertise = [
     desc1: "Custom Mendix widgets built with React and TypeScript, extending platform capabilities.",
     chips: ["React", "TypeScript"],
     score: 87,
-    tone: "#409cff"
+    tone: "#8f85ff"
   },
   {
     title: "Frontend Dev",
@@ -213,7 +165,7 @@ const expertise = [
     desc1: "Responsive, accessible, high-performing interfaces with strong usability and visual engagement.",
     chips: ["Responsive", "Accessibility"],
     score: 88,
-    tone: "#409cff"
+    tone: "#8f85ff"
   },
   {
     title: "JavaScript",
@@ -222,7 +174,7 @@ const expertise = [
     desc1: "Dynamic, modular JS architecture for clean interactive components.",
     chips: ["DOM", "Modules"],
     score: 85,
-    tone: "#ffd84d"
+    tone: "#8f85ff"
   },
   {
     title: "SCSS",
@@ -231,7 +183,7 @@ const expertise = [
     desc1: "Modular, maintainable SCSS with mixins, functions, and scalable responsive systems.",
     chips: ["Mixins", "Responsive"],
     score: 80,
-    tone: "#dc66f0"
+    tone: "#8f85ff"
   },
   {
     title: "Java",
@@ -240,7 +192,7 @@ const expertise = [
     desc1: "Reliable OOP services and APIs powering scalable application logic.",
     chips: ["OOP", "Services"],
     score: 72,
-    tone: "#ff884d"
+    tone: "#8f85ff"
   }
 ];
 
@@ -791,7 +743,10 @@ const initWallOfLoveCarousel = () => {
   let lastTime = performance.now();
   let isHoverPaused = false;
   let isUserPaused = false;
-  const speed = 42;
+  let isDragging = false;
+  let dragStartX = 0;
+  let dragStartOffset = 0;
+  const speed = 34;
 
   const setTrackX = () => {
     if (window.gsap) {
@@ -861,7 +816,7 @@ const initWallOfLoveCarousel = () => {
     const delta = Math.min((time - lastTime) / 1000, 0.05);
     lastTime = time;
 
-    if (!isHoverPaused && !isUserPaused) {
+    if (!isHoverPaused && !isUserPaused && !isDragging) {
       offset -= speed * delta;
       wrapOffset();
       setTrackX();
@@ -882,6 +837,37 @@ const initWallOfLoveCarousel = () => {
   carousel.addEventListener("focusout", () => {
     isHoverPaused = false;
   });
+
+  const getPointerX = (event) => event.clientX ?? event.touches?.[0]?.clientX ?? 0;
+
+  const startDrag = (event) => {
+    isDragging = true;
+    dragStartX = getPointerX(event);
+    dragStartOffset = offset;
+    carousel.classList.add("is-dragging");
+    carousel.setPointerCapture?.(event.pointerId);
+  };
+
+  const moveDrag = (event) => {
+    if (!isDragging) return;
+    offset = dragStartOffset + getPointerX(event) - dragStartX;
+    wrapOffset();
+    setTrackX();
+    setActiveCard();
+  };
+
+  const endDrag = (event) => {
+    if (!isDragging) return;
+    isDragging = false;
+    carousel.classList.remove("is-dragging");
+    carousel.releasePointerCapture?.(event.pointerId);
+  };
+
+  carousel.addEventListener("pointerdown", startDrag);
+  carousel.addEventListener("pointermove", moveDrag);
+  carousel.addEventListener("pointerup", endDrag);
+  carousel.addEventListener("pointercancel", endDrag);
+  carousel.addEventListener("lostpointercapture", endDrag);
 
   prevButton?.addEventListener("click", () => moveByCard(1));
   nextButton?.addEventListener("click", () => moveByCard(-1));

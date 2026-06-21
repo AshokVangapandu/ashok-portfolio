@@ -3,7 +3,7 @@
   --project-blue: #8fb2ff;
   --project-violet: #b89cff;
   --project-rose: #ff8fb8;
-  background: #050609;
+  background: transparent;
 }
 
 .project-main {
@@ -5910,4 +5910,44 @@
 
 .ds-light-hero-inner {
   padding-top: clamp(32px, 5vw, 72px);
+}
+
+/* Unified site background */
+.project-detail-page,
+.project-main,
+.medi-main,
+.vantage-page,
+.vantage-main,
+.ds-page,
+.ds-main,
+.ds-light-hero {
+  background: transparent;
+}
+
+.project-main::before,
+.medi-page .project-main::before,
+.vantage-page .project-main::before,
+.ds-page .project-main::before {
+  background:
+    radial-gradient(circle at 18% 10%, rgba(101, 230, 196, 0.08), transparent 28rem),
+    radial-gradient(circle at 84% 16%, rgba(184, 156, 255, 0.09), transparent 34rem);
+}
+
+.ds-light-hero {
+  color: #f7f8ff;
+}
+
+.ds-light-hero::before {
+  display: none;
+}
+
+.ds-light-hero-copy h1,
+.edith-brand,
+.edith-nav-links a,
+.edith-nav-cta {
+  color: #fff;
+}
+
+.ds-light-hero-copy p:not(.ds-light-badge) {
+  color: rgba(226, 234, 255, 0.68);
 }

@@ -4,22 +4,11 @@
   overflow: hidden;
   isolation: isolate;
   padding: 96px 0 72px;
-  background:
-    radial-gradient(circle at 50% 40%, rgba(96, 70, 205, 0.32), transparent 30rem),
-    radial-gradient(circle at 18% 78%, rgba(17, 124, 150, 0.16), transparent 28rem),
-    linear-gradient(180deg, #080c25 0%, #0b0f2d 48%, #070a1d 100%);
+  background: transparent;
 }
 
 .portfolio-showcase::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
-  background-size: 36px 36px;
-  mask-image: linear-gradient(180deg, transparent 0%, #000 12%, #000 88%, transparent 100%);
+  display: none;
 }
 
 .portfolio-showcase-shell {

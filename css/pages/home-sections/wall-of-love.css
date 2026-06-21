@@ -1,15 +1,14 @@
 /* Wall of Love */
 .heard-section {
-  --wall-bg: #050505;
-  --wall-accent: #ff8c42;
-  --wall-accent-two: #ffb347;
+  --wall-bg: transparent;
+  --wall-accent: #8f85ff;
+  --wall-accent-two: #b8a9ff;
   position: relative;
   overflow: hidden;
   padding: 0 0 118px;
   background:
-    radial-gradient(circle at 14% 40%, rgba(255, 140, 66, 0.08), transparent 26rem),
-    radial-gradient(circle at 84% 24%, rgba(255, 179, 71, 0.055), transparent 30rem),
-    var(--wall-bg);
+    radial-gradient(circle at 14% 40%, rgba(143, 133, 255, 0.055), transparent 26rem),
+    radial-gradient(circle at 84% 24%, rgba(184, 169, 255, 0.04), transparent 30rem);
 }
 
 .heard-section::before,
@@ -117,6 +116,12 @@
   overflow: hidden;
   padding: 0;
   cursor: grab;
+  touch-action: pan-y;
+  user-select: none;
+}
+
+.wall-carousel.is-dragging {
+  cursor: grabbing;
 }
 
 .wall-carousel::before,
@@ -132,12 +137,12 @@
 
 .wall-carousel::before {
   left: 0;
-  background: linear-gradient(90deg, #050505, transparent);
+  background: linear-gradient(90deg, rgba(3, 5, 14, 0.95), transparent);
 }
 
 .wall-carousel::after {
   right: 0;
-  background: linear-gradient(270deg, #050505, transparent);
+  background: linear-gradient(270deg, rgba(3, 5, 14, 0.95), transparent);
 }
 
 .wall-marquee {
@@ -154,12 +159,15 @@
   flex-direction: column;
   gap: 16px;
   padding: 28px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 28px;
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(10px);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.045);
-  opacity: 0.75;
+  border: 1px solid rgba(180, 188, 255, 0.09);
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 82% 8%, rgba(143, 133, 255, 0.055), transparent 36%),
+    rgba(255, 255, 255, 0.026);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  opacity: 0.78;
   transform: scale(0.96);
   transition: transform 300ms ease, opacity 300ms ease, border-color 300ms ease, box-shadow 300ms ease, background 300ms ease;
 }
@@ -167,14 +175,29 @@
 .wall-card.is-active {
   opacity: 1;
   transform: scale(1);
-  border-color: rgba(255, 140, 66, 0.22);
-  box-shadow: 0 0 30px rgba(255, 140, 66, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  border-color: rgba(143, 133, 255, 0.18);
+  box-shadow: 0 0 21px rgba(143, 133, 255, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.055);
 }
 
 .wall-card:hover {
   transform: translateY(-8px) scale(1);
-  border-color: rgba(255, 140, 66, 0.3);
-  box-shadow: 0 0 30px rgba(255, 140, 66, 0.15), 0 22px 70px rgba(0, 0, 0, 0.28);
+  border-color: rgba(143, 133, 255, 0.24);
+  box-shadow: 0 0 22px rgba(143, 133, 255, 0.1), 0 22px 70px rgba(0, 0, 0, 0.24);
+}
+
+.wall-card-compact {
+  min-height: 382px;
+}
+
+.wall-card-tall {
+  min-height: 458px;
+}
+
+.wall-card-system,
+.wall-card-metric {
+  background:
+    radial-gradient(circle at 18% 12%, rgba(143, 133, 255, 0.08), transparent 34%),
+    rgba(255, 255, 255, 0.028);
 }
 
 .wall-card-top {
@@ -188,14 +211,39 @@
   width: 62px;
   height: 62px;
   object-fit: cover;
-  border: 2px solid rgba(255, 140, 66, 0.28);
+  border: 2px solid rgba(143, 133, 255, 0.24);
   border-radius: 50%;
-  box-shadow: 0 0 0 6px rgba(255, 140, 66, 0.055);
+  box-shadow: 0 0 0 6px rgba(143, 133, 255, 0.045);
+  pointer-events: none;
+}
+
+.wall-avatar {
+  display: grid;
+  width: 62px;
+  height: 62px;
+  place-items: center;
+  border: 1px solid rgba(143, 133, 255, 0.26);
+  border-radius: 50%;
+  color: rgba(238, 240, 255, 0.9);
+  background:
+    radial-gradient(circle at 32% 20%, rgba(255, 255, 255, 0.12), transparent 38%),
+    linear-gradient(145deg, rgba(143, 133, 255, 0.24), rgba(143, 133, 255, 0.065));
+  box-shadow: 0 0 0 6px rgba(143, 133, 255, 0.04);
+  font-size: 14px;
+  font-weight: 820;
 }
 
 .wall-card-stars {
   font-size: 13px;
   line-height: 1;
+}
+
+.wall-card-stars span {
+  margin-left: 7px;
+  color: rgba(203, 209, 255, 0.68);
+  font-size: 11px;
+  font-weight: 780;
+  letter-spacing: 0;
 }
 
 .wall-card h3 {
@@ -228,12 +276,37 @@
 
 .wall-tags span {
   padding: 7px 10px;
-  border: 1px solid rgba(255, 140, 66, 0.18);
+  border: 1px solid rgba(143, 133, 255, 0.14);
   border-radius: 999px;
-  color: rgba(255, 179, 71, 0.82);
-  background: rgba(255, 140, 66, 0.055);
+  color: rgba(203, 209, 255, 0.72);
+  background: rgba(143, 133, 255, 0.052);
   font-size: 11px;
   line-height: 1;
+}
+
+.wall-card-metric-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: auto;
+  padding: 13px 14px;
+  border: 1px solid rgba(143, 133, 255, 0.12);
+  border-radius: 16px;
+  background: rgba(143, 133, 255, 0.045);
+}
+
+.wall-card-metric-row strong {
+  color: #ffffff;
+  font-size: 28px;
+  line-height: 1;
+}
+
+.wall-card-metric-row span {
+  color: rgba(157, 169, 194, 0.7);
+  font-size: 11px;
+  font-weight: 760;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .wall-controls {
@@ -260,14 +333,14 @@
 
 .wall-control:hover {
   transform: translateY(-2px);
-  border-color: rgba(255, 140, 66, 0.32);
+  border-color: rgba(143, 133, 255, 0.28);
   color: #ffffff;
-  background: rgba(255, 140, 66, 0.08);
+  background: rgba(143, 133, 255, 0.075);
 }
 
 .wall-toggle {
-  color: #050505;
-  border-color: rgba(255, 140, 66, 0.9);
+  color: #ffffff;
+  border-color: rgba(143, 133, 255, 0.52);
   background: linear-gradient(135deg, var(--wall-accent), var(--wall-accent-two));
 }
 

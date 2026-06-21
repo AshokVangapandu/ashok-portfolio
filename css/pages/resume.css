@@ -1,6 +1,6 @@
 /* Resume Page */
 .resume-page {
-  background: #030712;
+  background: transparent;
 }
 
 .resume-main {
@@ -18,6 +18,10 @@
     radial-gradient(ellipse at 14% 14%, rgba(126, 91, 255, 0.16), transparent 32rem),
     radial-gradient(ellipse at 86% 12%, rgba(55, 193, 255, 0.13), transparent 34rem),
     radial-gradient(ellipse at 48% 92%, rgba(101, 230, 196, 0.1), transparent 34rem);
+}
+
+.resume-main {
+  background: transparent;
 }
 
 .resume-shell {

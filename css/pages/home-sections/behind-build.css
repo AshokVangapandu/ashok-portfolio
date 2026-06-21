@@ -3,8 +3,7 @@
   padding: 88px 0 0;
   background:
     radial-gradient(circle at 10% 8%, rgba(0, 214, 198, 0.08), transparent 28rem),
-    radial-gradient(circle at 78% 18%, rgba(143, 114, 255, 0.08), transparent 30rem),
-    #071121;
+    radial-gradient(circle at 78% 18%, rgba(143, 114, 255, 0.08), transparent 30rem);
 }
 
 .behind-build::before,

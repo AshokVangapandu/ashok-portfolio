@@ -35,9 +35,9 @@ body {
   min-height: 100vh;
   overflow-x: hidden;
   background:
-    radial-gradient(circle at 50% -20%, rgba(101, 230, 196, 0.08), transparent 32rem),
-    radial-gradient(circle at 0% 10%, rgba(255, 125, 167, 0.055), transparent 28rem),
-    var(--bg);
+    radial-gradient(circle at 50% 40%, rgba(96, 70, 205, 0.32), transparent 30rem),
+    radial-gradient(circle at 18% 78%, rgba(17, 124, 150, 0.16), transparent 28rem),
+    linear-gradient(180deg, #080c25 0%, #0b0f2d 48%, #070a1d 100%);
   color: var(--text);
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-weight: 500;
@@ -57,11 +57,9 @@ body::before {
   z-index: -4;
   pointer-events: none;
   background:
-    radial-gradient(circle at 12% 10%, rgba(74, 124, 255, 0.15), transparent 24rem),
-    radial-gradient(circle at 84% 34%, rgba(142, 102, 255, 0.13), transparent 28rem),
-    radial-gradient(circle at 50% 100%, rgba(71, 212, 255, 0.12), transparent 30rem),
-    radial-gradient(circle at 26% 72%, rgba(101, 230, 196, 0.08), transparent 24rem),
-    linear-gradient(180deg, #020617 0%, #030712 24%, #071838 58%, #090d22 100%);
+    radial-gradient(circle at 50% 40%, rgba(96, 70, 205, 0.32), transparent 30rem),
+    radial-gradient(circle at 18% 78%, rgba(17, 124, 150, 0.16), transparent 28rem),
+    linear-gradient(180deg, #080c25 0%, #0b0f2d 48%, #070a1d 100%);
 }
 
 a {
@@ -92,30 +90,38 @@ button {
 .site-bg::before {
   content: "";
   position: absolute;
-  inset: -8%;
-  opacity: 0.08;
+  inset: -14%;
+  z-index: 1;
+  opacity: 1;
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px),
-    linear-gradient(115deg, transparent 0 46%, rgba(101, 230, 196, 0.16) 50%, transparent 54%),
-    linear-gradient(35deg, transparent 0 47%, rgba(184, 156, 255, 0.13) 50%, transparent 53%);
-  background-size: 96px 96px, 96px 96px, 520px 520px, 620px 620px;
-  mask-image: radial-gradient(circle at 50% 32%, rgba(0, 0, 0, 0.82), transparent 74%);
-  animation: gridDrift 34s linear infinite, meshSweep 24s ease-in-out infinite alternate;
+    linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
+  background-size: 36px 36px;
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.72), #000 14%, #000 88%, rgba(0, 0, 0, 0.68));
+  transform: translate3d(0, 0, 0);
+  animation: globalGridDrift 46s linear infinite;
+  will-change: transform;
 }
 
 .site-bg::after {
   content: "";
   position: absolute;
-  inset: -18%;
+  inset: 0;
+  z-index: 0;
   opacity: 1;
   background:
-    radial-gradient(circle at 14% 12%, rgba(82, 129, 255, 0.16), transparent 18rem),
-    radial-gradient(circle at 86% 40%, rgba(151, 104, 255, 0.13), transparent 21rem),
-    radial-gradient(circle at 52% 94%, rgba(76, 225, 255, 0.12), transparent 22rem),
-    linear-gradient(120deg, transparent 22%, rgba(255, 125, 167, 0.055), transparent 44%, rgba(101, 230, 196, 0.06), transparent 72%);
-  filter: blur(160px);
-  animation: environmentFloat 32s var(--ease) infinite alternate;
+    radial-gradient(circle at 50% 40%, rgba(96, 70, 205, 0.32), transparent 30rem),
+    radial-gradient(circle at 18% 78%, rgba(17, 124, 150, 0.16), transparent 28rem),
+    linear-gradient(180deg, rgba(8, 12, 37, 0.82) 0%, rgba(11, 15, 45, 0.74) 48%, rgba(7, 10, 29, 0.86) 100%);
+  transform: translate3d(0, 0, 0);
+}
+
+.site-bg .light-ribbon,
+.site-bg .aurora,
+.site-bg .energy-field,
+.site-bg .orb-field,
+.site-bg .particle-field {
+  display: none;
 }
 
 .energy-field,
@@ -458,6 +464,7 @@ body.has-pointer .cursor-light {
   padding: calc(var(--header-height) + 34px) 0 72px;
   isolation: isolate;
   overflow: hidden;
+  background: transparent;
 }
 
 .hero::before,
@@ -1108,7 +1115,7 @@ h1 {
   overflow: hidden;
   padding: 92px 0 118px;
   isolation: isolate;
-  background: #080e1d;
+  background: transparent;
 }
 
 .expertise::before,
@@ -1172,7 +1179,8 @@ h1 {
 .expertise .section-heading {
   display: grid;
   grid-template-columns: minmax(0, 0.9fr) minmax(280px, 0.78fr);
-  gap: clamp(28px, 8vw, 120px);
+  column-gap: clamp(28px, 8vw, 120px);
+  row-gap: 12px;
   align-items: end;
   max-width: none;
   margin-bottom: 38px;
@@ -1214,9 +1222,11 @@ h1 {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 14px;
+  --expertise-accent: #8f85ff;
 }
 
 .expertise-card {
+  --skill-color: var(--expertise-accent) !important;
   position: relative;
   min-height: 216px;
   overflow: hidden;
@@ -1226,14 +1236,16 @@ h1 {
   justify-content: space-between;
   gap: 18px;
   padding: 18px;
-  border: 1px solid color-mix(in srgb, var(--skill-color) 42%, transparent);
+  border: 1px solid rgba(180, 188, 255, 0.15);
   border-radius: 10px;
   background:
-    radial-gradient(circle at 12% 10%, color-mix(in srgb, var(--skill-color) 15%, transparent), transparent 44%),
-    linear-gradient(180deg, rgba(18, 29, 54, 0.88), rgba(8, 14, 29, 0.86));
+    radial-gradient(circle at 18% 0%, rgba(143, 133, 255, 0.115), transparent 42%),
+    linear-gradient(180deg, rgba(18, 24, 48, 0.68), rgba(7, 11, 28, 0.58));
   box-shadow:
-    0 26px 72px rgba(0, 0, 0, 0.23),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    0 22px 58px rgba(0, 0, 0, 0.19),
+    inset 0 1px 0 rgba(255, 255, 255, 0.055);
+  backdrop-filter: blur(18px) saturate(1.06);
+  -webkit-backdrop-filter: blur(18px) saturate(1.06);
   transform: perspective(800px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(0);
   transition: opacity 520ms var(--ease), transform 320ms var(--ease), border-color 320ms ease, box-shadow 320ms ease;
   will-change: transform;
@@ -1249,29 +1261,29 @@ h1 {
 
 .expertise-card::before {
   inset: 0;
-  opacity: 0.54;
+  opacity: 0.34;
   background:
-    linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.06), transparent),
-    radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--skill-color) 18%, transparent), transparent 36%);
+    linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.045), transparent),
+    radial-gradient(circle at 50% 0%, rgba(143, 133, 255, 0.12), transparent 36%);
   mask-image: linear-gradient(to bottom, #000 0 1px, transparent 42%);
 }
 
 .expertise-card::after {
   inset: auto -18% -46% 12%;
   height: 126px;
-  opacity: 0.16;
+  opacity: 0.07;
   border-radius: 999px;
-  background: var(--skill-color);
+  background: var(--expertise-accent);
   filter: blur(44px);
 }
 
 .expertise-card:hover {
-  transform: perspective(800px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(-6px);
-  border-color: color-mix(in srgb, var(--skill-color) 72%, transparent);
+  transform: perspective(800px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(-5px);
+  border-color: rgba(180, 188, 255, 0.27);
   box-shadow:
-    0 34px 86px rgba(0, 0, 0, 0.32),
-    0 0 42px color-mix(in srgb, var(--skill-color) 18%, transparent),
-    inset 0 1px 0 rgba(255, 255, 255, 0.09);
+    0 30px 78px rgba(0, 0, 0, 0.27),
+    0 0 34px rgba(143, 133, 255, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.085);
 }
 
 .expertise-card:hover::before {
@@ -1279,8 +1291,9 @@ h1 {
 }
 
 .expertise-card:hover .expertise-icon {
-  border-color: color-mix(in srgb, var(--skill-color) 72%, transparent);
-  box-shadow: 0 0 24px color-mix(in srgb, var(--skill-color) 24%, transparent);
+  border-color: rgba(180, 188, 255, 0.32);
+  background: rgba(143, 133, 255, 0.13);
+  box-shadow: 0 0 22px rgba(143, 133, 255, 0.12);
   transform: translateY(-2px) scale(1.035);
 }
 
@@ -1312,11 +1325,13 @@ h1 {
   width: 34px;
   height: 34px;
   place-items: center;
-  border: 1px solid color-mix(in srgb, var(--skill-color) 52%, transparent);
+  border: 1px solid rgba(180, 188, 255, 0.2);
   border-radius: 12px;
-  color: var(--skill-color);
-  background: color-mix(in srgb, var(--skill-color) 13%, transparent);
-  box-shadow: 0 0 22px color-mix(in srgb, var(--skill-color) 12%, transparent);
+  color: #b7c0ff;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.015)),
+    rgba(143, 133, 255, 0.095);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.065);
   transition: transform 360ms var(--ease), color 360ms ease, border-color 360ms ease, background 360ms ease, box-shadow 360ms ease;
 }
 
@@ -1326,9 +1341,9 @@ h1 {
   inset: 8px;
   z-index: 0;
   border-radius: inherit;
-  background: var(--skill-color);
+  background: var(--expertise-accent);
   filter: blur(10px);
-  opacity: 0.28;
+  opacity: 0.12;
 }
 
 .expertise-icon svg {
@@ -1337,6 +1352,11 @@ h1 {
   width: 19px;
   height: 19px;
   filter: none;
+}
+
+.expertise-icon .brand-icon * {
+  fill: currentColor !important;
+  stroke: currentColor !important;
 }
 
 .expertise-icon svg:not(.brand-icon) {
@@ -1352,14 +1372,14 @@ h1 {
   position: relative;
   z-index: 1;
   display: grid;
-  gap: 18px;
+  gap: 20px;
   width: 100%;
 }
 
 .expertise-signal,
 .expertise-score,
 .expertise-tags span {
-  color: rgba(151, 166, 201, 0.78);
+  color: rgba(154, 166, 204, 0.66);
   font-size: 10px;
   font-weight: 750;
   line-height: 1;
@@ -1377,17 +1397,19 @@ h1 {
 .expertise-score {
   position: relative;
   z-index: 1;
-  padding: 7px 8px;
-  border: 1px solid color-mix(in srgb, var(--skill-color) 42%, transparent);
+  padding: 5px 7px;
+  border: 1px solid rgba(180, 188, 255, 0.16);
   border-radius: 8px;
-  color: var(--skill-color);
-  background: color-mix(in srgb, var(--skill-color) 12%, transparent);
+  color: rgba(198, 204, 255, 0.68);
+  background: rgba(255, 255, 255, 0.026);
+  font-size: 9px;
+  font-weight: 680;
   letter-spacing: 0;
   text-transform: none;
 }
 
 .expertise-card h3 {
-  color: #ffffff;
+  color: rgba(249, 250, 255, 0.98);
   font-size: 19px;
   line-height: 1.08;
   font-weight: 780;
@@ -1396,7 +1418,7 @@ h1 {
 
 .expertise-card p {
   max-width: 30ch;
-  color: rgba(151, 166, 201, 0.78);
+  color: rgba(160, 172, 205, 0.66);
   font-size: 13px;
   line-height: 1.55;
   font-weight: 500;
@@ -1405,7 +1427,7 @@ h1 {
 .expertise-card-bottom {
   flex-direction: column;
   align-items: flex-start;
-  gap: 14px;
+  gap: 16px;
   padding-top: 0;
   border-top: 0;
 }
@@ -1413,10 +1435,10 @@ h1 {
 .expertise-meter {
   position: relative;
   width: 100%;
-  height: 4px;
+  height: 3px;
   overflow: hidden;
   border-radius: 999px;
-  background: rgba(39, 53, 84, 0.92);
+  background: rgba(94, 105, 148, 0.22);
 }
 
 .expertise-meter span {
@@ -1424,23 +1446,32 @@ h1 {
   width: var(--skill-score);
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, color-mix(in srgb, var(--skill-color) 82%, #ffffff), var(--skill-color));
-  box-shadow: 0 0 18px color-mix(in srgb, var(--skill-color) 28%, transparent);
+  background: linear-gradient(90deg, rgba(196, 202, 255, 0.92), rgba(143, 133, 255, 0.86));
+  box-shadow: 0 0 12px rgba(143, 133, 255, 0.16);
+  transform-origin: left;
+  transition: transform 520ms var(--ease), box-shadow 320ms ease;
+}
+
+.expertise-card:hover .expertise-meter span {
+  transform: scaleX(1.015);
+  box-shadow: 0 0 18px rgba(143, 133, 255, 0.24);
 }
 
 .expertise-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 5px;
   min-width: 0;
 }
 
 .expertise-tags span {
-  padding: 6px 8px;
-  border: 1px solid color-mix(in srgb, var(--skill-color) 32%, transparent);
+  padding: 5px 7px;
+  border: 1px solid rgba(180, 188, 255, 0.13);
   border-radius: 7px;
-  color: var(--skill-color);
-  background: color-mix(in srgb, var(--skill-color) 9%, transparent);
+  color: rgba(198, 204, 255, 0.72);
+  background: rgba(255, 255, 255, 0.024);
+  font-size: 9px;
+  font-weight: 650;
   letter-spacing: 0;
   text-transform: none;
 }
@@ -1779,7 +1810,7 @@ h1 {
 }
 
 .expertise-card.reveal-on-scroll.is-visible:hover {
-  transform: perspective(800px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(-6px);
+  transform: perspective(800px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(-5px);
 }
 
 h1.reveal {
@@ -1902,6 +1933,12 @@ h1.reveal {
 @keyframes gridDrift {
   to {
     transform: translate3d(-96px, -96px, 0);
+  }
+}
+
+@keyframes globalGridDrift {
+  to {
+    transform: translate3d(-36px, 36px, 0);
   }
 }
 
@@ -3686,6 +3723,12 @@ h1.reveal {
   .animated-section {
     opacity: 1;
     transform: none;
+  }
+
+  .site-bg::before,
+  .site-bg::after {
+    animation: none !important;
+    transform: none !important;
   }
 }
 

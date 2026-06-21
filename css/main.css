@@ -1,8 +1,6 @@
 @import url("./base/variables.css");
-@import url("./base/themes.css");
 @import url("./base/reset.css");
 @import url("./base/typography.css");
-@import url("./components/theme-switcher.css");
 @import url("./components/navbar.css");
 @import url("./components/footer.css");
 @import url("./components/cards.css");
