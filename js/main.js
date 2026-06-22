@@ -129,7 +129,7 @@ const expertise = [
     desc1: "Scalable enterprise apps with Atlas UI, microflows, and end-to-end cloud deployment.",
     chips: ["Atlas UI", "Microflows"],
     score: 92,
-    tone: "#8f85ff"
+    tone: "#5cdbb5"
   },
   {
     title: "Figma",
@@ -138,7 +138,7 @@ const expertise = [
     desc1: "Pixel-perfect wireframing, prototyping, and component systems dev-ready from day one.",
     chips: ["Prototypes", "Components"],
     score: 95,
-    tone: "#8f85ff"
+    tone: "#ff85a2"
   },
   {
     title: "Design System",
@@ -147,7 +147,7 @@ const expertise = [
     desc1: "Token architecture to variant logic, building consistency at every scale.",
     chips: ["Tokens", "Variants"],
     score: 90,
-    tone: "#8f85ff"
+    tone: "#a78bfa"
   },
   {
     title: "Widgets",
@@ -156,7 +156,7 @@ const expertise = [
     desc1: "Custom Mendix widgets built with React and TypeScript, extending platform capabilities.",
     chips: ["React", "TypeScript"],
     score: 87,
-    tone: "#8f85ff"
+    tone: "#60a5fa"
   },
   {
     title: "Frontend Dev",
@@ -165,7 +165,7 @@ const expertise = [
     desc1: "Responsive, accessible, high-performing interfaces with strong usability and visual engagement.",
     chips: ["Responsive", "Accessibility"],
     score: 88,
-    tone: "#8f85ff"
+    tone: "#34d399"
   },
   {
     title: "JavaScript",
@@ -174,7 +174,7 @@ const expertise = [
     desc1: "Dynamic, modular JS architecture for clean interactive components.",
     chips: ["DOM", "Modules"],
     score: 85,
-    tone: "#8f85ff"
+    tone: "#fbbf24"
   },
   {
     title: "SCSS",
@@ -183,7 +183,7 @@ const expertise = [
     desc1: "Modular, maintainable SCSS with mixins, functions, and scalable responsive systems.",
     chips: ["Mixins", "Responsive"],
     score: 80,
-    tone: "#8f85ff"
+    tone: "#f472b6"
   },
   {
     title: "Java",
@@ -192,7 +192,7 @@ const expertise = [
     desc1: "Reliable OOP services and APIs powering scalable application logic.",
     chips: ["OOP", "Services"],
     score: 72,
-    tone: "#8f85ff"
+    tone: "#fb923c"
   }
 ];
 
@@ -744,6 +744,8 @@ const initWallOfLoveCarousel = () => {
   let isHoverPaused = false;
   let isUserPaused = false;
   let isDragging = false;
+  let isAnimating = false;
+  let slideTween = null;
   let dragStartX = 0;
   let dragStartOffset = 0;
   const speed = 34;
@@ -806,17 +808,43 @@ const initWallOfLoveCarousel = () => {
   };
 
   const moveByCard = (direction) => {
-    offset += getStepSize() * direction;
-    wrapOffset();
-    setTrackX();
-    setActiveCard();
+    if (window.gsap) {
+      if (slideTween) {
+        slideTween.kill();
+      }
+      
+      wrapOffset();
+      const target = offset + getStepSize() * direction;
+      isAnimating = true;
+      
+      slideTween = window.gsap.to(track, {
+        x: target,
+        duration: 0.75,
+        ease: "power3.out",
+        onUpdate: () => {
+          setActiveCard();
+        },
+        onComplete: () => {
+          offset = target;
+          wrapOffset();
+          setTrackX();
+          isAnimating = false;
+          slideTween = null;
+        }
+      });
+    } else {
+      offset += getStepSize() * direction;
+      wrapOffset();
+      setTrackX();
+      setActiveCard();
+    }
   };
 
   const tick = (time) => {
     const delta = Math.min((time - lastTime) / 1000, 0.05);
     lastTime = time;
 
-    if (!isHoverPaused && !isUserPaused && !isDragging) {
+    if (!isHoverPaused && !isUserPaused && !isDragging && !isAnimating) {
       offset -= speed * delta;
       wrapOffset();
       setTrackX();
@@ -841,6 +869,11 @@ const initWallOfLoveCarousel = () => {
   const getPointerX = (event) => event.clientX ?? event.touches?.[0]?.clientX ?? 0;
 
   const startDrag = (event) => {
+    if (slideTween) {
+      slideTween.kill();
+      slideTween = null;
+      isAnimating = false;
+    }
     isDragging = true;
     dragStartX = getPointerX(event);
     dragStartOffset = offset;
