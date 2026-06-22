@@ -922,7 +922,7 @@ h1 {
 .profile-image {
   position: absolute;
   left: 50%;
-  top: 51%;
+  top: calc(56% + 20px);
   width: auto;
   height: 140%;
   max-width: none;
