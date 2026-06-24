@@ -129,7 +129,7 @@ const expertise = [
     desc1: "Scalable enterprise apps with Atlas UI, microflows, and end-to-end cloud deployment.",
     chips: ["Atlas UI", "Microflows"],
     score: 92,
-    tone: "#5cdbb5"
+    tone: "#a78bfa"
   },
   {
     title: "Figma",
@@ -138,7 +138,7 @@ const expertise = [
     desc1: "Pixel-perfect wireframing, prototyping, and component systems dev-ready from day one.",
     chips: ["Prototypes", "Components"],
     score: 95,
-    tone: "#ff85a2"
+    tone: "#a78bfa"
   },
   {
     title: "Design System",
@@ -156,7 +156,7 @@ const expertise = [
     desc1: "Custom Mendix widgets built with React and TypeScript, extending platform capabilities.",
     chips: ["React", "TypeScript"],
     score: 87,
-    tone: "#60a5fa"
+    tone: "#a78bfa"
   },
   {
     title: "Frontend Dev",
@@ -165,7 +165,7 @@ const expertise = [
     desc1: "Responsive, accessible, high-performing interfaces with strong usability and visual engagement.",
     chips: ["Responsive", "Accessibility"],
     score: 88,
-    tone: "#34d399"
+    tone: "#a78bfa"
   },
   {
     title: "JavaScript",
@@ -174,7 +174,7 @@ const expertise = [
     desc1: "Dynamic, modular JS architecture for clean interactive components.",
     chips: ["DOM", "Modules"],
     score: 85,
-    tone: "#fbbf24"
+    tone: "#a78bfa"
   },
   {
     title: "SCSS",
@@ -183,7 +183,7 @@ const expertise = [
     desc1: "Modular, maintainable SCSS with mixins, functions, and scalable responsive systems.",
     chips: ["Mixins", "Responsive"],
     score: 80,
-    tone: "#f472b6"
+    tone: "#a78bfa"
   },
   {
     title: "Java",
@@ -192,7 +192,7 @@ const expertise = [
     desc1: "Reliable OOP services and APIs powering scalable application logic.",
     chips: ["OOP", "Services"],
     score: 72,
-    tone: "#fb923c"
+    tone: "#a78bfa"
   }
 ];
 
@@ -611,13 +611,20 @@ anchorLinks.forEach((link) => {
 
     event.preventDefault();
 
-    const headerOffset = header.offsetHeight + 18;
+    const headerOffset = header ? header.offsetHeight + 18 : 100;
     const targetTop = target.getBoundingClientRect().top + window.scrollY - headerOffset;
 
-    window.scrollTo({
-      top: Math.max(targetTop, 0),
-      behavior: "auto"
-    });
+    if (window.lenis) {
+      window.lenis.scrollTo(target, {
+        offset: -headerOffset,
+        duration: 1.2,
+      });
+    } else {
+      window.scrollTo({
+        top: Math.max(targetTop, 0),
+        behavior: "auto"
+      });
+    }
 
     if (window.history.pushState) {
       window.history.pushState(null, "", targetId);
@@ -730,6 +737,17 @@ const initWallOfLoveCarousel = () => {
   const originalCards = Array.from(track.children);
   if (!originalCards.length) return;
 
+  // Dynamically create navigation dots (6 dots) for mobile carousel indicators
+  const dotsContainer = document.createElement("div");
+  dotsContainer.className = "wall-carousel-dots";
+  for (let i = 0; i < 6; i++) {
+    const dot = document.createElement("span");
+    dot.className = "wall-dot";
+    if (i === 0) dot.classList.add("is-active");
+    dotsContainer.appendChild(dot);
+  }
+  carousel.parentNode.appendChild(dotsContainer);
+
   originalCards.forEach((card) => {
     const clone = card.cloneNode(true);
     clone.setAttribute("aria-hidden", "true");
@@ -790,6 +808,16 @@ const initWallOfLoveCarousel = () => {
     cards.forEach((card) => {
       card.classList.toggle("is-active", card === activeCard);
     });
+
+    // Update active mobile dot indicator
+    if (activeCard && dotsContainer) {
+      const activeIndex = cards.indexOf(activeCard);
+      const dotIndex = (activeIndex % originalCards.length) % 6;
+      const dots = dotsContainer.querySelectorAll(".wall-dot");
+      dots.forEach((dot, idx) => {
+        dot.classList.toggle("is-active", idx === dotIndex);
+      });
+    }
   };
 
   const updateToggle = () => {
@@ -926,3 +954,103 @@ const initWallOfLoveCarousel = () => {
 };
 
 initWallOfLoveCarousel();
+
+const initSmoothScrolling = () => {
+  if (typeof Lenis === "undefined") return;
+
+  const lenis = new Lenis({
+    duration: 1.2,
+    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+    smoothWheel: true,
+    smoothTouch: false, // Keep native touch scroll on mobile
+  });
+
+  window.lenis = lenis;
+
+  // Integrate with GSAP ScrollTrigger if available
+  if (window.gsap && window.ScrollTrigger) {
+    window.gsap.registerPlugin(window.ScrollTrigger);
+
+    lenis.on("scroll", window.ScrollTrigger.update);
+
+    window.gsap.ticker.add((time) => {
+      lenis.raf(time * 1000);
+    });
+
+    window.gsap.ticker.lagSmoothing(0);
+  } else {
+    // Fallback if GSAP/ScrollTrigger are not available
+    const raf = (time) => {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    };
+    requestAnimationFrame(raf);
+  }
+
+  // Neon Reading Progress Bar
+  if (!prefersReducedMotion) {
+    const progressBar = document.createElement("div");
+    progressBar.className = "scroll-progress-bar";
+    document.body.appendChild(progressBar);
+
+    if (window.gsap && window.ScrollTrigger) {
+      window.gsap.to(progressBar, {
+        scaleX: 1,
+        ease: "none",
+        scrollTrigger: {
+          trigger: "body",
+          start: "top top",
+          end: "bottom bottom",
+          scrub: true,
+        },
+      });
+    } else {
+      const updateProgressFallback = () => {
+        const scrollPercent = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+        progressBar.style.transform = `scaleX(${scrollPercent / 100})`;
+      };
+      lenis.on("scroll", updateProgressFallback);
+    }
+  }
+
+  // Interactive Velocity-based Card Skewing
+  if (!prefersReducedMotion && window.gsap && window.ScrollTrigger) {
+    const skewElements = document.querySelectorAll(
+      ".expertise-card, .build-node, .portfolio-display-card, .resume-card, .resume-project-card, .resume-identity-card, .widget-teaser-card, .wall-card"
+    );
+
+    if (skewElements.length > 0) {
+      let skewProxy = { skew: 0 };
+      const skewSetter = window.gsap.quickSetter(skewElements, "skewY", "deg");
+      const clampSkew = window.gsap.utils.clamp(-2.5, 2.5); // max 2.5 degrees for premium feel
+
+      window.ScrollTrigger.create({
+        onUpdate: (self) => {
+          const velocity = self.getVelocity();
+          const skewVal = clampSkew(velocity / -350);
+          
+          if (Math.abs(skewVal) > Math.abs(skewProxy.skew)) {
+            skewProxy.skew = skewVal;
+            window.gsap.to(skewProxy, {
+              skew: 0,
+              duration: 0.8,
+              ease: "power3.out",
+              overwrite: "auto",
+              onUpdate: () => skewSetter(skewProxy.skew),
+            });
+          }
+        },
+      });
+
+      // Align transform origin to center
+      window.gsap.set(skewElements, { transformOrigin: "center center", force3D: true });
+    }
+  }
+};
+
+// Initialize after page load
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initSmoothScrolling);
+} else {
+  initSmoothScrolling();
+}
