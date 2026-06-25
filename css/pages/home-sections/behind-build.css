@@ -179,11 +179,7 @@
   border-right: 0;
 }
 
-.build-node:hover,
-.build-node.reveal-on-scroll.is-visible:hover,
-.build-node-2.reveal-on-scroll.is-visible:hover {
-  transform: translateY(-4px);
-}
+
 
 .build-step-index,
 .build-node-3 .build-step-index {
@@ -248,13 +244,6 @@
   transform: none;
 }
 
-.build-node:hover .build-icon,
-.build-node-3:hover .build-icon {
-  color: var(--build-color);
-  border-color: color-mix(in srgb, var(--build-color) 62%, transparent);
-  transform: translateY(-2px);
-  box-shadow: 0 0 34px color-mix(in srgb, var(--build-color) 22%, transparent);
-}
 
 .build-card-copy,
 .build-node-1 .build-card-copy,
@@ -445,4 +434,53 @@
     max-width: none;
   }
 }
+
+/* Disable hover effects on the build flow cards completely */
+.build-node:hover,
+.build-node-1:hover,
+.build-node-2:hover,
+.build-node-3:hover,
+.build-node-4:hover,
+.build-node-5:hover,
+.build-node.reveal-on-scroll.is-visible:hover,
+.build-node-2.reveal-on-scroll.is-visible:hover {
+  transform: none !important;
+  box-shadow: none !important;
+  border-color: transparent rgba(220, 231, 255, 0.105) rgba(220, 231, 255, 0.105) transparent !important;
+}
+
+@media (max-width: 640px) {
+  .build-node:hover,
+  .build-node-1:hover,
+  .build-node-2:hover,
+  .build-node-3:hover,
+  .build-node-4:hover,
+  .build-node-5:hover,
+  .build-node.reveal-on-scroll.is-visible:hover,
+  .build-node-2.reveal-on-scroll.is-visible:hover {
+    border-color: transparent transparent rgba(220, 231, 255, 0.105) transparent !important;
+    box-shadow: none !important;
+  }
+}
+
+.build-node:hover .build-icon,
+.build-node-3:hover .build-icon {
+  color: var(--build-color) !important;
+  border-color: color-mix(in srgb, var(--build-color) 44%, transparent) !important;
+  transform: none !important;
+  box-shadow: 0 0 28px color-mix(in srgb, var(--build-color) 16%, transparent) !important;
+}
+
+.build-node:hover .build-card-copy,
+.build-node-3:hover .build-card-copy {
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.build-node:hover .build-card-copy::before {
+  opacity: 0 !important;
+  animation: none !important;
+}
+
 

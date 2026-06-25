@@ -215,10 +215,7 @@
 }
 
 .hero {
-  background:
-    radial-gradient(circle at 22% 36%, rgba(101, 230, 196, 0.08), transparent 22rem),
-    radial-gradient(circle at 48% 18%, rgba(159, 184, 255, 0.08), transparent 24rem),
-    transparent;
+  background: transparent;
 }
 
 .hero-copy::before {

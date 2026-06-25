@@ -6,9 +6,7 @@
   position: relative;
   overflow: hidden;
   padding: 0 0 118px;
-  background:
-    radial-gradient(circle at 14% 40%, rgba(143, 133, 255, 0.055), transparent 26rem),
-    radial-gradient(circle at 84% 24%, rgba(184, 169, 255, 0.04), transparent 30rem);
+  background: transparent;
 }
 
 .heard-section::before,

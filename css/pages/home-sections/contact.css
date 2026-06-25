@@ -10,6 +10,7 @@
 
 /* Subtle purple vignette/glow only in bottom-left corner */
 .contact-section::after {
+  display: none;
   content: "";
   position: absolute;
   bottom: 0;
@@ -23,6 +24,7 @@
 
 /* Ambient background glows for contact section specifically */
 .contact-bg-glows {
+  display: none;
   position: absolute;
   inset: 0;
   pointer-events: none;

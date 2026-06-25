@@ -1120,6 +1120,7 @@ h1 {
 
 .expertise::before,
 .expertise::after {
+  display: none;
   content: "";
   position: absolute;
   pointer-events: none;
