@@ -6,7 +6,7 @@ const magneticItems = document.querySelectorAll(".magnetic");
 const expertiseGrid = document.querySelector("[data-expertise-grid]");
 const buildFlow = document.querySelector("[data-build-flow]");
 const anchorLinks = document.querySelectorAll('a[href^="#"]');
-const navSectionLinks = document.querySelectorAll('.nav-links a[href^="#"]');
+const navSectionLinks = document.querySelectorAll('.nav-links a[href^="#"], .mobile-nav-container a[href^="#"]');
 const projectNavLinks = document.querySelectorAll('.project-nav a[href^="#"]');
 const floatingProjectNav = document.querySelector(".medi-subnav, .ds-subnav");
 const whatsappLinks = document.querySelectorAll("[data-whatsapp-link]");
