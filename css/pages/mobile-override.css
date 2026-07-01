@@ -119,6 +119,11 @@
   }
 
   /* 3. Hero Layout (Mobile UI Reference style) */
+  .hero {
+    min-height: auto !important;
+    padding: 0 !important;
+  }
+
   .hero-container,
   .hero-copy::before {
     display: none !important; /* Hide desktop hero */
@@ -154,6 +159,7 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transform: translateY(5px) scale(1.15);
   }
 
   .mobile-hero-identity {
@@ -287,7 +293,7 @@
 
   .mobile-about-actions {
     display: flex;
-    gap: 10px;
+    gap: 8px;
     width: 100%;
     margin-top: 6px;
   }
@@ -297,17 +303,29 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 6px;
     height: 44px;
+    min-height: 44px !important;
     border-radius: 10px;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 700;
     text-decoration: none;
     transition: all 0.2s ease;
+    flex: 1;
+    white-space: nowrap;
+    padding: 0 8px;
+  }
+
+  @media (max-width: 350px) {
+    .mobile-btn-primary,
+    .mobile-btn-secondary {
+      font-size: 11px;
+      gap: 4px;
+      padding: 0 6px;
+    }
   }
 
   .mobile-btn-primary {
-    flex: 1.2;
     background: #6C3CFF;
     color: #FFFFFF;
     box-shadow: 0 4px 14px rgba(108, 60, 255, 0.35);
@@ -319,18 +337,21 @@
   }
 
   .mobile-btn-secondary {
-    flex: 1;
-    background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.12);
     color: #FFFFFF;
   }
 
   .mobile-btn-secondary svg {
     stroke: #FFFFFF;
+    fill: none !important;
   }
 
   .mobile-btn-secondary:active {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.16);
     transform: scale(0.98);
   }
 
@@ -373,46 +394,29 @@
   }
 
   .expertise-card {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    min-height: 0 !important;
-    padding: 14px 16px !important;
+    display: grid !important;
+    grid-template-columns: auto 1fr auto !important;
+    grid-template-rows: auto auto auto auto !important;
+    gap: 12px 10px !important;
+    padding: 20px !important;
     background: #140E2D !important;
-    border: 1px solid rgba(108, 60, 255, 0.12) !important;
-    border-radius: 12px !important;
-    gap: 12px !important;
-    position: relative !important;
+    border: 1px solid rgba(108, 60, 255, 0.14) !important;
+    border-radius: 16px !important;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.16) !important;
-    transform: none !important; /* Disable 3D tilt effects on mobile */
+    transform: none !important;
+    min-height: auto !important;
   }
 
-  .expertise-card::before {
-    display: none !important; /* Hide complex hovers */
-  }
-
-  .expertise-card-bottom,
-  .expertise-score,
-  .expertise-signal {
-    display: none !important; /* Hide score/bottom tags */
-  }
-
-  .expertise-card-top {
-    display: flex !important;
-    align-items: center !important;
-    flex: 1 !important;
-    padding: 0 !important;
-    border: none !important;
-  }
-
-  .expertise-card-meta {
-    display: flex !important;
-    align-items: center !important;
-    gap: 12px !important;
+  .expertise-card-top,
+  .expertise-card-meta,
+  .expertise-card-copy,
+  .expertise-card-bottom {
+    display: contents !important;
   }
 
   .expertise-icon {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
     width: 36px !important;
     height: 36px !important;
     border-radius: 8px !important;
@@ -429,37 +433,87 @@
     height: 18px !important;
   }
 
-  .expertise-card-copy {
-    padding: 0 !important;
-    flex: 1 !important;
+  .expertise-card h3 {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    align-self: center !important;
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    color: #FFFFFF !important;
+    margin: 0 0 0 4px !important;
     text-align: left !important;
   }
 
-  .expertise-card-copy h3 {
-    font-size: 14.5px !important;
+  .expertise-score {
+    grid-column: 3 !important;
+    grid-row: 1 !important;
+    align-self: center !important;
+    justify-self: end !important;
+    padding: 5px 9px !important;
+    border: 1px solid rgba(108, 60, 255, 0.2) !important;
+    border-radius: 99px !important;
+    color: #8F72FF !important;
+    background: rgba(108, 60, 255, 0.1) !important;
+    font-size: 11px !important;
     font-weight: 700 !important;
-    color: #FFFFFF !important;
-    margin: 0 0 3px !important;
+    letter-spacing: 0 !important;
+    text-transform: none !important;
   }
 
-  .expertise-card-copy p {
-    font-size: 12px !important;
-    line-height: 1.4 !important;
-    color: #A1A1AA !important;
-    margin: 0 !important;
+  .expertise-card p {
+    grid-column: 1 / -1 !important;
+    grid-row: 2 !important;
+    font-size: 12.5px !important;
+    line-height: 1.5 !important;
+    color: rgba(255, 255, 255, 0.6) !important;
+    margin: 4px 0 0 0 !important;
+    text-align: left !important;
+    max-width: 100% !important;
   }
 
-  /* Chevron arrow glyph on the right */
-  .expertise-card::after {
-    content: "" !important;
-    width: 14px;
-    height: 14px;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238F72FF' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='9 18 15 12 9 6'/%3E%3C/svg%3E") !important;
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    flex-shrink: 0 !important;
-    opacity: 0.8;
+  .expertise-meter {
+    grid-column: 1 / -1 !important;
+    grid-row: 3 !important;
+    width: 100% !important;
+    height: 3px !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-radius: 999px !important;
+    margin: 6px 0 !important;
+    position: relative !important;
+    overflow: hidden !important;
+  }
+
+  .expertise-meter span {
+    display: block !important;
+    width: var(--skill-score) !important;
+    height: 100% !important;
+    background: linear-gradient(90deg, #8F72FF, #6C3CFF) !important;
+    box-shadow: 0 0 8px rgba(108, 60, 255, 0.5) !important;
+  }
+
+  .expertise-tags {
+    grid-column: 1 / -1 !important;
+    grid-row: 4 !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+    margin-top: 4px !important;
+  }
+
+  .expertise-tags span {
+    padding: 5px 10px !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 6px !important;
+    color: rgba(255, 255, 255, 0.6) !important;
+    font-size: 10px !important;
+    font-weight: 600 !important;
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+  }
+
+  .expertise-signal {
+    display: none !important;
   }
 
   /* Mobile Capability Grid (Hero Cards) */
