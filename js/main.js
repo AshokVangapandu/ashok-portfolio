@@ -55,31 +55,139 @@ const showContactToast = (type, title, message) => {
   }, 5600);
 };
 
+// Initialize Supabase Client
+const supabaseUrl = "https://txoszrnjkrlbjzpjisvp.supabase.co";
+const supabaseKey = "sb_publishable_DS3aReX7DKPTUeFrfndvAQ_4p7QTYfB";
+const supabaseClient = window.supabase ? window.supabase.createClient(supabaseUrl, supabaseKey) : null;
+
+// Validation UI Helpers
+const showFieldError = (inputElement, errorMessage) => {
+  const group = inputElement.closest(".contact-form-group");
+  if (!group) return;
+
+  group.classList.add("has-error");
+  let errorSpan = group.querySelector(".validation-error");
+  if (!errorSpan) {
+    errorSpan = document.createElement("span");
+    errorSpan.className = "validation-error";
+    group.appendChild(errorSpan);
+  }
+  errorSpan.textContent = errorMessage;
+};
+
+const clearFieldError = (inputElement) => {
+  const group = inputElement.closest(".contact-form-group");
+  if (!group) return;
+
+  group.classList.remove("has-error");
+  const errorSpan = group.querySelector(".validation-error");
+  if (errorSpan) {
+    errorSpan.remove();
+  }
+};
+
+const validateContactForm = (form) => {
+  let isValid = true;
+  const nameInput = form.querySelector("#contact-name");
+  const emailInput = form.querySelector("#contact-email");
+  const subjectInput = form.querySelector("#contact-subject");
+  const messageInput = form.querySelector("#contact-message");
+
+  // Validate Name
+  const nameVal = nameInput.value.trim();
+  nameInput.value = nameVal;
+  if (!nameVal) {
+    showFieldError(nameInput, "Name is required.");
+    isValid = false;
+  } else {
+    clearFieldError(nameInput);
+  }
+
+  // Validate Email
+  const emailVal = emailInput.value.trim();
+  emailInput.value = emailVal;
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailVal) {
+    showFieldError(emailInput, "Email is required.");
+    isValid = false;
+  } else if (!emailRegex.test(emailVal)) {
+    showFieldError(emailInput, "Please enter a valid email address.");
+    isValid = false;
+  } else {
+    clearFieldError(emailInput);
+  }
+
+  // Validate Subject
+  const subjectVal = subjectInput.value.trim();
+  subjectInput.value = subjectVal;
+  if (!subjectVal) {
+    showFieldError(subjectInput, "Subject is required.");
+    isValid = false;
+  } else {
+    clearFieldError(subjectInput);
+  }
+
+  // Validate Message
+  const messageVal = messageInput.value.trim();
+  messageInput.value = messageVal;
+  if (!messageVal) {
+    showFieldError(messageInput, "Message is required.");
+    isValid = false;
+  } else {
+    clearFieldError(messageInput);
+  }
+
+  return isValid;
+};
+
+// Setup real-time validation clear handlers
+if (contactForm) {
+  const inputs = contactForm.querySelectorAll("input, textarea");
+  inputs.forEach(input => {
+    input.addEventListener("input", () => {
+      if (input.value.trim()) {
+        if (input.id === "contact-email") {
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          if (emailRegex.test(input.value.trim())) {
+            clearFieldError(input);
+          }
+        } else {
+          clearFieldError(input);
+        }
+      }
+    });
+  });
+}
+
 const setContactSubmitState = (form, isSubmitting) => {
   const submitButton = form.querySelector(".contact-submit");
-  const submitLabel = submitButton?.querySelector("span");
-
-  if (!submitButton || !submitLabel) return;
-
+  const submitLabel = submitButton.querySelector("span:not(.spinner)");
   submitButton.disabled = isSubmitting;
   submitButton.setAttribute("aria-busy", String(isSubmitting));
-  submitLabel.textContent = isSubmitting ? "Sending..." : "Send Message";
+  
+  if (isSubmitting) {
+    submitLabel.textContent = "Sending...";
+    submitButton.classList.add("loading");
+  } else {
+    submitLabel.textContent = "Send Message";
+    submitButton.classList.remove("loading");
+  }
 };
 
 contactForm?.addEventListener("submit", async (event) => {
   event.preventDefault();
 
-  if (!contactForm.checkValidity()) {
-    contactForm.reportValidity();
+  // Perform client-side validation
+  if (!validateContactForm(contactForm)) {
     return;
   }
 
-  const accessKey = contactForm.querySelector('[name="access_key"]')?.value.trim();
-  if (!accessKey || accessKey === "PASTE_WEB3FORMS_ACCESS_KEY_HERE") {
+  if (!supabaseClient) {
+    console.error("Supabase client is not loaded.");
     showContactToast(
       "error",
-      "Email key missing.",
-      "Add your Web3Forms access key in the contact form, then messages will come directly to your inbox."
+      "Something went wrong while sending your message.",
+      "Please try again in a few moments."
     );
     return;
   }
@@ -87,34 +195,47 @@ contactForm?.addEventListener("submit", async (event) => {
   setContactSubmitState(contactForm, true);
 
   try {
-    const formData = new FormData(contactForm);
-    const payload = Object.fromEntries(formData);
+    const nameVal = contactForm.querySelector("#contact-name").value.trim();
+    const emailVal = contactForm.querySelector("#contact-email").value.trim();
+    const subjectVal = contactForm.querySelector("#contact-subject").value.trim();
+    const messageVal = contactForm.querySelector("#contact-message").value.trim();
 
-    const response = await fetch(contactForm.action, {
-      method: "POST",
-      body: JSON.stringify(payload),
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json"
-      }
-    });
-    const result = await response.json().catch(() => ({}));
+    const { error } = await supabaseClient
+      .from("contact_messages")
+      .insert([
+        {
+          full_name: nameVal,
+          email: emailVal,
+          subject: subjectVal,
+          message: messageVal,
+          submitted_from: "Portfolio Website",
+          status: "New"
+        }
+      ]);
 
-    if (!response.ok || result.success === false) {
-      throw new Error(result.message || "Message request failed");
+    if (error) {
+      throw error;
     }
 
+    // Success flow
     contactForm.reset();
+    
+    // Clear validation messages and borders
+    contactForm.querySelectorAll("input, textarea").forEach(input => {
+      clearFieldError(input);
+    });
+
     showContactToast(
       "success",
-      "Message sent successfully.",
-      "Thanks for reaching out. I'll review your message and get back to you as soon as possible."
+      "✅ Message Sent Successfully!",
+      "Thank you for reaching out. I've received your message and will get back to you as soon as possible."
     );
   } catch (error) {
+    console.error("Supabase Database error during form submission:", error);
     showContactToast(
       "error",
-      "Message did not send.",
-      error.message || "Please try again in a moment, or email Ashok directly at ashokvangapandu45@gmail.com."
+      "Something went wrong while sending your message.",
+      "Please try again in a few moments."
     );
   } finally {
     setContactSubmitState(contactForm, false);
