@@ -245,7 +245,7 @@ contactForm?.addEventListener("submit", async (event) => {
 const expertise = [
   {
     title: "Mendix",
-    icon: "mendix-brand",
+    icon: "assets/images/Mendix-Brandmark.webp",
     signal: "Low-code delivery",
     desc1: "Scalable enterprise apps with Atlas UI, microflows, and end-to-end cloud deployment.",
     chips: ["Atlas UI", "Microflows"],
@@ -254,7 +254,7 @@ const expertise = [
   },
   {
     title: "Figma",
-    icon: "figma-brand",
+    icon: "assets/images/FigmaImage.png",
     signal: "Product design",
     desc1: "Pixel-perfect wireframing, prototyping, and component systems dev-ready from day one.",
     chips: ["Prototypes", "Components"],
@@ -263,7 +263,7 @@ const expertise = [
   },
   {
     title: "Design System",
-    icon: "design-system-brand",
+    icon: "assets/images/design-system.webp",
     signal: "Reusable patterns",
     desc1: "Token architecture to variant logic, building consistency at every scale.",
     chips: ["Tokens", "Variants"],
@@ -272,7 +272,7 @@ const expertise = [
   },
   {
     title: "Widgets",
-    icon: "component",
+    icon: "assets/images/Widget.png",
     signal: "Pluggable widgets",
     desc1: "Custom Mendix widgets built with React and TypeScript, extending platform capabilities.",
     chips: ["React", "TypeScript"],
@@ -281,7 +281,7 @@ const expertise = [
   },
   {
     title: "Frontend Dev",
-    icon: "layout-dashboard",
+    icon: "assets/images/front-end.svg",
     signal: "Modern interfaces",
     desc1: "Responsive, accessible, high-performing interfaces with strong usability and visual engagement.",
     chips: ["Responsive", "Accessibility"],
@@ -290,7 +290,7 @@ const expertise = [
   },
   {
     title: "JavaScript",
-    icon: "javascript-brand",
+    icon: "assets/images/javascript-logo.webp",
     signal: "Interactive UI",
     desc1: "Dynamic, modular JS architecture for clean interactive components.",
     chips: ["DOM", "Modules"],
@@ -299,7 +299,7 @@ const expertise = [
   },
   {
     title: "SCSS",
-    icon: "scss-brand",
+    icon: "assets/images/SCSS.png",
     signal: "Style architecture",
     desc1: "Modular, maintainable SCSS with mixins, functions, and scalable responsive systems.",
     chips: ["Mixins", "Responsive"],
@@ -307,12 +307,12 @@ const expertise = [
     tone: "#a78bfa"
   },
   {
-    title: "Java",
-    icon: "java-brand",
-    signal: "Backend logic",
-    desc1: "Reliable OOP services and APIs powering scalable application logic.",
-    chips: ["OOP", "Services"],
-    score: 72,
+    title: "AI Product Building",
+    icon: "sparkles",
+    signal: "AI-POWERED DEVELOPMENT",
+    desc1: "Leveraging AI to design, prototype, and build production-ready applications through modern AI-assisted development workflows.",
+    chips: ["Codex", "AI Agents"],
+    score: 78,
     tone: "#a78bfa"
   }
 ];
@@ -336,7 +336,7 @@ const buildSteps = [
   },
   {
     title: "Build",
-    icon: "hash",
+    icon: "code",
     description: "Transforming designs into scalable digital products through clean systems and reusable components.",
     meta: "03",
     tags: ["Frontend", "Components", "Code"],
@@ -436,6 +436,9 @@ const iconPaths = {
     <path d="M4 9h16"/>
     <path d="M3 15h16"/>
   `,
+  code: `
+    <path d="M7 8L3 11.6923L7 16M17 8L21 11.6923L17 16M14 4L10 20"/>
+  `,
   wand: `
     <path d="M15 4V2"/>
     <path d="M15 10V8"/>
@@ -466,6 +469,11 @@ const iconPaths = {
   "badge-check": `
     <path d="M12 2.5 14.8 5l3.8-.2.9 3.7 3 2.3-1.5 3.5.9 3.7-3.6 1.5-2 3.2-3.3-.8-3.3.8-2-3.2L4 18l.9-3.7-1.5-3.5 3-2.3.9-3.7 3.8.2L12 2.5Z"/>
     <path d="m8.8 12.5 2.1 2.1 4.5-5"/>
+  `,
+  sparkles: `
+    <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
+    <path d="m5 3 1 2.5L8.5 6 6 7 5 9.5 4 7 1.5 6 4 5.5 5 3Z"/>
+    <path d="m19 17 1 2.5 2.5.5-2.5 1-1 2.5-1-2.5-2.5-1 2.5-1 1-2.5Z"/>
   `
 };
 
@@ -540,9 +548,12 @@ const brandIcons = {
   `
 };
 
-const renderIcon = (icon) => `
-  ${brandIcons[icon] || `<svg viewBox="0 0 24 24" aria-hidden="true">${iconPaths[icon]}</svg>`}
-`;
+const renderIcon = (icon) => {
+  if (icon.startsWith("assets/")) {
+    return `<img src="${icon}" alt="" class="expertise-img-icon" />`;
+  }
+  return brandIcons[icon] || `<svg viewBox="0 0 24 24" aria-hidden="true">${iconPaths[icon]}</svg>`;
+};
 
 const renderExpertise = () => {
   if (!expertiseGrid) return;

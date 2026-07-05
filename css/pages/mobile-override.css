@@ -428,7 +428,8 @@
     flex-shrink: 0 !important;
   }
 
-  .expertise-icon svg {
+  .expertise-icon svg,
+  .expertise-icon img {
     width: 18px !important;
     height: 18px !important;
   }

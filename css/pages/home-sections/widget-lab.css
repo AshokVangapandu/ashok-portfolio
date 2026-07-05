@@ -858,9 +858,9 @@
 
 .widget-showcase-stats {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 10px;
-  width: min(840px, 100%);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  width: min(920px, 100%);
   margin: -4px auto 0;
 }
 
@@ -882,20 +882,58 @@
   -webkit-backdrop-filter: blur(14px);
 }
 
-.widget-showcase-stats strong {
-  color: #ffffff;
-  font-size: clamp(18px, 1.7vw, 24px);
-  font-weight: 760;
-  line-height: 1;
+.widget-showcase-stats .capability-card {
+  min-height: 132px;
+  padding: 22px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-align: center;
 }
 
-.widget-showcase-stats span {
-  color: rgba(157, 169, 194, 0.68);
-  font-size: 11px;
-  font-weight: 720;
-  letter-spacing: 0.08em;
+.widget-showcase-stats .capability-icon {
+  width: 22px;
+  height: 22px;
+  color: #a78bfa;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  margin-bottom: 2px;
+  filter: drop-shadow(0 0 8px rgba(167, 139, 250, 0.3));
+}
+
+.widget-showcase-stats .capability-card strong {
+  font-size: 15px;
+  font-weight: 700;
+  color: #ffffff;
   line-height: 1.2;
+}
+
+.widget-showcase-stats .capability-card span {
+  font-size: 11.5px;
+  color: rgba(157, 169, 194, 0.72);
+  line-height: 1.5;
+  text-transform: none;
+  letter-spacing: normal;
+  font-weight: 450;
+}
+
+.tech-marquee-title {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 760;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
+  color: rgba(203, 209, 255, 0.48);
+  margin: 34px 0 10px;
+}
+
+.widget-showcase-ticker:hover div {
+  animation-play-state: paused;
 }
 
 .widget-showcase-ticker {
@@ -1377,18 +1415,31 @@
     margin-top: -8px;
   }
 
-  .widget-showcase-stats div {
-    min-height: 68px;
-    padding: 11px 9px;
+  .widget-showcase-stats .capability-card {
+    min-height: 120px;
+    padding: 16px 12px;
     border-radius: 12px;
   }
 
-  .widget-showcase-stats strong {
-    font-size: clamp(18px, 6vw, 23px);
+  .widget-showcase-stats .capability-card:nth-child(3) {
+    grid-column: span 2;
   }
 
-  .widget-showcase-stats span {
-    font-size: 10px;
+  .widget-showcase-stats .capability-card strong {
+    font-size: 13.5px;
+  }
+
+  .widget-showcase-stats .capability-card span {
+    font-size: 10.5px;
+  }
+
+  @media (max-width: 480px) {
+    .widget-showcase-stats {
+      grid-template-columns: 1fr;
+    }
+    .widget-showcase-stats .capability-card:nth-child(3) {
+      grid-column: span 1;
+    }
   }
 
   .widget-showcase-ticker {
