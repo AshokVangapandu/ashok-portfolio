@@ -19,40 +19,10 @@ whatsappLinks.forEach((link) => {
   link.href = prefersMobileWhatsApp ? link.dataset.mobileHref : link.dataset.desktopHref;
 });
 
-const contactToast = document.createElement("div");
-contactToast.className = "contact-toast";
-contactToast.setAttribute("role", "status");
-contactToast.setAttribute("aria-live", "polite");
-
 const showContactToast = (type, title, message) => {
-  contactToast.dataset.status = type;
-  const iconPath = type === "success"
-    ? '<path d="M20 6 9 17l-5-5"/>'
-    : '<path d="M12 8v5"/><path d="M12 17h.01"/><path d="M10.3 3.9 2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/>';
-
-  contactToast.innerHTML = `
-    <span class="contact-toast-icon" aria-hidden="true">
-      <svg viewBox="0 0 24 24">${iconPath}</svg>
-    </span>
-    <span class="contact-toast-copy">
-      <strong></strong>
-      <span></span>
-    </span>
-  `;
-
-  contactToast.querySelector("strong").textContent = title;
-  contactToast.querySelector(".contact-toast-copy span").textContent = message;
-
-  if (!contactToast.isConnected) {
-    document.body.appendChild(contactToast);
+  if (window.showToast) {
+    window.showToast(type, title, message, 5600);
   }
-
-  window.clearTimeout(showContactToast.timeoutId);
-  contactToast.classList.add("is-visible");
-
-  showContactToast.timeoutId = window.setTimeout(() => {
-    contactToast.classList.remove("is-visible");
-  }, 5600);
 };
 
 // Initialize Supabase Client
@@ -1085,7 +1055,51 @@ const initWallOfLoveCarousel = () => {
   }
 };
 
-initWallOfLoveCarousel();
+// Dynamic testimonial load helper
+const loadDynamicTestimonials = async () => {
+  const track = document.querySelector("[data-wall-marquee]");
+  if (!track) return;
+
+  try {
+    if (window.TestimonialService) {
+      const { data: testimonials, error } = await window.TestimonialService.getApprovedTestimonials();
+      if (error) throw error;
+
+      if (testimonials && testimonials.length > 0) {
+        track.innerHTML = testimonials.map(t => {
+          const displayName = t.google_name || "Collaborator";
+          const avatarSrc = t.google_avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80";
+          
+          const linkedinIcon = t.linkedin_url ? `
+            <a href="${t.linkedin_url}" class="wall-card-linkedin" target="_blank" rel="noopener noreferrer" aria-label="${displayName}'s LinkedIn profile">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.779-1.75-1.75s.784-1.75 1.75-1.75 1.75.779 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+              </svg>
+            </a>
+          ` : '';
+
+          return `
+            <article class="wall-card">
+              <div class="wall-card-top">
+                <img src="${avatarSrc}" alt="${displayName}" loading="lazy">
+                ${linkedinIcon}
+              </div>
+              <h3>${displayName}</h3>
+              <p class="wall-role">Collaborator</p>
+              <blockquote>${t.testimonial}</blockquote>
+            </article>
+          `;
+        }).join("");
+      }
+    }
+  } catch (err) {
+    console.error("Failed to load dynamic testimonials, using static fallback:", err);
+  } finally {
+    initWallOfLoveCarousel();
+  }
+};
+
+loadDynamicTestimonials();
 
 const initSmoothScrolling = () => {
   if (typeof Lenis === "undefined") return;

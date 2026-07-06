@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Ashok Vangapandu | Testimonial Admin Dashboard">
+  <title>Admin Dashboard | Testimonials</title>
+  <link rel="stylesheet" href="css/main.css?v=1.3">
+  
+  <style>
+    /* Admin dashboard page-specific styles */
+    .admin-page {
+      background: #090d18;
+      color: #ffffff;
+      font-family: 'Inter', system-ui, sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      padding-bottom: 80px;
+    }
+
+    .admin-container {
+      width: min(100%, 1280px);
+      margin: 0 auto;
+      padding: 40px 24px;
+    }
+
+    .admin-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 48px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 24px;
+    }
+
+    .admin-title-group h1 {
+      font-size: clamp(28px, 4vw, 36px);
+      font-weight: 760;
+      letter-spacing: -0.02em;
+      margin: 0 0 6px 0;
+      background: linear-gradient(135deg, #ffffff 30%, #8f85ff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .admin-title-group p {
+      margin: 0;
+      color: rgba(255, 255, 255, 0.45);
+      font-size: 14px;
+    }
+
+    .admin-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    /* Auth state screens */
+    .admin-auth-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 80vh;
+      text-align: center;
+    }
+
+    .auth-card {
+      max-width: 420px;
+      padding: 48px 36px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.015);
+      backdrop-filter: blur(16px);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+    }
+
+    .auth-icon-box {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: rgba(143, 133, 255, 0.1);
+      border: 1px solid rgba(143, 133, 255, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
+      color: #8f85ff;
+    }
+
+    .auth-card h2 {
+      font-size: 22px;
+      font-weight: 700;
+      margin: 0 0 12px 0;
+    }
+
+    .auth-card p {
+      color: rgba(255, 255, 255, 0.54);
+      font-size: 14px;
+      line-height: 1.5;
+      margin: 0 0 32px 0;
+    }
+
+    /* Tab Controls */
+    .admin-tabs {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 32px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding-bottom: 16px;
+      overflow-x: auto;
+    }
+
+    .admin-tab {
+      background: transparent;
+      border: 1px solid transparent;
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 13.5px;
+      font-weight: 700;
+      padding: 8px 16px;
+      border-radius: 999px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 250ms ease;
+    }
+
+    .admin-tab:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .admin-tab.is-active {
+      background: rgba(143, 133, 255, 0.08);
+      border-color: rgba(143, 133, 255, 0.25);
+      color: #8f85ff;
+    }
+
+    .tab-count {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 6px;
+      margin-left: 6px;
+    }
+
+    .admin-tab.is-active .tab-count {
+      background: #8f85ff;
+    }
+
+    /* Dashboard grids */
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 24px;
+    }
+
+    .no-records {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 80px 24px;
+      border: 1px dashed rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    /* Admin testimonial card */
+    .admin-card {
+      background: rgba(255, 255, 255, 0.015);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 20px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      position: relative;
+      transition: border-color 250ms ease, transform 250ms ease;
+    }
+
+    .admin-card:hover {
+      border-color: rgba(143, 133, 255, 0.16);
+      transform: translateY(-2px);
+    }
+
+    .card-meta-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+    }
+
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .user-profile img {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(143, 133, 255, 0.2);
+    }
+
+    .user-details {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .user-details h4 {
+      font-size: 14.5px;
+      font-weight: 700;
+      color: #ffffff;
+      margin: 0;
+    }
+
+    .user-details span {
+      font-size: 11.5px;
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    .badge-status {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 999px;
+      letter-spacing: 0.04em;
+    }
+
+    .badge-status.pending { background: rgba(255, 178, 54, 0.08); border: 1px solid rgba(255, 178, 54, 0.2); color: #ffb236; }
+    .badge-status.approved { background: rgba(46, 213, 115, 0.08); border: 1px solid rgba(46, 213, 115, 0.2); color: #2ed573; }
+    .badge-status.rejected { background: rgba(255, 71, 87, 0.08); border: 1px solid rgba(255, 71, 87, 0.2); color: #ff4757; }
+
+    .card-body {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .card-rating {
+      color: #8f85ff;
+      font-size: 16px;
+      letter-spacing: 0.04em;
+    }
+
+    .card-quote {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 13px;
+      line-height: 1.55;
+      margin: 0;
+      font-style: italic;
+    }
+
+    .card-linkedin-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #0a66c2;
+      font-size: 11.5px;
+      text-decoration: none;
+    }
+
+    .card-linkedin-link:hover {
+      text-decoration: underline;
+    }
+
+    .card-actions-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      padding-top: 16px;
+    }
+
+    .btn-action {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 8px;
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 6px 12px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 200ms ease;
+    }
+
+    .btn-action:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .btn-action.approve:hover { background: rgba(46, 213, 115, 0.08); border-color: rgba(46, 213, 115, 0.25); color: #2ed573; }
+    .btn-action.reject:hover { background: rgba(255, 71, 87, 0.08); border-color: rgba(255, 71, 87, 0.25); color: #ff4757; }
+    .btn-action.delete:hover { background: rgba(255, 71, 87, 0.12); border-color: rgba(255, 71, 87, 0.4); color: #ff4757; }
+    
+    .btn-action.featured-active {
+      background: rgba(143, 133, 255, 0.1);
+      border-color: rgba(143, 133, 255, 0.4);
+      color: #8f85ff;
+    }
+
+    .btn-action.featured-active:hover {
+      background: rgba(255, 71, 87, 0.06);
+      border-color: rgba(255, 71, 87, 0.2);
+      color: #ff4757;
+    }
+
+    /* Modal dialog overlays */
+    .admin-modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 100000;
+      background: rgba(9, 13, 24, 0.8);
+      backdrop-filter: blur(12px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 300ms ease, visibility 300ms ease;
+    }
+
+    .admin-modal-overlay.is-visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .admin-modal-container {
+      width: 100%;
+      max-width: 500px;
+      background: #0d111c;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+      border-radius: 20px;
+      padding: 32px;
+      position: relative;
+    }
+
+    .admin-modal-container h3 {
+      margin: 0 0 18px 0;
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .admin-form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 18px;
+    }
+
+    .admin-form-group label {
+      font-size: 11.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.5);
+      letter-spacing: 0.04em;
+    }
+
+    .admin-form-group input,
+    .admin-form-group select,
+    .admin-form-group textarea {
+      background: rgba(255, 255, 255, 0.015);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 12px;
+      color: #ffffff;
+      font-size: 13.5px;
+      outline: none;
+      font-family: inherit;
+    }
+
+    .admin-form-group textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .admin-form-group input:focus,
+    .admin-form-group select:focus,
+    .admin-form-group textarea:focus {
+      border-color: rgba(143, 133, 255, 0.35);
+      box-shadow: 0 0 12px rgba(143, 133, 255, 0.1);
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    /* Testimonial Visual Preview Element */
+    .preview-modal-container {
+      max-width: 420px;
+      padding: 0;
+      background: transparent;
+      border: none;
+      box-shadow: none;
+    }
+
+    .preview-modal-close {
+      position: absolute;
+      top: -40px;
+      right: 0;
+      background: transparent;
+      border: none;
+      color: #ffffff;
+      font-size: 24px;
+      cursor: pointer;
+    }
+
+    /* Wall of Love Card styling overrides to verify visuals */
+    .wall-card-preview {
+      flex: 0 0 100%;
+      min-height: auto;
+      transform: none !important;
+      opacity: 1 !important;
+      border-color: rgba(143, 133, 255, 0.18) !important;
+      box-shadow: 0 0 21px rgba(143, 133, 255, 0.1) !important;
+    }
+
+    /* Loader */
+    .admin-loader-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 60vh;
+    }
+  </style>
+</head>
+<body class="admin-page">
+  <div class="cursor-light" aria-hidden="true"></div>
+  <div class="site-bg" aria-hidden="true">
+    <div class="light-ribbon ribbon-one"></div>
+    <div class="light-ribbon ribbon-two"></div>
+    <div class="light-ribbon ribbon-three"></div>
+    <div class="aurora"></div>
+    <div class="noise"></div>
+  </div>
+
+  <div class="admin-container" id="admin-app-root">
+    <!-- Authenticating view -->
+    <div class="admin-loader-wrapper" id="page-loader">
+      <span class="auth-spinner" style="width:36px; height:36px; border-width:3px; margin-bottom:16px;"></span>
+      <p style="color:rgba(255,255,255,0.5); font-size:14px;">Securing session environment...</p>
+    </div>
+  </div>
+
+  <!-- Edit Testimonial Modal Dialog -->
+  <div class="admin-modal-overlay" id="edit-modal">
+    <div class="admin-modal-container">
+      <h3>Edit Testimonial</h3>
+      <form id="edit-testimonial-form">
+        <input type="hidden" id="edit-id">
+        <div class="admin-form-group">
+          <label>Collaborator</label>
+          <input type="text" id="edit-name" disabled style="opacity:0.6;">
+        </div>
+        <div class="admin-form-group">
+          <label>LinkedIn Profile URL</label>
+          <input type="url" id="edit-linkedin" placeholder="https://linkedin.com/in/username">
+        </div>
+        <div class="admin-form-group">
+          <label>Testimonial Text</label>
+          <textarea id="edit-quote" required></textarea>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-action" id="edit-cancel-btn">Cancel</button>
+          <button type="submit" class="profile-action profile-action-primary" style="min-height:36px; padding:0 20px; border-radius:10px; font-size:12.5px;">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Preview Testimonial Modal Dialog -->
+  <div class="admin-modal-overlay" id="preview-modal">
+    <div class="admin-modal-container preview-modal-container">
+      <button class="preview-modal-close" id="preview-close-btn">&times;</button>
+      <div id="preview-card-slot"></div>
+    </div>
+  </div>
+
+  <!-- Load dependencies -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/components/toast.js" defer></script>
+  <script src="js/services/supabase-service.js" defer></script>
+  
+  <script>
+    // Local application state
+    const AppState = {
+      testimonials: [],
+      currentTab: 'pending', // pending, approved, rejected, all
+      user: null
+    };
+
+    // Fast authorization and load script hooks
+    window.addEventListener("DOMContentLoaded", () => {
+      const checkTimer = setInterval(() => {
+        if (window.AuthService && window.AdminService) {
+          clearInterval(checkTimer);
+          initAdminApp();
+        }
+      }, 100);
+    });
+
+    async function initAdminApp() {
+      // 1. Confirm session auth
+      const user = await window.AuthService.getCurrentUser();
+      if (!user || user.email !== "ashokvangapandu45@gmail.com") {
+        renderAccessDenied(user);
+        return;
+      }
+
+      AppState.user = user;
+
+      // Listen for auth state changes to redirect if signed out
+      window.AuthService.onAuthStateChange((event, session) => {
+        if (!session || session.user.email !== "ashokvangapandu45@gmail.com") {
+          window.location.href = "index.html";
+        }
+      });
+
+      // 2. Fetch testimonials and bootstrap UI
+      await reloadTestimonials();
+      renderDashboard();
+    }
+
+    function renderAccessDenied(user) {
+      const root = document.getElementById("admin-app-root");
+      
+      let message = "This dashboard is restricted to Ashok's authorized Google account.";
+      if (user) {
+        message = `Access denied for user <strong>${user.email}</strong>. This dashboard is restricted to Ashok's email.`;
+      }
+
+      root.innerHTML = `
+        <div class="admin-auth-screen">
+          <div class="auth-card">
+            <div class="auth-icon-box">
+              <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+            </div>
+            <h2>Access Restricted</h2>
+            <p>${message}</p>
+            <p style="font-size: 12.5px; color: #ff6565;">Redirecting to home page...</p>
+            <button onclick="window.location.href='index.html'" class="profile-action profile-action-primary" style="width:100%;">Return to Home</button>
+          </div>
+        </div>
+      `;
+
+      // Redirect home after 3 seconds
+      setTimeout(() => {
+        window.location.href = "index.html";
+      }, 3500);
+    }
+
+    async function reloadTestimonials() {
+      try {
+        const { data, error } = await window.AdminService.getAllTestimonials();
+        if (error) throw error;
+        AppState.testimonials = data || [];
+      } catch (err) {
+        console.error("Failed to load testimonials:", err);
+        showToast("error", "Database Error", err.message || "Failed to load testimonials.");
+      }
+    }
+
+    function renderDashboard() {
+      const root = document.getElementById("admin-app-root");
+      
+      const counts = {
+        pending: AppState.testimonials.filter(t => t.status === 'pending').length,
+        approved: AppState.testimonials.filter(t => t.status === 'approved').length,
+        rejected: AppState.testimonials.filter(t => t.status === 'rejected').length,
+        all: AppState.testimonials.length
+      };
+
+      root.innerHTML = `
+        <header class="admin-header">
+          <div class="admin-title-group">
+            <h1>Wall of Love</h1>
+            <p>Admin Dashboard — Manage collaborator feedback and featured posts</p>
+          </div>
+          <div class="admin-header-actions">
+            <a href="index.html" class="btn-action">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="transform: rotate(180deg)">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+              <span>Back to Portfolio</span>
+            </a>
+            <button id="admin-signout-btn" class="profile-action profile-action-secondary" style="min-height:36px; font-size:12.5px; padding:0 20px;">Sign Out</button>
+          </div>
+        </header>
+
+        <nav class="admin-tabs">
+          <button class="admin-tab ${AppState.currentTab === 'pending' ? 'is-active' : ''}" onclick="switchTab('pending')">
+            Pending <span class="tab-count">${counts.pending}</span>
+          </button>
+          <button class="admin-tab ${AppState.currentTab === 'approved' ? 'is-active' : ''}" onclick="switchTab('approved')">
+            Approved <span class="tab-count">${counts.approved}</span>
+          </button>
+          <button class="admin-tab ${AppState.currentTab === 'rejected' ? 'is-active' : ''}" onclick="switchTab('rejected')">
+            Rejected <span class="tab-count">${counts.rejected}</span>
+          </button>
+          <button class="admin-tab ${AppState.currentTab === 'all' ? 'is-active' : ''}" onclick="switchTab('all')">
+            All <span class="tab-count">${counts.all}</span>
+          </button>
+        </nav>
+
+        <main class="testimonials-grid" id="cards-grid">
+          <!-- Render testimonials based on tab -->
+        </main>
+      `;
+
+      document.getElementById("admin-signout-btn")?.addEventListener("click", async () => {
+        await window.AuthService.signOut();
+        window.location.href = "index.html";
+      });
+
+      renderCards();
+    }
+
+    function switchTab(tabName) {
+      AppState.currentTab = tabName;
+      document.querySelectorAll(".admin-tab").forEach(tab => {
+        const isCurrent = tab.getAttribute("onclick").includes(`'${tabName}'`);
+        tab.classList.toggle("is-active", isCurrent);
+      });
+      renderCards();
+    }
+
+    function renderCards() {
+      const grid = document.getElementById("cards-grid");
+      if (!grid) return;
+
+      let filtered = AppState.testimonials;
+      if (AppState.currentTab !== 'all') {
+        filtered = AppState.testimonials.filter(t => t.status === AppState.currentTab);
+      }
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div class="no-records">
+            <h3>No testimonials found</h3>
+            <p>Entries in the "${AppState.currentTab}" category will show up here.</p>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(t => {
+        const dateStr = new Date(t.created_at).toLocaleDateString(undefined, {
+          month: 'short', day: 'numeric', year: 'numeric'
+        });
+
+        // Setup actions depending on current status
+        const isPending = t.status === 'pending';
+        const isApproved = t.status === 'approved';
+        const isRejected = t.status === 'rejected';
+
+        const displayName = t.google_name || "Collaborator";
+        const emailVal = t.google_email;
+        const avatarSrc = t.google_avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80";
+
+        const linkedinRow = t.linkedin_url ? `
+          <a href="${t.linkedin_url}" class="card-linkedin-link" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor">
+              <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.779-1.75-1.75s.784-1.75 1.75-1.75 1.75.779 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+            </svg>
+            <span>LinkedIn Profile</span>
+          </a>
+        ` : `<span style="font-size:11.5px; color:rgba(255,255,255,0.22);">No LinkedIn Profile</span>`;
+
+        return `
+          <article class="admin-card" id="card-${t.id}">
+            <div class="card-meta-top">
+              <div class="user-profile">
+                <img src="${avatarSrc}" alt="${displayName}">
+                <div class="user-details">
+                  <h4>${displayName}</h4>
+                  <span>${emailVal}</span>
+                </div>
+              </div>
+              <span class="badge-status ${t.status}">${t.status}</span>
+            </div>
+
+            <div class="card-body">
+              <blockquote class="card-quote">"${t.testimonial}"</blockquote>
+              <div style="margin-top: 10px;">${linkedinRow}</div>
+              <div style="font-size: 11px; color: rgba(255,255,255,0.25); margin-top:8px;">Submitted on ${dateStr}</div>
+            </div>
+
+            <div class="card-actions-row">
+              ${isPending || isRejected ? `
+                <button class="btn-action approve" onclick="approveRecord('${t.id}')">Approve</button>
+              ` : ''}
+              ${isPending || isApproved ? `
+                <button class="btn-action reject" onclick="rejectRecord('${t.id}')">Reject</button>
+              ` : ''}
+              <button class="btn-action" onclick="editRecord('${t.id}')">Edit</button>
+              <button class="btn-action" onclick="previewRecord('${t.id}')">Preview</button>
+              <button class="btn-action delete" onclick="deleteRecord('${t.id}')">Delete</button>
+            </div>
+          </article>
+        `;
+      }).join("");
+    }
+
+    // Direct Action utilities called by buttons
+    async function approveRecord(id) {
+      try {
+        const { error } = await window.AdminService.approveTestimonial(id);
+        if (error) throw error;
+        showToast("success", "Approved", "Testimonial approved successfully.");
+        await reloadTestimonials();
+        renderDashboard();
+      } catch (err) {
+        showToast("error", "Error", err.message || "Failed to approve record.");
+      }
+    }
+
+    async function rejectRecord(id) {
+      try {
+        const { error } = await window.AdminService.rejectTestimonial(id);
+        if (error) throw error;
+        showToast("success", "Rejected", "Testimonial rejected successfully.");
+        await reloadTestimonials();
+        renderDashboard();
+      } catch (err) {
+        showToast("error", "Error", err.message || "Failed to reject record.");
+      }
+    }
+
+    async function deleteRecord(id) {
+      if (!confirm("Are you sure you want to permanently delete this testimonial? This action cannot be undone.")) {
+        return;
+      }
+      try {
+        const { error } = await window.AdminService.deleteTestimonial(id);
+        if (error) throw error;
+        showToast("success", "Deleted", "Testimonial deleted successfully.");
+        await reloadTestimonials();
+        renderDashboard();
+      } catch (err) {
+        showToast("error", "Error", err.message || "Failed to delete record.");
+      }
+    }
+
+    // Modal controller hooks
+    // Modal controller hooks
+    function editRecord(id) {
+      const record = AppState.testimonials.find(t => t.id === id);
+      if (!record) return;
+
+      document.getElementById("edit-id").value = record.id;
+      document.getElementById("edit-name").value = `${record.google_name || "Collaborator"} (${record.google_email})`;
+      document.getElementById("edit-linkedin").value = record.linkedin_url || "";
+      document.getElementById("edit-quote").value = record.testimonial;
+
+      const overlay = document.getElementById("edit-modal");
+      overlay.classList.add("is-visible");
+    }
+
+    document.getElementById("edit-cancel-btn")?.addEventListener("click", () => {
+      document.getElementById("edit-modal").classList.remove("is-visible");
+    });
+
+    document.getElementById("edit-testimonial-form")?.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      
+      const id = document.getElementById("edit-id").value;
+      const linkedin = document.getElementById("edit-linkedin").value.trim();
+      const testimonial = document.getElementById("edit-quote").value.trim();
+
+      if (linkedin) {
+        const linkedinRegex = /^(https?:\/\/)?(www\.)?linkedin\.com\/in\/[a-zA-Z0-9_-]+\/?$/;
+        if (!linkedinRegex.test(linkedin)) {
+          alert("Please enter a valid LinkedIn profile URL.");
+          return;
+        }
+      }
+
+      try {
+        const { error } = await window.AdminService.updateTestimonial(id, {
+          testimonial,
+          linkedin_url: linkedin
+        });
+
+        if (error) throw error;
+
+        showToast("success", "Updated", "Testimonial updated successfully.");
+        document.getElementById("edit-modal").classList.remove("is-visible");
+        await reloadTestimonials();
+        renderDashboard();
+      } catch (err) {
+        showToast("error", "Update Failed", err.message || "Could not update testimonial.");
+      }
+    });
+
+    function previewRecord(id) {
+      const record = AppState.testimonials.find(t => t.id === id);
+      if (!record) return;
+
+      const slot = document.getElementById("preview-card-slot");
+      const avatarSrc = record.google_avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80";
+      const displayName = record.google_name || "Collaborator";
+
+      slot.innerHTML = `
+        <article class="wall-card wall-card-preview">
+          <div class="wall-card-top">
+            <img src="${avatarSrc}" alt="${displayName}">
+          </div>
+          <h3>${displayName}</h3>
+          <p class="wall-role">Collaborator</p>
+          <blockquote>${record.testimonial}</blockquote>
+        </article>
+      `;
+
+      document.getElementById("preview-modal").classList.add("is-visible");
+    }
+
+    document.getElementById("preview-close-btn")?.addEventListener("click", () => {
+      document.getElementById("preview-modal").classList.remove("is-visible");
+    });
+  </script>
+</body>
+</html>
