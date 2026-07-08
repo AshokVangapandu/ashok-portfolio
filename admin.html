@@ -514,16 +514,55 @@
     async function initAdminApp() {
       // 1. Confirm session auth
       const user = await window.AuthService.getCurrentUser();
-      if (!user || user.email !== "ashokvangapandu45@gmail.com") {
+      if (!user) {
+        renderAccessDenied(null);
+        return;
+      }
+
+      // Query admins table
+      let isAdmin = false;
+      try {
+        const { data, error } = await window.AuthService.supabase
+          .from('admins')
+          .select('email, role, is_active')
+          .eq('email', user.email)
+          .maybeSingle();
+
+        if (!error && data && data.is_active === true) {
+          isAdmin = true;
+        }
+      } catch (err) {
+        console.error("Failed to query admin status:", err);
+      }
+
+      if (!isAdmin) {
         renderAccessDenied(user);
         return;
       }
 
       AppState.user = user;
 
-      // Listen for auth state changes to redirect if signed out
-      window.AuthService.onAuthStateChange((event, session) => {
-        if (!session || session.user.email !== "ashokvangapandu45@gmail.com") {
+      // Listen for auth state changes to redirect if signed out or permissions change
+      window.AuthService.onAuthStateChange(async (event, session) => {
+        if (!session) {
+          window.location.href = "index.html";
+          return;
+        }
+
+        let isCurrentAdmin = false;
+        try {
+          const { data } = await window.AuthService.supabase
+            .from('admins')
+            .select('email, role, is_active')
+            .eq('email', session.user.email)
+            .maybeSingle();
+
+          if (data && data.is_active === true) {
+            isCurrentAdmin = true;
+          }
+        } catch (e) {}
+
+        if (!isCurrentAdmin) {
           window.location.href = "index.html";
         }
       });

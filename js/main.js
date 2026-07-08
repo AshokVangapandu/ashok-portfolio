@@ -1200,3 +1200,222 @@ if (document.readyState === "loading") {
 } else {
   initSmoothScrolling();
 }
+
+// --- Static Navbar Authentication Setup ---
+const setupNavbarAuth = async () => {
+  const container = document.getElementById("navbar-auth-container");
+  if (!container || !window.AuthService) return;
+
+  let dropdownOpen = false;
+
+  const renderDropdown = async (user) => {
+    const avatar = user.user_metadata?.avatar_url || "";
+    const name = user.user_metadata?.full_name || user.email.split("@")[0];
+    const email = user.email;
+
+    // Retrieve and verify administrator privileges with caching
+    let isAdmin = false;
+    const cached = sessionStorage.getItem(`is_admin_${email}`);
+    
+    console.log('Authenticated Email:', email);
+
+    if (cached !== null) {
+      isAdmin = cached === 'true';
+      console.log(`isAdmin: ${isAdmin}`);
+    } else {
+      try {
+        const { data, error } = await window.AuthService.supabase
+          .from('admins')
+          .select('email, role, is_active')
+          .eq('email', email)
+          .maybeSingle();
+
+        console.log('Admin Query Result:', { data, error });
+
+        if (!error && data && data.is_active === true) {
+          isAdmin = true;
+        }
+
+        sessionStorage.setItem(`is_admin_${email}`, String(isAdmin));
+        console.log(`isAdmin: ${isAdmin}`);
+      } catch (err) {
+        console.error('[Navbar Auth] Failed to check admin status:', err);
+      }
+    }
+
+    const avatarHtml = avatar
+      ? `<img src="${avatar}" alt="${name}">`
+      : `<div class="navbar-user-avatar-fallback">${name.substring(0, 2).toUpperCase()}</div>`;
+
+    const dropdownAvatarHtml = avatar
+      ? `<img src="${avatar}" alt="${name}">`
+      : `<div class="dropdown-user-header-avatar-fallback">${name.substring(0, 2).toUpperCase()}</div>`;
+
+    container.innerHTML = `
+      <button type="button" class="navbar-user-avatar-btn" id="navbar-user-btn" aria-label="Open user menu" aria-expanded="false">
+        ${avatarHtml}
+      </button>
+      <div class="navbar-user-dropdown" id="navbar-user-dropdown">
+        <div class="dropdown-user-header">
+          ${dropdownAvatarHtml}
+          <div class="dropdown-user-info">
+            <span class="dropdown-user-name">${name}</span>
+            <span class="dropdown-user-email">${email}</span>
+          </div>
+        </div>
+        ${isAdmin ? `
+          <div class="dropdown-divider"></div>
+          <a href="admin/" id="navbar-admin-btn" 
+             onmouseenter="this.style.background='rgba(143, 133, 255, 0.16)'; this.style.borderColor='rgba(143, 133, 255, 0.3)';" 
+             onmouseleave="this.style.background='rgba(143, 133, 255, 0.08)'; this.style.borderColor='rgba(143, 133, 255, 0.15)';"
+             style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 36px; background: rgba(143, 133, 255, 0.08); border: 1px solid rgba(143, 133, 255, 0.15); border-radius: 10px; color: #8f85ff; font-size: 12.5px; font-weight: 600; text-decoration: none; margin-bottom: 4px; transition: all 250ms ease;">
+            <span>👑 Admin Dashboard</span>
+          </a>
+        ` : ''}
+        <div class="dropdown-divider"></div>
+        <button type="button" class="dropdown-logout-btn" id="navbar-logout-btn">
+          <span>Sign Out</span>
+        </button>
+      </div>
+    `;
+
+    const userBtn = container.querySelector("#navbar-user-btn");
+    const dropdown = container.querySelector("#navbar-user-dropdown");
+    const logoutBtn = container.querySelector("#navbar-logout-btn");
+
+    userBtn?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      dropdownOpen = !dropdownOpen;
+      dropdown?.classList.toggle("is-open", dropdownOpen);
+      userBtn.setAttribute("aria-expanded", String(dropdownOpen));
+    });
+
+    logoutBtn?.addEventListener("click", async () => {
+      logoutBtn.disabled = true;
+      logoutBtn.innerHTML = "<span>Signing out...</span>";
+      try {
+        const { error } = await window.AuthService.signOut();
+        if (error) throw error;
+        showToast("success", "Signed Out", "You have successfully signed out.");
+      } catch (err) {
+        showToast("error", "Sign Out Failed", err.message || "An error occurred.");
+        logoutBtn.disabled = false;
+        logoutBtn.innerHTML = "<span>Sign Out</span>";
+      }
+    });
+
+    // Close on click outside
+    document.addEventListener("click", (e) => {
+      if (dropdownOpen && !container.contains(e.target)) {
+        dropdownOpen = false;
+        dropdown?.classList.remove("is-open");
+        userBtn?.setAttribute("aria-expanded", "false");
+      }
+    });
+  };
+
+  const renderLoginButton = (isLoading = false) => {
+    container.innerHTML = `
+      <button type="button" class="profile-action profile-action-primary" id="fallback-login-btn" ${isLoading ? "disabled" : ""}>
+        ${isLoading ? `
+          <span class="auth-spinner" style="width: 14px; height: 14px; border: 2px solid rgba(255, 255, 255, 0.2); border-top-color: #ffffff; border-radius: 50%; display: inline-block; animation: spin 1s linear infinite; margin-right: 6px;"></span>
+          <span>Connecting...</span>
+        ` : `
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="margin-right: 6px;">
+            <path d="M12.24 10.285V13.4h6.887C18.2 15.614 15.645 18 12.24 18c-3.86 0-7-3.14-7-7s3.14-7 7-7c1.7 0 3.3.6 4.5 1.7l2.4-2.4C17.3 1.5 14.9 0 12.24 0c-6.08 0-11 4.92-11 11s4.92 11 11 11c5.73 0 10.2-4.1 10.2-11 0-.74-.08-1.46-.2-2.115H12.24z" />
+          </svg>
+          <span>Sign in with Google</span>
+        `}
+      </button>
+      <style>
+        @keyframes spin { to { transform: rotate(360deg); } }
+      </style>
+    `;
+
+    const loginBtn = container.querySelector("#fallback-login-btn");
+    loginBtn?.addEventListener("click", async () => {
+      renderLoginButton(true);
+      try {
+        const { data, error } = await window.AuthService.signInWithGoogle();
+        if (error) throw error;
+
+        if (data?.url) {
+          const width = 520;
+          const height = 600;
+          const left = window.screen.width / 2 - width / 2;
+          const top = window.screen.height / 2 - height / 2;
+
+          const authPopup = window.open(
+            data.url,
+            'Google Auth',
+            `width=${width},height=${height},top=${top},left=${left},scrollbars=yes,status=yes`
+          );
+
+          const popupInterval = setInterval(() => {
+            if (!authPopup || authPopup.closed) {
+              clearInterval(popupInterval);
+              setTimeout(async () => {
+                const user = await window.AuthService.getCurrentUser();
+                if (!user) {
+                  showToast("error", "Login Cancelled", "Google sign-in popup was closed.");
+                  renderLoginButton(false);
+                }
+              }, 500);
+            }
+          }, 800);
+        }
+      } catch (err) {
+        showToast("error", "Authentication Failed", err.message || "An error occurred.");
+        renderLoginButton(false);
+      }
+    });
+  };
+
+  // Check initial state
+  const user = await window.AuthService.getCurrentUser();
+  if (user) {
+    renderDropdown(user);
+  } else {
+    renderLoginButton(false);
+  }
+
+  // Subscribe to auth state updates
+  window.AuthService.onAuthStateChange((event, session) => {
+    if (session?.user) {
+      renderDropdown(session.user);
+    } else {
+      renderLoginButton(false);
+    }
+  });
+
+  // Handle popup window messaging redirect callbacks
+  window.addEventListener('message', async (event) => {
+    if (event.origin !== window.location.origin && event.origin !== "null") return;
+    if (event.data?.type === 'supabase-oauth-callback') {
+      if (event.data.status === 'success') {
+        try {
+          const { data, error } = await window.AuthService.setSession(event.data.hash);
+          if (error) throw error;
+          const user = await window.AuthService.getCurrentUser();
+          if (user) renderDropdown(user);
+        } catch (e) {
+          showToast("error", "Session Error", e.message || "Failed to configure user session.");
+          renderLoginButton(false);
+        }
+      } else {
+        showToast("error", "Authentication Failed", "Google sign-in was not successful.");
+        renderLoginButton(false);
+      }
+    }
+  });
+};
+
+// Start setup
+if (window.AuthService) {
+  setupNavbarAuth();
+} else {
+  document.addEventListener("DOMContentLoaded", () => {
+    if (window.AuthService) setupNavbarAuth();
+  });
+}
+

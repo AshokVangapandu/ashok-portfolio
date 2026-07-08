@@ -13,6 +13,20 @@ Deno.serve(async (req) => {
     });
   }
 
+  const debugInfo: any = {
+    logs: [],
+    webhookPayload: null,
+    googleEmail: null,
+    thankYouResStatus: null,
+    thankYouResBody: null,
+    thankYouError: null
+  };
+
+  const debugLog = (msg: string) => {
+    console.log(msg);
+    debugInfo.logs.push(msg);
+  };
+
   try {
     // Verify Webhook Secret
     const webhookSecret = req.headers.get('x-webhook-secret');
@@ -26,13 +40,18 @@ Deno.serve(async (req) => {
     }
 
     const payload = await req.json();
+    debugInfo.webhookPayload = payload;
     const record = payload.record;
     if (!record) {
       throw new Error("No record found in payload");
     }
 
+    debugInfo.googleEmail = record.google_email;
+
     // Log successful database save event
-    console.log("✔ Testimonial saved:", record.id);
+    debugLog("✔ Testimonial saved: " + record.id);
+    debugLog("Webhook payload: " + JSON.stringify(payload));
+    debugLog("Parsed google_email: " + record.google_email);
 
     const { google_name, google_email, google_avatar, linkedin_url, testimonial, consent_public, status, created_at } = record;
 
@@ -226,7 +245,190 @@ Deno.serve(async (req) => {
     }
 
     console.log("✔ Email sent successfully. Resend ID:", result.id);
-    return new Response(JSON.stringify({ success: true, id: result.id }), {
+
+    // Send thank-you email to submitter
+    try {
+      if (google_email) {
+        console.log("record.google_email value:", google_email);
+        console.log(`Sending thank-you email to submitter: ${google_email}...`);
+        const thankYouEmailBody = {
+          from: 'Portfolio Team <onboarding@resend.dev>',
+          to: google_email,
+          subject: 'Thank you for sharing your experience ❤️',
+          html: `
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+              <meta charset="UTF-8">
+              <title>Thank You for Your Testimonial</title>
+              <style>
+                body {
+                  margin: 0;
+                  padding: 0;
+                  background-color: #090d16;
+                  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+                  color: #ffffff;
+                }
+                .email-container {
+                  max-width: 600px;
+                  margin: 30px auto;
+                  padding: 32px;
+                  background: radial-gradient(circle at top right, rgba(143, 133, 255, 0.05), transparent 45%), #0d111c;
+                  border: 1px solid rgba(255, 255, 255, 0.08);
+                  border-radius: 24px;
+                  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+                }
+                .header {
+                  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                  padding-bottom: 20px;
+                  margin-bottom: 24px;
+                }
+                .logo-text {
+                  font-size: 22px;
+                  font-weight: 800;
+                  background: linear-gradient(135deg, #8f85ff, #3cbcff);
+                  -webkit-background-clip: text;
+                  -webkit-text-fill-color: transparent;
+                  margin: 0;
+                }
+                .subject-title {
+                  font-size: 20px;
+                  font-weight: 700;
+                  color: #ffffff;
+                  margin-top: 10px;
+                  margin-bottom: 0;
+                }
+                .content-box {
+                  line-height: 1.6;
+                  font-size: 15px;
+                  color: rgba(255, 255, 255, 0.9);
+                }
+                .content-box p {
+                  margin-top: 0;
+                  margin-bottom: 16px;
+                }
+                .highlight-box {
+                  margin: 24px 0;
+                  padding: 18px;
+                  background: rgba(143, 133, 255, 0.04);
+                  border-left: 3px solid #8f85ff;
+                  border-radius: 0 12px 12px 0;
+                  color: rgba(255, 255, 255, 0.8);
+                  font-size: 14px;
+                }
+                .links-section {
+                  margin-top: 30px;
+                  padding-top: 20px;
+                  border-top: 1px solid rgba(255, 255, 255, 0.1);
+                }
+                .link-item {
+                  margin-bottom: 10px;
+                  font-size: 13px;
+                }
+                .link-item a {
+                  color: #3cbcff;
+                  text-decoration: none;
+                }
+                .footer {
+                  margin-top: 30px;
+                  font-size: 11px;
+                  color: rgba(255, 255, 255, 0.3);
+                  text-align: center;
+                  line-height: 1.5;
+                }
+              </style>
+            </head>
+            <body>
+              <div class="email-container">
+                <div class="header">
+                  <div class="logo-text">Ashok Vangapandu</div>
+                  <h1 class="subject-title">Thank you for sharing your experience ❤️</h1>
+                </div>
+                
+                <div class="content-box">
+                  <p>Hi ${google_name || "there"},</p>
+                  <p>Thank you for taking the time to share your experience.</p>
+                  <p>Your testimonial has been received successfully and is currently under review.</p>
+                  <p>Once approved, it may appear on my portfolio's Wall of Love.</p>
+                  <p>I truly appreciate your support.</p>
+                  
+                  <div class="highlight-box">
+                    <strong>Please Note:</strong> Submissions are moderated to ensure high-quality interactions. You will receive an automated update once approval status updates.
+                  </div>
+                  
+                  <p style="margin-bottom: 4px;">Regards,</p>
+                  <p><strong>Ashok Vangapandu</strong><br><span style="font-size: 13px; color: rgba(255,255,255,0.6);">UI Manager | Mendix UI Specialist</span></p>
+                </div>
+
+                <div class="links-section">
+                  <div class="link-item">🌐 <strong>Portfolio:</strong> <a href="https://ashokvangapandu.github.io/ashok-portfolio/" target="_blank">ashokvangapandu.github.io/ashok-portfolio</a></div>
+                  <div class="link-item">🔗 <strong>LinkedIn:</strong> <a href="https://www.linkedin.com/in/ashok-vangapandu/" target="_blank">linkedin.com/in/ashok-vangapandu</a></div>
+                  <div class="link-item">💻 <strong>GitHub:</strong> <a href="https://github.com/AshokVangapandu" target="_blank">github.com/AshokVangapandu</a></div>
+                </div>
+                
+                <div class="footer">
+                  This confirmation was generated automatically because you submitted a testimonial.
+                </div>
+              </div>
+            </body>
+            </html>
+          `,
+          text: `
+            Hi ${google_name || "there"},
+
+            Thank you for taking the time to share your experience.
+
+            Your testimonial has been received successfully and is currently under review.
+
+            Once approved, it may appear on my portfolio's Wall of Love.
+
+            I truly appreciate your support.
+
+            Regards,
+
+            Ashok Vangapandu
+            UI Manager | Mendix UI Specialist
+
+            Portfolio: https://ashokvangapandu.github.io/ashok-portfolio/
+            LinkedIn: https://www.linkedin.com/in/ashok-vangapandu/
+            GitHub: https://github.com/AshokVangapandu
+          `
+        };
+
+        const thankYouRes = await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${resendApiKey}`
+          },
+          body: JSON.stringify(thankYouEmailBody)
+        });
+
+        const thankYouStatus = thankYouRes.status;
+        const thankYouBodyText = await thankYouRes.text();
+        debugInfo.thankYouResStatus = thankYouStatus;
+        debugInfo.thankYouResBody = thankYouBodyText;
+        console.log("HTTP Status:", thankYouStatus);
+        console.log("Response Body:", thankYouBodyText);
+        debugLog(`Resend thank-you API status: ${thankYouStatus}`);
+        debugLog(`Resend thank-you API response: ${thankYouBodyText}`);
+
+        if (!thankYouRes.ok) {
+          throw new Error(`Resend API returned status ${thankYouStatus}: ${thankYouBodyText}`);
+        }
+        debugLog("Thank-you email sent.");
+      }
+    } catch (thankYouError) {
+      debugInfo.thankYouError = thankYouError.message;
+      console.error("Failed to send thank-you email.");
+      console.error("Error Message:", thankYouError.message);
+    }
+
+    return new Response(JSON.stringify({ 
+      success: true, 
+      id: result.id,
+      debug: debugInfo
+    }), {
       status: 200,
       headers: { 
         'Content-Type': 'application/json',
@@ -237,7 +439,11 @@ Deno.serve(async (req) => {
   } catch (error) {
     console.error("❌ Email failed:", error.message);
     // Return status 200/success so the PostgreSQL transaction is never aborted or blocked
-    return new Response(JSON.stringify({ success: false, error: error.message }), {
+    return new Response(JSON.stringify({ 
+      success: false, 
+      error: error.message,
+      debug: debugInfo
+    }), {
       status: 200,
       headers: { 
         'Content-Type': 'application/json',
