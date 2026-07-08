@@ -18,6 +18,7 @@
    * Handles social authentication flow state operations.
    */
   const AuthService = {
+    supabase: supabase,
     async signInWithGoogle() {
       console.log("AuthService: signInWithGoogle invoked");
       if (!supabase) {
