@@ -1099,8 +1099,7 @@ body.modal-open {
   .modal-subtitle {
     font-size: 13px;
   }
-
-
+}
 
 /* Spinner and loading state styles for OAuth button */
 .auth-spinner {

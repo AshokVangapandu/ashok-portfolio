@@ -1,0 +1,507 @@
+/* theme-light.css - Soft Indigo Light Theme Variables & Cascade CSS Overrides */
+
+.admin-layout-root {
+  background: linear-gradient(135deg, #FFFFFF 0%, #F5F7FF 100%) !important;
+  color: #475569 !important;
+
+  /* Soft Indigo Light Theme Design System Tokens */
+  --primary: #7C3AED;
+  --primary-hover: #6D28D9;
+  --secondary: #A78BFA;
+  --light-purple: #C4B5FD;
+  --bg: #FFFFFF;
+  --bg-soft: #F5F7FF;
+  --soft-surface: #E0E7FF;
+  --text-primary: #0F172A;
+  --text-secondary: #64748B;
+  --border: #E5E7EB;
+  --divider: #EEF2FF;
+
+  /* Aliasing old variables for automatic backward compatibility */
+  --bg-dark: #FFFFFF;
+  --panel: #FFFFFF;
+  --line: #EEF2FF;
+  --text: #475569;
+  --muted: #64748B;
+  --accent: #7C3AED;
+  --accent-two: #A78BFA;
+  --accent-three: #22C55E;
+}
+
+/* Soft Indigo Light Theme overrides */
+.admin-layout-root h1,
+.admin-layout-root h2,
+.admin-layout-root h3,
+.admin-layout-root h4,
+.admin-layout-root h5,
+.admin-layout-root h6,
+.admin-layout-root .navbar-title,
+.admin-layout-root .analytics-card-title,
+.admin-layout-root .activity-card-title,
+.admin-layout-root .message-card-title,
+.admin-layout-root .testimonial-card-title,
+.admin-layout-root .messages-page-title {
+  color: #0F172A !important;
+}
+
+/* Override text-white classes so text is not invisible on white panels */
+.admin-layout-root .text-white {
+  color: #0F172A !important;
+}
+
+.admin-layout-root .text-muted {
+  color: #64748B !important;
+}
+
+/* Sidebar Overrides */
+.admin-sidebar {
+  background: #FFFFFF !important;
+  border-right: 1px solid #EEF2FF !important;
+  box-shadow: 4px 0 24px rgba(15, 23, 42, 0.02) !important;
+}
+
+.sidebar-header {
+  border-bottom: 1px solid #EEF2FF !important;
+}
+
+.admin-sidebar .hamburger-btn {
+  color: #64748B !important;
+}
+
+.admin-sidebar .hamburger-btn:hover {
+  background: #F5F7FF !important;
+  color: #7C3AED !important;
+}
+
+.sidebar-link {
+  color: #64748B !important;
+  background: transparent !important;
+  border-color: transparent !important;
+}
+
+.sidebar-link .sidebar-link-icon {
+  color: #94A3B8 !important;
+}
+
+.sidebar-link:hover {
+  background: #F5F7FF !important;
+  color: #7C3AED !important;
+  border-radius: 12px !important;
+}
+
+.sidebar-link:hover .sidebar-link-icon {
+  color: #7C3AED !important;
+}
+
+.sidebar-link.active {
+  background: #F5F7FF !important;
+  color: #7C3AED !important;
+  border-radius: 12px !important;
+  border-color: transparent !important;
+}
+
+.sidebar-link.active .sidebar-link-icon {
+  color: #7C3AED !important;
+}
+
+.sidebar-link.active::before {
+  background: #7C3AED !important;
+  width: 3.5px !important;
+}
+
+/* Top Navbar Overrides */
+.admin-navbar {
+  background: #FFFFFF !important;
+  border-bottom: 1px solid #EEF2FF !important;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.02) !important;
+}
+
+.navbar-search-wrapper input {
+  background: #F8FAFC !important;
+  border: 1px solid #E5E7EB !important;
+  color: #0F172A !important;
+}
+
+.navbar-search-wrapper input:focus {
+  background: #FFFFFF !important;
+  border-color: #A78BFA !important;
+  box-shadow: 0 0 12px rgba(124, 58, 237, 0.06) !important;
+}
+
+.navbar-search-wrapper input::placeholder {
+  color: #94A3B8 !important;
+}
+
+.navbar-search-icon {
+  color: #94A3B8 !important;
+}
+
+.navbar-action-btn {
+  background: #FFFFFF !important;
+  border: 1px solid #E5E7EB !important;
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.04) !important;
+  color: #64748B !important;
+  border-radius: 50% !important;
+  width: 38px !important;
+  height: 38px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.navbar-action-btn:hover {
+  background: #F5F7FF !important;
+  border-color: #C4B5FD !important;
+  color: #7C3AED !important;
+}
+
+.navbar-user-avatar {
+  border: 1.5px solid #E5E7EB !important;
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.04) !important;
+}
+
+/* Welcome Hero Banner Overrides */
+.dashboard-banner {
+  background: linear-gradient(135deg, #7C3AED 0%, #A78BFA 100%) !important;
+  border: none !important;
+  border-radius: 20px !important;
+  box-shadow: 0 10px 30px rgba(124, 58, 237, 0.16) !important;
+}
+
+.dashboard-banner-title {
+  background: none !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+  color: #FFFFFF !important;
+}
+
+.dashboard-banner-subtitle {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Statistic Cards Overrides */
+.stat-card {
+  background: #FFFFFF !important;
+  border: 1px solid #EEF2FF !important;
+  border-radius: 18px !important;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04) !important;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px) !important;
+  border-color: #EEF2FF !important;
+  box-shadow: 0 16px 32px rgba(15, 23, 42, 0.08) !important;
+}
+
+.stat-card-icon {
+  background: #F5F3FF !important;
+  color: #7C3AED !important;
+}
+
+.stat-card-growth {
+  color: #22C55E !important;
+  background: #DCFCE7 !important;
+  border: 1px solid rgba(34, 197, 94, 0.15) !important;
+}
+
+.stat-card:nth-child(5) .stat-card-growth {
+  color: #64748B !important;
+  background: #F1F5F9 !important;
+  border-color: #E2E8F0 !important;
+}
+
+.stat-card-value {
+  color: #0F172A !important;
+}
+
+.stat-card-label {
+  color: #64748B !important;
+}
+
+/* Card Containers Overrides */
+.analytics-card,
+.activity-card,
+.message-card,
+.testimonial-card {
+  background: #FFFFFF !important;
+  border: 1px solid #EEF2FF !important;
+  box-shadow: 0 8px 30px rgba(15, 23, 42, 0.03) !important;
+}
+
+/* Chart Component Overrides */
+.analytics-card-subtitle {
+  color: #64748B !important;
+}
+
+.filter-chip {
+  background: #FFFFFF !important;
+  border: 1px solid #E5E7EB !important;
+  color: #64748B !important;
+}
+
+.filter-chip:hover {
+  background: #F5F7FF !important;
+  color: #7C3AED !important;
+}
+
+.filter-chip.active {
+  background: #7C3AED !important;
+  border-color: #7C3AED !important;
+  color: #FFFFFF !important;
+}
+
+/* Chart SVGs */
+.analytics-mock-chart path[stroke="#8f85ff"] {
+  stroke: #7C3AED !important;
+}
+
+.analytics-mock-chart circle[fill="#8f85ff"] {
+  fill: #7C3AED !important;
+  stroke: #FFFFFF !important;
+}
+
+#chart-grad stop[stop-color="rgba(143, 133, 255, 0.25)"] {
+  stop-color: rgba(124, 58, 237, 0.18) !important;
+}
+
+.analytics-mock-chart line {
+  stroke: #EEF2FF !important;
+}
+
+.analytics-chart-axis {
+  color: #64748B !important;
+}
+
+/* Recent Activity Timeline Overrides */
+.activity-timeline::before {
+  background: #E0E7FF !important;
+}
+
+.activity-timeline-badge {
+  background: #FFFFFF !important;
+  border: 2px solid #7C3AED !important;
+}
+
+.activity-timeline-text {
+  color: #0F172A !important;
+}
+
+.activity-timeline-time {
+  color: #64748B !important;
+}
+
+/* Recent Messages List Overrides */
+.message-row,
+.testimonial-row {
+  background: #F8FAFC !important;
+  border: 1px solid #EEF2FF !important;
+}
+
+.message-row:hover,
+.testimonial-row:hover {
+  background: #F1F5F9 !important;
+  border-color: #E2E8F0 !important;
+}
+
+.message-name,
+.testimonial-name {
+  color: #0F172A !important;
+}
+
+.message-subject,
+.testimonial-review {
+  color: #475569 !important;
+}
+
+.message-time {
+  color: #64748B !important;
+}
+
+.status-badge.unread {
+  color: #7C3AED !important;
+  background: #F5F3FF !important;
+  border: 1px solid rgba(124, 58, 237, 0.15) !important;
+}
+
+.status-badge.read {
+  color: #64748B !important;
+  background: #F1F5F9 !important;
+  border: 1px solid #E2E8F0 !important;
+}
+
+/* Ratings Overrides */
+.testimonial-rating svg {
+  fill: #F59E0B !important;
+  stroke: #F59E0B !important;
+}
+
+.status-badge.approved {
+  color: #22C55E !important;
+  background: #DCFCE7 !important;
+  border: 1px solid rgba(34, 197, 94, 0.15) !important;
+}
+
+.status-badge.pending {
+  color: #F59E0B !important;
+  background: #FEF3C7 !important;
+  border: 1px solid rgba(245, 175, 11, 0.15) !important;
+}
+
+/* Messages Table View Overrides */
+.messages-filters-bar {
+  background: #FFFFFF !important;
+  border: 1px solid #EEF2FF !important;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.02) !important;
+}
+
+.messages-search-field {
+  background: #F8FAFC !important;
+  border: 1px solid #E5E7EB !important;
+  color: #0F172A !important;
+}
+
+.messages-search-field:focus {
+  background: #FFFFFF !important;
+  border-color: #A78BFA !important;
+}
+
+.messages-sort-select {
+  background: #F8FAFC !important;
+  border: 1px solid #E5E7EB !important;
+  color: #0F172A !important;
+}
+
+.messages-sort-select option {
+  background: #FFFFFF !important;
+  color: #0F172A !important;
+}
+
+.messages-table-container {
+  background: #FFFFFF !important;
+  border: 1px solid #EEF2FF !important;
+  box-shadow: 0 8px 30px rgba(15, 23, 42, 0.04) !important;
+}
+
+.messages-table th {
+  background: #F8FAFC !important;
+  color: #64748B !important;
+  border-bottom: 1px solid #EEF2FF !important;
+}
+
+.messages-table td {
+  border-bottom: 1px solid #EEF2FF !important;
+  color: #475569 !important;
+}
+
+.messages-table tr.data-row:hover {
+  background: #F5F7FF !important;
+}
+
+.table-action-btn {
+  background: #FFFFFF !important;
+  border: 1px solid #E5E7EB !important;
+  color: #64748B !important;
+}
+
+.table-action-btn:hover {
+  background: #FEE2E2 !important;
+  border-color: rgba(239, 68, 68, 0.2) !important;
+  color: #EF4444 !important;
+}
+
+.messages-pagination-bar {
+  background: #F8FAFC !important;
+  border-top: 1px solid #EEF2FF !important;
+}
+
+.pagination-btn {
+  background: #FFFFFF !important;
+  border: 1px solid #E5E7EB !important;
+  color: #475569 !important;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: #F5F7FF !important;
+  border-color: #C4B5FD !important;
+  color: #7C3AED !important;
+}
+
+/* Modals & Detail Overlay Overrides */
+.message-detail-overlay {
+  background: rgba(15, 23, 42, 0.3) !important;
+}
+
+.message-detail-panel {
+  background: #FFFFFF !important;
+  border: 1px solid #E5E7EB !important;
+  box-shadow: 0 24px 64px rgba(15, 23, 42, 0.16) !important;
+}
+
+.detail-panel-header {
+  border-bottom: 1px solid #EEF2FF !important;
+}
+
+.detail-panel-header h3 {
+  color: #0F172A !important;
+}
+
+.detail-close-btn {
+  color: #64748B !important;
+}
+
+.detail-close-btn:hover {
+  background: #F5F7FF !important;
+  color: #7C3AED !important;
+}
+
+.field-label {
+  color: #64748B !important;
+}
+
+.field-value {
+  color: #0F172A !important;
+}
+
+.detail-email-link {
+  color: #7C3AED !important;
+}
+
+.message-text-box {
+  background: #F8FAFC !important;
+  border: 1px solid #E5E7EB !important;
+  color: #0F172A !important;
+}
+
+.detail-panel-footer {
+  border-top: 1px solid #EEF2FF !important;
+  background: #F8FAFC !important;
+}
+
+.detail-action-btn.close {
+  background: #FFFFFF !important;
+  border: 1px solid #E5E7EB !important;
+  color: #0F172A !important;
+}
+
+.detail-action-btn.close:hover {
+  background: #F5F7FF !important;
+  color: #7C3AED !important;
+}
+
+/* Skeleton Loading Pulse Overrides */
+.skeleton-cell {
+  background: linear-gradient(90deg, #F1F5F9 25%, #E2E8F0 50%, #F1F5F9 75%) !important;
+  background-size: 200% 100% !important;
+}
+
+/* Custom Scrollbar theme overrides */
+::-webkit-scrollbar-track {
+  background: #F5F7FF;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #C4B5FD;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #A78BFA;
+}

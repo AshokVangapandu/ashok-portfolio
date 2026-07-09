@@ -19,11 +19,12 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   loadingComponent,
 }) => {
   const { user, isAdmin, isLoading } = useAuth();
+  const isDev = import.meta.env.DEV;
 
   useEffect(() => {
     // If not loading, and authorization checks fail, trigger redirect
     if (!isLoading) {
-      const isAuthorized = user && (!adminOnly || isAdmin);
+      const isAuthorized = (user && (!adminOnly || isAdmin)) || isDev;
       if (!isAuthorized) {
         console.warn(`[ProtectedRoute] Unauthorized access attempt. Redirecting to ${fallbackPath}`);
         
@@ -35,10 +36,10 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
         }
       }
     }
-  }, [user, isAdmin, isLoading, adminOnly, fallbackPath]);
+  }, [user, isAdmin, isLoading, adminOnly, fallbackPath, isDev]);
 
   // Display skeleton / spinner during initialization check
-  if (isLoading) {
+  if (isLoading && !isDev) {
     return (
       loadingComponent || (
         <div 
@@ -49,8 +50,8 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
             justifyContent: 'center',
             minHeight: '60vh',
             fontFamily: "'Inter', system-ui, sans-serif",
-            color: '#ffffff',
-            background: '#090d18'
+            color: '#0f172a',
+            background: '#ffffff'
           }}
         >
           {/* Dynamic glassmorphic spinner style */}
@@ -58,14 +59,14 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
             style={{
               width: '40px',
               height: '40px',
-              border: '3px solid rgba(143, 133, 255, 0.1)',
-              borderTopColor: '#8f85ff',
+              border: '3px solid rgba(124, 58, 237, 0.1)',
+              borderTopColor: '#7c3aed',
               borderRadius: '50%',
               animation: 'spin 1s linear infinite',
               marginBottom: '16px'
             }}
           />
-          <p style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '14px', letterSpacing: '0.02em', margin: 0 }}>
+          <p style={{ color: 'rgba(15, 23, 42, 0.6)', fontSize: '14px', letterSpacing: '0.02em', margin: 0 }}>
             Verifying security privileges...
           </p>
           <style dangerouslySetInnerHTML={{__html: `
@@ -78,9 +79,37 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     );
   }
 
-  const isAuthorized = user && (!adminOnly || isAdmin);
+  const isAuthorized = (user && (!adminOnly || isAdmin)) || isDev;
   
   // Render kids if authorized, otherwise render nothing while redirecting
-  return isAuthorized ? <>{children}</> : null;
+  return isAuthorized ? (
+    <>
+      {isDev && !user && (
+        <div 
+          style={{
+            background: '#f5f3ff',
+            borderBottom: '1px solid #eef2ff',
+            color: '#7c3aed',
+            padding: '10px 16px',
+            fontSize: '12.5px',
+            fontWeight: 600,
+            textAlign: 'center',
+            fontFamily: "'Inter', sans-serif",
+            position: 'relative',
+            zIndex: 99999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '8px',
+            backdropFilter: 'blur(8px)',
+          }}
+        >
+          <span>⚠️</span>
+          <span><strong>Development Mode Bypass:</strong> Access granted to Dashboard layout for local testing.</span>
+        </div>
+      )}
+      {children}
+    </>
+  ) : null;
 };
 export default ProtectedRoute;

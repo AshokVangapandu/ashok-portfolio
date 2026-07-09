@@ -25,6 +25,7 @@ export interface Database {
           consent_public: boolean
           status: 'pending' | 'approved' | 'rejected'
           approved: boolean
+          featured: boolean
           source: string
           ip_address: string | null
           user_agent: string | null
@@ -42,6 +43,7 @@ export interface Database {
           consent_public?: boolean
           status?: 'pending' | 'approved' | 'rejected'
           approved?: boolean
+          featured?: boolean
           source?: string
           ip_address?: string | null
           user_agent?: string | null
@@ -59,6 +61,7 @@ export interface Database {
           consent_public?: boolean
           status?: 'pending' | 'approved' | 'rejected'
           approved?: boolean
+          featured?: boolean
           source?: string
           ip_address?: string | null
           user_agent?: string | null
@@ -71,6 +74,69 @@ export interface Database {
             referencedColumns: ["id"]
           }
         ]
+      }
+      admins: {
+        Row: {
+          id: string
+          email: string
+          full_name: string | null
+          role: string
+          is_active: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          email: string
+          full_name?: string | null
+          role?: string
+          is_active?: boolean
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          email?: string
+          full_name?: string | null
+          role?: string
+          is_active?: boolean
+          created_at?: string
+        }
+        Relationships: []
+      }
+      contact_messages: {
+        Row: {
+          id: string
+          full_name: string
+          email: string
+          company: string | null
+          phone_number: string | null
+          subject: string
+          message: string
+          status: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          full_name: string
+          email: string
+          company?: string | null
+          phone_number?: string | null
+          subject: string
+          message: string
+          status?: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          full_name?: string
+          email?: string
+          company?: string | null
+          phone_number?: string | null
+          subject?: string
+          message?: string
+          status?: string
+          created_at?: string
+        }
+        Relationships: []
       }
     }
     Views: {
