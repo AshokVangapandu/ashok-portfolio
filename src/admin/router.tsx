@@ -8,6 +8,7 @@ import { AnalyticsPage } from './pages/analytics/AnalyticsPage';
 import { PortfolioSettingsPage } from './pages/settings/PortfolioSettingsPage';
 import { SocialLinksPage } from './pages/social-links/SocialLinksPage';
 import { AdminAccessPage } from './pages/admin-access/AdminAccessPage';
+import { CertificationsPage } from './pages/certifications/CertificationsPage';
 
 interface RouteResolution {
   component: React.ReactNode;
@@ -27,6 +28,11 @@ export const resolveRoute = (path: string): RouteResolution => {
       return {
         component: <DashboardPage />,
         pageTitle: 'Admin Dashboard',
+      };
+    case '/admin/certifications':
+      return {
+        component: <CertificationsPage />,
+        pageTitle: 'Certifications',
       };
     case '/admin/contacts':
       return {
