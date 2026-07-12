@@ -1,0 +1,107 @@
+/* src/admin/styles/admin-theme.css */
+
+/* Reset & Scoped Framework Styling */
+.admin-dashboard-env {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--admin-text);
+  background-color: var(--admin-bg);
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Typography styles */
+.text-heading-xl {
+  font-size: 2.25rem; /* 36px */
+  line-height: 2.5rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  color: var(--admin-text);
+}
+
+.text-heading-lg {
+  font-size: 1.875rem; /* 30px */
+  line-height: 2.25rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: var(--admin-text);
+}
+
+.text-heading-md {
+  font-size: 1.5rem; /* 24px */
+  line-height: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--admin-text);
+}
+
+.text-section-title {
+  font-size: 1.25rem; /* 20px */
+  line-height: 1.75rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--admin-text);
+}
+
+.text-card-title {
+  font-size: 1rem; /* 16px */
+  line-height: 1.5rem;
+  font-weight: 600;
+  color: var(--admin-text);
+}
+
+.text-subtitle {
+  font-size: 1.125rem; /* 18px */
+  line-height: 1.75rem;
+  font-weight: 400;
+  color: var(--admin-text-secondary);
+}
+
+.text-body {
+  font-size: 0.875rem; /* 14px */
+  line-height: 1.25rem;
+  font-weight: 400;
+  color: var(--admin-text);
+}
+
+.text-caption {
+  font-size: 0.75rem; /* 12px */
+  line-height: 1rem;
+  font-weight: 400;
+  color: var(--admin-text-secondary);
+}
+
+.text-label {
+  font-size: 0.875rem; /* 14px */
+  line-height: 1.25rem;
+  font-weight: 500;
+  color: var(--admin-text-secondary);
+}
+
+.text-button {
+  font-size: 0.875rem; /* 14px */
+  line-height: 1.25rem;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+}
+
+/* Custom Scrollbar Styles */
+.admin-dashboard-env ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.admin-dashboard-env ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.admin-dashboard-env ::-webkit-scrollbar-thumb {
+  background: rgba(124, 58, 237, 0.15);
+  border-radius: 9999px;
+}
+
+.admin-dashboard-env ::-webkit-scrollbar-thumb:hover {
+  background: var(--admin-secondary);
+}

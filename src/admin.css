@@ -1,8 +1,13 @@
 /* src/admin.css */
 
 /* Main Compiler Entrypoint for Modular Admin Dashboard styles */
+@import url("./admin/styles/admin-variables.css");
+@import url("./admin/styles/admin-animations.css");
+@import url("./admin/styles/admin-theme.css");
+
 @import url("./styles/admin/base.css");
 @import url("./styles/admin/layout.css");
 @import url("./styles/admin/dashboard.css");
 @import url("./styles/admin/messages.css");
+@import url("./styles/admin/social-links.css");
 @import url("./styles/admin/theme-light.css");

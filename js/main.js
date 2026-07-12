@@ -7,8 +7,6 @@ const expertiseGrid = document.querySelector("[data-expertise-grid]");
 const buildFlow = document.querySelector("[data-build-flow]");
 const anchorLinks = document.querySelectorAll('a[href^="#"]');
 const navSectionLinks = document.querySelectorAll('.nav-links a[href^="#"], .mobile-nav-container a[href^="#"]');
-const projectNavLinks = document.querySelectorAll('.project-nav a[href^="#"]');
-const floatingProjectNav = document.querySelector(".medi-subnav, .ds-subnav");
 const whatsappLinks = document.querySelectorAll("[data-whatsapp-link]");
 const contactForm = document.querySelector("[data-contact-form]");
 
@@ -623,24 +621,6 @@ const setActiveNavLink = () => {
     }
   });
 
-  projectNavLinks.forEach((link) => {
-    const isActive = link.getAttribute("href") === `#${activeId}`;
-    link.classList.toggle("is-active", isActive);
-
-    if (isActive) {
-      link.setAttribute("aria-current", "true");
-    } else {
-      link.removeAttribute("aria-current");
-    }
-  });
-
-  if (document.body.classList.contains("project-detail-page")) {
-    document.querySelectorAll('.nav-links a[href$="#work"]').forEach((link) => {
-      link.classList.add("is-active");
-      link.setAttribute("aria-current", "page");
-    });
-  }
-
   if (document.body.classList.contains("resume-page")) {
     document.querySelectorAll('.nav-links a[href$="#resume"]').forEach((link) => {
       link.classList.add("is-active");
@@ -649,28 +629,12 @@ const setActiveNavLink = () => {
   }
 };
 
-const setProjectNavVisibility = () => {
-  if (!floatingProjectNav) return;
-
-  const overviewSection = document.querySelector("#overview");
-  const outcomeSection = document.querySelector("#outcomes, #outcome");
-  if (!overviewSection || !outcomeSection) return;
-
-  const overviewRect = overviewSection.getBoundingClientRect();
-  const outcomeRect = outcomeSection.getBoundingClientRect();
-  const hasPassedHero = overviewRect.bottom <= header.offsetHeight + 42;
-  const isNearEnding = outcomeRect.bottom <= window.innerHeight * 0.82;
-
-  floatingProjectNav.classList.toggle("is-floating-visible", hasPassedHero && !isNearEnding);
-};
-
 let scrollTicking = false;
 
 const updateScrollState = () => {
   scrollTicking = false;
   setHeaderState();
   setActiveNavLink();
-  setProjectNavVisibility();
 };
 
 const requestScrollUpdate = () => {
@@ -687,7 +651,6 @@ const closeMenu = () => {
 
 setHeaderState();
 setActiveNavLink();
-setProjectNavVisibility();
 showRevealItems();
 
 window.addEventListener("scroll", requestScrollUpdate, { passive: true });
