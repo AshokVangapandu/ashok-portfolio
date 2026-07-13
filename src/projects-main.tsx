@@ -45,10 +45,11 @@ const MainLayout: React.FC = () => {
 
           <div className={`nav-links ${navActive ? 'active' : ''}`} data-nav-menu>
             <a href="../../index.html#expertise" onClick={() => setNavActive(false)}>Expertise</a>
-            <a href="/pages/projects" className="active" style={{ color: 'var(--admin-secondary)', fontWeight: 700 }} onClick={() => setNavActive(false)}>Projects</a>
+            <a href="./index.html" className="active" style={{ color: 'var(--admin-secondary)', fontWeight: 700 }} onClick={() => setNavActive(false)}>Projects</a>
             <a href="../../index.html#behind-build" onClick={() => setNavActive(false)}>Process</a>
             <a href="../../index.html#work" onClick={() => setNavActive(false)}>Work</a>
-            <a href="/widgets" onClick={() => setNavActive(false)}>Tools & Products</a>
+            <a href="../../widgets/index.html" onClick={() => setNavActive(false)}>Tools & Products</a>
+            <a href="../../certifications/index.html" onClick={() => setNavActive(false)}>Certifications</a>
             <a href="../../index.html#contact" onClick={() => setNavActive(false)}>Contact</a>
           </div>
         </nav>

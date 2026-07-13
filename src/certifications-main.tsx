@@ -25,7 +25,7 @@ const MainLayout: React.FC = () => {
       {/* Header Navigation */}
       <header className="site-header" style={{ position: 'fixed', top: 0, width: '100%', zIndex: 1000 }}>
         <nav className="navbar" aria-label="Certifications showcase navigation">
-          <a className="brand" href="../../index.html#hero" aria-label="Ashok Vangapandu home">
+          <a className="brand" href="../index.html#hero" aria-label="Ashok Vangapandu home">
             <span className="brand-mark">AV</span>
             <span className="brand-copy">
               <span className="brand-name">Ashok Vangapandu</span>
@@ -44,13 +44,13 @@ const MainLayout: React.FC = () => {
           </button>
 
           <div className={`nav-links ${navActive ? 'active' : ''}`} data-nav-menu>
-            <a href="../../index.html#expertise" onClick={() => setNavActive(false)}>Expertise</a>
-            <a href="/pages/projects" onClick={() => setNavActive(false)}>Projects</a>
-            <a href="../../index.html#behind-build" onClick={() => setNavActive(false)}>Process</a>
-            <a href="../../index.html#work" onClick={() => setNavActive(false)}>Work</a>
-            <a href="/widgets" onClick={() => setNavActive(false)}>Tools & Products</a>
-            <a href="/certifications" className="active" style={{ color: 'var(--admin-secondary)', fontWeight: 700 }} onClick={() => setNavActive(false)}>Certifications</a>
-            <a href="../../index.html#contact" onClick={() => setNavActive(false)}>Contact</a>
+            <a href="../index.html#expertise" onClick={() => setNavActive(false)}>Expertise</a>
+            <a href="../pages/projects/index.html" onClick={() => setNavActive(false)}>Projects</a>
+            <a href="../index.html#behind-build" onClick={() => setNavActive(false)}>Process</a>
+            <a href="../index.html#work" onClick={() => setNavActive(false)}>Work</a>
+            <a href="../widgets/index.html" onClick={() => setNavActive(false)}>Tools & Products</a>
+            <a href="./index.html" className="active" style={{ color: 'var(--admin-secondary)', fontWeight: 700 }} onClick={() => setNavActive(false)}>Certifications</a>
+            <a href="../index.html#contact" onClick={() => setNavActive(false)}>Contact</a>
           </div>
         </nav>
       </header>

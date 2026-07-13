@@ -34,11 +34,40 @@ export const ProjectsShowcasePage: React.FC = () => {
     loadData();
   }, []);
 
+  useEffect(() => {
+    if (projects.length === 0) return;
+
+    const handleHashChange = () => {
+      const hash = window.location.hash;
+      if (hash) {
+        const projId = hash.replace('#', '');
+        const found = projects.find(p => p.id === projId);
+        if (found) {
+          setSelectedProject(found);
+        } else {
+          setSelectedProject(null);
+        }
+      } else {
+        setSelectedProject(null);
+      }
+    };
+
+    handleHashChange();
+
+    window.addEventListener('hashchange', handleHashChange);
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange);
+    };
+  }, [projects]);
+
   const handleOpenDetails = (proj: Project) => {
-    setSelectedProject(proj);
+    window.location.hash = proj.id;
   };
 
   const handleCloseDetails = () => {
+    if (window.location.hash) {
+      window.history.pushState(null, '', window.location.pathname + window.location.search);
+    }
     setSelectedProject(null);
   };
 

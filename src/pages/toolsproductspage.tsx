@@ -55,11 +55,40 @@ export const ToolsProductsPage: React.FC = () => {
     }
   }, [searchQuery, products]);
 
+  useEffect(() => {
+    if (products.length === 0) return;
+
+    const handleHashChange = () => {
+      const hash = window.location.hash;
+      if (hash) {
+        const prodId = hash.replace('#', '');
+        const found = products.find(p => p.id === prodId);
+        if (found) {
+          setSelectedProduct(found);
+        } else {
+          setSelectedProduct(null);
+        }
+      } else {
+        setSelectedProduct(null);
+      }
+    };
+
+    handleHashChange();
+
+    window.addEventListener('hashchange', handleHashChange);
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange);
+    };
+  }, [products]);
+
   const handleOpenDetails = (prod: Product) => {
-    setSelectedProduct(prod);
+    window.location.hash = prod.id;
   };
 
   const handleCloseDetails = () => {
+    if (window.location.hash) {
+      window.history.pushState(null, '', window.location.pathname + window.location.search);
+    }
     setSelectedProduct(null);
   };
 
