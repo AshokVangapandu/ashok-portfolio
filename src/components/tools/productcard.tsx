@@ -1,7 +1,7 @@
 /* src/components/tools/ProductCard.tsx */
 import React from 'react';
 import { Product } from '../../types/Product';
-import { ProductPreview } from './ProductPreview';
+import { ProductPreview } from './productpreview';
 
 interface ProductCardProps {
   product: Product;

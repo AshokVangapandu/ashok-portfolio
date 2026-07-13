@@ -1,7 +1,7 @@
 /* src/components/tools/ProductCarousel.tsx */
 import React, { useState, useEffect, useCallback } from 'react';
 import { Product } from '../../types/Product';
-import { ProductCard } from './ProductCard';
+import { ProductCard } from './productcard';
 
 interface ProductCarouselProps {
   products: Product[];

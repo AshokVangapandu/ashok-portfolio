@@ -2,13 +2,13 @@
 import React, { useState, useEffect } from 'react';
 import { Project } from '../types/Project';
 import { projectService } from '../services/projectService';
-import { FeaturedProject } from '../components/projects/FeaturedProject';
-import { ProjectCollection } from '../components/projects/ProjectCollection';
-import { ImpactMetrics } from '../components/projects/ImpactMetrics';
-import { IndustryGrid } from '../components/projects/IndustryGrid';
-import { TechStackGrid } from '../components/projects/TechStackGrid';
-import { CTASection } from '../components/projects/CTASection';
-import { ProjectDetailsModal } from '../components/projects/ProjectDetailsModal';
+import { FeaturedProject } from '../components/projects/featuredproject';
+import { ProjectCollection } from '../components/projects/projectcollection';
+import { ImpactMetrics } from '../components/projects/impactmetrics';
+import { IndustryGrid } from '../components/projects/industrygrid';
+import { TechStackGrid } from '../components/projects/techstackgrid';
+import { CTASection } from '../components/projects/ctasection';
+import { ProjectDetailsModal } from '../components/projects/projectdetailsmodal';
 
 export const ProjectsShowcasePage: React.FC = () => {
   const [projects, setProjects] = useState<Project[]>([]);

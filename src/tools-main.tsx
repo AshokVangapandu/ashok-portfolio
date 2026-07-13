@@ -1,7 +1,7 @@
 /* src/tools-main.tsx */
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom/client';
-import { ToolsProductsPage } from './pages/ToolsProductsPage';
+import { ToolsProductsPage } from './pages/toolsproductspage';
 import './admin.css';
 
 const MainLayout: React.FC = () => {

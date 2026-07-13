@@ -2,11 +2,11 @@
 import React, { useState, useEffect } from 'react';
 import { Product } from '../types/Product';
 import { productService } from '../services/productService';
-import { ProductMetrics } from '../components/tools/ProductMetrics';
-import { AchievementsPanel } from '../components/tools/AchievementsPanel';
-import { TechnologyGrid } from '../components/tools/TechnologyGrid';
-import { CTASection } from '../components/tools/CTASection';
-import { ProductDetailsModal } from '../components/tools/ProductDetailsModal';
+import { ProductMetrics } from '../components/tools/productmetrics';
+import { AchievementsPanel } from '../components/tools/achievementspanel';
+import { TechnologyGrid } from '../components/tools/technologygrid';
+import { CTASection } from '../components/tools/ctasection';
+import { ProductDetailsModal } from '../components/tools/productdetailsmodal';
 
 export const ToolsProductsPage: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);

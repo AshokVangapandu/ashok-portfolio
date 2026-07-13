@@ -1,7 +1,7 @@
 /* src/projects-main.tsx */
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom/client';
-import { ProjectsShowcasePage } from './pages/ProjectsShowcasePage';
+import { ProjectsShowcasePage } from './pages/projectsshowcasepage';
 import './admin.css';
 
 const MainLayout: React.FC = () => {
