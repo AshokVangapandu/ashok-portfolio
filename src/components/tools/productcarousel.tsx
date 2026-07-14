@@ -118,7 +118,7 @@ export const ProductCarousel: React.FC<ProductCarouselProps> = ({
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <span style={{ width: '4px', height: '18px', backgroundColor: 'var(--admin-primary)', borderRadius: '2px' }} />
-          <h2 style={{ fontSize: '20px', fontWeight: 800, margin: 0, color: '#FFFFFF', letterSpacing: '-0.02em' }}>
+          <h2 style={{ fontSize: '20px', fontWeight: 600, margin: 0, color: '#FFFFFF', letterSpacing: '-0.02em' }}>
             Complete Collection
           </h2>
           <span style={{ fontSize: '13px', color: '#64748B', marginLeft: '8px', fontWeight: 500 }}>

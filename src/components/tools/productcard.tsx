@@ -88,7 +88,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             </span>
           )}
         </div>
-        <span style={{ fontSize: '11px', color: '#64748B', fontWeight: 600 }}>{version}</span>
+        <span style={{ fontSize: '11px', color: '#64748B', fontWeight: 500 }}>{version}</span>
       </div>
 
       {/* 2. Large Preview Area */}
@@ -102,7 +102,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           style={{
             margin: 0,
             fontSize: '18px',
-            fontWeight: 700,
+            fontWeight: 600,
             color: comingSoon ? '#64748B' : '#FFFFFF',
             letterSpacing: '-0.01em',
             transition: 'color 0.2s ease',
@@ -164,7 +164,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
               <svg viewBox="0 0 24 24" width="12" height="12" fill="#F59E0B" stroke="#F59E0B">
                 <path d="M12 3.8 14.5 9l5.7.8-4.1 4 1 5.7-5.1-2.7-5.1 2.7 1-5.7-4.1-4L9.5 9 12 3.8Z" />
               </svg>
-              <strong style={{ color: '#E2E8F0' }}>{rating}</strong>
+              <strong style={{ color: '#E2E8F0', fontWeight: 500 }}>{rating}</strong>
             </span>
             {/* Downloads */}
             <span style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
@@ -187,7 +187,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           <span>Updated {updatedAt}</span>
         </div>
       ) : (
-        <div style={{ fontSize: '11px', color: '#475569', fontWeight: 600, textAlign: 'center' }}>
+        <div style={{ fontSize: '11px', color: '#475569', fontWeight: 500, textAlign: 'center' }}>
           COMING SOON • PRE-RELEASE STAGE
         </div>
       )}

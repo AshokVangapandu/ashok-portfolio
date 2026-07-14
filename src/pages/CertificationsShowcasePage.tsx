@@ -177,8 +177,8 @@ export const CertificationsShowcasePage: React.FC = () => {
           </div>
           <h1
             style={{
-              fontSize: '48px',
-              fontWeight: 850,
+              fontSize: '42px',
+              fontWeight: 700,
               color: '#ffffff',
               margin: 0,
               letterSpacing: '-0.02em',
@@ -187,7 +187,7 @@ export const CertificationsShowcasePage: React.FC = () => {
           >
             Certifications
           </h1>
-          <h2 style={{ fontSize: '20px', fontWeight: 650, color: 'rgba(255, 255, 255, 0.95)', margin: 0 }}>
+          <h2 style={{ fontSize: '20px', fontWeight: 500, color: 'rgba(255, 255, 255, 0.95)', margin: 0 }}>
             Learning <span style={{ color: '#A78BFA' }}>never</span> stops.
           </h2>
           <p style={{ fontSize: '15px', lineHeight: '1.65', color: '#94A3B8', margin: 0, maxWidth: '540px' }}>

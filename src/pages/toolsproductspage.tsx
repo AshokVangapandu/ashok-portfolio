@@ -25,7 +25,7 @@ export const ToolsProductsPage: React.FC = () => {
         if (list.length > 0) {
           setActiveProduct(list[0]);
         }
-        
+
         const featured = await productService.getFeaturedProduct();
         setFeaturedProduct(featured);
       } catch (err) {
@@ -159,14 +159,15 @@ export const ToolsProductsPage: React.FC = () => {
           ★ PRODUCT ECOSYSTEM
         </span>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', maxWidth: '780px', zIndex: 2 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '780px', zIndex: 2 }}>
           <h1
             style={{
               margin: 0,
-              fontSize: 'clamp(42px, 7.5vw, 64px)',
-              fontWeight: 850,
+              fontSize: 'clamp(36px, 6vw, 48px)',
+              fontWeight: 700,
               letterSpacing: '-0.03em',
               lineHeight: 1.1,
+              width: '100%',
               color: '#FFFFFF'
             }}
           >
@@ -174,15 +175,15 @@ export const ToolsProductsPage: React.FC = () => {
           </h1>
           <p
             style={{
-              margin: '8px auto 0 auto',
-              fontSize: 'clamp(15px, 2.5vw, 18px)',
+              margin: '4px 0 0 0',
+              fontSize: 'clamp(15px, 2.5vw, 17px)',
               lineHeight: 1.6,
-              color: '#94A3B8',
-              fontWeight: 500,
+              color: '#CBD5E1',
+              fontWeight: 400,
               maxWidth: '680px'
             }}
           >
-            Pluggable widgets, developer plugins, and productivity tools built to optimize workflow efficiency.
+            Pluggable widgets, developer plugins, and productivity tools crafted to streamline workflows and accelerate modern product development.
           </p>
         </div>
       </section>
@@ -192,10 +193,10 @@ export const ToolsProductsPage: React.FC = () => {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', borderBottom: '1px solid rgba(255, 255, 255, 0.05)', paddingBottom: '16px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <span style={{ width: '4px', height: '16px', backgroundColor: 'var(--admin-primary)', borderRadius: '2px' }} />
-            <h2 style={{ fontSize: '20px', fontWeight: 800, margin: 0, color: '#FFFFFF', letterSpacing: '-0.02em' }}>
+            <h2 style={{ fontSize: '20px', fontWeight: 600, margin: 0, color: '#FFFFFF', letterSpacing: '-0.02em' }}>
               Complete Collection
             </h2>
-            <span style={{ fontSize: '12px', color: '#64748B', fontWeight: 650, marginLeft: '4px' }}>
+            <span style={{ fontSize: '12px', color: '#64748B', fontWeight: 500, marginLeft: '4px' }}>
               ({filteredProducts.length} Items Available)
             </span>
           </div>
@@ -302,14 +303,14 @@ export const ToolsProductsPage: React.FC = () => {
                       className="tool-mini-card"
                     >
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px' }}>
-                        <span style={{ fontSize: '10px', fontWeight: 750, color: isActive ? '#C4B5FD' : '#64748B', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                        <span style={{ fontSize: '10px', fontWeight: 500, color: isActive ? '#C4B5FD' : '#64748B', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                           {prod.type}
                         </span>
-                        <span style={{ fontSize: '11px', color: '#10B981', fontWeight: 650, display: 'inline-flex', alignItems: 'center', gap: '2px' }}>
+                        <span style={{ fontSize: '11px', color: '#10B981', fontWeight: 500, display: 'inline-flex', alignItems: 'center', gap: '2px' }}>
                           ★ {prod.rating}
                         </span>
                       </div>
-                      <h4 style={{ margin: 0, fontSize: '14px', fontWeight: 750, color: isActive ? '#FFFFFF' : '#CBD5E1', transition: 'color 0.2s ease' }} className="tool-card-title">
+                      <h4 style={{ margin: 0, fontSize: '14px', fontWeight: 600, color: isActive ? '#FFFFFF' : '#CBD5E1', transition: 'color 0.2s ease' }} className="tool-card-title">
                         {prod.title}
                       </h4>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '11px', color: '#64748B', fontWeight: 500 }}>
@@ -367,7 +368,7 @@ export const ToolsProductsPage: React.FC = () => {
                         <span
                           style={{
                             fontSize: '10px',
-                            fontWeight: 800,
+                            fontWeight: 500,
                             backgroundColor: 'rgba(124, 58, 237, 0.1)',
                             border: '1px solid rgba(124, 58, 237, 0.2)',
                             borderRadius: '6px',
@@ -379,23 +380,23 @@ export const ToolsProductsPage: React.FC = () => {
                         >
                           {activeProduct.type}
                         </span>
-                        <span style={{ fontSize: '12px', color: '#64748B', fontWeight: 600 }}>
+                        <span style={{ fontSize: '12px', color: '#64748B', fontWeight: 500 }}>
                           Version {activeProduct.version}
                         </span>
                         {activeProduct.comingSoon && (
-                          <span style={{ fontSize: '10px', fontWeight: 800, backgroundColor: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.2)', borderRadius: '6px', padding: '3px 8px', color: '#F59E0B', textTransform: 'uppercase' }}>
+                          <span style={{ fontSize: '10px', fontWeight: 500, backgroundColor: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.2)', borderRadius: '6px', padding: '3px 8px', color: '#F59E0B', textTransform: 'uppercase' }}>
                             Coming Soon
                           </span>
                         )}
                       </div>
 
-                      <h3 style={{ margin: 0, fontSize: '24px', fontWeight: 850, color: '#FFFFFF', letterSpacing: '-0.02em', lineHeight: 1.2 }}>
+                      <h3 style={{ margin: 0, fontSize: '24px', fontWeight: 600, color: '#FFFFFF', letterSpacing: '-0.02em', lineHeight: 1.2 }}>
                         {activeProduct.title}
                       </h3>
-                      
-                      <div style={{ display: 'flex', gap: '16px', fontSize: '13px', color: '#64748B', fontWeight: 550 }}>
-                        <span>Downloads: <strong style={{ color: '#E2E8F0' }}>{activeProduct.downloads}</strong></span>
-                        <span>Rating: <strong style={{ color: '#E2E8F0' }}>★ {activeProduct.rating}</strong></span>
+
+                      <div style={{ display: 'flex', gap: '16px', fontSize: '13px', color: '#64748B', fontWeight: 500 }}>
+                        <span>Downloads: <strong style={{ color: '#E2E8F0', fontWeight: 500 }}>{activeProduct.downloads}</strong></span>
+                        <span>Rating: <strong style={{ color: '#E2E8F0', fontWeight: 500 }}>★ {activeProduct.rating}</strong></span>
                       </div>
                     </div>
                   </div>
@@ -554,12 +555,12 @@ export const ToolsProductsPage: React.FC = () => {
         )}
       </section>
 
-      {/* 5. Metrics & Achievements side-by-side grids */}
+      {/* 5. Metrics & Achievements stacked vertically */}
       <section
         style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 1.1fr',
-          gap: '24px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '40px',
           width: '100%'
         }}
         className="metrics-grid-layout"
@@ -584,7 +585,8 @@ export const ToolsProductsPage: React.FC = () => {
         onClose={handleCloseDetails}
       />
 
-      <style dangerouslySetInnerHTML={{__html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
         .custom-scrollbar::-webkit-scrollbar {
           width: 5px;
         }
