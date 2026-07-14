@@ -12,7 +12,7 @@
 }
 
 .portfolio-showcase-shell {
-  width: min(1160px, calc(100% - 40px));
+  width: min(1249px, calc(100% - 40px));
   margin: 0 auto;
 }
 
@@ -67,7 +67,7 @@
   background-clip: text;
 }
 
-.portfolio-showcase-heading > p:not(.portfolio-badge) {
+.portfolio-showcase-heading>p:not(.portfolio-badge) {
   max-width: 570px;
   margin: 20px 0 0;
   color: rgba(142, 153, 187, 0.58);
@@ -639,7 +639,7 @@
   }
 
   .portfolio-showcase-shell {
-    width: min(100% - 28px, 1160px);
+    width: min(100% - 28px, 1249px);
   }
 
   .portfolio-showcase-heading {
@@ -731,4 +731,3 @@
     animation: none;
   }
 }
-

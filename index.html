@@ -12,8 +12,8 @@
     // Fast handler for Supabase OAuth popup callbacks
     if (window.opener && (window.location.hash.includes('access_token') || window.location.search.includes('error'))) {
       const isSuccess = window.location.hash.includes('access_token');
-      window.opener.postMessage({ 
-        type: 'supabase-oauth-callback', 
+      window.opener.postMessage({
+        type: 'supabase-oauth-callback',
         status: isSuccess ? 'success' : 'error',
         hash: window.location.hash,
         search: window.location.search
@@ -402,26 +402,26 @@
           <div class="widget-showcase-stats" aria-label="Custom tooling capabilities">
             <div class="capability-card">
               <svg viewBox="0 0 24 24" aria-hidden="true" class="capability-icon">
-                <circle cx="12" cy="12" r="10"/>
-                <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/>
-                <path d="M2 12h20"/>
+                <circle cx="12" cy="12" r="10" />
+                <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+                <path d="M2 12h20" />
               </svg>
               <strong>Cross-Platform</strong>
               <span>Tools that work across design and development environments.</span>
             </div>
             <div class="capability-card">
               <svg viewBox="0 0 24 24" aria-hidden="true" class="capability-icon">
-                <path d="m12 3 8 4.5-8 4.5-8-4.5L12 3Z"/>
-                <path d="m4 12 8 4.5 8-4.5"/>
-                <path d="m4 16.5 8 4.5 8-4.5"/>
+                <path d="m12 3 8 4.5-8 4.5-8-4.5L12 3Z" />
+                <path d="m4 12 8 4.5 8-4.5" />
+                <path d="m4 16.5 8 4.5 8-4.5" />
               </svg>
               <strong>Reusable</strong>
               <span>Built with modularity and reusability at the core for long-term impact.</span>
             </div>
             <div class="capability-card">
               <svg viewBox="0 0 24 24" aria-hidden="true" class="capability-icon">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                <path d="m9 11 2 2 4-4"/>
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                <path d="m9 11 2 2 4-4" />
               </svg>
               <strong>Production-Ready</strong>
               <span>Focused on performance, quality, and enterprise standards.</span>
@@ -459,7 +459,8 @@
             <p class="widget-lab-badge">Custom Tooling</p>
             <h2 id="widget-lab-title">Custom Tooling</h2>
             <p class="widget-showcase-lead">Building Plugins, Reusable Widgets &amp; Productivity Tools</p>
-            <p>I design and build custom plugins, reusable widgets, and productivity tools that streamline workflows and bridge the gap between design and development.</p>
+            <p>I design and build custom plugins, reusable widgets, and productivity tools that streamline workflows and
+              bridge the gap between design and development.</p>
 
             <div class="widget-showcase-actions" aria-label="Widget showcase actions">
               <a class="profile-action profile-action-primary magnetic" href="widgets/index.html">
@@ -477,7 +478,7 @@
                 </svg>
               </a>
             </div>
-      </div>
+          </div>
     </section>
 
     <section class="certifications animated-section" id="certifications" aria-labelledby="certifications-title"
@@ -486,157 +487,164 @@
         <div class="certifications-heading-wrapper">
           <div class="section-heading reveal">
             <p class="section-kicker">🏆 Certifications</p>
-            <h2 id="certifications-title">Industry Recognized Learning &amp;<br>Professional Credentials</h2>
-            <p class="section-subtitle">A curated collection of professional certifications that validate my expertise across UI/UX Design, Mendix Development, Frontend Engineering, AI, Cloud Technologies, and modern digital product development.</p>
+            <h2 id="certifications-title">Industry Recognized Learning<br>&amp; Professional Credentials</h2>
+            <div class="title-underline"></div>
           </div>
-          <a class="primary-action magnetic reveal" href="certifications/index.html">
-            <span>View All Certifications</span>
-            <svg viewBox="0 0 24 24" aria-hidden="true" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5">
-              <line x1="5" y1="12" x2="19" y2="12" />
-              <polyline points="12 5 19 12 12 19" />
-            </svg>
-          </a>
+          <div class="heading-cta-wrapper">
+            <a class="primary-action magnetic reveal" href="certifications/index.html">
+              <span>View All Certifications</span>
+              <svg viewBox="0 0 24 24" aria-hidden="true" width="16" height="16" fill="none" stroke="currentColor"
+                stroke-width="2.5">
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
+              </svg>
+            </a>
+          </div>
         </div>
 
-        <div class="certifications-grid reveal">
+        <div class="certifications-grid-v2 reveal">
           <!-- Card 1: Google Cloud -->
-          <article class="certification-card">
-            <div class="cert-card-top">
-              <div class="cert-logo-wrapper">
-                <svg viewBox="0 0 24 24" width="24" height="24">
-                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                </svg>
-              </div>
-              <span class="cert-verified-badge">
-                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-                Verified
-              </span>
+          <div class="provider-logo-card">
+            <div class="provider-logo-container">
+              <svg viewBox="0 0 24 24" width="32" height="32">
+                <path fill="#4285F4"
+                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                <path fill="#34A853"
+                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                <path fill="#FBBC05"
+                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
+                <path fill="#EA4335"
+                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+              </svg>
             </div>
-            <div class="cert-card-body">
-              <h3>Professional Cloud Architect</h3>
-              <p class="cert-issuer">Google Cloud</p>
-            </div>
-            <div class="cert-card-bottom">
-              <span class="cert-date">Issued: Jan 2025</span>
-              <span class="cert-arrow">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <line x1="5" y1="12" x2="19" y2="12" />
-                  <polyline points="12 5 19 12 12 19" />
-                </svg>
-              </span>
-            </div>
-          </article>
+            <span class="provider-name">Google Cloud</span>
+            <span class="provider-glow-dot"></span>
+          </div>
 
           <!-- Card 2: AWS -->
-          <article class="certification-card">
-            <div class="cert-card-top">
-              <div class="cert-logo-wrapper">
-                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm3.32 14.28c-.89.65-2.09 1-3.32 1s-2.43-.35-3.32-1l.73-1.07c.6.43 1.45.67 2.59.67s1.99-.24 2.59-.67l.73 1.07zm.8-2.61c-.51.4-1.28.62-2.12.62s-1.61-.22-2.12-.62l.62-1.15c.34.25.87.37 1.5.37s1.16-.12 1.5-.37l.62 1.15z"/>
-                </svg>
-              </div>
-              <span class="cert-verified-badge">
-                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-                Verified
-              </span>
+          <div class="provider-logo-card">
+            <div class="provider-logo-container">
+              <svg viewBox="0 0 100 60" width="44" height="26">
+                <path
+                  d="M25 24c0-3.3 2.1-5.1 5.5-5.1s5.5 1.8 5.5 5.1v10h-11V24zm5.5 14c4 0 7.5-1.5 9-4.5V38h4.5V23c0-5-3.5-7.5-9.5-7.5s-9.5 2.5-9.5 7.5v15h5zM53.5 15.5l-4 13.5-4-13.5H41l6.5 20h4.5l6.5-20h-5zM67.5 23.5c-2.5-.8-4-.8-4 0s.5.7 2 1.2c4 1.2 5.5 2.5 5.5 5.3c0 4.5-3.5 6.5-8.5 6.5s-8.5-1.5-9-5.5h4.5c0 2 .5 2.5 4.5 2.5s4-.5 4-1.2c0-.8-.5-.8-2.5-1.5-3.5-1.2-5-2-5-5s3-5 8-5c4.5 0 7.5 1.5 8 5h-4.5z"
+                  fill="#FFFFFF" />
+                <path d="M15 44c15 8 36 10 52 5c6.5-2 12.5-5.5 17-10.5" fill="none" stroke="#FF9900" stroke-width="3"
+                  stroke-linecap="round" />
+                <path d="M81 38.5l4-1 1 4-5-3z" fill="#FF9900" />
+              </svg>
             </div>
-            <div class="cert-card-body">
-              <h3>Certified Solutions Architect</h3>
-              <p class="cert-issuer">Amazon Web Services</p>
-            </div>
-            <div class="cert-card-bottom">
-              <span class="cert-date">Issued: Mar 2025</span>
-              <span class="cert-arrow">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <line x1="5" y1="12" x2="19" y2="12" />
-                  <polyline points="12 5 19 12 12 19" />
-                </svg>
-              </span>
-            </div>
-          </article>
+            <span class="provider-name">AWS</span>
+            <span class="provider-glow-dot"></span>
+          </div>
 
-          <!-- Card 3: CNCF CKA -->
-          <article class="certification-card">
-            <div class="cert-card-top">
-              <div class="cert-logo-wrapper">
-                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" />
-                  <path d="M12 6v6l4 2" />
-                </svg>
-              </div>
-              <span class="cert-verified-badge">
-                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-                Verified
-              </span>
+          <!-- Card 3: Mendix -->
+          <div class="provider-logo-card">
+            <div class="provider-logo-container">
+              <img src="assets/images/Mendix-Brandmark.webp" style="width: 34px; height: 34px; object-fit: contain;"
+                alt="Mendix" />
             </div>
-            <div class="cert-card-body">
-              <h3>Certified Kubernetes Administrator</h3>
-              <p class="cert-issuer">Linux Foundation / CNCF</p>
-            </div>
-            <div class="cert-card-bottom">
-              <span class="cert-date">Issued: Jul 2025</span>
-              <span class="cert-arrow">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <line x1="5" y1="12" x2="19" y2="12" />
-                  <polyline points="12 5 19 12 12 19" />
-                </svg>
-              </span>
-            </div>
-          </article>
+            <span class="provider-name">Mendix</span>
+            <span class="provider-glow-dot"></span>
+          </div>
 
-          <!-- Card 4: Mendix -->
-          <article class="certification-card">
-            <div class="cert-card-top">
-              <div class="cert-logo-wrapper">
-                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 14h-2v-4H9V9h4v7z"/>
-                </svg>
-              </div>
-              <span class="cert-verified-badge">
-                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-                Verified
-              </span>
+          <!-- Card 4: Meta -->
+          <div class="provider-logo-card">
+            <div class="provider-logo-container">
+              <svg viewBox="0 0 24 24" width="34" height="34">
+                <path
+                  d="M16.035 6c-2.316 0-4.321 1.488-5.176 3.619a5.98 5.98 0 0 0-5.176-3.619C2.553 6 0 8.653 0 11.92c0 3.267 2.553 5.92 5.683 5.92 2.316 0 4.321-1.488 5.176-3.619a5.98 5.98 0 0 0 5.176 3.619c3.13 0 5.683-2.653 5.683-5.92C21.718 8.653 19.165 6 16.035 6zm-10.352 9.54c-1.97 0-3.567-1.624-3.567-3.62 0-1.996 1.597-3.62 3.567-3.62 1.97 0 3.567 1.624 3.567 3.62 0 1.996-1.597 3.62-3.567 3.62zm10.352 0c-1.97 0-3.567-1.624-3.567-3.62 0-1.996 1.597-3.62 3.567-3.62 1.97 0 3.567 1.624 3.567 3.62 0 1.996-1.597 3.62-3.567 3.62z"
+                  fill="#0064E0" />
+              </svg>
             </div>
-            <div class="cert-card-body">
-              <h3>Advanced Developer Certification</h3>
-              <p class="cert-issuer">Mendix Platform</p>
+            <span class="provider-name">Meta</span>
+            <span class="provider-glow-dot"></span>
+          </div>
+
+          <!-- Card 5: Microsoft -->
+          <div class="provider-logo-card">
+            <div class="provider-logo-container">
+              <svg viewBox="0 0 23 23" width="26" height="26">
+                <rect x="0" y="0" width="10.5" height="10.5" fill="#F25022" />
+                <rect x="12.5" y="0" width="10.5" height="10.5" fill="#7FBA00" />
+                <rect x="0" y="12.5" width="10.5" height="10.5" fill="#00A4EF" />
+                <rect x="12.5" y="12.5" width="10.5" height="10.5" fill="#FFB900" />
+              </svg>
             </div>
-            <div class="cert-card-bottom">
-              <span class="cert-date">Issued: Sep 2024</span>
-              <span class="cert-arrow">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <line x1="5" y1="12" x2="19" y2="12" />
-                  <polyline points="12 5 19 12 12 19" />
-                </svg>
-              </span>
+            <span class="provider-name">Microsoft</span>
+            <span class="provider-glow-dot"></span>
+          </div>
+
+          <!-- Card 6: Linux Foundation -->
+          <div class="provider-logo-card">
+            <div class="provider-logo-container">
+              <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#FFFFFF" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 9V3h6m6 0h6v6m0 6v6h-6M9 21H3v-6" />
+              </svg>
             </div>
-          </article>
+            <span class="provider-name">Linux Foundation</span>
+            <span class="provider-glow-dot"></span>
+          </div>
         </div>
 
-        <div class="certifications-stats reveal">
-          <div class="cert-stat-item">
-            <span class="cert-stat-num">12+</span>
-            <span class="cert-stat-lbl">Professional Certifications</span>
+        <div class="certifications-trust-panel-v2 reveal">
+          <div class="trust-metric-item">
+            <div class="trust-icon-box">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#A78BFA" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
+                <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
+                <path d="M4 22h16" />
+                <path d="M10 14.66V17c0 .55-.45 1-1 1H4v2h16v-2h-5c-.55 0-1-.45-1-1v-2.34" />
+                <path d="M12 2a5 5 0 0 0-5 5v5a5 5 0 0 0 10 0V7a5 5 0 0 0-5-5z" />
+              </svg>
+            </div>
+            <div class="trust-text-stack">
+              <span class="trust-stat-title">12+</span>
+              <span class="trust-stat-description">Professional Certifications</span>
+            </div>
           </div>
-          <div class="cert-stat-item">
-            <span class="cert-stat-num">8</span>
-            <span class="cert-stat-lbl">Learning Platforms</span>
+
+          <div class="trust-panel-separator"></div>
+
+          <div class="trust-metric-item">
+            <div class="trust-icon-box">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#34D399" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                <polyline points="9 11 11 13 15 9" />
+              </svg>
+            </div>
+            <div class="trust-text-stack">
+              <span class="trust-stat-title">100%</span>
+              <span class="trust-stat-description">Verified Credentials</span>
+            </div>
           </div>
-          <div class="cert-stat-item">
-            <span class="cert-stat-num">100%</span>
-            <span class="cert-stat-lbl">Verified Credentials</span>
+
+          <div class="trust-panel-separator"></div>
+
+          <div class="trust-metric-item">
+            <div class="trust-icon-box">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#60A5FA" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+              </svg>
+            </div>
+            <div class="trust-text-stack">
+              <span class="trust-stat-title">Continuous</span>
+              <span class="trust-stat-description">Learning &amp; Growth</span>
+            </div>
           </div>
+        </div>
+
+        <div class="certifications-verification-footer reveal">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            <polyline points="9 11 11 13 15 9" />
+          </svg>
+          <span>All certifications are verified and issued by their respective organizations.</span>
         </div>
       </div>
     </section>
@@ -685,35 +693,56 @@
                 Project Showcase
               </span>
               <h2 class="new-portfolio-title" id="work-title">
-                Building Digital <br />
-                <span class="gradient-text">Products</span> <br />
-                That Make <br />
+                Building Digital
+                <span class="gradient-text">Products</span>
+                That Make
                 an Impact.
               </h2>
               <p class="new-portfolio-subtitle">
-                Exploring ideas. Designing experiences. Building scalable solutions with Mendix, low-code, and modern technologies.
+                Exploring ideas. Designing experiences. Building scalable solutions with Mendix, low-code, and modern
+                technologies.
               </p>
-              
+
               <!-- Badges grid -->
               <div class="new-platform-grid">
                 <span class="new-platform-pill">
-                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style="margin-right: 4px;"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5"
+                    strokeLinecap="round" strokeLinejoin="round" style="margin-right: 4px;">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                  </svg>
                   Mendix
                 </span>
                 <span class="new-platform-pill">
-                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style="margin-right: 4px;"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5"
+                    strokeLinecap="round" strokeLinejoin="round" style="margin-right: 4px;">
+                    <path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+                  </svg>
                   UI/UX Design
                 </span>
                 <span class="new-platform-pill">
-                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style="margin-right: 4px;"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5"
+                    strokeLinecap="round" strokeLinejoin="round" style="margin-right: 4px;">
+                    <polyline points="16 18 22 12 16 6" />
+                    <polyline points="8 6 2 12 8 18" />
+                  </svg>
                   Low-Code
                 </span>
                 <span class="new-platform-pill">
-                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style="margin-right: 4px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5"
+                    strokeLinecap="round" strokeLinejoin="round" style="margin-right: 4px;">
+                    <polygon
+                      points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                  </svg>
                   AI Exploration
                 </span>
                 <span class="new-platform-pill">
-                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style="margin-right: 4px;"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5"
+                    strokeLinecap="round" strokeLinejoin="round" style="margin-right: 4px;">
+                    <rect x="3" y="3" width="7" height="7" />
+                    <rect x="14" y="3" width="7" height="7" />
+                    <rect x="14" y="14" width="7" height="7" />
+                    <rect x="3" y="14" width="7" height="7" />
+                  </svg>
                   Design Systems
                 </span>
               </div>
@@ -724,7 +753,12 @@
                   Explore My Work &rarr;
                 </a>
                 <a href="pages/projects/index.html" class="new-btn-icon" aria-label="Open project index">
-                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5"
+                    strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                    <polyline points="15 3 21 3 21 9" />
+                    <line x1="10" y1="14" x2="21" y2="3" />
+                  </svg>
                 </a>
                 <span class="new-action-subtext">See selected projects and case studies</span>
               </div>
@@ -737,63 +771,74 @@
             </div>
           </div>
 
-          <!-- Bottom Row: Statistics bar -->
-          <div class="new-portfolio-footer">
-            <div class="footer-stats-col">
-              <div class="stat-item">
-                <span class="stat-icon">
-                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-                </span>
-                <div class="stat-copy">
-                  <span class="stat-num">20+</span>
-                  <span class="stat-lbl">Projects Delivered</span>
-                </div>
-              </div>
-              <div class="stat-item">
-                <span class="stat-icon">
-                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                </span>
-                <div class="stat-copy">
-                  <span class="stat-num">3+</span>
-                  <span class="stat-lbl">Years Experience</span>
-                </div>
-              </div>
-              <div class="stat-item">
-                <span class="stat-icon">
-                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-                </span>
-                <div class="stat-copy">
-                  <span class="stat-num">100+</span>
-                  <span class="stat-lbl">Screens Designed</span>
-                </div>
-              </div>
-              <div class="stat-item">
-                <span class="stat-icon">
-                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-                </span>
-                <div class="stat-copy">
-                  <span class="stat-num">15+</span>
-                  <span class="stat-lbl">Industries Served</span>
-                </div>
-              </div>
+          <!-- Bottom Row: Redesigned full-width Highlights block -->
+          <div class="new-portfolio-footer-v3">
+            <div class="highlights-header-v3">
+              <span class="highlights-title-v3">Project Highlights</span>
+              <p class="highlights-statement-v3">Delivering scalable digital products with thoughtful design and modern engineering.</p>
             </div>
-
-            <div class="footer-pills-col">
-              <span class="footer-pill">Mendix</span>
-              <span class="footer-pill">UI/UX</span>
-              <span class="footer-pill">Design Systems</span>
-              <span class="footer-pill">AI Products</span>
-              <span class="footer-pill">Enterprise Applications</span>
-            </div>
-
-            <div class="footer-cta-col">
-              <div class="footer-cta-text">
-                <span class="cta-mini-lbl">Interested in working together?</span>
-                <span class="cta-mini-title">Let's build something amazing.</span>
+            
+            <div class="highlights-cards-grid-v3">
+              <!-- Card 1 -->
+              <div class="highlight-card-v3 reveal-on-scroll" style="transition-delay: 80ms;">
+                <div class="card-accent-line-v3"></div>
+                <div class="card-glow-v3"></div>
+                <div class="card-icon-box-v3">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+                  </svg>
+                </div>
+                <span class="highlight-num-v3">20+</span>
+                <span class="highlight-lbl-v3">Projects Delivered</span>
+                <span class="highlight-sub-v3">Enterprise &amp; Product Applications</span>
               </div>
-              <a href="#contact" class="cta-round-btn" aria-label="Go to contact section">
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-              </a>
+              
+              <!-- Card 2 -->
+              <div class="highlight-card-v3 reveal-on-scroll" style="transition-delay: 160ms;">
+                <div class="card-accent-line-v3"></div>
+                <div class="card-glow-v3"></div>
+                <div class="card-icon-box-v3">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+                    <line x1="8" y1="21" x2="16" y2="21" />
+                    <line x1="12" y1="17" x2="12" y2="21" />
+                  </svg>
+                </div>
+                <span class="highlight-num-v3">100+</span>
+                <span class="highlight-lbl-v3">Screens Designed</span>
+                <span class="highlight-sub-v3">High-Fidelity Interactive Mockups</span>
+              </div>
+              
+              <!-- Card 3 -->
+              <div class="highlight-card-v3 reveal-on-scroll" style="transition-delay: 240ms;">
+                <div class="card-accent-line-v3"></div>
+                <div class="card-glow-v3"></div>
+                <div class="card-icon-box-v3">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                </div>
+                <span class="highlight-num-v3">3+</span>
+                <span class="highlight-lbl-v3">Years Experience</span>
+                <span class="highlight-sub-v3">End-to-End Product Lifecycle</span>
+              </div>
+              
+              <!-- Card 4 -->
+              <div class="highlight-card-v3 reveal-on-scroll" style="transition-delay: 320ms;">
+                <div class="card-accent-line-v3"></div>
+                <div class="card-glow-v3"></div>
+                <div class="card-icon-box-v3">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="2" y1="12" x2="22" y2="12" />
+                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                  </svg>
+                </div>
+                <span class="highlight-num-v3">15+</span>
+                <span class="highlight-lbl-v3">Industries Served</span>
+                <span class="highlight-sub-v3">Global Domain Verticals</span>
+              </div>
             </div>
           </div>
         </div>
