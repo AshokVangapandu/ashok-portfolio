@@ -20,9 +20,10 @@ export const CertificationsShowcasePage: React.FC = () => {
       desc: 'Industry Recognized',
       glowColor: 'rgba(167, 139, 250, 0.25)',
       icon: (
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#A78BFA" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="12" cy="8" r="6" />
-          <path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11" />
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#a855f7" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="8" r="7" />
+          <path d="M8.21 13.89L7 23l5-3 5 3-1.21-9.12" />
+          <polygon points="12 5 13 8 16 8 13.5 10 14.5 13 12 11 9.5 13 10.5 10 8 8 11 8 12 5" fill="#a855f7" />
         </svg>
       )
     },
@@ -32,7 +33,7 @@ export const CertificationsShowcasePage: React.FC = () => {
       desc: 'Global Brands',
       glowColor: 'rgba(59, 130, 246, 0.25)',
       icon: (
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#3B82F6" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#3b82f6" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
           <circle cx="12" cy="12" r="10" />
           <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
           <path d="M2 12h20" />
@@ -45,7 +46,7 @@ export const CertificationsShowcasePage: React.FC = () => {
       desc: 'Authentic Credentials',
       glowColor: 'rgba(16, 185, 129, 0.25)',
       icon: (
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#10B981" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#10b981" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
           <path d="m9 11 2 2 4-4" />
         </svg>
@@ -136,11 +137,11 @@ export const CertificationsShowcasePage: React.FC = () => {
       style={{
         display: 'flex',
         flexDirection: 'column',
-        gap: '48px',
+        gap: '32px',
         width: '100%',
         maxWidth: '1280px',
         margin: '0 auto',
-        padding: '120px 24px 80px 24px',
+        padding: 'calc(var(--header-height) + 44px) 24px 60px 24px',
         boxSizing: 'border-box',
         color: '#FFFFFF',
         fontFamily: "'Inter', sans-serif"
@@ -152,47 +153,50 @@ export const CertificationsShowcasePage: React.FC = () => {
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          gap: '64px',
+          gap: '40px',
           width: '100%'
         }}
       >
         {/* Left Side: Headings */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <div
-            style={{
-              width: 'fit-content',
-              padding: '4px 12px',
-              borderRadius: '999px',
-              background: 'rgba(124, 58, 237, 0.1)',
-              border: '1px solid rgba(124, 58, 237, 0.2)',
-              color: '#A78BFA',
-              fontSize: '11px',
-              fontWeight: 700,
-              textTransform: 'uppercase',
-              letterSpacing: '0.08em',
-              lineHeight: '1.2'
-            }}
-          >
-            Continuous Learning
+        <div style={{ flex: 1, display: 'flex', alignItems: 'flex-start', gap: '20px' }}>
+          {/* Medal Icon on the left */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '4px', flexShrink: 0 }}>
+            <svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="#a855f7" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ filter: 'drop-shadow(0 0 8px rgba(168, 85, 247, 0.25))' }}>
+              <circle cx="12" cy="8" r="7" />
+              <path d="M8.21 13.89L7 23l5-3 5 3-1.21-9.12" />
+              <polygon points="12 5 13 8 16 8 13.5 10 14.5 13 12 11 9.5 13 10.5 10 8 8 11 8 12 5" fill="#a855f7" />
+            </svg>
           </div>
-          <h1
-            style={{
-              fontSize: '42px',
-              fontWeight: 700,
-              color: '#ffffff',
-              margin: 0,
-              letterSpacing: '-0.02em',
-              lineHeight: '1.1'
-            }}
-          >
-            Certifications
-          </h1>
-          <h2 style={{ fontSize: '20px', fontWeight: 500, color: 'rgba(255, 255, 255, 0.95)', margin: 0 }}>
-            Learning <span style={{ color: '#A78BFA' }}>never</span> stops.
-          </h2>
-          <p style={{ fontSize: '15px', lineHeight: '1.65', color: '#94A3B8', margin: 0, maxWidth: '540px' }}>
-            These certifications represent my commitment to continuous learning and staying up-to-date with the latest technologies and best practices.
-          </p>
+          {/* Text Stack on the right of the icon */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <div
+              style={{
+                color: '#a855f7',
+                fontSize: '11px',
+                fontWeight: 700,
+                textTransform: 'uppercase',
+                letterSpacing: '0.08em',
+                lineHeight: '1.2'
+              }}
+            >
+              CERTIFICATIONS
+            </div>
+            <h1
+              style={{
+                fontSize: '32px',
+                fontWeight: 700,
+                color: '#ffffff',
+                margin: 0,
+                letterSpacing: '-0.02em',
+                lineHeight: '1.1'
+              }}
+            >
+              Professional Certifications
+            </h1>
+            <p style={{ fontSize: '14.5px', lineHeight: '1.5', color: '#94A3B8', margin: '4px 0 0 0', maxWidth: '520px' }}>
+              Trusted credentials from globally recognized organizations that validate my skills and expertise.
+            </p>
+          </div>
         </div>
 
         {/* Right Side: 3 Stats Cards (Centered Vertically) */}
@@ -201,64 +205,34 @@ export const CertificationsShowcasePage: React.FC = () => {
             <div
               key={idx}
               style={{
-                width: '140px',
-                padding: '24px 20px',
+                width: '170px',
+                padding: '16px 20px',
                 background: 'rgba(13, 17, 30, 0.45)',
                 border: '1px solid rgba(255, 255, 255, 0.05)',
-                borderRadius: '18px',
+                borderRadius: '16px',
                 backdropFilter: 'blur(20px)',
                 WebkitBackdropFilter: 'blur(20px)',
                 display: 'flex',
                 flexDirection: 'column',
-                alignItems: 'center',
-                textAlign: 'center',
-                boxShadow: '0 10px 40px rgba(0, 0, 0, 0.3)',
+                justifyContent: 'space-between',
                 boxSizing: 'border-box',
-                position: 'relative'
+                height: '110px'
               }}
             >
-              {/* Stats Badge Icon */}
-              <div
-                style={{
-                  width: '36px',
-                  height: '36px',
-                  borderRadius: '50%',
-                  background: 'rgba(255, 255, 255, 0.03)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginBottom: '14px',
-                  boxShadow: `0 0 15px ${stat.glowColor}`,
-                  border: '1px solid rgba(255,255,255,0.05)'
-                }}
-              >
-                {stat.icon}
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', width: '100%' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '2px' }}>
+                  {stat.icon}
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                  <div style={{ fontSize: '26px', fontWeight: 800, color: '#ffffff', lineHeight: '1.1' }}>
+                    {stat.value}
+                  </div>
+                  <div style={{ fontSize: '11.5px', fontWeight: 550, color: '#94A3B8', marginTop: '1px' }}>
+                    {stat.label}
+                  </div>
+                </div>
               </div>
-
-              <div style={{ fontSize: '32px', fontWeight: 850, color: '#ffffff', lineHeight: '1' }}>
-                {stat.value}
-              </div>
-              <div
-                style={{
-                  fontSize: '12px',
-                  fontWeight: 700,
-                  color: '#FFFFFF',
-                  marginTop: '8px',
-                  letterSpacing: '0.02em'
-                }}
-              >
-                {stat.label}
-              </div>
-              <div
-                style={{
-                  fontSize: '10px',
-                  fontWeight: 500,
-                  color: '#64748B',
-                  marginTop: '4px',
-                  letterSpacing: '0.01em',
-                  textTransform: 'uppercase'
-                }}
-              >
+              <div style={{ fontSize: '11px', color: '#475569', marginTop: '8px', textAlign: 'left', fontWeight: 500 }}>
                 {stat.desc}
               </div>
             </div>
@@ -298,7 +272,7 @@ export const CertificationsShowcasePage: React.FC = () => {
             </span>
             <input
               type="text"
-              placeholder="Search certifications..."
+              placeholder="Search certifications, platforms or skills..."
               style={{
                 width: '100%',
                 padding: '16px 50px 16px 48px',
