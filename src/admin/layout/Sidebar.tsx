@@ -4,7 +4,7 @@ import { useAuth } from '../../hooks/useAuth';
 
 interface MenuItem {
   label: string;
-  icon: React.ReactNode;
+  icon: (isActive: boolean) => React.ReactNode;
   path: string;
 }
 
@@ -12,12 +12,14 @@ interface SidebarProps {
   collapsed: boolean;
   currentPath: string;
   onNavigate: (path: string) => void;
+  onToggleSidebar: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
   collapsed,
   currentPath,
   onNavigate,
+  onToggleSidebar,
 }) => {
   const { logout } = useAuth();
   const settingsRef = useRef<HTMLButtonElement>(null);
@@ -27,10 +29,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const [showSubmenu, setShowSubmenu] = useState<boolean>(false);
   const [submenuTop, setSubmenuTop] = useState<number>(0);
 
+  // Normalize current path for comparisons (strip /ashok-portfolio and trailing slash)
+  let cleanPath = currentPath.toLowerCase().replace(/\/$/, '');
+  if (cleanPath.startsWith('/ashok-portfolio')) {
+    cleanPath = cleanPath.substring('/ashok-portfolio'.length);
+  }
+  if (!cleanPath.startsWith('/')) {
+    cleanPath = '/' + cleanPath;
+  }
+
   // Check if active settings route is matched
-  const isSettingsActive = currentPath.startsWith('/admin/settings') || 
-                           currentPath === '/admin/social-links' || 
-                           currentPath === '/admin/access';
+  const isSettingsActive = cleanPath.startsWith('/admin/settings') || 
+                           cleanPath === '/admin/social-links' || 
+                           cleanPath === '/admin/access';
 
   // Mobile accordion expand state - default open if inside settings sub-paths
   const [mobileExpand, setMobileExpand] = useState<boolean>(isSettingsActive);
@@ -60,8 +71,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const menuItems: MenuItem[] = [
     { 
       label: 'Dashboard', 
-      icon: (
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      icon: (isActive) => (
+        <svg viewBox="0 0 24 24" width="20" height="20" fill={isActive ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
         </svg>
       ), 
@@ -69,8 +80,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
     },
     { 
       label: 'Contacts', 
-      icon: (
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      icon: (isActive) => (
+        <svg viewBox="0 0 24 24" width="20" height="20" fill={isActive ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
         </svg>
       ), 
@@ -78,8 +89,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
     },
     { 
       label: 'Testimonials', 
-      icon: (
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      icon: (isActive) => (
+        <svg viewBox="0 0 24 24" width="20" height="20" fill={isActive ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
         </svg>
       ), 
@@ -87,8 +98,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
     },
     { 
       label: 'Certifications', 
-      icon: (
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      icon: (isActive) => (
+        <svg viewBox="0 0 24 24" width="20" height="20" fill={isActive ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
           <circle cx="12" cy="8" r="6" />
           <path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11" />
         </svg>
@@ -97,8 +108,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
     },
     { 
       label: 'Resume Downloads', 
-      icon: (
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      icon: (isActive) => (
+        <svg viewBox="0 0 24 24" width="20" height="20" fill={isActive ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
         </svg>
       ), 
@@ -106,8 +117,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
     },
     { 
       label: 'Analytics', 
-      icon: (
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      icon: (isActive) => (
+        <svg viewBox="0 0 24 24" width="20" height="20" fill={isActive ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M18 20V10M12 20V4M6 20v-6" />
         </svg>
       ), 
@@ -151,7 +162,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     setShowSubmenu(false); // Close submenu popup on select
   };
 
-  const sidebarWidth = collapsed ? '72px' : '260px';
+  const sidebarWidth = collapsed ? '64px' : '240px';
 
   return (
     <>
@@ -159,9 +170,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
         className="transition-layout"
         style={{
           width: sidebarWidth,
-          background: '#FFFFFF',
+          background: '#FAFBFF',
           borderRight: '1px solid var(--admin-border)',
-          boxShadow: 'var(--admin-shadow-sm)',
           display: 'flex',
           flexDirection: 'column',
           height: '100vh',
@@ -175,74 +185,127 @@ export const Sidebar: React.FC<SidebarProps> = ({
           transition: 'width 250ms cubic-bezier(0.22, 1, 0.36, 1)'
         }}
       >
-        {/* 1. Header Profile block */}
+        {/* 1. Header Profile block (Aligned with 64px Topbar height) */}
         <div
           style={{
-            padding: '0 var(--admin-space-5)',
+            padding: '0 var(--admin-space-4)',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: collapsed ? 'center' : 'flex-start',
+            justifyContent: collapsed ? 'center' : 'space-between',
             borderBottom: '1px solid var(--admin-border)',
-            height: '82px',
-            boxSizing: 'border-box'
+            height: '64px',
+            boxSizing: 'border-box',
+            width: '100%'
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center' }}>
-            <div
+            <button
+              onClick={onToggleSidebar}
+              className="hover-scale active-press"
               style={{
-                width: '38px',
-                height: '38px',
+                background: 'none',
+                border: 'none',
+                padding: 0,
+                cursor: 'pointer',
                 borderRadius: '50%',
-                background: 'var(--admin-gradient-primary)',
-                color: '#FFFFFF',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontWeight: 700,
-                fontSize: '15px',
-                boxShadow: 'var(--admin-shadow-sm)',
                 flexShrink: 0
               }}
             >
-              A
-            </div>
+              <div
+                style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '50%',
+                  background: 'var(--admin-gradient-primary)',
+                  color: '#FFFFFF',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontWeight: 700,
+                  fontSize: '13px',
+                  boxShadow: 'var(--admin-shadow-sm)'
+                }}
+              >
+                AV
+              </div>
+            </button>
 
             {!collapsed && (
               <div 
                 className="animate-fade-in"
                 style={{ 
-                  marginLeft: '12px', 
+                  marginLeft: '10px', 
                   display: 'flex', 
                   flexDirection: 'column',
                   whiteSpace: 'nowrap'
                 }}
               >
-                <span style={{ fontSize: '14px', fontWeight: 700, color: 'var(--admin-text)', lineHeight: 1.2 }}>
+                <span style={{ fontSize: '13.5px', fontWeight: 700, color: 'var(--admin-text)', lineHeight: 1.2 }}>
                   Ashok
                 </span>
-                <span style={{ fontSize: '11px', color: 'var(--admin-text-secondary)', fontWeight: 500, lineHeight: 1.1, marginTop: '1px' }}>
+                <span style={{ fontSize: '11px', color: 'var(--admin-text-secondary)', fontWeight: 550, lineHeight: 1.1, marginTop: '1px' }}>
                   Portfolio Admin
                 </span>
               </div>
             )}
           </div>
+
+          {!collapsed && (
+            <button
+              onClick={onToggleSidebar}
+              className="hover-scale active-press animate-fade-in"
+              title="Collapse Sidebar"
+              style={{
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                padding: '6px',
+                borderRadius: '6px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'var(--admin-text-secondary)',
+                transition: 'background-color 200ms ease',
+                flexShrink: 0
+              }}
+              onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'rgba(124, 58, 237, 0.05)'}
+              onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+            >
+              <svg
+                viewBox="0 0 24 24"
+                width="16"
+                height="16"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+          )}
         </div>
 
         {/* 2. Menu Link List */}
         <ul
           style={{
             listStyle: 'none',
-            padding: 'var(--admin-space-4) var(--admin-space-3)',
+            padding: 'var(--admin-space-3) var(--admin-space-2)',
             margin: 0,
             display: 'flex',
             flexDirection: 'column',
-            gap: 'var(--admin-space-2)',
+            gap: 'var(--admin-space-1.5)',
             flex: 1,
             overflowY: 'auto'
           }}
         >
           {menuItems.map((item) => {
-            const isActive = currentPath === item.path;
+            const isActive = cleanPath === item.path.replace(/\/$/, '').toLowerCase();
 
             return (
               <li key={item.label}>
@@ -255,23 +318,23 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: collapsed ? 'center' : 'flex-start',
-                    gap: collapsed ? '0' : '12px',
-                    padding: '12px 14px',
-                    border: '1px solid transparent',
+                    gap: collapsed ? '0' : '10px',
+                    padding: '10px 12px',
+                    border: 'none',
                     borderRadius: 'var(--admin-radius-sm)',
                     cursor: 'pointer',
-                    backgroundColor: isActive ? 'rgba(124, 58, 237, 0.06)' : 'transparent',
-                    borderColor: isActive ? 'rgba(124, 58, 237, 0.12)' : 'transparent',
+                    backgroundColor: isActive ? 'rgba(124, 58, 237, 0.08)' : 'transparent',
+                    boxShadow: isActive ? 'var(--admin-shadow-sm)' : 'none',
                     color: isActive ? 'var(--admin-primary)' : 'var(--admin-text-secondary)',
                     fontWeight: isActive ? 600 : 500,
-                    fontSize: '13.5px',
-                    transition: 'all 0.15s ease',
+                    fontSize: '13px',
+                    transition: 'all 200ms ease',
                     boxSizing: 'border-box',
                     position: 'relative'
                   }}
                   onMouseOver={(e) => {
                     if (!isActive) {
-                      e.currentTarget.style.backgroundColor = 'var(--admin-surface)';
+                      e.currentTarget.style.backgroundColor = 'rgba(124, 58, 237, 0.04)';
                       e.currentTarget.style.color = 'var(--admin-primary)';
                     }
                   }}
@@ -287,9 +350,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       style={{
                         position: 'absolute',
                         left: 0,
-                        top: '25%',
-                        height: '50%',
-                        width: '3px',
+                        top: '20%',
+                        bottom: '20%',
+                        width: '4px',
                         backgroundColor: 'var(--admin-primary)',
                         borderRadius: '0 4px 4px 0'
                       }}
@@ -297,7 +360,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   )}
                   
                   <span style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
-                    {item.icon}
+                    {item.icon(isActive)}
                   </span>
                   
                   {!collapsed && (
@@ -322,23 +385,23 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: collapsed ? 'center' : 'flex-start',
-                gap: collapsed ? '0' : '12px',
-                padding: '12px 14px',
-                border: '1px solid transparent',
+                gap: collapsed ? '0' : '10px',
+                padding: '10px 12px',
+                border: 'none',
                 borderRadius: 'var(--admin-radius-sm)',
                 cursor: 'pointer',
-                backgroundColor: isSettingsActive ? 'rgba(124, 58, 237, 0.06)' : 'transparent',
-                borderColor: isSettingsActive ? 'rgba(124, 58, 237, 0.12)' : 'transparent',
+                backgroundColor: isSettingsActive ? 'rgba(124, 58, 237, 0.08)' : 'transparent',
+                boxShadow: isSettingsActive ? 'var(--admin-shadow-sm)' : 'none',
                 color: isSettingsActive ? 'var(--admin-primary)' : 'var(--admin-text-secondary)',
                 fontWeight: isSettingsActive ? 600 : 500,
-                fontSize: '13.5px',
-                transition: 'all 0.15s ease',
+                fontSize: '13px',
+                transition: 'all 200ms ease',
                 boxSizing: 'border-box',
                 position: 'relative'
               }}
               onMouseOver={(e) => {
                 if (!isSettingsActive) {
-                  e.currentTarget.style.backgroundColor = 'var(--admin-surface)';
+                  e.currentTarget.style.backgroundColor = 'rgba(124, 58, 237, 0.04)';
                   e.currentTarget.style.color = 'var(--admin-primary)';
                 }
               }}
@@ -354,9 +417,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   style={{
                     position: 'absolute',
                     left: 0,
-                    top: '25%',
-                    height: '50%',
-                    width: '3px',
+                    top: '20%',
+                    bottom: '20%',
+                    width: '4px',
                     backgroundColor: 'var(--admin-primary)',
                     borderRadius: '0 4px 4px 0'
                   }}
@@ -364,7 +427,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               )}
               
               <span style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill={isSettingsActive ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="12" cy="12" r="3" />
                   <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
                 </svg>
@@ -372,11 +435,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
               
               {!collapsed && (
                 <>
-                  <span className="animate-fade-in" style={{ whiteSpace: 'nowrap', flex: 1 }}>
+                  <span className="animate-fade-in" style={{ whiteSpace: 'nowrap', flex: 1, textAlign: 'left' }}>
                     Settings
                   </span>
                   
-                  {/* Accordion indicator for mobile, arrow for desktop */}
                   {isMobile ? (
                     <svg
                       viewBox="0 0 24 24"
@@ -389,7 +451,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       strokeLinejoin="round"
                       style={{
                         transform: mobileExpand ? 'rotate(180deg)' : 'rotate(0deg)',
-                        transition: 'transform 0.2s ease',
+                        transition: 'transform 200ms ease',
                         opacity: 0.6
                       }}
                     >
@@ -408,7 +470,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       style={{
                         opacity: 0.5,
                         transform: showSubmenu ? 'rotate(90deg)' : 'rotate(0deg)',
-                        transition: 'transform 0.2s ease'
+                        transition: 'transform 200ms ease'
                       }}
                     >
                       <polyline points="9 18 15 12 9 6" />
@@ -432,7 +494,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 }}
               >
                 {subNavItems.map((subItem) => {
-                  const isSubActive = subItem.paths.includes(currentPath);
+                  const isSubActive = subItem.paths.some(p => p.replace(/\/$/, '').toLowerCase() === cleanPath);
                   return (
                     <li key={subItem.label}>
                       <button
@@ -448,7 +510,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                           fontSize: '12.5px',
                           fontWeight: isSubActive ? 600 : 500,
                           cursor: 'pointer',
-                          transition: 'all 0.15s ease'
+                          transition: 'all 200ms ease'
                         }}
                       >
                         {subItem.label}
@@ -461,10 +523,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </li>
         </ul>
 
-        {/* 3. Bottom Sign Out section */}
+        {/* 3. Bottom Sign Out section (Dedicated Sidebar Footer with divider) */}
         <div
           style={{
-            padding: '16px var(--admin-space-4)',
+            padding: '12px var(--admin-space-2)',
             borderTop: '1px solid var(--admin-border)',
             boxSizing: 'border-box'
           }}
@@ -478,20 +540,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
               display: 'flex',
               alignItems: 'center',
               justifyContent: collapsed ? 'center' : 'flex-start',
-              gap: collapsed ? '0' : '12px',
-              padding: '12px 14px',
+              gap: collapsed ? '0' : '10px',
+              padding: '10px 12px',
               border: 'none',
               borderRadius: 'var(--admin-radius-sm)',
               cursor: 'pointer',
               backgroundColor: 'transparent',
               color: 'var(--admin-text-secondary)',
-              fontWeight: 600,
+              fontWeight: 550,
               fontSize: '13px',
-              transition: 'all 0.15s ease',
+              transition: 'all 200ms ease',
               boxSizing: 'border-box'
             }}
             onMouseOver={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.05)';
+              e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.06)';
               e.currentTarget.style.color = 'var(--admin-danger)';
             }}
             onMouseOut={(e) => {
@@ -500,7 +562,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             }}
           >
             <span style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
-              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
                 <polyline points="16 17 21 12 16 7" />
                 <line x1="21" y1="12" x2="9" y2="12" />
@@ -515,7 +577,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
       </aside>
 
-      {/* DESKTOP FLOATING FLY-OUT SUBMENU POPUP */}
+      {/* DESKTOP FLOATING FLY-OUT SUBMENU POPUP (Aligned to smaller 240px expanded sidebar) */}
       {!isMobile && showSubmenu && (
         <>
           {/* Overlay mask for clicking outside to dismiss */}
@@ -533,13 +595,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <div
             style={{
               position: 'fixed',
-              left: collapsed ? '80px' : '268px',
+              left: collapsed ? '72px' : '248px',
               top: `${submenuTop}px`,
               zIndex: 1000,
               width: '200px',
               backgroundColor: '#FFFFFF',
-              borderRadius: '12px',
-              boxShadow: '0 10px 25px -5px rgba(15, 23, 42, 0.1), 0 8px 10px -6px rgba(15, 23, 42, 0.1)',
+              borderRadius: '8px',
+              boxShadow: 'var(--admin-shadow-md)',
               border: '1px solid var(--admin-border)',
               padding: '6px',
               display: 'flex',
@@ -550,7 +612,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             }}
           >
             {subNavItems.map((subItem) => {
-              const isSubActive = subItem.paths.includes(currentPath);
+              const isSubActive = subItem.paths.some(p => p.replace(/\/$/, '').toLowerCase() === cleanPath);
               return (
                 <button
                   key={subItem.label}
@@ -561,13 +623,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     textAlign: 'left',
                     padding: '10px 14px',
                     border: 'none',
-                    borderRadius: '8px',
+                    borderRadius: '6px',
                     backgroundColor: isSubActive ? 'rgba(124, 58, 237, 0.06)' : 'transparent',
                     color: isSubActive ? 'var(--admin-primary)' : 'var(--admin-text-secondary)',
                     fontSize: '13px',
                     fontWeight: isSubActive ? 600 : 500,
                     cursor: 'pointer',
-                    transition: 'all 0.15s ease',
+                    transition: 'all 200ms ease',
                     boxSizing: 'border-box'
                   }}
                   onMouseOver={(e) => {

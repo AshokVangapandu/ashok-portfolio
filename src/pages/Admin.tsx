@@ -22,15 +22,24 @@ export const AdminPage: React.FC = () => {
 
   const handleNavigate = (path: string) => {
     if (typeof window !== 'undefined') {
-      window.history.pushState(null, '', path);
-      setCurrentPath(path);
+      const hasBase = window.location.pathname.startsWith('/ashok-portfolio');
+      const targetPath = hasBase ? `/ashok-portfolio${path}` : path;
+      window.history.pushState(null, '', targetPath);
+      setCurrentPath(targetPath);
     }
+  };
+
+  const getFallbackPath = () => {
+    if (typeof window !== 'undefined') {
+      return window.location.pathname.startsWith('/ashok-portfolio') ? '/ashok-portfolio/' : '/';
+    }
+    return '/';
   };
 
   const { component, pageTitle } = resolveRoute(currentPath);
 
   return (
-    <ProtectedRoute adminOnly fallbackPath="/">
+    <ProtectedRoute adminOnly fallbackPath={getFallbackPath()}>
       <PageLayout
         currentPath={currentPath}
         onNavigate={handleNavigate}

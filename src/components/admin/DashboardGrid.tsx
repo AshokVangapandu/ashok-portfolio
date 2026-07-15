@@ -16,9 +16,6 @@ export const DashboardGrid: React.FC = () => {
 
   return (
     <div className="dashboard-grid-container">
-      {/* 1. Welcome Banner Hero */}
-      <DashboardBanner />
-
       {/* 2. Statistics Cards List */}
       <div className="stats-grid">
         <StatisticCard

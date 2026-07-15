@@ -245,7 +245,7 @@ export const CertificationsShowcasePage: React.FC = () => {
         style={{
           display: 'grid',
           gridTemplateColumns: '1fr 410px',
-          gap: '40px',
+          gap: '56px',
           alignItems: 'start',
           width: '100%'
         }}
@@ -335,16 +335,16 @@ export const CertificationsShowcasePage: React.FC = () => {
                   onMouseEnter={() => setHoveredCard(card.id)}
                   onMouseLeave={() => setHoveredCard(null)}
                   style={{
-                    background: 'rgba(13, 17, 30, 0.45)',
-                    border: isHovered ? '1px solid rgba(124, 92, 255, 0.45)' : '1px solid rgba(255, 255, 255, 0.05)',
+                    background: 'rgba(23, 29, 49, 0.54)',
+                    border: isHovered ? '1px solid rgba(124, 92, 255, 0.45)' : '1px solid rgba(255, 255, 255, 0.09)',
                     borderRadius: '16px',
                     padding: '24px',
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'space-between',
                     boxShadow: isHovered 
-                      ? '0 20px 40px rgba(0, 0, 0, 0.25), 0 0 30px rgba(124, 92, 255, 0.12)' 
-                      : '0 10px 30px rgba(0, 0, 0, 0.15)',
+                      ? '0 24px 48px rgba(0, 0, 0, 0.35), 0 0 30px rgba(124, 92, 255, 0.16)' 
+                      : '0 14px 40px rgba(0, 0, 0, 0.28)',
                     transform: isHovered ? 'translateY(-6px)' : 'translateY(0)',
                     transition: 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
                     cursor: 'pointer',
@@ -525,8 +525,8 @@ export const CertificationsShowcasePage: React.FC = () => {
             position: 'sticky',
             top: '120px',
             padding: '24px',
-            background: 'rgba(13, 17, 30, 0.45)',
-            border: '1px solid rgba(255, 255, 255, 0.06)',
+            background: 'rgba(35, 43, 71, 0.64)',
+            border: '1px solid rgba(255, 255, 255, 0.14)',
             borderRadius: '20px',
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
@@ -534,7 +534,7 @@ export const CertificationsShowcasePage: React.FC = () => {
             flexDirection: 'column',
             gap: '24px',
             boxSizing: 'border-box',
-            boxShadow: '0 20px 50px rgba(0, 0, 0, 0.35)',
+            boxShadow: '0 32px 64px rgba(0, 0, 0, 0.45), inset 0 2px 12px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.12)',
             width: '410px'
           }}
         >

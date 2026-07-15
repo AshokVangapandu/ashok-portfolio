@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Sidebar } from './Sidebar';
 import { Topbar } from './Topbar';
-import { Breadcrumb } from './Breadcrumb';
 
 interface PageLayoutProps {
   children: React.ReactNode;
@@ -46,7 +45,7 @@ export const PageLayout: React.FC<PageLayoutProps> = ({
     setCollapsed(!collapsed);
   };
 
-  const contentMarginLeft = isMobileOrTablet ? '0px' : (collapsed ? '72px' : '240px');
+  const contentMarginLeft = isMobileOrTablet ? '0px' : (collapsed ? '64px' : '240px');
 
   return (
     <div 
@@ -64,11 +63,12 @@ export const PageLayout: React.FC<PageLayoutProps> = ({
         collapsed={collapsed}
         currentPath={currentPath}
         onNavigate={onNavigate}
+        onToggleSidebar={handleToggleSidebar}
       />
 
       {/* Screen overlay for tablets and mobile when sidebar is active */}
       <div 
-        className={`admin-sidebar-overlay ${!collapsed ? 'active' : ''}`} 
+        className={`admin-sidebar-overlay ${(isMobileOrTablet && !collapsed) ? 'active' : ''}`} 
         onClick={() => setCollapsed(true)}
       />
 
@@ -102,12 +102,6 @@ export const PageLayout: React.FC<PageLayoutProps> = ({
             boxSizing: 'border-box'
           }}
         >
-          {/* Location tracking path */}
-          <Breadcrumb 
-            currentPath={currentPath} 
-            onNavigate={onNavigate} 
-          />
-          
           {/* Active module content viewport */}
           <div style={{ flex: 1 }}>
             {children}

@@ -20,7 +20,17 @@ interface RouteResolution {
  */
 export const resolveRoute = (path: string): RouteResolution => {
   // Normalize paths for matching (strip trailing slash)
-  const normalizedPath = path.replace(/\/$/, '').toLowerCase();
+  let normalizedPath = path.replace(/\/$/, '').toLowerCase();
+
+  // Strip repository base path if present (e.g. on GitHub Pages)
+  if (normalizedPath.startsWith('/ashok-portfolio')) {
+    normalizedPath = normalizedPath.substring('/ashok-portfolio'.length);
+  }
+
+  // Ensure it starts with '/'
+  if (!normalizedPath.startsWith('/')) {
+    normalizedPath = '/' + normalizedPath;
+  }
 
   switch (normalizedPath) {
     case '/admin':

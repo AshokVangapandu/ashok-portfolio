@@ -1,11 +1,11 @@
 /* src/admin/layout/Topbar.tsx */
-import React from 'react';
+import React, { useState } from 'react';
 import { Avatar } from '../components/avatars/Avatar';
 import { useAuth } from '../../hooks/useAuth';
 
 interface TopbarProps {
-  onToggleSidebar: () => void;
-  pageTitle: string;
+  onToggleSidebar?: () => void;
+  pageTitle: string; // Preserved in signature to prevent compile errors, but not rendered.
 }
 
 export const Topbar: React.FC<TopbarProps> = ({
@@ -13,6 +13,7 @@ export const Topbar: React.FC<TopbarProps> = ({
   pageTitle,
 }) => {
   const { user, logout } = useAuth();
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   
   const userDisplayName = user?.user_metadata?.full_name || user?.email || 'Administrator';
   const userAvatar = user?.user_metadata?.avatar_url || null;
@@ -21,7 +22,7 @@ export const Topbar: React.FC<TopbarProps> = ({
     <header
       style={{
         height: '64px',
-        background: '#FFFFFF',
+        background: '#FAFBFF',
         borderBottom: '1px solid var(--admin-border)',
         display: 'flex',
         alignItems: 'center',
@@ -34,63 +35,52 @@ export const Topbar: React.FC<TopbarProps> = ({
         boxSizing: 'border-box'
       }}
     >
-      {/* Left section: Toggle & Title */}
+      {/* Left section: App Title */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--admin-space-4)' }}>
-        <button
-          onClick={onToggleSidebar}
-          className="active-press"
-          style={{
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            padding: 'var(--admin-space-2)',
-            borderRadius: 'var(--admin-radius-sm)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: 'var(--admin-text-secondary)',
-            fontSize: '18px'
-          }}
-          onMouseOver={(e) => e.currentTarget.style.background = 'var(--admin-surface)'}
-          onMouseOut={(e) => e.currentTarget.style.background = 'none'}
-        >
-          <svg
-            viewBox="0 0 24 24"
-            width="22"
-            height="22"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <line x1="3" y1="12" x2="21" y2="12" />
-            <line x1="3" y1="6" x2="21" y2="6" />
-            <line x1="3" y1="18" x2="21" y2="18" />
-          </svg>
-        </button>
+        {/* App Representative Title (No page titles) */}
         <h1
-          className="text-section-title"
           style={{
             margin: 0,
-            fontSize: '18px',
-            fontWeight: 600,
-            color: 'var(--admin-text)'
+            fontSize: '16px',
+            fontWeight: 700,
+            color: 'var(--admin-text)',
+            letterSpacing: '-0.02em',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
           }}
         >
-          {pageTitle}
+          Good Evening, Ashok 👋
         </h1>
       </div>
 
-      {/* Right section: Profile & Actions */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--admin-space-4)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--admin-space-2.5)' }}>
-          <Avatar src={userAvatar} name={userDisplayName} size={36} />
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
+      {/* Right section: Profile & Dropdown menu */}
+      <div style={{ position: 'relative' }}>
+        <button
+          onClick={() => setDropdownOpen(!dropdownOpen)}
+          className="active-press"
+          style={{
+            background: 'none',
+            border: '1px solid transparent',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            padding: '6px 12px',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            transition: 'all 200ms ease',
+            boxSizing: 'border-box'
+          }}
+          onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--admin-surface)'}
+          onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+        >
+          <Avatar src={userAvatar} name={userDisplayName} size={32} />
+          
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', textAlign: 'left' }}>
             <span
               style={{
                 fontSize: '13px',
-                fontWeight: 600,
+                fontWeight: 650,
                 color: 'var(--admin-text)',
                 lineHeight: 1.2
               }}
@@ -101,51 +91,149 @@ export const Topbar: React.FC<TopbarProps> = ({
               style={{
                 fontSize: '11px',
                 color: 'var(--admin-text-secondary)',
-                lineHeight: 1
+                fontWeight: 500,
+                lineHeight: 1,
+                marginTop: '1px'
               }}
             >
-              Admin Role
+              Administrator
             </span>
           </div>
-        </div>
-
-        <div
-          style={{
-            width: '1px',
-            height: '24px',
-            background: 'var(--admin-border)',
-            margin: '0 var(--admin-space-1)'
-          }}
-        />
-
-        <button
-          onClick={logout}
-          className="hover-scale active-press"
-          style={{
-            background: 'none',
-            border: '1px solid var(--admin-border)',
-            padding: 'var(--admin-space-1.5) var(--admin-space-3)',
-            borderRadius: 'var(--admin-radius-sm)',
-            color: 'var(--admin-text-secondary)',
-            fontSize: '12px',
-            fontWeight: 600,
-            cursor: 'pointer',
-            transition: 'all 0.15s'
-          }}
-          onMouseOver={(e) => {
-            e.currentTarget.style.background = 'var(--admin-surface)';
-            e.currentTarget.style.color = 'var(--admin-danger)';
-            e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.3)';
-          }}
-          onMouseOut={(e) => {
-            e.currentTarget.style.background = 'none';
-            e.currentTarget.style.color = 'var(--admin-text-secondary)';
-            e.currentTarget.style.borderColor = 'var(--admin-border)';
-          }}
-        >
-          Sign Out
+          
+          <svg
+            viewBox="0 0 24 24"
+            width="10"
+            height="10"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="3"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            style={{
+              color: 'var(--admin-text-secondary)',
+              transition: 'transform 200ms ease',
+              transform: dropdownOpen ? 'rotate(180deg)' : 'rotate(0)'
+            }}
+          >
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
         </button>
+
+        {dropdownOpen && (
+          <>
+            {/* Click-outside dismiss overlay */}
+            <div
+              onClick={() => setDropdownOpen(false)}
+              style={{
+                position: 'fixed',
+                inset: 0,
+                zIndex: 999,
+                backgroundColor: 'transparent'
+              }}
+            />
+            
+            {/* Floating Dropdown Panel */}
+            <div
+              style={{
+                position: 'absolute',
+                right: 0,
+                top: 'calc(100% + 6px)',
+                width: '180px',
+                backgroundColor: '#FFFFFF',
+                borderRadius: '8px',
+                border: '1px solid var(--admin-border)',
+                boxShadow: 'var(--admin-shadow-md)',
+                padding: '4px',
+                zIndex: 1000,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '2px',
+                boxSizing: 'border-box',
+                animation: 'topbarDropdownIn 200ms cubic-bezier(0.16, 1, 0.3, 1)'
+              }}
+            >
+              <button
+                onClick={() => setDropdownOpen(false)}
+                style={{
+                  width: '100%',
+                  textAlign: 'left',
+                  padding: '8px 12px',
+                  background: 'none',
+                  border: 'none',
+                  borderRadius: '6px',
+                  fontSize: '13px',
+                  fontWeight: 500,
+                  color: 'var(--admin-text)',
+                  cursor: 'pointer',
+                  transition: 'background-color 150ms ease'
+                }}
+                onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--admin-surface)'}
+                onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+              >
+                Profile
+              </button>
+              
+              <button
+                onClick={() => setDropdownOpen(false)}
+                style={{
+                  width: '100%',
+                  textAlign: 'left',
+                  padding: '8px 12px',
+                  background: 'none',
+                  border: 'none',
+                  borderRadius: '6px',
+                  fontSize: '13px',
+                  fontWeight: 500,
+                  color: 'var(--admin-text)',
+                  cursor: 'pointer',
+                  transition: 'background-color 150ms ease'
+                }}
+                onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--admin-surface)'}
+                onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+              >
+                Settings
+              </button>
+              
+              <div style={{ height: '1px', background: 'var(--admin-border)', margin: '4px 0' }} />
+              
+              <button
+                onClick={() => {
+                  setDropdownOpen(false);
+                  logout();
+                }}
+                style={{
+                  width: '100%',
+                  textAlign: 'left',
+                  padding: '8px 12px',
+                  background: 'none',
+                  border: 'none',
+                  borderRadius: '6px',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  color: 'var(--admin-danger)',
+                  cursor: 'pointer',
+                  transition: 'all 150ms ease'
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.06)';
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                }}
+              >
+                Logout
+              </button>
+            </div>
+          </>
+        )}
       </div>
+
+      <style dangerouslySetInnerHTML={{__html: `
+        @keyframes topbarDropdownIn {
+          from { opacity: 0; transform: translateY(-4px) scale(0.97); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+      `}} />
     </header>
   );
 };
