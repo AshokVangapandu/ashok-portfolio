@@ -1,10 +1,11 @@
+/* src/components/admin/DashboardGrid.tsx */
 import React, { useEffect } from 'react';
 import { DashboardBanner } from './DashboardBanner';
-import { StatisticCard } from './StatisticCard';
+import { KpiCard } from './KpiCard';
 import { AnalyticsCard } from './AnalyticsCard';
 import { ActivityCard } from './ActivityCard';
-import { MessageCard } from './MessageCard';
-import { TestimonialCard } from './TestimonialCard';
+import { EdithInsights } from './EdithInsights';
+import { SystemMonitor } from './SystemMonitor';
 import { useContactMessages } from '../../hooks/useContactMessages';
 
 export const DashboardGrid: React.FC = () => {
@@ -16,12 +17,13 @@ export const DashboardGrid: React.FC = () => {
 
   return (
     <div className="dashboard-grid-container">
-      {/* 2. Statistics Cards List */}
+      {/* Statistics Cards List */}
       <div className="stats-grid">
-        <StatisticCard
+        <KpiCard
           label="Total Visitors"
           value="24,819"
-          growth="+12%"
+          badge="+12%"
+          badgeType="positive"
           icon={
             <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
@@ -30,10 +32,12 @@ export const DashboardGrid: React.FC = () => {
             </svg>
           }
         />
-        <StatisticCard
+        
+        <KpiCard
           label="Contact Messages"
           value={totalCount}
-          growth="+8%"
+          badge="+8%"
+          badgeType="positive"
           loading={loading}
           icon={
             <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -42,30 +46,34 @@ export const DashboardGrid: React.FC = () => {
             </svg>
           }
         />
-        <StatisticCard
+        
+        <KpiCard
           label="Testimonials"
           value="92"
-          growth="+4%"
           icon={
             <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
             </svg>
           }
         />
-        <StatisticCard
+        
+        <KpiCard
           label="Resume Downloads"
           value="1,204"
-          growth="+18%"
+          badge="+18%"
+          badgeType="positive"
           icon={
             <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
             </svg>
           }
         />
-        <StatisticCard
+        
+        <KpiCard
           label="Projects"
           value="18"
-          growth="Active"
+          badge="Active"
+          badgeType="neutral"
           icon={
             <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
@@ -73,13 +81,16 @@ export const DashboardGrid: React.FC = () => {
             </svg>
           }
         />
-        <StatisticCard
+        
+        <KpiCard
           label="Live Visitors"
           value="7"
-          growth="+40%"
+          badge="+40%"
+          badgeType="positive"
           icon={
             <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
             </svg>
           }
         />
@@ -91,10 +102,10 @@ export const DashboardGrid: React.FC = () => {
         <ActivityCard />
       </div>
 
-      {/* 4. Messages Card & Testimonials Card row */}
+      {/* 4. Edith Insights & System Monitor Card row */}
       <div className="dashboard-grid-row two-cols equal">
-        <MessageCard />
-        <TestimonialCard />
+        <EdithInsights />
+        <SystemMonitor />
       </div>
     </div>
   );

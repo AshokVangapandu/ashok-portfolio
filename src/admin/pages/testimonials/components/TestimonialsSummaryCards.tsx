@@ -1,6 +1,6 @@
 /* src/admin/pages/testimonials/components/TestimonialsSummaryCards.tsx */
 import React from 'react';
-import { StatisticCard } from '../../../../components/admin/StatisticCard';
+import { KpiCard } from '../../../../components/admin/KpiCard';
 
 interface SummaryData {
   total: number;
@@ -26,10 +26,11 @@ export const TestimonialsSummaryCards: React.FC<TestimonialsSummaryCardsProps> =
 }) => {
   return (
     <div className="stats-grid">
-      <StatisticCard
+      <KpiCard
         label="Total Testimonials"
         value={summary.total}
-        growth={summary.trends.total}
+        badge={summary.trends.total}
+        badgeType="positive"
         loading={loading}
         icon={
           <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -38,10 +39,11 @@ export const TestimonialsSummaryCards: React.FC<TestimonialsSummaryCardsProps> =
         }
       />
       
-      <StatisticCard
+      <KpiCard
         label="Pending Review"
         value={summary.pending}
-        growth={summary.trends.pending}
+        badge={summary.trends.pending}
+        badgeType="neutral"
         loading={loading}
         icon={
           <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -51,10 +53,11 @@ export const TestimonialsSummaryCards: React.FC<TestimonialsSummaryCardsProps> =
         }
       />
 
-      <StatisticCard
+      <KpiCard
         label="Approved"
         value={summary.approved}
-        growth={summary.trends.approved}
+        badge={summary.trends.approved}
+        badgeType="positive"
         loading={loading}
         icon={
           <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -64,10 +67,11 @@ export const TestimonialsSummaryCards: React.FC<TestimonialsSummaryCardsProps> =
         }
       />
 
-      <StatisticCard
+      <KpiCard
         label="Rejected"
         value={summary.rejected}
-        growth={summary.trends.rejected}
+        badge={summary.trends.rejected}
+        badgeType="negative"
         loading={loading}
         icon={
           <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

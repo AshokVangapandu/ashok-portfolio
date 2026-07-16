@@ -15,7 +15,15 @@ export const PageLayout: React.FC<PageLayoutProps> = ({
   onNavigate,
   pageTitle,
 }) => {
-  const [collapsed, setCollapsed] = useState<boolean>(true);
+  const [collapsed, setCollapsed] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('admin-sidebar-collapsed');
+      if (stored !== null) {
+        return stored === 'true';
+      }
+    }
+    return false; // Expanded by default
+  });
   const [isMobileOrTablet, setIsMobileOrTablet] = useState<boolean>(false);
 
   useEffect(() => {
@@ -24,15 +32,6 @@ export const PageLayout: React.FC<PageLayoutProps> = ({
         const width = window.innerWidth;
         const isTabletOrMobile = width < 980;
         setIsMobileOrTablet(isTabletOrMobile);
-        
-        // Breakpoint default states:
-        // Desktop: expanded by default
-        // Tablet/Mobile: collapsed by default
-        if (isTabletOrMobile) {
-          setCollapsed(true);
-        } else {
-          setCollapsed(false);
-        }
       };
 
       handleResize();
@@ -42,10 +41,16 @@ export const PageLayout: React.FC<PageLayoutProps> = ({
   }, []);
 
   const handleToggleSidebar = () => {
-    setCollapsed(!collapsed);
+    setCollapsed((prev) => {
+      const newVal = !prev;
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('admin-sidebar-collapsed', String(newVal));
+      }
+      return newVal;
+    });
   };
 
-  const contentMarginLeft = isMobileOrTablet ? '0px' : (collapsed ? '64px' : '240px');
+  const contentMarginLeft = isMobileOrTablet ? '0px' : (collapsed ? '72px' : '240px');
 
   return (
     <div 
@@ -81,7 +86,7 @@ export const PageLayout: React.FC<PageLayoutProps> = ({
           flexDirection: 'column',
           minHeight: '100vh',
           boxSizing: 'border-box',
-          transition: 'margin-left 250ms cubic-bezier(0.22, 1, 0.36, 1)'
+          transition: 'margin-left 300ms cubic-bezier(0.4, 0, 0.2, 1)'
         }}
       >
         {/* Header Topbar */}
