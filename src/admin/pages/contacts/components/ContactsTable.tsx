@@ -7,13 +7,13 @@ import { ContactRow } from './ContactRow';
 interface ContactsTableProps {
   contacts: ContactSubmission[];
   onViewContact?: (contact: ContactSubmission) => void;
-  onReplyContact?: (contact: ContactSubmission) => void;
+  onArchiveContact?: (contact: ContactSubmission) => void;
 }
 
 export const ContactsTable: React.FC<ContactsTableProps> = ({
   contacts,
   onViewContact,
-  onReplyContact,
+  onArchiveContact,
 }) => {
   return (
     <Table headers={['Contact', 'Company', 'Subject', 'Date', 'Status', 'Actions']}>
@@ -22,7 +22,7 @@ export const ContactsTable: React.FC<ContactsTableProps> = ({
           key={contact.id}
           contact={contact}
           onView={onViewContact}
-          onReply={onReplyContact}
+          onArchive={onArchiveContact}
         />
       ))}
     </Table>

@@ -1,117 +1,162 @@
-/* src/admin/hooks/useContacts.ts */
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { ContactSubmission } from '../types/contact';
 import { contactService } from '../services/contactService';
+import { supabase } from '../../services/supabase/client';
 
 export const useContacts = () => {
+  // Parse initial query params from URL
+  const getInitialParams = () => {
+    if (typeof window === 'undefined') {
+      return { search: '', status: 'all', sort: 'newest' as const, page: 1, pageSize: 8 };
+    }
+    const params = new URLSearchParams(window.location.search);
+    return {
+      search: params.get('search') || '',
+      status: params.get('status') || 'all',
+      sort: (params.get('sort') as 'newest' | 'oldest') || 'newest',
+      page: parseInt(params.get('page') || '1', 10),
+      pageSize: parseInt(params.get('pageSize') || '8', 10)
+    };
+  };
+
+  const initialParams = getInitialParams();
+
+  // Component States
   const [submissions, setSubmissions] = useState<ContactSubmission[]>([]);
+  const [totalCount, setTotalCount] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Filter and search states
-  const [searchQuery, setSearchQuery] = useState<string>('');
-  const [statusFilter, setStatusFilter] = useState<string>('all'); // 'all' | 'open' | 'reply_pending' | 'replied'
-  
-  // Pagination states
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const [pageSize, setPageSize] = useState<number>(8);
+  // Stats aggregate states
+  const [statsData, setStatsData] = useState({ total: 0, open: 0, pending: 0, replied: 0 });
 
-  // Fetch data on mount
+  // Filter States
+  const [searchInput, setSearchInput] = useState<string>(initialParams.search);
+  const [searchQuery, setSearchQuery] = useState<string>(initialParams.search);
+  const [statusFilter, setStatusFilter] = useState<string>(initialParams.status);
+  const [sortBy, setSortBy] = useState<'newest' | 'oldest'>(initialParams.sort);
+  const [currentPage, setCurrentPage] = useState<number>(initialParams.page);
+  const [pageSize, setPageSize] = useState<number>(initialParams.pageSize);
+
+  // 1. Debounce Search Input
   useEffect(() => {
-    let isMounted = true;
-    
-    const loadSubmissions = async () => {
-      setIsLoading(true);
-      try {
-        const data = await contactService.getSubmissions();
-        if (isMounted) {
-          setSubmissions(data);
-        }
-      } catch (err: any) {
-        if (isMounted) {
-          setError(err?.message || 'Failed to fetch contact submissions.');
-        }
-      } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
-      }
-    };
+    const handler = setTimeout(() => {
+      setSearchQuery(searchInput);
+      setCurrentPage(1); // Reset page on query search
+    }, 300);
 
-    loadSubmissions();
+    return () => clearTimeout(handler);
+  }, [searchInput]);
 
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  // Filter submissions by status and search queries
-  const filteredSubmissions = useMemo(() => {
-    return submissions.filter((sub) => {
-      // Status check
-      const matchesStatus = 
-        statusFilter === 'all' || 
-        sub.status === statusFilter;
-
-      // Search match (name, email, subject, company, message)
-      const query = searchQuery.toLowerCase().trim();
-      const matchesSearch = 
-        !query ||
-        sub.name.toLowerCase().includes(query) ||
-        sub.email.toLowerCase().includes(query) ||
-        sub.subject.toLowerCase().includes(query) ||
-        sub.company.toLowerCase().includes(query) ||
-        sub.message.toLowerCase().includes(query);
-
-      return matchesStatus && matchesSearch;
-    });
-  }, [submissions, statusFilter, searchQuery]);
-
-  // Compute status summary aggregates
-  const stats = useMemo(() => {
-    const total = submissions.length;
-    const open = submissions.filter(s => s.status === 'open').length;
-    const pending = submissions.filter(s => s.status === 'reply_pending').length;
-    const replied = submissions.filter(s => s.status === 'replied').length;
-    
-    return {
-      total,
-      open,
-      pending,
-      replied,
-      awaitingReply: open + pending
-    };
-  }, [submissions]);
-
-  // Handle pagination indexing slice
-  const paginatedSubmissions = useMemo(() => {
-    const startIndex = (currentPage - 1) * pageSize;
-    const endIndex = startIndex + pageSize;
-    return filteredSubmissions.slice(startIndex, endIndex);
-  }, [filteredSubmissions, currentPage, pageSize]);
-
-  const totalPages = Math.max(1, Math.ceil(filteredSubmissions.length / pageSize));
-
-  // Reset page when filters or search change
+  // Reset page when filter/sort attributes modify
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, statusFilter, pageSize]);
+  }, [statusFilter, sortBy, pageSize]);
+
+  // 2. Sync URL Search Params
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams();
+    
+    if (searchQuery) params.set('search', searchQuery);
+    if (statusFilter !== 'all') params.set('status', statusFilter);
+    if (sortBy !== 'newest') params.set('sort', sortBy);
+    if (currentPage > 1) params.set('page', String(currentPage));
+    if (pageSize !== 8) params.set('pageSize', String(pageSize));
+
+    const newSearch = params.toString();
+    const newUrl = `${window.location.pathname}${newSearch ? '?' + newSearch : ''}`;
+    window.history.replaceState(null, '', newUrl);
+  }, [searchQuery, statusFilter, sortBy, currentPage, pageSize]);
+
+  // 3. Fetch Data & Stats from Supabase
+  const loadSubmissions = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      // Parallel queries: Fetch paginated data + overall stats aggregates
+      const [submissionsResponse, statsResponse] = await Promise.all([
+        contactService.getSubmissions({
+          search: searchQuery,
+          status: statusFilter,
+          sortBy,
+          page: currentPage,
+          pageSize
+        }),
+        (supabase as any).from('contact_messages').select('status')
+      ]);
+
+      setSubmissions(submissionsResponse.data);
+      setTotalCount(submissionsResponse.count);
+
+      // Aggregate stats in memory (highly efficient - loads status string only)
+      if (statsResponse.data) {
+        const rows = statsResponse.data as { status: string }[];
+        const total = rows.length;
+        const open = rows.filter(r => !r.status || r.status.toLowerCase() === 'open' || r.status.toLowerCase() === 'new').length;
+        const pending = rows.filter(r => r.status && r.status.toLowerCase() === 'reply_pending').length;
+        const replied = rows.filter(r => r.status && r.status.toLowerCase() === 'replied').length;
+        setStatsData({ total, open, pending, replied });
+      }
+    } catch (err: any) {
+      console.error('[useContacts] Error loading contacts:', err);
+      setError(err?.message || 'Failed to load contact submissions.');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [searchQuery, statusFilter, sortBy, currentPage, pageSize]);
+
+  // Fetch on state variations
+  useEffect(() => {
+    loadSubmissions();
+  }, [loadSubmissions]);
+
+  // Calculate pages
+  const totalPages = useMemo(() => {
+    return Math.max(1, Math.ceil(totalCount / pageSize));
+  }, [totalCount, pageSize]);
+
+  // Calculate Stats
+  const stats = useMemo(() => {
+    return {
+      total: statsData.total,
+      open: statsData.open,
+      pending: statsData.pending,
+      replied: statsData.replied,
+      awaitingReply: statsData.open + statsData.pending
+    };
+  }, [statsData]);
+
+  // Reset helper method
+  const clearFilters = () => {
+    setSearchInput('');
+    setSearchQuery('');
+    setStatusFilter('all');
+    setSortBy('newest');
+    setCurrentPage(1);
+  };
 
   return {
-    submissions: paginatedSubmissions,
-    allFilteredCount: filteredSubmissions.length,
+    submissions,
+    allFilteredCount: totalCount,
     stats,
     isLoading,
     error,
+    searchInput,
+    setSearchInput,
     searchQuery,
     setSearchQuery,
     statusFilter,
     setStatusFilter,
+    sortBy,
+    setSortBy,
     currentPage,
     setCurrentPage,
     pageSize,
     setPageSize,
-    totalPages
+    totalPages,
+    refresh: loadSubmissions,
+    clearFilters
   };
 };
 

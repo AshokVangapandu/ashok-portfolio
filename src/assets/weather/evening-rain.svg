@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+  <defs>
+    <linearGradient id="eveningSun" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FF5E3A" />
+      <stop offset="100%" stop-color="#FF2A68" />
+    </linearGradient>
+    <linearGradient id="rainCloud" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#8E8E93" />
+      <stop offset="100%" stop-color="#5856D6" />
+    </linearGradient>
+  </defs>
+  <!-- Setting Sun -->
+  <circle cx="38" cy="46" r="14" fill="url(#eveningSun)" />
+  <!-- Rain Cloud -->
+  <path d="M25 60 h42 a15 15 0 0 0 4 -29.4 a18 18 0 0 0 -33.6 -7.6 a13 13 0 0 0 -12.4 12 a15 15 0 0 0 0 25 z" fill="url(#rainCloud)" />
+  <!-- Rain Drops -->
+  <g stroke="#5AC8FA" stroke-width="2" stroke-linecap="round" opacity="0.8">
+    <line x1="33" y1="68" x2="29" y2="76" />
+    <line x1="45" y1="68" x2="41" y2="76" />
+    <line x1="57" y1="68" x2="53" y2="76" />
+  </g>
+</svg>

@@ -5,9 +5,13 @@ export interface ContactSubmission {
   name: string;
   email: string;
   company: string;
+  phoneNumber?: string | null;
   subject: string;
   message: string;
   date: string;
-  status: 'open' | 'reply_pending' | 'replied';
+  status: 'open' | 'reply_pending' | 'replied' | 'REPLIED' | 'New' | string;
   avatarUrl?: string | null;
+  updatedAt?: string;
+  isRead?: boolean;
+  repliedAt?: string | null;
 }

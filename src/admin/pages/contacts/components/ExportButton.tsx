@@ -6,18 +6,21 @@ interface ExportButtonProps {
   onExport?: () => void;
   className?: string;
   style?: React.CSSProperties;
+  isLoading?: boolean;
 }
 
 export const ExportButton: React.FC<ExportButtonProps> = ({
   onExport,
   className = '',
   style,
+  isLoading = false,
 }) => {
   return (
     <Button
       variant="secondary"
       size="md"
       onClick={onExport}
+      disabled={isLoading}
       className={className}
       style={{
         display: 'inline-flex',
@@ -26,14 +29,18 @@ export const ExportButton: React.FC<ExportButtonProps> = ({
         borderColor: 'var(--admin-border)',
         color: 'var(--admin-text-secondary)',
         background: '#FFFFFF',
+        opacity: isLoading ? 0.6 : 1,
+        cursor: isLoading ? 'not-allowed' : 'pointer',
         ...style
       }}
       onMouseOver={(e) => {
+        if (isLoading) return;
         e.currentTarget.style.color = 'var(--admin-primary)';
         e.currentTarget.style.borderColor = 'var(--admin-primary)';
         e.currentTarget.style.background = 'var(--admin-surface)';
       }}
       onMouseOut={(e) => {
+        if (isLoading) return;
         e.currentTarget.style.color = 'var(--admin-text-secondary)';
         e.currentTarget.style.borderColor = 'var(--admin-border)';
         e.currentTarget.style.background = '#FFFFFF';
@@ -44,7 +51,7 @@ export const ExportButton: React.FC<ExportButtonProps> = ({
         <polyline points="7 10 12 15 17 10" />
         <line x1="12" y1="15" x2="12" y2="3" />
       </svg>
-      <span>Export</span>
+      <span>{isLoading ? 'Exporting...' : 'Export'}</span>
     </Button>
   );
 };

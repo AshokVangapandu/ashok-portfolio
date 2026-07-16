@@ -3,13 +3,13 @@ import React from 'react';
 
 interface ActionButtonsProps {
   onView?: () => void;
-  onReply?: () => void;
+  onArchive?: () => void;
   onMore?: () => void;
 }
 
 export const ActionButtons: React.FC<ActionButtonsProps> = ({
   onView,
-  onReply,
+  onArchive,
   onMore,
 }) => {
   const buttonStyle: React.CSSProperties = {
@@ -51,9 +51,9 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
         </svg>
       </button>
 
-      {/* Reply Button */}
+      {/* Archive Button */}
       <button
-        onClick={onReply}
+        onClick={onArchive}
         className="hover-scale active-press"
         style={buttonStyle}
         onMouseOver={(e) => {
@@ -66,11 +66,12 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
           e.currentTarget.style.borderColor = 'var(--admin-border)';
           e.currentTarget.style.background = 'none';
         }}
-        title="Reply"
+        title="Archive"
       >
         <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-          <polyline points="9 17 4 12 9 7" />
-          <path d="M20 18v-2a4 4 0 0 0-4-4H4" />
+          <polyline points="21 8 21 21 3 21 3 8" />
+          <rect x="1" y="3" width="22" height="5" />
+          <line x1="10" y1="12" x2="14" y2="12" />
         </svg>
       </button>
 

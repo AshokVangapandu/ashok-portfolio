@@ -3,7 +3,7 @@ import React from 'react';
 import { Badge } from '../../../components/badges/Badge';
 
 interface StatusBadgeProps {
-  status: 'open' | 'reply_pending' | 'replied';
+  status: 'open' | 'reply_pending' | 'replied' | 'REPLIED' | string;
 }
 
 export const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
@@ -28,12 +28,22 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
           }
         };
       case 'replied':
+      case 'REPLIED':
         return { 
           label: 'Replied', 
           variant: 'success' as const,
           customStyle: {
             color: '#16A34A', // Green
             background: '#DCFCE7'
+          }
+        };
+      default:
+        return {
+          label: typeof status === 'string' ? status.toUpperCase() : 'UNKNOWN',
+          variant: 'default' as const,
+          customStyle: {
+            color: '#4B5563', // Grey
+            background: '#F3F4F6'
           }
         };
     }

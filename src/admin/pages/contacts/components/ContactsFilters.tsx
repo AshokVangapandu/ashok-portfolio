@@ -13,7 +13,8 @@ export const ContactsFilters: React.FC<ContactsFiltersProps> = ({
   const filters = [
     { label: 'All', id: 'all' },
     { label: 'Open', id: 'open' },
-    { label: 'Replied', id: 'replied' }
+    { label: 'Replied', id: 'replied' },
+    { label: 'Archived', id: 'archived' }
   ];
 
   return (

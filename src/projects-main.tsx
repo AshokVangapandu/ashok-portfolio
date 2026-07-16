@@ -32,10 +32,10 @@ const MainLayout: React.FC = () => {
             </span>
           </a>
 
-          <button 
-            className={`nav-toggle ${navActive ? 'active' : ''}`} 
-            type="button" 
-            aria-label="Open navigation" 
+          <button
+            className={`nav-toggle ${navActive ? 'active' : ''}`}
+            type="button"
+            aria-label="Open navigation"
             aria-expanded={navActive}
             onClick={() => setNavActive(!navActive)}
           >
@@ -61,7 +61,8 @@ const MainLayout: React.FC = () => {
       </main>
 
       {/* Re-inject mobile header toggle styles */}
-      <style dangerouslySetInnerHTML={{__html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
         @media (max-width: 768px) {
           .nav-links {
             display: none;

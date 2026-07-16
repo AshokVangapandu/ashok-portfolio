@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+  <defs>
+    <linearGradient id="skyBlue" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E5E5EA" />
+      <stop offset="100%" stop-color="#D1D1D6" />
+    </linearGradient>
+    <linearGradient id="whiteCloud" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="100%" stop-color="#E5E5EA" />
+    </linearGradient>
+  </defs>
+  <!-- Background Cloud -->
+  <path d="M15 50 h36 a12 12 0 0 0 3.2 -23.5 a15 15 0 0 0 -28 -6.3 a11 11 0 0 0 -11.2 10.3 a12 12 0 0 0 0 19.5 z" fill="url(#skyBlue)" opacity="0.6" transform="translate(25, 5) scale(0.85)" />
+  <!-- Foreground Cloud -->
+  <path d="M22 62 h48 a16 16 0 0 0 4.3 -31.4 a20 20 0 0 0 -37.3 -8.4 a14 14 0 0 0 -15 13.8 a16 16 0 0 0 0 26 z" fill="url(#whiteCloud)" filter="drop-shadow(0px 3px 6px rgba(0,0,0,0.05))" />
+</svg>

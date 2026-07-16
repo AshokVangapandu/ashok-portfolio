@@ -8,13 +8,13 @@ import { ActionButtons } from './ActionButtons';
 interface ContactRowProps {
   contact: ContactSubmission;
   onView?: (contact: ContactSubmission) => void;
-  onReply?: (contact: ContactSubmission) => void;
+  onArchive?: (contact: ContactSubmission) => void;
 }
 
 export const ContactRow: React.FC<ContactRowProps> = ({
   contact,
   onView,
-  onReply,
+  onArchive,
 }) => {
   return (
     <tr 
@@ -105,7 +105,7 @@ export const ContactRow: React.FC<ContactRowProps> = ({
       <td style={{ padding: 'var(--admin-space-3) var(--admin-space-4)' }}>
         <ActionButtons 
           onView={onView ? () => onView(contact) : undefined}
-          onReply={onReply ? () => onReply(contact) : undefined}
+          onArchive={onArchive ? () => onArchive(contact) : undefined}
         />
       </td>
     </tr>

@@ -113,6 +113,9 @@ export interface Database {
           message: string
           status: string
           created_at: string
+          is_read: boolean
+          replied_at: string | null
+          updated_at: string
         }
         Insert: {
           id?: string
@@ -124,6 +127,9 @@ export interface Database {
           message: string
           status?: string
           created_at?: string
+          is_read?: boolean
+          replied_at?: string | null
+          updated_at?: string
         }
         Update: {
           id?: string
@@ -135,6 +141,9 @@ export interface Database {
           message?: string
           status?: string
           created_at?: string
+          is_read?: boolean
+          replied_at?: string | null
+          updated_at?: string
         }
         Relationships: []
       }

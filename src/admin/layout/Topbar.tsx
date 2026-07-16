@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Avatar } from '../components/avatars/Avatar';
 import { useAuth } from '../../hooks/useAuth';
+import { TopBarGreeting } from '../components/TopBarGreeting';
 
 interface TopbarProps {
   onToggleSidebar?: () => void;
@@ -35,24 +36,7 @@ export const Topbar: React.FC<TopbarProps> = ({
         boxSizing: 'border-box'
       }}
     >
-      {/* Left section: App Title */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--admin-space-4)' }}>
-        {/* App Representative Title (No page titles) */}
-        <h1
-          style={{
-            margin: 0,
-            fontSize: '16px',
-            fontWeight: 700,
-            color: 'var(--admin-text)',
-            letterSpacing: '-0.02em',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px'
-          }}
-        >
-          Good Evening, Ashok 👋
-        </h1>
-      </div>
+      <TopBarGreeting userName={userDisplayName} />
 
       {/* Right section: Profile & Dropdown menu */}
       <div style={{ position: 'relative' }}>
