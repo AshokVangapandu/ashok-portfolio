@@ -22,7 +22,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
-  const [isAdminLoading, setIsAdminLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
   const prevUserIdRef = useRef<string | null>(null);
@@ -43,72 +42,37 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, [user]);
 
-  // Query database to evaluate administrator privilege claims with session caching
-  useEffect(() => {
-    let active = true;
+  const checkAdminPrivilege = async (email: string): Promise<boolean> => {
+    const cached = sessionStorage.getItem(`is_admin_${email}`);
+    console.log('Checking Admin Privilege for Email:', email);
 
-    const checkAdminPrivilege = async (email: string) => {
-      const cached = sessionStorage.getItem(`is_admin_${email}`);
-      console.log('Authenticated Email:', email);
-
-      if (cached !== null) {
-        console.log('[AuthProvider] Loaded admin status from session storage cache');
-        if (active) {
-          setIsAdmin(cached === 'true');
-          setIsAdminLoading(false);
-          console.log(`isAdmin: ${cached === 'true'}`);
-        }
-        return;
-      }
-
-      if (active) {
-        setIsAdminLoading(true);
-      }
-
-      try {
-        const { data, error } = await supabase
-          .from('admins')
-          .select('email, role, is_active')
-          .eq('email', email)
-          .maybeSingle();
-
-        console.log('Admin Query Result:', { data, error });
-
-        if (error) {
-          console.error('[AuthProvider] Supabase query failed:', error);
-          throw error;
-        }
-
-        const isUserAdmin = data !== null && data.is_active === true;
-        sessionStorage.setItem(`is_admin_${email}`, String(isUserAdmin));
-        
-        if (active) {
-          setIsAdmin(isUserAdmin);
-          console.log(`isAdmin: ${isUserAdmin}`);
-        }
-      } catch (err: any) {
-        console.error('[AuthProvider] Failed to verify administrator privilege claims:', err);
-        if (active) {
-          setIsAdmin(false);
-        }
-      } finally {
-        if (active) {
-          setIsAdminLoading(false);
-        }
-      }
-    };
-
-    if (user && user.email) {
-      checkAdminPrivilege(user.email);
-    } else {
-      setIsAdmin(false);
-      setIsAdminLoading(false);
+    if (cached !== null) {
+      console.log('[AuthProvider] Loaded admin status from session storage cache:', cached);
+      return cached === 'true';
     }
 
-    return () => {
-      active = false;
-    };
-  }, [user]);
+    try {
+      const { data, error } = await supabase
+        .from('admins')
+        .select('email, role, is_active')
+        .eq('email', email)
+        .maybeSingle();
+
+      console.log('Admin Query Result:', { data, error });
+
+      if (error) {
+        console.error('[AuthProvider] Supabase query failed:', error);
+        throw error;
+      }
+
+      const isUserAdmin = data !== null && data.is_active === true;
+      sessionStorage.setItem(`is_admin_${email}`, String(isUserAdmin));
+      return isUserAdmin;
+    } catch (err: any) {
+      console.error('[AuthProvider] Failed to verify administrator privilege claims:', err);
+      return false;
+    }
+  };
 
   useEffect(() => {
     let active = true;
@@ -120,6 +84,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         if (currentSession && active) {
           setSession(currentSession);
           setUser(currentSession.user);
+          if (currentSession.user?.email) {
+            const isUserAdmin = await checkAdminPrivilege(currentSession.user.email);
+            if (active) {
+              setIsAdmin(isUserAdmin);
+            }
+          }
         }
       } catch (err: any) {
         if (active) {
@@ -140,7 +110,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       console.log(`[AuthProvider] Auth state event: ${event}`);
       setSession(currentSession);
-      setUser(currentSession?.user || null);
+      const currentUser = currentSession?.user || null;
+      setUser(currentUser);
+      
+      if (currentUser?.email) {
+        const isUserAdmin = await checkAdminPrivilege(currentUser.email);
+        if (active) {
+          setIsAdmin(isUserAdmin);
+        }
+      } else {
+        if (active) {
+          setIsAdmin(false);
+        }
+      }
       setLoading(false);
     });
 
@@ -195,7 +177,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const isAuthenticated = !!user;
-  const isLoading = loading || isAdminLoading;
+  const isLoading = loading;
 
   return (
     <AuthContext.Provider
