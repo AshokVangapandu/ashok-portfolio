@@ -21,3 +21,9 @@ function copyDir(src, dest) {
 // Copy js folder to dist/js
 copyDir('js', 'dist/js');
 console.log('Static js directory copied to dist/js successfully!');
+
+// Copy assets subfolders
+copyDir('assets/images', 'dist/assets/images');
+copyDir('assets/icons', 'dist/assets/icons');
+copyDir('assets/documents', 'dist/assets/documents');
+console.log('Static assets subdirectories copied successfully!');
