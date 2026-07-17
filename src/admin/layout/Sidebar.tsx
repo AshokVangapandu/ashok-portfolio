@@ -162,7 +162,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </button>
 
         {/* 1. Header Logo & Title block */}
-        <div
+        <a
+          href={window.location.pathname.startsWith('/ashok-portfolio') ? '/ashok-portfolio/' : '/'}
+          title="Back to Portfolio Site"
           style={{
             padding: collapsed ? '0' : '0 20px',
             display: 'flex',
@@ -173,6 +175,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             boxSizing: 'border-box',
             width: '100%',
             transition: 'padding 280ms cubic-bezier(0.4, 0, 0.2, 1)',
+            textDecoration: 'none'
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: collapsed ? 'center' : 'flex-start', width: '100%' }}>
@@ -197,16 +200,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
 
             {/* Profile Info (Labels) - Persistent in DOM, collapsed via CSS */}
-            <div className="sidebar-profile-info">
+            <div className="sidebar-profile-info" style={{ display: collapsed ? 'none' : 'flex', flexDirection: 'column', marginLeft: '12px' }}>
               <span style={{ fontSize: '15px', fontWeight: 700, color: '#FFFFFF', lineHeight: 1.2 }}>
-                Ashok
+                Ashok V
               </span>
-              <span style={{ fontSize: '11px', color: '#8E8EA8', fontWeight: 550, lineHeight: 1.1, marginTop: '2px' }}>
-                Portfolio Admin
+              <span style={{ fontSize: '11px', color: '#8E8EA8', fontWeight: 550, lineHeight: 1.1, marginTop: '2.5px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                View Website
+                <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3" />
+                </svg>
               </span>
             </div>
           </div>
-        </div>
+        </a>
 
         {/* 2. Menu Navigation Links List */}
         <ul className="premium-menu-list">

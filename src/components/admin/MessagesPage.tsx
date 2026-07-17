@@ -242,16 +242,16 @@ export const MessagesPage: React.FC = () => {
                   <a href={`mailto:${selectedMessage.email}`} className="detail-email-link">{selectedMessage.email}</a>
                 </p>
               </div>
-              {selectedMessage.company && (
+              {(selectedMessage as any).company && (
                 <div className="detail-field">
                   <span className="field-label">Company</span>
-                  <p className="field-value text-white">{selectedMessage.company}</p>
+                  <p className="field-value text-white">{(selectedMessage as any).company}</p>
                 </div>
               )}
-              {selectedMessage.phone_number && (
+              {(selectedMessage as any).phone_number && (
                 <div className="detail-field">
                   <span className="field-label">Phone Number</span>
-                  <p className="field-value text-white">{selectedMessage.phone_number}</p>
+                  <p className="field-value text-white">{(selectedMessage as any).phone_number}</p>
                 </div>
               )}
               <div className="detail-field">

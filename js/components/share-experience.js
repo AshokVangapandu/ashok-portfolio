@@ -44,13 +44,33 @@ class ShareExperienceCard extends HTMLElement {
   connectedCallback() {
     this.className = "share-experience-card-container";
     this.innerHTML = `
-      <div class="share-card">
-        <h3 class="share-card-title">Share Your Experience</h3>
-        <p class="share-card-desc">Worked with me on a project? I'd genuinely love to hear your experience. Your testimonial may be featured on this Wall of Love after approval.</p>
-        <button type="button" class="profile-action profile-action-primary share-card-btn magnetic" id="open-share-modal-btn">
-          <span>Share Your Experience</span>
-        </button>
-        <span class="share-card-meta">Verified collaborators only.</span>
+      <div class="heard-cta-panel">
+        <div class="cta-left-decor">
+          <div class="cta-orbit-ring ring-outer"></div>
+          <div class="cta-orbit-ring ring-middle"></div>
+          <div class="cta-orbit-ring ring-inner"></div>
+          <div class="cta-icon-center">
+            <svg viewBox="0 0 24 24" class="cta-msg-icon" fill="currentColor">
+              <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/>
+            </svg>
+          </div>
+        </div>
+        
+        <div class="cta-middle-copy">
+          <h4>Worked with me?</h4>
+          <p>Share your experience and add your story to the Wall of Love.</p>
+        </div>
+        
+        <div class="cta-right-action">
+          <button type="button" class="profile-action profile-action-primary heard-cta-btn magnetic" id="open-share-modal-btn">
+            <span>Share Your Experience</span>
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" class="cta-arrow-icon">
+              <path d="M5 12h14" />
+              <path d="m12 5 7 7-7 7" />
+            </svg>
+          </button>
+          <span class="cta-meta-text">Testimonials are reviewed before publishing.</span>
+        </div>
       </div>
     `;
 
@@ -129,6 +149,7 @@ customElements.define("textarea-field", TextAreaField);
 class ModalOverlay extends HTMLElement {
   connectedCallback() {
     this.className = "modal-overlay-container";
+    this.setAttribute("data-lenis-prevent", "true");
     this.innerHTML = `<share-experience-modal></share-experience-modal>`;
 
     // Close when clicking directly on overlay (not child modal)
@@ -409,10 +430,41 @@ class ShareExperienceModal extends HTMLElement {
 
       <form class="share-form" id="share-experience-form" novalidate>
         <div class="form-group">
+          <label for="role-designation">Role / Designation <span class="label-required">*</span></label>
+          <div class="input-wrapper">
+            <input type="text" id="role-designation" name="designation" placeholder="Senior Software Engineer" required ${isFormDisabled ? 'disabled' : ''}>
+            <span class="field-error-msg" id="designation-error"></span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="company-org">Company / Organization <span class="label-optional">(Optional)</span></label>
+          <div class="input-wrapper">
+            <input type="text" id="company-org" name="company" placeholder="Company name" ${isFormDisabled ? 'disabled' : ''}>
+            <span class="field-error-msg" id="company-error"></span>
+          </div>
+        </div>
+
+        <div class="form-group">
           <label for="linkedin-url">LinkedIn Profile URL <span class="label-optional">(Optional)</span></label>
           <div class="input-wrapper">
             <input type="url" id="linkedin-url" name="linkedin" placeholder="https://linkedin.com/in/username" ${isFormDisabled ? 'disabled' : ''}>
             <span class="field-error-msg" id="linkedin-error"></span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Rating <span class="label-required">*</span></label>
+          <div class="rating-input-container">
+            <input type="hidden" id="testimonial-rating" name="rating" value="">
+            <div class="rating-stars" role="radiogroup" aria-label="Rating select">
+              <button type="button" class="rating-star-btn" data-value="1" aria-label="1 star" ${isFormDisabled ? 'disabled' : ''}>★</button>
+              <button type="button" class="rating-star-btn" data-value="2" aria-label="2 stars" ${isFormDisabled ? 'disabled' : ''}>★</button>
+              <button type="button" class="rating-star-btn" data-value="3" aria-label="3 stars" ${isFormDisabled ? 'disabled' : ''}>★</button>
+              <button type="button" class="rating-star-btn" data-value="4" aria-label="4 stars" ${isFormDisabled ? 'disabled' : ''}>★</button>
+              <button type="button" class="rating-star-btn" data-value="5" aria-label="5 stars" ${isFormDisabled ? 'disabled' : ''}>★</button>
+            </div>
+            <span class="field-error-msg" id="rating-error"></span>
           </div>
         </div>
 
@@ -513,6 +565,9 @@ class ShareExperienceModal extends HTMLElement {
 
     const submitBtn = form.querySelector(".submit-form-btn");
     const linkedinInput = form.querySelector("#linkedin-url");
+    const designationInput = form.querySelector("#role-designation");
+    const companyInput = form.querySelector("#company-org");
+    const starBtns = form.querySelectorAll(".rating-star-btn");
     const testimonialComp = form.querySelector("#form-testimonial");
     const testimonialTextarea = testimonialComp ? testimonialComp.querySelector("textarea") : null;
     const consentCheck = form.querySelector("#consent-check");
@@ -526,6 +581,9 @@ class ShareExperienceModal extends HTMLElement {
         `;
       }
       if (linkedinInput) linkedinInput.disabled = true;
+      if (designationInput) designationInput.disabled = true;
+      if (companyInput) companyInput.disabled = true;
+      starBtns.forEach(btn => btn.disabled = true);
       if (testimonialTextarea) testimonialTextarea.disabled = true;
       if (consentCheck) consentCheck.disabled = true;
     } else {
@@ -534,6 +592,9 @@ class ShareExperienceModal extends HTMLElement {
         submitBtn.innerHTML = `<span>Submit Testimonial</span>`;
       }
       if (linkedinInput) linkedinInput.disabled = false;
+      if (designationInput) designationInput.disabled = false;
+      if (companyInput) companyInput.disabled = false;
+      starBtns.forEach(btn => btn.disabled = false);
       if (testimonialTextarea) testimonialTextarea.disabled = false;
       if (consentCheck) consentCheck.disabled = false;
     }
@@ -542,6 +603,25 @@ class ShareExperienceModal extends HTMLElement {
   setupFormHandlers() {
     const form = this.querySelector("#share-experience-form");
     if (!form) return;
+
+    const ratingInput = this.querySelector("#testimonial-rating");
+    const starBtns = this.querySelectorAll(".rating-star-btn");
+    
+    starBtns.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const val = btn.getAttribute("data-value");
+        if (ratingInput) ratingInput.value = val;
+        
+        starBtns.forEach(b => {
+          const starVal = b.getAttribute("data-value");
+          if (parseInt(starVal) <= parseInt(val)) {
+            b.classList.add("is-selected");
+          } else {
+            b.classList.remove("is-selected");
+          }
+        });
+      });
+    });
 
     form.addEventListener("submit", (event) => {
       event.preventDefault();
@@ -553,19 +633,45 @@ class ShareExperienceModal extends HTMLElement {
 
       this.clearErrors();
 
+      const designationInput = this.querySelector("#role-designation");
+      const designationVal = designationInput ? designationInput.value.trim() : "";
+      
+      const companyInput = this.querySelector("#company-org");
+      const companyVal = companyInput ? companyInput.value.trim() : "";
+
+      const ratingVal = ratingInput ? ratingInput.value : "";
+
       const linkedinInput = this.querySelector("#linkedin-url");
       const linkedinVal = linkedinInput.value.trim();
+      
       const testimonialComp = this.querySelector("#form-testimonial");
       const testimonialVal = testimonialComp ? testimonialComp.value.trim() : "";
+      
       const consentCheck = this.querySelector("#consent-check");
       const consentVal = consentCheck ? consentCheck.checked : false;
 
       let hasError = false;
 
+      if (!designationVal) {
+        this.showError("designation", "Please enter your Role / Designation.");
+        hasError = true;
+      }
+
       if (linkedinVal) {
         const linkedinRegex = /^(https?:\/\/)?(www\.)?linkedin\.com\/in\/[a-zA-Z0-9_-]+\/?$/;
         if (!linkedinRegex.test(linkedinVal)) {
           this.showError("linkedin", "Please enter a valid LinkedIn profile URL.");
+          hasError = true;
+        }
+      }
+
+      if (!ratingVal) {
+        this.showError("rating", "Please select a rating.");
+        hasError = true;
+      } else {
+        const r = parseInt(ratingVal);
+        if (isNaN(r) || r < 1 || r > 5) {
+          this.showError("rating", "Please select a rating between 1 and 5.");
           hasError = true;
         }
       }
@@ -594,6 +700,9 @@ class ShareExperienceModal extends HTMLElement {
         google_email: this.userState.email,
         google_avatar: this.userState.avatar,
         linkedin_url: linkedinVal || null,
+        designation: designationVal,
+        company: companyVal || null,
+        rating: parseInt(ratingVal),
         testimonial: testimonialVal,
         consent_public: consentVal,
         source: "portfolio",
@@ -617,14 +726,18 @@ class ShareExperienceModal extends HTMLElement {
                   this.setFormDisabled(false);
                   showToast("error", "Something went wrong", "Unable to submit your testimonial. Please try again.", 4000);
                 } else {
-                  showToast("success", "✅ Thank you!", "Your testimonial has been submitted successfully. It will appear once approved.", 4000);
+                  showToast("success", "✅ Submitted", "Your testimonial has been submitted for review.", 4000);
                   
                   form.reset();
                   if (testimonialComp) testimonialComp.value = "";
                   
+                  this.submitted = true;
+                  this.render();
+                  
                   setTimeout(() => {
                     this.closest("modal-overlay")?.close();
-                  }, 800);
+                    this.submitted = false;
+                  }, 2800);
                 }
               })
               .catch(err => {
@@ -671,7 +784,7 @@ class ShareExperienceModal extends HTMLElement {
           </svg>
         </div>
         <h2 class="success-title">Thank You!</h2>
-        <p class="success-desc">Hi <strong>${this.userState.name}</strong>, your testimonial has been submitted successfully and is currently pending review.</p>
+        <p class="success-desc">Thank you! Your testimonial has been submitted and will appear after review and approval.</p>
         <button type="button" class="profile-action profile-action-primary close-success-btn magnetic" id="success-close-btn">
           <span>Done</span>
         </button>

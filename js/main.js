@@ -1,3 +1,49 @@
+const getBaseUrl = () => {
+  const path = window.location.pathname;
+  if (path.startsWith('/ashok-portfolio')) {
+    return '/ashok-portfolio/';
+  }
+  return '/';
+};
+
+const rewriteNavLinks = () => {
+  const base = getBaseUrl();
+
+  const brandLogo = document.querySelector(".brand");
+  if (brandLogo) {
+    brandLogo.setAttribute("href", base);
+  }
+
+  const navMenu = document.querySelector("[data-nav-menu]");
+  if (navMenu) {
+    navMenu.querySelectorAll("a").forEach((link) => {
+      const href = link.getAttribute("href");
+      if (!href) return;
+
+      if (href.startsWith("#")) {
+        const currentPath = window.location.pathname;
+        const isAtRoot = currentPath === base || currentPath === base + 'index.html';
+        if (!isAtRoot) {
+          link.setAttribute("href", base + href);
+        }
+      } else if (href.includes("index.html#")) {
+        const hash = href.substring(href.indexOf("#"));
+        link.setAttribute("href", base + hash);
+      } else if (href.includes("index.html") && !href.includes("widgets") && !href.includes("projects") && !href.includes("certifications")) {
+        link.setAttribute("href", base);
+      } else if (href.includes("widgets/index.html")) {
+        link.setAttribute("href", base + "widgets/index.html");
+      } else if (href.includes("pages/projects/index.html")) {
+        link.setAttribute("href", base + "pages/projects/index.html");
+      } else if (href.includes("certifications/index.html")) {
+        link.setAttribute("href", base + "certifications/index.html");
+      }
+    });
+  }
+};
+
+rewriteNavLinks();
+
 const header = document.querySelector("[data-header]");
 const navToggle = document.querySelector("[data-nav-toggle]");
 const navMenu = document.querySelector("[data-nav-menu]");
@@ -795,12 +841,49 @@ const initWallOfLoveCarousel = () => {
   const track = document.querySelector("[data-wall-marquee]");
   if (!carousel || !track) return;
 
+  // Clean up any existing dots containers
+  const existingDots = carousel.parentNode.querySelector(".wall-carousel-dots");
+  if (existingDots) {
+    existingDots.remove();
+  }
+
+  // Clean up any cloned cards before cloning new ones
+  const clonedCards = track.querySelectorAll("[data-clone='true']");
+  clonedCards.forEach(c => c.remove());
+
   const prevButton = document.querySelector("[data-wall-prev]");
   const nextButton = document.querySelector("[data-wall-next]");
   const toggleButton = document.querySelector("[data-wall-toggle]");
   const toggleLabel = toggleButton?.querySelector("span");
   const originalCards = Array.from(track.children);
   if (!originalCards.length) return;
+
+  // If there are less than 3 testimonials, we do not animate or clone them
+  if (originalCards.length < 3) {
+    const existingDotsContainer = carousel.parentNode.querySelector(".wall-carousel-dots");
+    if (existingDotsContainer) {
+      existingDotsContainer.remove();
+    }
+    
+    // Hide controls
+    if (prevButton) prevButton.style.display = "none";
+    if (nextButton) nextButton.style.display = "none";
+    if (toggleButton) toggleButton.style.display = "none";
+    
+    // Center the track layout
+    track.style.justifyContent = "center";
+    track.style.transform = "none";
+    
+    // Add is-active class to all of them so they display in full color
+    originalCards.forEach(card => card.classList.add("is-active"));
+    return;
+  }
+
+  // Reset track styles for standard infinite scrolling carousel
+  track.style.justifyContent = "flex-start";
+  if (prevButton) prevButton.style.display = "flex";
+  if (nextButton) nextButton.style.display = "flex";
+  if (toggleButton) toggleButton.style.display = "flex";
 
   // Dynamically create navigation dots (6 dots) for mobile carousel indicators
   const dotsContainer = document.createElement("div");
@@ -1018,47 +1101,157 @@ const initWallOfLoveCarousel = () => {
   }
 };
 
-// Dynamic testimonial load helper
-const loadDynamicTestimonials = async () => {
+// Render testimonials helper
+const renderTestimonials = (testimonials = []) => {
   const track = document.querySelector("[data-wall-marquee]");
+  const emptyState = document.querySelector(".wall-empty-state");
+  const navContainer = document.querySelector(".heard-carousel-nav");
+  const prevButton = document.querySelector("[data-wall-prev]");
+  const nextButton = document.querySelector("[data-wall-next]");
+
   if (!track) return;
 
+  // Clear existing content
+  track.innerHTML = "";
+
+  if (!testimonials || testimonials.length === 0) {
+    if (emptyState) emptyState.style.display = "flex";
+    track.style.display = "none";
+    if (navContainer) navContainer.style.display = "none";
+    if (prevButton) prevButton.style.display = "none";
+    if (nextButton) nextButton.style.display = "none";
+    
+    // Hide dots container if any exists
+    const dotsContainer = document.querySelector(".wall-carousel-dots");
+    if (dotsContainer) dotsContainer.style.display = "none";
+    return;
+  }
+
+  if (emptyState) emptyState.style.display = "none";
+  track.style.display = "flex";
+  if (navContainer) navContainer.style.display = "flex";
+  if (prevButton) prevButton.style.display = "flex";
+  if (nextButton) nextButton.style.display = "flex";
+
+  track.innerHTML = testimonials.map(t => {
+    const displayName = t.full_name || t.google_name || "Collaborator";
+    const avatarSrc = t.avatar_url || t.google_avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80";
+    const roleStr = t.designation ? (t.company ? `${t.designation} at ${t.company}` : t.designation) : (t.company || "Collaborator");
+    
+    const linkedinIcon = t.linkedin_url ? `
+      <a href="${t.linkedin_url}" class="wall-card-linkedin" target="_blank" rel="noopener noreferrer" aria-label="${displayName}'s LinkedIn profile">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+          <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.779-1.75-1.75s.784-1.75 1.75-1.75 1.75.779 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+        </svg>
+      </a>
+    ` : '';
+
+    const starsHtml = '★'.repeat(t.rating || 5) + '☆'.repeat(5 - (t.rating || 5));
+    const avatarHtml = (avatarSrc.includes('unsplash') || avatarSrc.includes('google') || avatarSrc.includes('http') || avatarSrc.includes('photo-'))
+      ? `<img src="${avatarSrc}" alt="${displayName}" class="author-avatar" loading="lazy">`
+      : `<div class="author-avatar author-avatar-initials">${displayName.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase()}</div>`;
+
+    return `
+      <article class="wall-card">
+        <div class="wall-card-top-row">
+          <div class="card-quote-icon">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+              <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/>
+            </svg>
+          </div>
+          <div class="card-rating-stars">
+            <span>${starsHtml}</span>
+          </div>
+        </div>
+        <blockquote class="card-testimonial-text">${t.testimonial}</blockquote>
+        <div class="card-divider"></div>
+        <div class="card-author-row">
+          ${avatarHtml}
+          <div class="author-meta">
+            <h4>${displayName}</h4>
+            <p class="author-title">${roleStr}</p>
+          </div>
+          ${linkedinIcon}
+        </div>
+      </article>
+    `;
+  }).join("");
+
+  initWallOfLoveCarousel();
+};
+
+// Dynamic testimonial load helper
+const loadDynamicTestimonials = async () => {
   try {
     if (window.TestimonialService) {
       const { data: testimonials, error } = await window.TestimonialService.getApprovedTestimonials();
       if (error) throw error;
 
-      if (testimonials && testimonials.length > 0) {
-        track.innerHTML = testimonials.map(t => {
-          const displayName = t.google_name || "Collaborator";
-          const avatarSrc = t.google_avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80";
-          
-          const linkedinIcon = t.linkedin_url ? `
-            <a href="${t.linkedin_url}" class="wall-card-linkedin" target="_blank" rel="noopener noreferrer" aria-label="${displayName}'s LinkedIn profile">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
-                <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.779-1.75-1.75s.784-1.75 1.75-1.75 1.75.779 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
-              </svg>
-            </a>
-          ` : '';
+      // 1. Calculate & Render Metrics
+      const totalCount = testimonials ? testimonials.length : 0;
+      let averageRating = 0;
+      let verifiedPercent = 0;
 
-          return `
-            <article class="wall-card">
-              <div class="wall-card-top">
-                <img src="${avatarSrc}" alt="${displayName}" loading="lazy">
-                ${linkedinIcon}
-              </div>
-              <h3>${displayName}</h3>
-              <p class="wall-role">Collaborator</p>
-              <blockquote>${t.testimonial}</blockquote>
-            </article>
-          `;
+      if (totalCount > 0) {
+        const sumRatings = testimonials.reduce((acc, curr) => acc + (curr.rating || 5), 0);
+        averageRating = (sumRatings / totalCount).toFixed(1);
+        
+        // Calculate verified percentage based on authenticated user (those with user_id)
+        const verifiedCount = testimonials.filter(t => t.user_id).length;
+        verifiedPercent = Math.round((verifiedCount / totalCount) * 100);
+      }
+
+      // Update DOM metrics elements
+      const totalCountEl = document.getElementById("stats-total-count");
+      const averageRatingEl = document.getElementById("stats-average-rating");
+      const verifiedPercentEl = document.getElementById("stats-verified-percent");
+
+      if (totalCountEl) totalCountEl.textContent = totalCount;
+      if (averageRatingEl) averageRatingEl.textContent = totalCount > 0 ? `${averageRating}/5` : "0.0/5";
+      if (verifiedPercentEl) verifiedPercentEl.textContent = `${verifiedPercent}%`;
+
+      // 2. Calculate & Render Unique Collaborators
+      const uniqueCollabs = [];
+      const collabNames = new Set();
+      if (testimonials) {
+        testimonials.forEach(t => {
+          const name = (t.full_name || t.google_name || "Collaborator").trim();
+          if (name && !collabNames.has(name.toLowerCase())) {
+            collabNames.add(name.toLowerCase());
+            uniqueCollabs.push(t);
+          }
+        });
+      }
+
+      // Update Collaborators stack count badge
+      const collabsCountEl = document.getElementById("collaborators-badge-count");
+      if (collabsCountEl) {
+        const countText = uniqueCollabs.length === 1 ? "1 happy collaborator" : `${uniqueCollabs.length} happy collaborators`;
+        collabsCountEl.innerHTML = `<span>${countText}</span>`;
+      }
+
+      // Update Collaborators avatars list
+      const collabsListEl = document.getElementById("collaborator-avatars-list");
+      if (collabsListEl) {
+        collabsListEl.innerHTML = uniqueCollabs.slice(0, 4).map(c => {
+          const displayName = c.full_name || c.google_name || "Collaborator";
+          const avatarSrc = c.avatar_url || c.google_avatar || "";
+          if (avatarSrc && (avatarSrc.includes('unsplash') || avatarSrc.includes('google') || avatarSrc.includes('http') || avatarSrc.includes('photo-'))) {
+            return `<img src="${avatarSrc}" alt="${displayName}" title="${displayName}" />`;
+          } else {
+            const initials = displayName.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
+            return `<div class="collaborator-avatar-fallback-initials" title="${displayName}">${initials}</div>`;
+          }
         }).join("");
       }
+
+      // 3. Render Carousel cards
+      renderTestimonials(testimonials);
     }
   } catch (err) {
-    console.error("Failed to load dynamic testimonials, using static fallback:", err);
-  } finally {
-    initWallOfLoveCarousel();
+    console.error("Failed to load dynamic testimonials:", err);
+    // Fallback to empty state
+    renderTestimonials([]);
   }
 };
 
@@ -1169,6 +1362,21 @@ const setupNavbarAuth = async () => {
   const container = document.getElementById("navbar-auth-container");
   if (!container || !window.AuthService) return;
 
+  const getAdminUrl = () => {
+    let base = window.location.pathname;
+    if (base.endsWith('.html')) {
+      base = base.substring(0, base.lastIndexOf('/') + 1);
+    }
+    if (!base.endsWith('/')) {
+      base += '/';
+    }
+    const adminIndex = base.indexOf('/admin/');
+    if (adminIndex !== -1) {
+      base = base.substring(0, adminIndex + 1);
+    }
+    return base + 'admin/';
+  };
+
   let dropdownOpen = false;
 
   const renderDropdown = async (user) => {
@@ -1228,7 +1436,7 @@ const setupNavbarAuth = async () => {
         </div>
         ${isAdmin ? `
           <div class="dropdown-divider"></div>
-          <a href="admin/" id="navbar-admin-btn" 
+          <a href="${getAdminUrl()}" id="navbar-admin-btn" 
              onmouseenter="this.style.background='rgba(143, 133, 255, 0.16)'; this.style.borderColor='rgba(143, 133, 255, 0.3)';" 
              onmouseleave="this.style.background='rgba(143, 133, 255, 0.08)'; this.style.borderColor='rgba(143, 133, 255, 0.15)';"
              style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 36px; background: rgba(143, 133, 255, 0.08); border: 1px solid rgba(143, 133, 255, 0.15); border-radius: 10px; color: #8f85ff; font-size: 12.5px; font-weight: 600; text-decoration: none; margin-bottom: 4px; transition: all 250ms ease;">

@@ -53,7 +53,7 @@ Deno.serve(async (req) => {
     debugLog("Webhook payload: " + JSON.stringify(payload));
     debugLog("Parsed google_email: " + record.google_email);
 
-    const { google_name, google_email, google_avatar, linkedin_url, testimonial, consent_public, status, created_at } = record;
+    const { google_name, google_email, google_avatar, linkedin_url, designation, company, rating, testimonial, consent_public, status, created_at } = record;
 
     const resendApiKey = Deno.env.get('RESEND_API_KEY');
     if (!resendApiKey) {
@@ -67,18 +67,19 @@ Deno.serve(async (req) => {
     // Recipient email (ADMIN_NOTIFICATION_EMAIL or default to ashok's email)
     const toEmail = Deno.env.get('ADMIN_NOTIFICATION_EMAIL') || 'ashokvangapandu45@gmail.com';
     const fromEmail = Deno.env.get('NOTIFICATION_EMAIL_FROM') || 'Portfolio Testimonials <onboarding@resend.dev>';
+    const adminUrl = Deno.env.get('ADMIN_PORTAL_URL') || 'https://ashokvangapandu.in/admin';
     const submittedTime = created_at ? new Date(created_at).toLocaleString('en-US', { timeZone: 'UTC' }) + ' UTC' : new Date().toLocaleString();
 
     const emailBody = {
       from: fromEmail,
       to: toEmail,
-      subject: "🎉 New Testimonial Submitted",
+      subject: "New Testimonial Awaiting Approval",
       html: `
         <!DOCTYPE html>
         <html lang="en">
         <head>
           <meta charset="UTF-8">
-          <title>New Testimonial Submitted</title>
+          <title>New Testimonial Awaiting Approval</title>
           <style>
             body {
               margin: 0;
@@ -169,7 +170,7 @@ Deno.serve(async (req) => {
           <div class="email-container">
             <div class="header">
               <div class="logo-text">Ashok Vangapandu</div>
-              <h1 class="subject-title">🎉 New Testimonial Submitted</h1>
+              <h1 class="subject-title">🎉 New Testimonial Awaiting Approval</h1>
             </div>
             
             <div class="card">
@@ -180,6 +181,18 @@ Deno.serve(async (req) => {
               <div class="meta-row">
                 <span class="meta-label">Email:</span>
                 <span class="meta-value"><a href="mailto:${google_email}">${google_email}</a></span>
+              </div>
+              <div class="meta-row">
+                <span class="meta-label">Role:</span>
+                <span class="meta-value">${designation || '<em style="color:rgba(255,255,255,0.3);">Not specified</em>'}</span>
+              </div>
+              <div class="meta-row">
+                <span class="meta-label">Company:</span>
+                <span class="meta-value">${company || '<em style="color:rgba(255,255,255,0.3);">Not specified</em>'}</span>
+              </div>
+              <div class="meta-row">
+                <span class="meta-label">Rating:</span>
+                <span class="meta-value" style="color: #f59e0b; font-weight: bold;">${'★'.repeat(rating || 5)}${'☆'.repeat(5 - (rating || 5))} (${rating || 5}/5)</span>
               </div>
               <div class="meta-row">
                 <span class="meta-label">LinkedIn:</span>
@@ -204,21 +217,30 @@ Deno.serve(async (req) => {
               <div class="testimonial-box">
                 "${testimonial}"
               </div>
+              
+              <div style="text-align: center; margin-top: 30px;">
+                <a href="${adminUrl}" style="display: inline-block; padding: 12px 24px; background: linear-gradient(135deg, #8f85ff, #2563eb); color: #ffffff; text-decoration: none; border-radius: 12px; font-weight: bold; box-shadow: 0 4px 14px rgba(143, 133, 255, 0.3);">
+                  Review Testimonial in Admin Portal
+                </a>
+              </div>
             </div>
             
             <div class="footer">
               This notification was generated automatically by your portfolio database webhook.<br>
-              Login to your <a href="https://txoszrnjkrlbjzpjisvp.supabase.co" style="color:#8f85ff; text-decoration:none;">Supabase Dashboard</a> to manage approvals.
+              Login to your <a href="${adminUrl}" style="color:#8f85ff; text-decoration:none;">Admin Portal</a> to manage approvals.
             </div>
           </div>
         </body>
         </html>
       `,
       text: `
-        New Testimonial Submitted
+        New Testimonial Awaiting Approval
         ----------------------------
         Name: ${google_name || "Anonymous"}
         Email: ${google_email}
+        Role: ${designation || "Not specified"}
+        Company: ${company || "Not specified"}
+        Rating: ${rating || 5}/5
         LinkedIn: ${linkedin_url || "Not provided"}
         Submitted At: ${submittedTime}
         Consent to Display: ${consent_public ? "Yes" : "No"}
@@ -226,6 +248,8 @@ Deno.serve(async (req) => {
 
         Testimonial:
         "${testimonial}"
+
+        Review here: ${adminUrl}
       `
     };
 

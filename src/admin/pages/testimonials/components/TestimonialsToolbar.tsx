@@ -10,6 +10,7 @@ interface TestimonialsToolbarProps {
   setRating: (val: string) => void;
   sortBy: string;
   setSortBy: (val: string) => void;
+  disabled?: boolean;
 }
 
 export const TestimonialsToolbar: React.FC<TestimonialsToolbarProps> = ({
@@ -20,7 +21,8 @@ export const TestimonialsToolbar: React.FC<TestimonialsToolbarProps> = ({
   rating,
   setRating,
   sortBy,
-  setSortBy
+  setSortBy,
+  disabled = false
 }) => {
   return (
     <div
@@ -78,6 +80,7 @@ export const TestimonialsToolbar: React.FC<TestimonialsToolbarProps> = ({
             placeholder="Search testimonials..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
+            disabled={disabled}
             style={{
               width: '100%',
               padding: '8px 12px 8px 36px',
@@ -85,13 +88,18 @@ export const TestimonialsToolbar: React.FC<TestimonialsToolbarProps> = ({
               borderRadius: '8px',
               fontSize: '13.5px',
               color: 'var(--admin-text)',
-              backgroundColor: '#FFFFFF',
+              backgroundColor: disabled ? 'var(--admin-surface, #F8FAFC)' : '#FFFFFF',
               boxSizing: 'border-box',
               outline: 'none',
-              transition: 'border-color 0.15s ease'
+              transition: 'border-color 0.15s ease',
+              cursor: disabled ? 'not-allowed' : 'text'
             }}
-            onFocus={(e) => e.currentTarget.style.borderColor = 'var(--admin-primary)'}
-            onBlur={(e) => e.currentTarget.style.borderColor = 'var(--admin-border)'}
+            onFocus={(e) => {
+              if (!disabled) e.currentTarget.style.borderColor = 'var(--admin-primary)';
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.borderColor = 'var(--admin-border)';
+            }}
           />
         </div>
 
@@ -99,14 +107,15 @@ export const TestimonialsToolbar: React.FC<TestimonialsToolbarProps> = ({
         <select
           value={status}
           onChange={(e) => setStatus(e.target.value)}
+          disabled={disabled}
           style={{
             padding: '8px 12px',
             border: '1px solid var(--admin-border)',
             borderRadius: '8px',
             fontSize: '13.5px',
             color: 'var(--admin-text-secondary)',
-            backgroundColor: '#FFFFFF',
-            cursor: 'pointer',
+            backgroundColor: disabled ? 'var(--admin-surface, #F8FAFC)' : '#FFFFFF',
+            cursor: disabled ? 'not-allowed' : 'pointer',
             outline: 'none',
             minWidth: '100px'
           }}
@@ -122,14 +131,15 @@ export const TestimonialsToolbar: React.FC<TestimonialsToolbarProps> = ({
         <select
           value={rating}
           onChange={(e) => setRating(e.target.value)}
+          disabled={disabled}
           style={{
             padding: '8px 12px',
             border: '1px solid var(--admin-border)',
             borderRadius: '8px',
             fontSize: '13.5px',
             color: 'var(--admin-text-secondary)',
-            backgroundColor: '#FFFFFF',
-            cursor: 'pointer',
+            backgroundColor: disabled ? 'var(--admin-surface, #F8FAFC)' : '#FFFFFF',
+            cursor: disabled ? 'not-allowed' : 'pointer',
             outline: 'none',
             minWidth: '100px'
           }}
@@ -146,14 +156,15 @@ export const TestimonialsToolbar: React.FC<TestimonialsToolbarProps> = ({
         <select
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value)}
+          disabled={disabled}
           style={{
             padding: '8px 12px',
             border: '1px solid var(--admin-border)',
             borderRadius: '8px',
             fontSize: '13.5px',
             color: 'var(--admin-text-secondary)',
-            backgroundColor: '#FFFFFF',
-            cursor: 'pointer',
+            backgroundColor: disabled ? 'var(--admin-surface, #F8FAFC)' : '#FFFFFF',
+            cursor: disabled ? 'not-allowed' : 'pointer',
             outline: 'none',
             minWidth: '120px'
           }}
@@ -169,6 +180,7 @@ export const TestimonialsToolbar: React.FC<TestimonialsToolbarProps> = ({
       <div>
         <button
           className="hover-scale active-press"
+          disabled={disabled}
           style={{
             display: 'inline-flex',
             alignItems: 'center',
@@ -179,14 +191,16 @@ export const TestimonialsToolbar: React.FC<TestimonialsToolbarProps> = ({
             fontSize: '13px',
             fontWeight: 600,
             color: 'var(--admin-text)',
-            backgroundColor: '#FFFFFF',
-            cursor: 'pointer',
+            backgroundColor: disabled ? 'var(--admin-surface, #F8FAFC)' : '#FFFFFF',
+            cursor: disabled ? 'not-allowed' : 'pointer',
             transition: 'all 0.15s ease'
           }}
           onMouseOver={(e) => {
-            e.currentTarget.style.backgroundColor = 'var(--admin-surface)';
-            e.currentTarget.style.color = 'var(--admin-primary)';
-            e.currentTarget.style.borderColor = 'rgba(124, 58, 237, 0.2)';
+            if (!disabled) {
+              e.currentTarget.style.backgroundColor = 'var(--admin-surface)';
+              e.currentTarget.style.color = 'var(--admin-primary)';
+              e.currentTarget.style.borderColor = 'rgba(124, 58, 237, 0.2)';
+            }
           }}
           onMouseOut={(e) => {
             e.currentTarget.style.backgroundColor = '#FFFFFF';

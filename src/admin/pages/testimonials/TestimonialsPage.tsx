@@ -4,7 +4,9 @@ import { TestimonialsHeader } from './components/TestimonialsHeader';
 import { TestimonialsSummaryCards } from './components/TestimonialsSummaryCards';
 import { TestimonialsToolbar } from './components/TestimonialsToolbar';
 import { TestimonialsTable } from './components/TestimonialsTable';
-import { TestimonialDetailsModal } from './components/TestimonialDetailsModal';
+import { TestimonialDetailsDrawer } from './components/TestimonialDetailsDrawer';
+import { LoadingSkeleton } from './components/LoadingSkeleton';
+import { EmptyState } from './components/EmptyState';
 import { Testimonial } from '../../types/testimonial';
 
 export const TestimonialsPage: React.FC = () => {
@@ -13,6 +15,7 @@ export const TestimonialsPage: React.FC = () => {
   const {
     testimonials,
     loading,
+    error,
     totalCount,
     summary,
     
@@ -28,12 +31,19 @@ export const TestimonialsPage: React.FC = () => {
     page,
     setPage,
     pageSize,
-    setPageSize
+    setPageSize,
+    
+    approveTestimonial,
+    rejectTestimonial,
+    deleteTestimonial,
+    refresh
   } = useTestimonials();
 
-  // Static pagination details
-  const showingStart = 1;
-  const showingEnd = Math.min(testimonials.length, pageSize);
+  // Dynamic pagination details
+  const showingStart = totalCount === 0 ? 0 : (page - 1) * pageSize + 1;
+  const showingEnd = Math.min(totalCount, page * pageSize);
+  const totalPages = Math.ceil(totalCount / pageSize) || 1;
+  const pageNumbers = Array.from({ length: totalPages }, (_, idx) => idx + 1);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--admin-space-5)' }}>
@@ -54,12 +64,60 @@ export const TestimonialsPage: React.FC = () => {
           setRating={setRating}
           sortBy={sortBy}
           setSortBy={setSortBy}
+          disabled={loading}
         />
         
-        <TestimonialsTable 
-          testimonials={testimonials} 
-          onViewTestimonial={setSelectedTestimonial}
-        />
+        {loading ? (
+          <LoadingSkeleton />
+        ) : error ? (
+          <div
+            style={{
+              padding: 'var(--admin-space-8) var(--admin-space-4)',
+              background: '#FFFFFF',
+              border: '1px solid var(--admin-border)',
+              borderRadius: '0 0 var(--admin-radius-md) var(--admin-radius-md)',
+              textAlign: 'center',
+              boxSizing: 'border-box',
+              fontFamily: "'Inter', sans-serif"
+            }}
+          >
+            <p style={{ color: 'var(--admin-danger, #EF4444)', fontWeight: 600, fontSize: '14px', margin: '0 0 12px 0' }}>
+              Error loading testimonials: {error}
+            </p>
+            <button
+              onClick={() => refresh()}
+              style={{
+                padding: '8px 16px',
+                background: 'var(--admin-primary, #7C3AED)',
+                color: '#FFFFFF',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontWeight: 600,
+                fontSize: '13px'
+              }}
+            >
+              Retry
+            </button>
+          </div>
+        ) : testimonials.length === 0 ? (
+          <EmptyState
+            title="No Testimonials Found"
+            description="There are no testimonials matching your filter criteria."
+            onClear={() => {
+              setSearch('');
+              setStatus('all');
+              setRating('all');
+              setSortBy('newest');
+              setPage(1);
+            }}
+          />
+        ) : (
+          <TestimonialsTable 
+            testimonials={testimonials} 
+            onViewTestimonial={setSelectedTestimonial}
+          />
+        )}
         
         {/* 4. Table Pagination footer */}
         <div
@@ -86,15 +144,15 @@ export const TestimonialsPage: React.FC = () => {
           {/* Bottom Center: Prev/Next buttons */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <button
-              disabled={page === 1}
+              disabled={page === 1 || loading}
               onClick={() => setPage((prev) => Math.max(1, prev - 1))}
               style={{
                 padding: '6px 12px',
                 border: '1px solid var(--admin-border)',
                 borderRadius: '6px',
                 backgroundColor: '#FFFFFF',
-                color: page === 1 ? '#D1D5DB' : 'var(--admin-text)',
-                cursor: page === 1 ? 'not-allowed' : 'pointer',
+                color: (page === 1 || loading) ? '#D1D5DB' : 'var(--admin-text)',
+                cursor: (page === 1 || loading) ? 'not-allowed' : 'pointer',
                 fontWeight: 600,
                 fontSize: '12px'
               }}
@@ -102,10 +160,11 @@ export const TestimonialsPage: React.FC = () => {
               Previous
             </button>
 
-            {[1, 2, 3].map((pNum) => (
+            {pageNumbers.map((pNum) => (
               <button
                 key={pNum}
                 onClick={() => setPage(pNum)}
+                disabled={loading}
                 style={{
                   width: '32px',
                   height: '32px',
@@ -115,7 +174,7 @@ export const TestimonialsPage: React.FC = () => {
                   color: page === pNum ? '#FFFFFF' : 'var(--admin-text)',
                   fontWeight: 600,
                   fontSize: '12px',
-                  cursor: 'pointer'
+                  cursor: loading ? 'not-allowed' : 'pointer'
                 }}
               >
                 {pNum}
@@ -123,15 +182,15 @@ export const TestimonialsPage: React.FC = () => {
             ))}
 
             <button
-              disabled={page === 3}
-              onClick={() => setPage((prev) => Math.min(3, prev + 1))}
+              disabled={page === totalPages || loading}
+              onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
               style={{
                 padding: '6px 12px',
                 border: '1px solid var(--admin-border)',
                 borderRadius: '6px',
                 backgroundColor: '#FFFFFF',
-                color: page === 3 ? '#D1D5DB' : 'var(--admin-text)',
-                cursor: page === 3 ? 'not-allowed' : 'pointer',
+                color: (page === totalPages || loading) ? '#D1D5DB' : 'var(--admin-text)',
+                cursor: (page === totalPages || loading) ? 'not-allowed' : 'pointer',
                 fontWeight: 600,
                 fontSize: '12px'
               }}
@@ -166,10 +225,12 @@ export const TestimonialsPage: React.FC = () => {
         </div>
       </div>
 
-      {/* 5. Details popup modal */}
-      <TestimonialDetailsModal
-        testimonial={selectedTestimonial}
+      {/* 5. Details popup drawer */}
+      <TestimonialDetailsDrawer
+        isOpen={selectedTestimonial !== null}
+        testimonialId={selectedTestimonial?.id || null}
         onClose={() => setSelectedTestimonial(null)}
+        onSuccess={refresh}
       />
     </div>
   );

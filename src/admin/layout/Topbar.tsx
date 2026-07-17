@@ -1,6 +1,7 @@
 /* src/admin/layout/Topbar.tsx */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../hooks/useAuth';
+import { supabase } from '../../services/supabase/client';
 
 interface TopbarProps {
   onToggleSidebar?: () => void;
@@ -43,14 +44,69 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({
 };
 
 // 2. Main Topbar Component
-export const Topbar: React.FC<TopbarProps> = ({
-  onToggleSidebar,
-  pageTitle,
-}) => {
+export const Topbar: React.FC<TopbarProps> = () => {
   const { user, logout } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [greeting, setGreeting] = useState('Good Afternoon');
+
+  // Dynamic notifications state
+  const [pendingCount, setPendingCount] = useState(0);
+  const [pendingTestimonials, setPendingTestimonials] = useState<any[]>([]);
+  const [readIds, setReadIds] = useState<string[]>(() => {
+    try {
+      return JSON.parse(localStorage.getItem('read_testimonial_ids') || '[]');
+    } catch {
+      return [];
+    }
+  });
+
+  const fetchPendingTestimonials = useCallback(async () => {
+    try {
+      const { data, error } = await supabase
+        .from('testimonials')
+        .select('id, full_name, created_at')
+        .eq('status', 'pending');
+      
+      if (!error && data) {
+        setPendingTestimonials(data);
+        const unread = data.filter((t: any) => !readIds.includes(t.id));
+        setPendingCount(unread.length);
+      }
+    } catch (err) {
+      console.error('Error fetching pending notifications:', err);
+    }
+  }, [readIds]);
+
+  useEffect(() => {
+    fetchPendingTestimonials();
+
+    // Subscribe to realtime updates on testimonials
+    const channel = supabase
+      .channel('topbar-testimonial-changes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'testimonials' },
+        () => {
+          fetchPendingTestimonials();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [fetchPendingTestimonials]);
+
+  // Mark pending notifications as read when dropdown is opened
+  useEffect(() => {
+    if (notificationsOpen && pendingTestimonials.length > 0) {
+      const allIds = pendingTestimonials.map((t) => t.id);
+      localStorage.setItem('read_testimonial_ids', JSON.stringify(allIds));
+      setReadIds(allIds);
+      setPendingCount(0);
+    }
+  }, [notificationsOpen, pendingTestimonials]);
 
   // Calculate greeting based on local time
   useEffect(() => {
@@ -82,8 +138,8 @@ export const Topbar: React.FC<TopbarProps> = ({
 
   const userInitials = getInitials(userDisplayName);
 
-  // Static list of exactly 5 notifications
-  const notifications = [
+  // Static fallback list of notifications
+  const staticNotifications = [
     {
       id: 1,
       title: 'New Contact Received',
@@ -95,19 +151,6 @@ export const Topbar: React.FC<TopbarProps> = ({
         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
           <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
           <polyline points="22,6 12,13 2,6" />
-        </svg>
-      )
-    },
-    {
-      id: 2,
-      title: 'New Testimonial Submitted',
-      description: 'A new testimonial is awaiting approval.',
-      timestamp: '15 minutes ago',
-      iconBg: 'rgba(245, 158, 11, 0.08)',
-      iconColor: '#D97706',
-      icon: (
-        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
         </svg>
       )
     },
@@ -124,37 +167,36 @@ export const Topbar: React.FC<TopbarProps> = ({
           <polyline points="14 2 14 8 20 8" />
         </svg>
       )
-    },
-    {
-      id: 4,
-      title: 'Email Service Warning',
-      description: 'Resend API response delayed.',
-      timestamp: '2 hours ago',
-      iconBg: 'rgba(239, 68, 68, 0.08)',
-      iconColor: '#DC2626',
-      icon: (
-        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
-          <line x1="12" y1="9" x2="12" y2="13" />
-          <line x1="12" y1="17" x2="12.01" y2="17" />
-        </svg>
-      )
-    },
-    {
-      id: 5,
-      title: 'Project Published',
-      description: 'Your AI Portfolio project is now live.',
-      timestamp: 'Yesterday',
-      iconBg: 'rgba(124, 58, 237, 0.08)',
-      iconColor: '#7C3AED',
-      icon: (
-        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-          <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
-          <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
-        </svg>
-      )
     }
   ];
+
+  // Map dynamic pending notifications
+  const dynamicNotifications = pendingTestimonials.map((t: any) => {
+    const isUnread = !readIds.includes(t.id);
+    const dateObj = new Date(t.created_at);
+    return {
+      id: `testimonial-${t.id}`,
+      title: 'New Testimonial Submitted',
+      description: `${t.full_name || 'Collaborator'} submitted a testimonial awaiting review.`,
+      timestamp: dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
+      iconBg: isUnread ? 'rgba(124, 58, 237, 0.15)' : 'rgba(245, 158, 11, 0.08)',
+      iconColor: isUnread ? 'var(--admin-primary)' : '#D97706',
+      icon: (
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+        </svg>
+      )
+    };
+  });
+
+  const allNotifications = [...dynamicNotifications, ...staticNotifications];
+
+  const handleMarkAllRead = () => {
+    const allIds = pendingTestimonials.map((t) => t.id);
+    localStorage.setItem('read_testimonial_ids', JSON.stringify(allIds));
+    setReadIds(allIds);
+    setPendingCount(0);
+  };
 
   return (
     <header className="premium-topbar">
@@ -192,8 +234,8 @@ export const Topbar: React.FC<TopbarProps> = ({
               <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0" />
             </svg>
             
-            {/* Unread badge count "3" */}
-            <div className="notification-badge">3</div>
+            {/* Unread badge count */}
+            {pendingCount > 0 && <div className="notification-badge">{pendingCount}</div>}
           </button>
 
           {notificationsOpen && (
@@ -210,10 +252,10 @@ export const Topbar: React.FC<TopbarProps> = ({
                 <div className="notification-panel-header">
                   <div className="panel-header-left">
                     <h4 className="panel-title-text">Notifications</h4>
-                    <span className="panel-unread-sub">You have 3 unread notifications</span>
+                    <span className="panel-unread-sub">You have {pendingCount} unread notifications</span>
                   </div>
                   <button
-                    onClick={() => setNotificationsOpen(false)}
+                    onClick={handleMarkAllRead}
                     className="mark-read-btn"
                   >
                     Mark all as read
@@ -222,7 +264,7 @@ export const Topbar: React.FC<TopbarProps> = ({
 
                 {/* Notification Feed List */}
                 <div className="notification-items-list">
-                  {notifications.map((item) => (
+                  {allNotifications.map((item) => (
                     <NotificationItem
                       key={item.id}
                       icon={item.icon}
@@ -322,6 +364,18 @@ export const Topbar: React.FC<TopbarProps> = ({
                   </svg>
                   Settings
                 </button>
+                <a
+                  href={window.location.pathname.startsWith('/ashok-portfolio') ? '/ashok-portfolio/' : '/'}
+                  onClick={() => setDropdownOpen(false)}
+                  className="dropdown-item-btn"
+                  style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}
+                >
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="dropdown-item-icon">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                    <polyline points="9 22 9 12 15 12 15 22" />
+                  </svg>
+                  Go to Portfolio
+                </a>
                 
                 <div className="dropdown-divider" />
                 

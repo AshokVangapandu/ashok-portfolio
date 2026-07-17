@@ -32,15 +32,14 @@ export async function createTestimonial(testimonial: InsertTestimonial) {
 
 /**
  * getUserTestimonials
- * Fetches all testimonials submitted by a specific user.
- * Restricted by RLS: selects are only allowed if auth.uid() matches user_id.
+ * Fetches all testimonials submitted by a specific email.
  */
-export async function getUserTestimonials(userId: string) {
+export async function getUserTestimonials(email: string) {
   try {
     const { data, error } = await supabase
       .from('testimonials')
       .select('*')
-      .eq('user_id', userId)
+      .eq('email', email)
       .order('created_at', { ascending: false });
 
     if (error) {

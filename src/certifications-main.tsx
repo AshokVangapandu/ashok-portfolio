@@ -7,6 +7,16 @@ import './admin.css';
 const MainLayout: React.FC = () => {
   const [navActive, setNavActive] = useState(false);
 
+  const getBaseUrl = () => {
+    const path = window.location.pathname;
+    if (path.startsWith('/ashok-portfolio')) {
+      return '/ashok-portfolio/';
+    }
+    return '/';
+  };
+
+  const baseUrl = getBaseUrl();
+
   return (
     <>
       {/* Background Ribbons */}
@@ -25,7 +35,7 @@ const MainLayout: React.FC = () => {
       {/* Header Navigation */}
       <header className="site-header" style={{ position: 'fixed', top: 0, width: '100%', zIndex: 1000 }}>
         <nav className="navbar" aria-label="Certifications showcase navigation">
-          <a className="brand" href="../index.html#hero" aria-label="Ashok Vangapandu home">
+          <a className="brand" href={baseUrl} aria-label="Ashok Vangapandu home">
             <span className="brand-mark">AV</span>
             <span className="brand-copy">
               <span className="brand-name">Ashok Vangapandu</span>
@@ -44,13 +54,13 @@ const MainLayout: React.FC = () => {
           </button>
 
           <div className={`nav-links ${navActive ? 'active' : ''}`} data-nav-menu>
-            <a href="../index.html#expertise" onClick={() => setNavActive(false)}>Expertise</a>
-            <a href="../pages/projects/index.html" onClick={() => setNavActive(false)}>Projects</a>
-            <a href="../index.html#behind-build" onClick={() => setNavActive(false)}>Process</a>
-            <a href="../index.html#work" onClick={() => setNavActive(false)}>Work</a>
-            <a href="../widgets/index.html" onClick={() => setNavActive(false)}>Tools & Products</a>
-            <a href="./index.html" className="active" style={{ color: 'var(--admin-secondary)', fontWeight: 700 }} onClick={() => setNavActive(false)}>Certifications</a>
-            <a href="../index.html#contact" onClick={() => setNavActive(false)}>Contact</a>
+            <a href={`${baseUrl}#expertise`} onClick={() => setNavActive(false)}>Expertise</a>
+            <a href={`${baseUrl}pages/projects/index.html`} onClick={() => setNavActive(false)}>Projects</a>
+            <a href={`${baseUrl}#behind-build`} onClick={() => setNavActive(false)}>Process</a>
+            <a href={`${baseUrl}#work`} onClick={() => setNavActive(false)}>Work</a>
+            <a href={`${baseUrl}widgets/index.html`} onClick={() => setNavActive(false)}>Tools & Products</a>
+            <a href={`${baseUrl}certifications/index.html`} className="active" style={{ color: 'var(--admin-secondary)', fontWeight: 700 }} onClick={() => setNavActive(false)}>Certifications</a>
+            <a href={`${baseUrl}#contact`} onClick={() => setNavActive(false)}>Contact</a>
           </div>
         </nav>
       </header>
