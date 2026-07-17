@@ -90,16 +90,46 @@
   const TestimonialService = {
     async submitTestimonial(testimonial) {
       if (!supabase) throw new Error("Supabase Client is not initialized.");
+      const dbTestimonial = {
+        user_id: testimonial.user_id || null,
+        full_name: testimonial.google_name || testimonial.full_name,
+        email: testimonial.google_email || testimonial.email,
+        avatar_url: testimonial.google_avatar || testimonial.avatar_url || null,
+        linkedin_url: testimonial.linkedin_url || null,
+        testimonial: testimonial.testimonial,
+        status: 'pending',
+        featured: false,
+        is_visible: false,
+        display_order: null,
+        rating: testimonial.rating,
+        designation: testimonial.designation || null,
+        company: testimonial.company || null
+      };
       return await supabase
         .from('testimonials')
-        .insert([testimonial]);
+        .insert([dbTestimonial]);
     },
 
     async createTestimonial(testimonial) {
       if (!supabase) throw new Error("Supabase Client is not initialized.");
+      const dbTestimonial = {
+        user_id: testimonial.user_id || null,
+        full_name: testimonial.google_name || testimonial.full_name,
+        email: testimonial.google_email || testimonial.email,
+        avatar_url: testimonial.google_avatar || testimonial.avatar_url || null,
+        linkedin_url: testimonial.linkedin_url || null,
+        testimonial: testimonial.testimonial,
+        status: 'pending',
+        featured: false,
+        is_visible: false,
+        display_order: null,
+        rating: testimonial.rating,
+        designation: testimonial.designation || null,
+        company: testimonial.company || null
+      };
       return await supabase
         .from('testimonials')
-        .insert([testimonial]);
+        .insert([dbTestimonial]);
     },
 
     async hasSubmittedTestimonial(userId) {
@@ -118,6 +148,10 @@
         .from('testimonials')
         .select('*')
         .eq('status', 'approved')
+        .eq('is_visible', true)
+        .is('deleted_at', null)
+        .order('featured', { ascending: false })
+        .order('display_order', { ascending: true, nullsFirst: false })
         .order('created_at', { ascending: false });
     }
   };
@@ -139,7 +173,7 @@
       if (!supabase) throw new Error("Supabase Client is not initialized.");
       return await supabase
         .from('testimonials')
-        .update({ status: 'approved', approved: true })
+        .update({ status: 'approved', is_visible: true })
         .eq('id', id);
     },
 
@@ -147,7 +181,7 @@
       if (!supabase) throw new Error("Supabase Client is not initialized.");
       return await supabase
         .from('testimonials')
-        .update({ status: 'rejected', approved: false })
+        .update({ status: 'rejected', is_visible: false })
         .eq('id', id);
     },
 
