@@ -1257,6 +1257,307 @@ const loadDynamicTestimonials = async () => {
 
 loadDynamicTestimonials();
 
+// Dynamic certifications load helper
+const loadDynamicCertifications = async () => {
+  try {
+    if (window.CertificationService) {
+      const { data: certifications, error } = await window.CertificationService.getPublishedCertifications();
+      if (error) throw error;
+
+      const totalCount = certifications ? certifications.length : 0;
+      const verifiedCount = certifications ? certifications.filter(c => (c.credential_url && c.credential_url.trim() !== "") || c.certificate_file_url).length : 0;
+      const verifiedPercent = totalCount > 0 ? Math.round((verifiedCount / totalCount) * 100) : 0;
+
+      // Update trust panel title texts using classes
+      const trustTitles = document.querySelectorAll('.certifications-trust-panel-v2 .trust-stat-title');
+      if (trustTitles && trustTitles.length >= 2) {
+        trustTitles[0].textContent = totalCount > 0 ? `${totalCount}+` : "0";
+        trustTitles[1].textContent = `${verifiedPercent}%`;
+      }
+
+      // 2. Derive Unique Providers
+      const uniqueProviders = [];
+      const seenProviders = new Set();
+      if (certifications) {
+        certifications.forEach(c => {
+          if (c.issuer) {
+            const norm = c.issuer.toLowerCase().trim();
+            if (!seenProviders.has(norm)) {
+              seenProviders.add(norm);
+              uniqueProviders.push(c.issuer);
+            }
+          }
+        });
+      }
+
+      // Respect the 6 provider cards limit
+      const maxProviders = uniqueProviders.slice(0, 6);
+
+      // Render grid
+      const gridEl = document.querySelector('.certifications-grid-v2');
+      if (gridEl) {
+        if (maxProviders.length === 0) {
+          gridEl.innerHTML = `<div style="grid-column: span 6; text-align: center; color: #94A3B8; padding: 40px 0; font-size: 14px;">No certifications published yet.</div>`;
+        } else {
+          // Inner helper function to get SVG / Webp logo brandmark
+          const getProviderLogo = (name) => {
+            const key = name.toLowerCase().trim();
+            if (key.includes('mendix')) {
+              return `<img src="assets/images/Mendix-Brandmark.webp" alt="Mendix" style="height: 32px; width: auto; object-fit: contain;" />`;
+            }
+            if (key.includes('google')) {
+              return `<svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor" style="color: #60A5FA;">
+                <path d="M12.24 10.285V13.4h6.887c-.275 1.565-1.88 4.604-6.887 4.604-4.33 0-7.866-3.577-7.866-8s3.536-8 7.866-8c2.46 0 4.105 1.025 5.047 1.926l2.427-2.334C17.955 2.192 15.34 1 12.24 1 7.14 1 3 5.14 3 10.25s4.14 9.25 9.24 9.25c5.32 0 8.86-3.72 8.86-9.01 0-.61-.06-1.08-.14-1.54H12.24z"/>
+              </svg>`;
+            }
+            if (key.includes('aws') || key.includes('amazon')) {
+              return `<svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor" style="color: #F59E0B;">
+                <path d="M11.625 15.783c-1.189 0-2.18-.152-2.973-.456-.793-.304-1.229-.685-1.31-1.144-.066-.379.083-.75.446-1.112.363-.362.908-.667 1.636-.916.727-.248 1.656-.424 2.787-.528l2.673-.243v1.39c0 .736-.188 1.282-.564 1.637-.376.356-.99.534-1.84.534m3.048-6.147v1.73l-2.423.23c-1.393.13-2.483.364-3.272.705-.789.34-1.34.786-1.655 1.336-.314.55-.471 1.157-.471 1.823 0 .973.307 1.737.92 2.293.614.555 1.492.833 2.634.833 1.082 0 1.986-.226 2.711-.678a4.877 4.877 0 0 0 1.684-1.874h.084c.121.666.333 1.168.636 1.505.303.337.755.505 1.356.505.47 0 .973-.105 1.511-.314a13.38 13.38 0 0 0 1.51-.714V14.86c0-.987-.042-1.921-.125-2.802-.083-.88-.242-1.66-.477-2.339a5.147 5.147 0 0 0-1.042-1.874c-.496-.549-1.194-.973-2.096-1.272-.9-.3-2.023-.45-3.37-.45-1.42 0-2.585.185-3.493.555a6.666 6.666 0 0 0-2.33 1.585l1.323 1.306c.49-.496.99-.861 1.5-1.096.51-.235 1.176-.353 2.0-.353.94 0 1.636.19 2.09.569.453.38.68.959.68 1.738"/>
+                <path d="M12.046 22.094c3.488 0 6.634-1.22 8.784-3.213.303-.28.1-.733-.303-.64-2.883.666-6.425.992-9.743.992-3.473 0-7.253-.36-10.158-1.092-.394-.1-.594.364-.285.64 2.224 1.993 5.485 3.313 9.705 3.313m8.948-4.053c-.328-.426-1.503-.186-2.073-.092-.188.03-.236-.18-.073-.314.509-.42 1.485-.363 1.867.042.382.404-.036 1.442-.442 1.916-.134.155-.31.066-.273-.146.115-.658.322-.98.994-1.406"/>
+              </svg>`;
+            }
+            if (key.includes('microsoft')) {
+              return `<svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor">
+                <path d="M2 2h9.5v9.5H2V2zm10.5 0H22v9.5h-9.5V2zM2 12.5h9.5V22H2v-9.5zm10.5 0H22V22h-9.5v-9.5z" fill="#F25022"/>
+              </svg>`;
+            }
+            if (key.includes('meta')) {
+              return `<svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor" style="color: #0668E1;">
+                <path d="M22.5 12c0-3.32-2.7-6-6-6-2.22 0-4.14 1.2-5.16 3-1.02-1.8-2.94-3-5.16-3-3.3 0-6 2.68-6 6 0 3.31 2.7 6 6 6 2.22 0 4.14-1.2 5.16-3 1.02 1.8 2.94 3 5.16 3 3.3 0 6-2.69 6-6zm-17.34 4c-2.2 0-4-1.8-4-4s1.8-4 4-4 4 1.8 4 4-1.8 4-4 4zm11.68 0c-2.2 0-4-1.8-4-4s1.8-4 4-4 4 1.8 4 4-1.8 4-4 4z"/>
+              </svg>`;
+            }
+            if (key.includes('linux')) {
+              return `<svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor" style="color: #64748B;">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+              </svg>`;
+            }
+            return `<svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="#7C5CFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="8" r="6" />
+              <path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11" />
+            </svg>`;
+          };
+
+          gridEl.innerHTML = maxProviders.map(provider => `
+            <div class="provider-logo-card">
+              <div class="provider-logo-container">
+                ${getProviderLogo(provider)}
+              </div>
+              <span class="provider-name">${provider}</span>
+              <div class="provider-glow-dot"></div>
+            </div>
+          `).join('');
+        }
+      }
+    }
+  } catch (err) {
+    console.error("Failed to load dynamic certifications:", err);
+  }
+};
+
+loadDynamicCertifications();
+
+// Geolocation caching for resume downloads
+let cachedGeoData = { ip_address: 'Unknown', country: 'Unknown', city: 'Unknown' };
+const prefetchGeoData = async () => {
+  try {
+    const res = await fetch('https://ipapi.co/json/');
+    if (res.ok) {
+      const data = await res.json();
+      cachedGeoData = {
+        ip_address: data.ip || 'Unknown',
+        country: data.country_name || 'Unknown',
+        city: data.city || 'Unknown'
+      };
+    }
+  } catch (err) {
+    console.warn('Geolocation prefetch failed:', err);
+  }
+};
+prefetchGeoData();
+
+// Helper for UUID / random ID generation
+const generateId = () => {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+};
+
+// Retrieve or generate visitor_id and session_id
+const getVisitorId = () => {
+  let vId = localStorage.getItem('visitor_id');
+  if (!vId) {
+    vId = generateId();
+    localStorage.setItem('visitor_id', vId);
+  }
+  return vId;
+};
+
+const getSessionId = () => {
+  let sId = sessionStorage.getItem('session_id');
+  if (!sId) {
+    sId = generateId();
+    sessionStorage.setItem('session_id', sId);
+  }
+  return sId;
+};
+
+const getDeviceDetails = () => {
+  const ua = navigator.userAgent;
+  let browser = 'Other';
+  let os = 'Other';
+  let deviceType = 'Desktop';
+
+  if (ua.includes('Firefox')) browser = 'Firefox';
+  else if (ua.includes('SamsungBrowser')) browser = 'Samsung Browser';
+  else if (ua.includes('Opera') || ua.includes('OPR')) browser = 'Opera';
+  else if (ua.includes('Trident')) browser = 'Internet Explorer';
+  else if (ua.includes('Edge') || ua.includes('Edg')) browser = 'Edge';
+  else if (ua.includes('Chrome')) browser = 'Chrome';
+  else if (ua.includes('Safari')) browser = 'Safari';
+
+  if (ua.includes('Windows')) os = 'Windows';
+  else if (ua.includes('Macintosh') || ua.includes('Mac OS X')) os = 'macOS';
+  else if (ua.includes('Android')) os = 'Android';
+  else if (ua.includes('iPhone') || ua.includes('iPad')) os = 'iOS';
+  else if (ua.includes('Linux')) os = 'Linux';
+
+  if (/Mobi|Android|iPhone|iPad|iPod/i.test(ua)) {
+    deviceType = /Tablet|iPad/i.test(ua) ? 'Tablet' : 'Mobile';
+  }
+
+  return { browser, os, deviceType, userAgent: ua };
+};
+
+// Dynamic resume settings load helper
+const loadDynamicResume = async () => {
+  const downloadResumeBtn = document.querySelector('.profile-actions .profile-action-primary');
+  const viewOnlineBtn = document.querySelector('.profile-actions .profile-action-secondary');
+  
+  if (!downloadResumeBtn || !viewOnlineBtn) return;
+
+  const primarySpan = downloadResumeBtn.querySelector('span');
+  const secondarySpan = viewOnlineBtn.querySelector('span');
+
+  if (primarySpan) primarySpan.textContent = 'Loading...';
+
+  try {
+    if (window.ResumeService) {
+      const { data: activeResume, error } = await window.ResumeService.getActiveResume();
+      
+      if (error || !activeResume || !activeResume.public_url) {
+        throw new Error(error ? error.message : 'No active resume found');
+      }
+
+      // 1. Setup Download Button
+      if (primarySpan) primarySpan.textContent = 'Download Resume';
+      downloadResumeBtn.setAttribute('href', '#');
+      downloadResumeBtn.removeAttribute('target');
+      downloadResumeBtn.removeAttribute('rel');
+      downloadResumeBtn.removeAttribute('aria-label');
+      downloadResumeBtn.setAttribute('aria-label', `Download Ashok's active resume PDF directly`);
+      
+      // Clear previous click event listeners if any
+      const newDownloadBtn = downloadResumeBtn.cloneNode(true);
+      downloadResumeBtn.parentNode.replaceChild(newDownloadBtn, downloadResumeBtn);
+
+      newDownloadBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const btnSpan = newDownloadBtn.querySelector('span');
+        const originalText = btnSpan.textContent;
+        btnSpan.textContent = 'Downloading...';
+
+        let downloadRecord = null;
+        try {
+          const device = getDeviceDetails();
+          // 1. Create a download record in database
+          const downloadPayload = {
+            resume_id: activeResume.id,
+            session_id: getSessionId(),
+            visitor_id: getVisitorId(),
+            page_source: window.location.pathname || '/',
+            referrer: document.referrer || '',
+            user_agent: device.userAgent,
+            browser: device.browser,
+            operating_system: device.os,
+            device_type: device.deviceType,
+            country: cachedGeoData.country,
+            city: cachedGeoData.city,
+            ip_address: cachedGeoData.ip_address,
+            download_status: 'completed'
+          };
+
+          const { data, error: logError } = await window.ResumeService.logResumeDownload(downloadPayload);
+          if (logError) throw logError;
+          downloadRecord = data;
+
+          // 2. Trigger file download
+          const response = await fetch(activeResume.public_url);
+          if (!response.ok) throw new Error(`HTTP status: ${response.status}`);
+          const blob = await response.blob();
+          const blobUrl = window.URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = blobUrl;
+          link.download = activeResume.file_name || 'Resume.pdf';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          window.URL.revokeObjectURL(blobUrl);
+        } catch (err) {
+          console.error('Download tracking or file retrieval failed:', err);
+          // 3. Update download status to 'failed' if download failed
+          if (downloadRecord && downloadRecord.id) {
+            try {
+              await window.ResumeService.updateDownloadStatus(downloadRecord.id, 'failed');
+            } catch (updateErr) {
+              console.error('Failed to update download status:', updateErr);
+            }
+          }
+          // Fallback trigger link open
+          window.open(activeResume.public_url, '_blank');
+        } finally {
+          btnSpan.textContent = originalText;
+        }
+      });
+
+      // 2. Setup View Online Button
+      if (secondarySpan) secondarySpan.textContent = 'View Online';
+      viewOnlineBtn.setAttribute('href', activeResume.preview_url || activeResume.public_url);
+      viewOnlineBtn.setAttribute('target', '_blank');
+      viewOnlineBtn.setAttribute('rel', 'noopener noreferrer');
+      viewOnlineBtn.removeAttribute('aria-label');
+      viewOnlineBtn.setAttribute('aria-label', "Open Ashok's active resume preview in a new tab");
+      viewOnlineBtn.style.opacity = '1';
+      viewOnlineBtn.style.pointerEvents = 'auto';
+      viewOnlineBtn.style.cursor = 'pointer';
+    } else {
+      throw new Error('ResumeService not initialized');
+    }
+  } catch (err) {
+    console.error('Failed to load active resume:', err);
+    if (primarySpan) primarySpan.textContent = 'Resume Unavailable';
+    if (secondarySpan) secondarySpan.textContent = 'View Online';
+
+    // Clear previous click event listeners on download button
+    const newDownloadBtn = downloadResumeBtn.cloneNode(true);
+    downloadResumeBtn.parentNode.replaceChild(newDownloadBtn, downloadResumeBtn);
+    newDownloadBtn.setAttribute('href', '#');
+    newDownloadBtn.style.opacity = '0.5';
+    newDownloadBtn.style.pointerEvents = 'none';
+    newDownloadBtn.style.cursor = 'not-allowed';
+
+    // Clear previous click event listeners on view online button
+    const newViewOnlineBtn = viewOnlineBtn.cloneNode(true);
+    viewOnlineBtn.parentNode.replaceChild(newViewOnlineBtn, viewOnlineBtn);
+    newViewOnlineBtn.setAttribute('href', '#');
+    newViewOnlineBtn.style.opacity = '0.5';
+    newViewOnlineBtn.style.pointerEvents = 'none';
+    newViewOnlineBtn.style.cursor = 'not-allowed';
+  }
+};
+
+loadDynamicResume();
+
 const initSmoothScrolling = () => {
   if (typeof Lenis === "undefined") return;
 

@@ -205,9 +205,52 @@
     }
   };
 
+  /**
+   * CertificationService
+   * Handles public certifications queries.
+   */
+  const CertificationService = {
+    async getPublishedCertifications() {
+      if (!supabase) throw new Error("Supabase Client is not initialized.");
+      return await supabase
+        .from('certifications')
+        .select('*')
+        .eq('status', 'published')
+        .order('created_at', { ascending: false });
+    }
+  };
+
+  const ResumeService = {
+    async getActiveResume() {
+      if (!supabase) throw new Error("Supabase Client is not initialized.");
+      return await supabase
+        .from('resume_settings')
+        .select('*')
+        .eq('is_active', true)
+        .maybeSingle();
+    },
+    async logResumeDownload(downloadData) {
+      if (!supabase) throw new Error("Supabase Client is not initialized.");
+      return await supabase
+        .from('resume_downloads')
+        .insert([downloadData])
+        .select()
+        .single();
+    },
+    async updateDownloadStatus(id, status) {
+      if (!supabase) throw new Error("Supabase Client is not initialized.");
+      return await supabase
+        .from('resume_downloads')
+        .update({ download_status: status })
+        .eq('id', id);
+    }
+  };
+
   // Expose services to window scope
   window.AuthService = AuthService;
   window.TestimonialService = TestimonialService;
   window.AdminService = AdminService;
+  window.CertificationService = CertificationService;
+  window.ResumeService = ResumeService;
   window.supabaseInstance = supabase;
 })();
