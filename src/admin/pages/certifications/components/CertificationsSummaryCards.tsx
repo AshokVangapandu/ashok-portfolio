@@ -1,13 +1,23 @@
 /* src/admin/pages/certifications/components/CertificationsSummaryCards.tsx */
 import React from 'react';
 import { Card } from '../../../components/cards/Card';
-import { MOCK_SUMMARY } from '../mockCertifications';
+interface CertificationsSummaryCardsProps {
+  total: number;
+  published: number;
+  draft: number;
+  featured: number;
+}
 
-export const CertificationsSummaryCards: React.FC = () => {
+export const CertificationsSummaryCards: React.FC<CertificationsSummaryCardsProps> = ({
+  total,
+  published,
+  draft,
+  featured
+}) => {
   const cards = [
     {
       title: 'Total Certifications',
-      value: MOCK_SUMMARY.total,
+      value: total,
       helperText: 'All registered credentials',
       iconColor: '#7C5CFF', // Soft Indigo
       iconBg: 'rgba(124, 92, 255, 0.1)',
@@ -20,7 +30,7 @@ export const CertificationsSummaryCards: React.FC = () => {
     },
     {
       title: 'Published',
-      value: MOCK_SUMMARY.published,
+      value: published,
       helperText: 'Live on your portfolio',
       iconColor: '#22C55E', // Green
       iconBg: 'rgba(34, 197, 94, 0.1)',
@@ -33,7 +43,7 @@ export const CertificationsSummaryCards: React.FC = () => {
     },
     {
       title: 'Draft',
-      value: MOCK_SUMMARY.draft,
+      value: draft,
       helperText: 'Work in progress',
       iconColor: '#F59E0B', // Amber
       iconBg: 'rgba(245, 158, 11, 0.1)',
@@ -46,7 +56,7 @@ export const CertificationsSummaryCards: React.FC = () => {
     },
     {
       title: 'Featured',
-      value: MOCK_SUMMARY.featured,
+      value: featured,
       helperText: 'Highlighted at the top',
       iconColor: '#A78BFA', // Purple
       iconBg: 'rgba(167, 139, 250, 0.1)',

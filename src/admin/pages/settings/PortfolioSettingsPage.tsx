@@ -8,6 +8,8 @@ import { AlertMessage } from './components/AlertMessage';
 import { StickyFooter } from './components/StickyFooter';
 import { Card } from '../../components/cards/Card';
 
+import { Tabs } from '../../components/tabs/Tabs';
+
 export const PortfolioSettingsPage: React.FC = () => {
   const {
     loading,
@@ -61,6 +63,24 @@ export const PortfolioSettingsPage: React.FC = () => {
           Manage your portfolio visibility and public availability.
         </p>
       </div>
+
+      {/* Sub-tab Navigation */}
+      <Tabs
+        options={[
+          { id: 'portfolio', label: 'Portfolio Settings' },
+          { id: 'social-links', label: 'Social Links' },
+          { id: 'admin-access', label: 'Admin Access' }
+        ]}
+        activeId="portfolio"
+        onChange={(id) => {
+          const path = id === 'portfolio' ? '/admin/settings/portfolio' : `/admin/settings/${id}`;
+          const hasBase = window.location.pathname.startsWith('/ashok-portfolio');
+          const targetPath = hasBase ? `/ashok-portfolio${path}` : path;
+          window.history.pushState(null, '', targetPath);
+          window.dispatchEvent(new PopStateEvent('popstate'));
+        }}
+        style={{ marginBottom: 'var(--admin-space-2)' }}
+      />
 
       {/* 2. Section Cards list */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', boxSizing: 'border-box' }}>

@@ -1,8 +1,23 @@
 /* src/admin/pages/certifications/components/CertificationsToolbar.tsx */
 import React, { useState } from 'react';
 
-export const CertificationsToolbar: React.FC = () => {
-  const [searchVal, setSearchVal] = useState('');
+interface CertificationsToolbarProps {
+  searchVal: string;
+  setSearchVal: (val: string) => void;
+  filterVal: string;
+  setFilterVal: (val: string) => void;
+  sortVal: string;
+  setSortVal: (val: string) => void;
+}
+
+export const CertificationsToolbar: React.FC<CertificationsToolbarProps> = ({
+  searchVal,
+  setSearchVal,
+  filterVal,
+  setFilterVal,
+  sortVal,
+  setSortVal
+}) => {
   const [searchFocused, setSearchFocused] = useState(false);
 
   return (
@@ -40,7 +55,7 @@ export const CertificationsToolbar: React.FC = () => {
         </span>
         <input
           type="text"
-          placeholder="Search certifications by title or organization..."
+          placeholder="Search certifications by title, organization, or skills..."
           value={searchVal}
           onChange={(e) => setSearchVal(e.target.value)}
           onFocus={() => setSearchFocused(true)}
@@ -64,82 +79,95 @@ export const CertificationsToolbar: React.FC = () => {
 
       {/* Action Buttons (Positioned on the right) */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
-        {/* Filter Button */}
-        <button
-          type="button"
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '8px',
-            height: '40px',
-            padding: '0 16px',
-            border: '1px solid var(--admin-border)',
-            borderRadius: '10px',
-            fontSize: '13.5px',
-            color: 'var(--admin-text)',
-            backgroundColor: '#FFFFFF',
-            fontWeight: 500,
-            cursor: 'pointer',
-            boxSizing: 'border-box',
-            transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--admin-surface)'}
-          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#FFFFFF'}
-          onFocus={(e) => {
-            e.currentTarget.style.borderColor = 'var(--admin-primary)';
-            e.currentTarget.style.boxShadow = '0 0 0 3px rgba(124, 92, 255, 0.15)';
-            e.currentTarget.style.outline = 'none';
-          }}
-          onBlur={(e) => {
-            e.currentTarget.style.borderColor = 'var(--admin-border)';
-            e.currentTarget.style.boxShadow = 'none';
-          }}
-        >
-          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
-          </svg>
-          <span>Filter</span>
-        </button>
+        {/* Filter Dropdown */}
+        <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}>
+          <select
+            value={filterVal}
+            onChange={(e) => setFilterVal(e.target.value)}
+            style={{
+              appearance: 'none',
+              WebkitAppearance: 'none',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              height: '40px',
+              padding: '0 36px 0 16px',
+              border: '1px solid var(--admin-border)',
+              borderRadius: '10px',
+              fontSize: '13.5px',
+              color: 'var(--admin-text)',
+              backgroundColor: '#FFFFFF',
+              fontWeight: 550,
+              cursor: 'pointer',
+              boxSizing: 'border-box',
+              outline: 'none',
+              transition: 'all 0.2s ease'
+            }}
+            onFocus={(e) => {
+              e.currentTarget.style.borderColor = 'var(--admin-primary)';
+              e.currentTarget.style.boxShadow = '0 0 0 3px rgba(124, 92, 255, 0.15)';
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.borderColor = 'var(--admin-border)';
+              e.currentTarget.style.boxShadow = 'none';
+            }}
+          >
+            <option value="all">All Statuses</option>
+            <option value="published">Published</option>
+            <option value="draft">Draft</option>
+            <option value="featured">Featured</option>
+          </select>
+          <span style={{ position: 'absolute', right: '12px', pointerEvents: 'none', display: 'flex', alignItems: 'center', color: 'var(--admin-text-secondary)' }}>
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </span>
+        </div>
 
-        {/* Sort Button */}
-        <button
-          type="button"
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '8px',
-            height: '40px',
-            padding: '0 16px',
-            border: '1px solid var(--admin-border)',
-            borderRadius: '10px',
-            fontSize: '13.5px',
-            color: 'var(--admin-text)',
-            backgroundColor: '#FFFFFF',
-            fontWeight: 500,
-            cursor: 'pointer',
-            boxSizing: 'border-box',
-            transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--admin-surface)'}
-          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#FFFFFF'}
-          onFocus={(e) => {
-            e.currentTarget.style.borderColor = 'var(--admin-primary)';
-            e.currentTarget.style.boxShadow = '0 0 0 3px rgba(124, 92, 255, 0.15)';
-            e.currentTarget.style.outline = 'none';
-          }}
-          onBlur={(e) => {
-            e.currentTarget.style.borderColor = 'var(--admin-border)';
-            e.currentTarget.style.boxShadow = 'none';
-          }}
-        >
-          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="21 15 12 24 3 15" />
-            <polyline points="21 9 12 0 3 9" />
-          </svg>
-          <span>Sort</span>
-        </button>
+        {/* Sort Dropdown */}
+        <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}>
+          <select
+            value={sortVal}
+            onChange={(e) => setSortVal(e.target.value)}
+            style={{
+              appearance: 'none',
+              WebkitAppearance: 'none',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              height: '40px',
+              padding: '0 36px 0 16px',
+              border: '1px solid var(--admin-border)',
+              borderRadius: '10px',
+              fontSize: '13.5px',
+              color: 'var(--admin-text)',
+              backgroundColor: '#FFFFFF',
+              fontWeight: 550,
+              cursor: 'pointer',
+              boxSizing: 'border-box',
+              outline: 'none',
+              transition: 'all 0.2s ease'
+            }}
+            onFocus={(e) => {
+              e.currentTarget.style.borderColor = 'var(--admin-primary)';
+              e.currentTarget.style.boxShadow = '0 0 0 3px rgba(124, 92, 255, 0.15)';
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.borderColor = 'var(--admin-border)';
+              e.currentTarget.style.boxShadow = 'none';
+            }}
+          >
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+            <option value="title_asc">Title A–Z</option>
+            <option value="title_desc">Title Z–A</option>
+          </select>
+          <span style={{ position: 'absolute', right: '12px', pointerEvents: 'none', display: 'flex', alignItems: 'center', color: 'var(--admin-text-secondary)' }}>
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </span>
+        </div>
       </div>
     </div>
   );

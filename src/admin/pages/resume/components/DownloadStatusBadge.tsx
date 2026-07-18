@@ -2,10 +2,15 @@
 import React from 'react';
 
 interface DownloadStatusBadgeProps {
-  isKnown: boolean;
+  status?: string;
+  isKnown?: boolean;
 }
 
-export const DownloadStatusBadge: React.FC<DownloadStatusBadgeProps> = ({ isKnown }) => {
+export const DownloadStatusBadge: React.FC<DownloadStatusBadgeProps> = ({ status, isKnown }) => {
+  const isFailed = status ? status.toLowerCase() === 'failed' : false;
+  const isGreen = status ? !isFailed : isKnown;
+  const label = status ? (isFailed ? 'Failed' : 'Completed') : (isKnown ? 'Known Visitor' : 'Anonymous');
+  
   return (
     <span
       style={{
@@ -16,8 +21,8 @@ export const DownloadStatusBadge: React.FC<DownloadStatusBadgeProps> = ({ isKnow
         borderRadius: '9999px',
         fontSize: '12px',
         fontWeight: 600,
-        backgroundColor: isKnown ? 'rgba(124, 58, 237, 0.06)' : '#F1F5F9', // Purple vs Gray bg
-        color: isKnown ? 'var(--admin-primary)' : '#64748B', // Purple vs Gray text
+        backgroundColor: isGreen ? '#ECFDF5' : (isFailed ? '#FEF2F2' : '#F1F5F9'),
+        color: isGreen ? '#10B981' : (isFailed ? '#EF4444' : '#64748B'),
         whiteSpace: 'nowrap'
       }}
     >
@@ -26,11 +31,11 @@ export const DownloadStatusBadge: React.FC<DownloadStatusBadgeProps> = ({ isKnow
           width: '6px',
           height: '6px',
           borderRadius: '50%',
-          backgroundColor: isKnown ? 'var(--admin-primary)' : '#64748B',
+          backgroundColor: isGreen ? '#10B981' : (isFailed ? '#EF4444' : '#64748B'),
           display: 'inline-block'
         }}
       />
-      <span>{isKnown ? 'Known Visitor' : 'Anonymous'}</span>
+      <span>{label}</span>
     </span>
   );
 };

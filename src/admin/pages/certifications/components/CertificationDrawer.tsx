@@ -1,6 +1,7 @@
 /* src/admin/pages/certifications/components/CertificationDrawer.tsx */
 import React, { useState, useEffect, useRef } from 'react';
 import { Certification } from '../mockCertifications';
+import { certificationService } from '../../../services/certificationService';
 
 interface CertificationDrawerProps {
   isOpen: boolean;
@@ -28,19 +29,17 @@ export const CertificationDrawer: React.FC<CertificationDrawerProps> = ({
   // Icon and Media uploads
   const [iconPreview, setIconPreview] = useState<string | null>(null);
   const [mediaPreview, setMediaPreview] = useState<string | null>(null);
+  const [iconFile, setIconFile] = useState<File | null>(null);
+  const [mediaFile, setMediaFile] = useState<File | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   // Skills Tags state
   const [skills, setSkills] = useState<string[]>([]);
   const [skillInput, setSkillInput] = useState('');
   
-  // Links state
-  const [verificationUrl, setVerificationUrl] = useState('');
-  const [downloadUrl, setDownloadUrl] = useState('');
-  
   // Toggle states
   const [isVerified, setIsVerified] = useState(true);
   const [isFeatured, setIsFeatured] = useState(false);
-  const [isPublished, setIsPublished] = useState(true);
 
   // Hidden file input refs
   const iconInputRef = useRef<HTMLInputElement>(null);
@@ -63,18 +62,17 @@ export const CertificationDrawer: React.FC<CertificationDrawerProps> = ({
       if (mode === 'edit' && selectedCertification) {
         setTitle(selectedCertification.title || '');
         setIssuer(selectedCertification.issuer || '');
-        setCredentialId('MX-ADV-2026-4587'); // Mock pre-population from details
-        setDescription('This certification represents advanced knowledge of domain models, microflows, validation, security rules, performance checks, and custom API integration.');
+        setCredentialId(selectedCertification.credentialId || '');
+        setDescription(selectedCertification.description || '');
         setIssueDate(selectedCertification.issueDate || '');
-        setExpiryDate('No expiry');
-        setIconPreview(selectedCertification.thumbnailUrl || null);
-        setMediaPreview(selectedCertification.thumbnailUrl || null);
-        setSkills(['Mendix', 'React', 'UI/UX']);
-        setVerificationUrl('https://credentials.mendix.com/MX-ADV-2026-4587');
-        setDownloadUrl('https://credentials.mendix.com/MX-ADV-2026-4587/download.pdf');
+        setExpiryDate(selectedCertification.expiryDate || '');
+        setIconPreview(selectedCertification.certificateImageUrl || null);
+        setMediaPreview(selectedCertification.certificateFileUrl || null);
+        setSkills(selectedCertification.skills || []);
         setIsVerified(true);
-        setIsFeatured(selectedCertification.status === 'Featured');
-        setIsPublished(selectedCertification.status === 'Published' || selectedCertification.status === 'Featured');
+        setIsFeatured(selectedCertification.isFeatured || false);
+        setIconFile(null);
+        setMediaFile(null);
       } else {
         // Clear all fields for Create Mode
         setTitle('');
@@ -85,13 +83,12 @@ export const CertificationDrawer: React.FC<CertificationDrawerProps> = ({
         setExpiryDate('');
         setIconPreview(null);
         setMediaPreview(null);
+        setIconFile(null);
+        setMediaFile(null);
         setSkills([]);
         setSkillInput('');
-        setVerificationUrl('');
-        setDownloadUrl('');
         setIsVerified(true);
         setIsFeatured(false);
-        setIsPublished(true);
       }
     }
   }, [isOpen, mode, selectedCertification]);
@@ -116,47 +113,160 @@ export const CertificationDrawer: React.FC<CertificationDrawerProps> = ({
   };
 
   // Trigger form submission callback
-  const handleSubmit = (statusOverride?: Certification['status']) => {
-    // Simple mock field validations
-    if (!title.trim() || !issuer.trim()) {
-      alert('Please fill out Certificate Title and Issuing Organization fields.');
+  const handleSubmit = async (statusOverride?: Certification['status']) => {
+    // Validation
+    if (!title.trim() || !issuer.trim() || !issueDate.trim()) {
+      if (typeof window !== 'undefined' && (window as any).showToast) {
+        (window as any).showToast('error', 'Validation Error', 'Please fill in all required fields (*).', 5000);
+      }
       return;
     }
 
-    let statusVal: Certification['status'] = 'Published';
-    if (statusOverride) {
-      statusVal = statusOverride;
-    } else {
-      if (!isPublished) {
-        statusVal = 'Draft';
-      } else if (isFeatured) {
-        statusVal = 'Published'; // Or handle Featured custom
+    // Expiry Date validation
+    const parsedIssue = Date.parse(issueDate);
+    const parsedExpiry = Date.parse(expiryDate);
+    if (!isNaN(parsedIssue) && !isNaN(parsedExpiry)) {
+      if (new Date(parsedExpiry) < new Date(parsedIssue)) {
+        if (typeof window !== 'undefined' && (window as any).showToast) {
+          (window as any).showToast('error', 'Validation Error', 'Expiry Date cannot be earlier than Issue Date.', 5000);
+        }
+        return;
       }
     }
 
-    onSave({
-      id: selectedCertification?.id || `cert-${Date.now()}`,
-      title,
-      issuer,
-      issueDate: issueDate || 'Jun 2026',
-      status: statusVal,
-      thumbnailUrl: iconPreview || 'https://images.unsplash.com/photo-1589330694653-ded6df53f6ee?auto=format&fit=crop&w=300&q=80'
-    });
+    const dbStatus = (statusOverride && (statusOverride.toLowerCase() === 'draft' || statusOverride.toLowerCase() === 'pending')) ? 'draft' : 'published';
+
+    if (mode === 'create') {
+      setIsSubmitting(true);
+      try {
+        let iconUrl = '';
+        let mediaUrl = '';
+
+        // Upload assets if present
+        if (iconFile) {
+          const iconPath = `icons/${Date.now()}-${iconFile.name}`;
+          iconUrl = await certificationService.uploadAsset(iconFile, iconPath);
+        }
+
+        if (mediaFile) {
+          const mediaPath = `media/${Date.now()}-${mediaFile.name}`;
+          mediaUrl = await certificationService.uploadAsset(mediaFile, mediaPath);
+        }
+
+        // Save record to Supabase
+        const newCert = await certificationService.createCertification({
+          title,
+          issuer,
+          category: 'General',
+          description: description.trim() || null,
+          issue_date: issueDate.trim(),
+          expiry_date: expiryDate.trim() || null,
+          credential_id: credentialId.trim() || null,
+          credential_url: null,
+          certificate_image_url: iconUrl || null,
+          certificate_file_url: mediaUrl || null,
+          skills: skills.length > 0 ? skills : null,
+          status: dbStatus,
+          is_featured: isFeatured,
+          display_order: 0
+        });
+
+        if (typeof window !== 'undefined' && (window as any).showToast) {
+          (window as any).showToast('success', 'Certification Added', 'Certification added successfully.', 4000);
+        }
+
+        onSave(newCert);
+      } catch (err: any) {
+        if (typeof window !== 'undefined' && (window as any).showToast) {
+          (window as any).showToast('error', 'Submission Failed', err.message || 'Failed to save certification.', 5000);
+        }
+        setIsSubmitting(false);
+      }
+    } else {
+      if (!selectedCertification) return;
+      setIsSubmitting(true);
+      try {
+        let iconUrl = iconPreview;
+        let mediaUrl = mediaPreview;
+
+        // Upload replacement assets if selected
+        if (iconFile) {
+          const iconPath = `icons/${Date.now()}-${iconFile.name}`;
+          iconUrl = await certificationService.uploadAsset(iconFile, iconPath);
+        }
+
+        if (mediaFile) {
+          const mediaPath = `media/${Date.now()}-${mediaFile.name}`;
+          mediaUrl = await certificationService.uploadAsset(mediaFile, mediaPath);
+        }
+
+        // Perform update query
+        const updatedCert = await certificationService.updateCertification(selectedCertification.id, {
+          title,
+          issuer,
+          description: description.trim() || null,
+          issue_date: issueDate.trim(),
+          expiry_date: expiryDate.trim() || null,
+          credential_id: credentialId.trim() || null,
+          credential_url: null,
+          certificate_image_url: iconUrl || null,
+          certificate_file_url: mediaUrl || null,
+          skills: skills.length > 0 ? skills : null,
+          status: dbStatus,
+          is_featured: isFeatured
+        });
+
+        let msg = 'Certification updated successfully.';
+        if (dbStatus === 'published' && selectedCertification.status?.toLowerCase() !== 'published') {
+          msg = 'Certification published successfully.';
+        } else if (dbStatus === 'draft' && selectedCertification.status?.toLowerCase() === 'published') {
+          msg = 'Certification moved to draft.';
+        } else if (isFeatured && !selectedCertification.isFeatured) {
+          msg = 'Certification marked as featured.';
+        } else if (!isFeatured && selectedCertification.isFeatured) {
+          msg = 'Certification removed from featured.';
+        }
+
+        if (typeof window !== 'undefined' && (window as any).showToast) {
+          (window as any).showToast('success', 'Certification Updated', msg, 4000);
+        }
+
+        onSave(updatedCert);
+      } catch (err: any) {
+        if (typeof window !== 'undefined' && (window as any).showToast) {
+          (window as any).showToast('error', 'Update Failed', err.message || 'Failed to update certification.', 5000);
+        }
+        setIsSubmitting(false);
+      }
+    }
   };
 
-  // Handle Mock File uploads
+  // Handle File uploads
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, target: 'icon' | 'media') => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        if (target === 'icon') {
-          setIconPreview(reader.result as string);
-        } else {
-          setMediaPreview(reader.result as string);
+      if (file.size > 10 * 1024 * 1024) {
+        if (typeof window !== 'undefined' && (window as any).showToast) {
+          (window as any).showToast('error', 'File Too Large', 'File size must not exceed 10MB.', 5000);
         }
-      };
-      reader.readAsDataURL(file);
+        return;
+      }
+      
+      const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp', 'application/pdf'];
+      if (!allowedTypes.includes(file.type)) {
+        if (typeof window !== 'undefined' && (window as any).showToast) {
+          (window as any).showToast('error', 'Invalid File Type', 'Only PNG, JPG, JPEG, WebP, and PDF files are allowed.', 5000);
+        }
+        return;
+      }
+
+      if (target === 'icon') {
+        setIconFile(file);
+        setIconPreview(URL.createObjectURL(file));
+      } else {
+        setMediaFile(file);
+        setMediaPreview(URL.createObjectURL(file));
+      }
     }
   };
 
@@ -448,7 +558,7 @@ export const CertificationDrawer: React.FC<CertificationDrawerProps> = ({
                   type="file"
                   ref={iconInputRef}
                   onChange={(e) => handleFileChange(e, 'icon')}
-                  accept="image/*"
+                  accept="image/*,application/pdf"
                   style={{ display: 'none' }}
                 />
                 <div
@@ -470,7 +580,58 @@ export const CertificationDrawer: React.FC<CertificationDrawerProps> = ({
                   }}
                 >
                   {iconPreview ? (
-                    <img src={iconPreview} alt="Icon Preview" style={{ maxHeight: '80px', maxWidth: '100%', objectFit: 'contain' }} />
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', width: '100%', height: '100%', justifyContent: 'center' }}>
+                      {(iconPreview.toLowerCase().includes('.pdf') || (iconFile && iconFile.type === 'application/pdf')) ? (
+                        <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="#EF4444" strokeWidth="2">
+                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                          <polyline points="14 2 14 8 20 8" />
+                          <text x="12" y="18" textAnchor="middle" fill="#EF4444" fontSize="5px" fontWeight="bold" fontFamily="sans-serif">PDF</text>
+                        </svg>
+                      ) : (
+                        <img src={iconPreview} alt="Icon Preview" style={{ maxHeight: '60px', maxWidth: '100%', objectFit: 'contain', borderRadius: '4px' }} />
+                      )}
+                      <div style={{ display: 'flex', gap: '8px', zIndex: 10 }}>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            iconInputRef.current?.click();
+                          }}
+                          style={{
+                            padding: '4px 10px',
+                            border: '1px solid #CBD5E1',
+                            borderRadius: '6px',
+                            fontSize: '11px',
+                            fontWeight: 600,
+                            backgroundColor: '#FFFFFF',
+                            color: '#475569',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          Replace
+                        </button>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setIconPreview(null);
+                            setIconFile(null);
+                          }}
+                          style={{
+                            padding: '4px 10px',
+                            border: '1px solid #FCA5A5',
+                            borderRadius: '6px',
+                            fontSize: '11px',
+                            fontWeight: 600,
+                            backgroundColor: '#FEF2F2',
+                            color: '#EF4444',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </div>
                   ) : (
                     <>
                       <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#7C5CFF" strokeWidth="2">
@@ -499,7 +660,7 @@ export const CertificationDrawer: React.FC<CertificationDrawerProps> = ({
                   type="file"
                   ref={mediaInputRef}
                   onChange={(e) => handleFileChange(e, 'media')}
-                  accept="image/*"
+                  accept="image/*,application/pdf"
                   style={{ display: 'none' }}
                 />
                 <div
@@ -521,7 +682,58 @@ export const CertificationDrawer: React.FC<CertificationDrawerProps> = ({
                   }}
                 >
                   {mediaPreview ? (
-                    <img src={mediaPreview} alt="Media Preview" style={{ maxHeight: '80px', maxWidth: '100%', objectFit: 'contain' }} />
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', width: '100%', height: '100%', justifyContent: 'center' }}>
+                      {(mediaPreview.toLowerCase().includes('.pdf') || (mediaFile && mediaFile.type === 'application/pdf')) ? (
+                        <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="#EF4444" strokeWidth="2">
+                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                          <polyline points="14 2 14 8 20 8" />
+                          <text x="12" y="18" textAnchor="middle" fill="#EF4444" fontSize="5px" fontWeight="bold" fontFamily="sans-serif">PDF</text>
+                        </svg>
+                      ) : (
+                        <img src={mediaPreview} alt="Media Preview" style={{ maxHeight: '60px', maxWidth: '100%', objectFit: 'contain', borderRadius: '4px' }} />
+                      )}
+                      <div style={{ display: 'flex', gap: '8px', zIndex: 10 }}>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            mediaInputRef.current?.click();
+                          }}
+                          style={{
+                            padding: '4px 10px',
+                            border: '1px solid #CBD5E1',
+                            borderRadius: '6px',
+                            fontSize: '11px',
+                            fontWeight: 600,
+                            backgroundColor: '#FFFFFF',
+                            color: '#475569',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          Replace
+                        </button>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setMediaPreview(null);
+                            setMediaFile(null);
+                          }}
+                          style={{
+                            padding: '4px 10px',
+                            border: '1px solid #FCA5A5',
+                            borderRadius: '6px',
+                            fontSize: '11px',
+                            fontWeight: 600,
+                            backgroundColor: '#FEF2F2',
+                            color: '#EF4444',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </div>
                   ) : (
                     <>
                       <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#7C5CFF" strokeWidth="2">
@@ -607,61 +819,6 @@ export const CertificationDrawer: React.FC<CertificationDrawerProps> = ({
                   flex: 1,
                   minWidth: '80px',
                   padding: 0
-                }}
-              />
-            </div>
-          </div>
-
-          {/* Links Section */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <span style={{ fontSize: '11px', fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-              Links
-            </span>
-
-            {/* Verification URL */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <label style={{ fontSize: '13px', fontWeight: 650, color: '#475569' }}>
-                Credential Verification URL
-              </label>
-              <input
-                type="text"
-                placeholder="https://credentials.mendix.com/..."
-                value={verificationUrl}
-                onChange={(e) => setVerificationUrl(e.target.value)}
-                style={{
-                  width: '100%',
-                  height: '40px',
-                  padding: '0 12px',
-                  border: '1.5px solid rgba(226, 232, 240, 1)',
-                  borderRadius: '10px',
-                  fontSize: '13.5px',
-                  boxSizing: 'border-box',
-                  color: '#0F172A',
-                  outline: 'none'
-                }}
-              />
-            </div>
-
-            {/* Download URL */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <label style={{ fontSize: '13px', fontWeight: 650, color: '#475569' }}>
-                Certificate Download URL
-              </label>
-              <input
-                type="text"
-                placeholder="https://..."
-                value={downloadUrl}
-                onChange={(e) => setDownloadUrl(e.target.value)}
-                style={{
-                  width: '100%',
-                  height: '40px',
-                  padding: '0 12px',
-                  border: '1.5px solid rgba(226, 232, 240, 1)',
-                  borderRadius: '10px',
-                  fontSize: '13.5px',
-                  boxSizing: 'border-box',
-                  color: '#0F172A',
-                  outline: 'none'
                 }}
               />
             </div>
@@ -760,50 +917,6 @@ export const CertificationDrawer: React.FC<CertificationDrawerProps> = ({
                 />
               </div>
             </div>
-
-            {/* Published toggle */}
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                padding: '12px 16px',
-                background: 'rgba(248, 250, 252, 0.5)',
-                border: '1.5px solid rgba(226, 232, 240, 0.8)',
-                borderRadius: '12px',
-                boxSizing: 'border-box'
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#10B981' }} />
-                <span style={{ fontSize: '13.5px', fontWeight: 600, color: '#475569' }}>Published</span>
-              </div>
-              <div
-                onClick={() => setIsPublished(!isPublished)}
-                style={{
-                  width: '44px',
-                  height: '24px',
-                  borderRadius: '999px',
-                  backgroundColor: isPublished ? '#10B981' : '#E2E8F0',
-                  position: 'relative',
-                  cursor: 'pointer',
-                  transition: 'background-color 0.2s ease'
-                }}
-              >
-                <div
-                  style={{
-                    width: '18px',
-                    height: '18px',
-                    borderRadius: '50%',
-                    backgroundColor: '#FFFFFF',
-                    position: 'absolute',
-                    top: '3px',
-                    left: isPublished ? '23px' : '3px',
-                    transition: 'left 0.2s ease'
-                  }}
-                />
-              </div>
-            </div>
           </div>
         </div>
 
@@ -845,44 +958,56 @@ export const CertificationDrawer: React.FC<CertificationDrawerProps> = ({
               {/* Save as Draft button */}
               <button
                 type="button"
+                disabled={isSubmitting}
                 onClick={() => handleSubmit('Draft')}
                 style={{
                   padding: '10px 20px',
                   border: '1px solid rgba(226, 232, 240, 1)',
                   borderRadius: '10px',
                   backgroundColor: '#FFFFFF',
-                  color: '#475569',
+                  color: isSubmitting ? '#94A3B8' : '#475569',
                   fontSize: '13.5px',
                   fontWeight: 600,
-                  cursor: 'pointer',
-                  transition: 'background-color 0.15s ease'
+                  cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                  transition: 'background-color 0.15s ease',
+                  opacity: isSubmitting ? 0.6 : 1
                 }}
-                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F8FAFC'}
-                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#FFFFFF'}
+                onMouseEnter={(e) => {
+                  if (!isSubmitting) e.currentTarget.style.backgroundColor = '#F8FAFC';
+                }}
+                onMouseLeave={(e) => {
+                  if (!isSubmitting) e.currentTarget.style.backgroundColor = '#FFFFFF';
+                }}
               >
-                Save as Draft
+                {isSubmitting ? 'Saving...' : 'Save as Draft'}
               </button>
 
               {/* Publish button */}
               <button
                 type="button"
+                disabled={isSubmitting}
                 onClick={() => handleSubmit('Published')}
                 style={{
                   padding: '10px 20px',
                   border: 'none',
                   borderRadius: '10px',
-                  backgroundColor: '#7C5CFF',
+                  backgroundColor: isSubmitting ? '#94A3B8' : '#7C5CFF',
                   color: '#FFFFFF',
                   fontSize: '13.5px',
                   fontWeight: 600,
-                  cursor: 'pointer',
+                  cursor: isSubmitting ? 'not-allowed' : 'pointer',
                   transition: 'background-color 0.15s ease',
-                  boxShadow: '0 4px 12px rgba(124, 92, 255, 0.25)'
+                  boxShadow: isSubmitting ? 'none' : '0 4px 12px rgba(124, 92, 255, 0.25)',
+                  opacity: isSubmitting ? 0.6 : 1
                 }}
-                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#6D4EE3'}
-                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#7C5CFF'}
+                onMouseEnter={(e) => {
+                  if (!isSubmitting) e.currentTarget.style.backgroundColor = '#6D4EE3';
+                }}
+                onMouseLeave={(e) => {
+                  if (!isSubmitting) e.currentTarget.style.backgroundColor = '#7C5CFF';
+                }}
               >
-                Publish
+                {isSubmitting ? 'Saving...' : 'Publish'}
               </button>
             </>
           ) : (
@@ -890,44 +1015,56 @@ export const CertificationDrawer: React.FC<CertificationDrawerProps> = ({
               {/* Save Changes button */}
               <button
                 type="button"
+                disabled={isSubmitting}
                 onClick={() => handleSubmit('Draft')}
                 style={{
                   padding: '10px 20px',
                   border: '1px solid rgba(226, 232, 240, 1)',
                   borderRadius: '10px',
                   backgroundColor: '#FFFFFF',
-                  color: '#475569',
+                  color: isSubmitting ? '#94A3B8' : '#475569',
                   fontSize: '13.5px',
                   fontWeight: 600,
-                  cursor: 'pointer',
-                  transition: 'background-color 0.15s ease'
+                  cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                  transition: 'background-color 0.15s ease',
+                  opacity: isSubmitting ? 0.6 : 1
                 }}
-                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F8FAFC'}
-                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#FFFFFF'}
+                onMouseEnter={(e) => {
+                  if (!isSubmitting) e.currentTarget.style.backgroundColor = '#F8FAFC';
+                }}
+                onMouseLeave={(e) => {
+                  if (!isSubmitting) e.currentTarget.style.backgroundColor = '#FFFFFF';
+                }}
               >
-                Save Changes
+                {isSubmitting ? 'Saving...' : 'Save Changes'}
               </button>
 
               {/* Update & Publish button */}
               <button
                 type="button"
+                disabled={isSubmitting}
                 onClick={() => handleSubmit('Published')}
                 style={{
                   padding: '10px 20px',
                   border: 'none',
                   borderRadius: '10px',
-                  backgroundColor: '#7C5CFF',
+                  backgroundColor: isSubmitting ? '#94A3B8' : '#7C5CFF',
                   color: '#FFFFFF',
                   fontSize: '13.5px',
                   fontWeight: 600,
-                  cursor: 'pointer',
+                  cursor: isSubmitting ? 'not-allowed' : 'pointer',
                   transition: 'background-color 0.15s ease',
-                  boxShadow: '0 4px 12px rgba(124, 92, 255, 0.25)'
+                  boxShadow: isSubmitting ? 'none' : '0 4px 12px rgba(124, 92, 255, 0.25)',
+                  opacity: isSubmitting ? 0.6 : 1
                 }}
-                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#6D4EE3'}
-                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#7C5CFF'}
+                onMouseEnter={(e) => {
+                  if (!isSubmitting) e.currentTarget.style.backgroundColor = '#6D4EE3';
+                }}
+                onMouseLeave={(e) => {
+                  if (!isSubmitting) e.currentTarget.style.backgroundColor = '#7C5CFF';
+                }}
               >
-                Update & Publish
+                {isSubmitting ? 'Saving...' : 'Update & Publish'}
               </button>
             </>
           )}

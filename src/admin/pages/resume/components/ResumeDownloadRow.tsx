@@ -143,7 +143,7 @@ export const ResumeDownloadRow: React.FC<ResumeDownloadRowProps> = ({
 
       {/* 8. Status Column */}
       <td style={{ padding: '16px var(--admin-space-4)' }}>
-        <DownloadStatusBadge isKnown={download.isKnown} />
+        <DownloadStatusBadge status={download.status} />
       </td>
 
       {/* 9. Action Column (Pill View Button) */}

@@ -7,9 +7,12 @@ import { Certification } from '../mockCertifications';
 interface CertificationsTableProps {
   certifications: Certification[];
   onEditClick: (cert: Certification) => void;
+  onDeleteClick: (id: string) => void;
+  isFiltered?: boolean;
+  onClearFilters?: () => void;
 }
 
-export const CertificationsTable: React.FC<CertificationsTableProps> = ({ certifications, onEditClick }) => {
+export const CertificationsTable: React.FC<CertificationsTableProps> = ({ certifications, onEditClick, onDeleteClick, isFiltered, onClearFilters }) => {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [hoveredRow, setHoveredRow] = useState<string | null>(null);
 
@@ -31,6 +34,50 @@ export const CertificationsTable: React.FC<CertificationsTableProps> = ({ certif
 
   // Empty state handler
   if (!certifications || certifications.length === 0) {
+    if (isFiltered) {
+      return (
+        <Card style={{ padding: '60px 40px', textAlign: 'center', backgroundColor: '#FFFFFF' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px' }}>
+            <div
+              style={{
+                width: '80px',
+                height: '80px',
+                borderRadius: '50%',
+                backgroundColor: 'var(--admin-surface)',
+                color: 'var(--admin-text-secondary)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                opacity: 0.8
+              }}
+            >
+              <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: 'var(--admin-text)' }}>
+                No matching certifications
+              </h3>
+              <p style={{ margin: 0, fontSize: '14px', color: 'var(--admin-text-secondary)', maxWidth: '320px' }}>
+                We couldn't find any certifications matching your search/filters. Try clearing your search term or filter parameters.
+              </p>
+            </div>
+            {onClearFilters && (
+              <Button
+                variant="primary"
+                onClick={onClearFilters}
+                style={{ backgroundColor: '#7C5CFF', borderRadius: 'var(--admin-radius-sm)', marginTop: '8px' }}
+              >
+                Clear Search & Filters
+              </Button>
+            )}
+          </div>
+        </Card>
+      );
+    }
+
     return (
       <Card style={{ padding: '60px 40px', textAlign: 'center', backgroundColor: '#FFFFFF' }}>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px' }}>
@@ -83,6 +130,7 @@ export const CertificationsTable: React.FC<CertificationsTableProps> = ({ certif
   const getBadgeStyle = (status: Certification['status']) => {
     switch (status) {
       case 'Published':
+      case 'published':
       case 'Featured':
         return {
           bg: 'rgba(16, 185, 129, 0.08)',
@@ -90,6 +138,7 @@ export const CertificationsTable: React.FC<CertificationsTableProps> = ({ certif
           border: '1px solid rgba(16, 185, 129, 0.15)'
         };
       case 'Draft':
+      case 'draft':
         return {
           bg: 'rgba(245, 158, 11, 0.08)',
           color: '#F59E0B',
@@ -467,7 +516,7 @@ export const CertificationsTable: React.FC<CertificationsTableProps> = ({ certif
                       <button
                         type="button"
                         title="Delete"
-                        onClick={() => console.log('TODO: Delete', cert.id)}
+                        onClick={() => onDeleteClick(cert.id)}
                         style={{
                           width: '32px',
                           height: '32px',

@@ -1,6 +1,7 @@
 /* src/admin/pages/resume/components/DownloadDetailsModal.tsx */
 import React, { useEffect } from 'react';
 import { ResumeDownload } from '../../../types/resumeDownload';
+import { DownloadStatusBadge } from './DownloadStatusBadge';
 
 interface DownloadDetailsModalProps {
   download: ResumeDownload | null;
@@ -9,7 +10,7 @@ interface DownloadDetailsModalProps {
 
 export const DownloadDetailsModal: React.FC<DownloadDetailsModalProps> = ({
   download,
-  onClose,
+  onClose
 }) => {
   // Escape key close handler
   useEffect(() => {
@@ -22,362 +23,241 @@ export const DownloadDetailsModal: React.FC<DownloadDetailsModalProps> = ({
 
   if (!download) return null;
 
-  // Clean Date & Time formatting
-  const rawDateTime = download.dateTime.replace('\n', ' at ');
-
-  // Default anonymous visitor avatar representation
-  const defaultAvatar = (
-    <div
-      style={{
-        width: '64px',
-        height: '64px',
-        borderRadius: '50%',
-        backgroundColor: '#F1F5F9',
-        border: '1px solid var(--admin-border)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: '#94A3B8',
-        flexShrink: 0
-      }}
-    >
-      <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-        <circle cx="12" cy="7" r="4" />
-      </svg>
-    </div>
-  );
-
   return (
-    <div
-      onClick={onClose}
-      style={{
-        position: 'fixed',
-        inset: 0,
-        backgroundColor: 'rgba(15, 23, 42, 0.45)', // Overlay Blur backdrop
-        backdropFilter: 'blur(4px)',
-        zIndex: 1100, // ZIndex overlay boundaries
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 'var(--admin-space-4)',
-        boxSizing: 'border-box',
-        animation: 'modalFadeIn 200ms ease-out'
-      }}
-    >
+    <>
+      {/* Backdrop overlay */}
       <div
+        onClick={onClose}
+        style={{
+          position: 'fixed',
+          inset: 0,
+          backgroundColor: 'rgba(15, 23, 42, 0.3)',
+          backdropFilter: 'blur(4px)',
+          zIndex: 9999,
+          animation: 'drawerFadeIn 200ms ease-out'
+        }}
+      />
+
+      {/* Drawer slide-in panel */}
+      <aside
         onClick={(e) => e.stopPropagation()}
         style={{
-          width: '100%',
-          maxWidth: '750px',
+          position: 'fixed',
+          right: 0,
+          top: 0,
+          bottom: 0,
+          width: '460px',
+          height: '100vh',
           backgroundColor: '#FFFFFF',
-          borderRadius: '16px',
-          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.15)', // Premium soft shadows
+          boxShadow: '-10px 0 30px rgba(15, 23, 42, 0.08)',
+          zIndex: 10000,
           display: 'flex',
           flexDirection: 'column',
-          maxHeight: '90vh',
-          fontFamily: "'Inter', sans-serif",
           boxSizing: 'border-box',
-          overflow: 'hidden',
-          animation: 'modalScaleUp 250ms cubic-bezier(0.34, 1.56, 0.64, 1)'
+          fontFamily: "'Inter', sans-serif",
+          animation: 'drawerSlideIn 250ms cubic-bezier(0.16, 1, 0.3, 1)'
         }}
       >
-        {/* MODAL HEADER */}
+        {/* Sticky Header */}
         <div
           style={{
-            padding: '24px 32px',
-            borderBottom: '1px solid #EEF2FF',
+            padding: '24px',
+            borderBottom: '1.5px dashed rgba(226, 232, 240, 1)',
             display: 'flex',
-            alignItems: 'center',
             justifyContent: 'space-between',
+            alignItems: 'flex-start',
             boxSizing: 'border-box'
           }}
         >
           <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            <h2
-              style={{
-                margin: 0,
-                fontSize: '20px',
-                fontWeight: 700,
-                color: 'var(--admin-text)',
-                letterSpacing: '-0.02em'
-              }}
-            >
+            <h2 style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: '#0F172A', letterSpacing: '-0.02em' }}>
               Download Details
             </h2>
-            <p
-              style={{
-                margin: 0,
-                fontSize: '13px',
-                color: 'var(--admin-text-secondary)',
-                fontWeight: 500
-              }}
-            >
-              Full session and visitor information for this download.
-            </p>
+            <span style={{ fontSize: '12.5px', color: '#64748B', fontWeight: 500 }}>
+              Full session and visitor information for this download event.
+            </span>
           </div>
-
+          {/* Close button */}
           <button
+            type="button"
             onClick={onClose}
-            className="hover-scale active-press"
-            aria-label="Close modal"
             style={{
-              background: 'none',
-              border: '1px solid #E2E8F0',
+              border: 'none',
+              backgroundColor: 'transparent',
+              cursor: 'pointer',
+              color: '#94A3B8',
               borderRadius: '50%',
               width: '32px',
               height: '32px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              cursor: 'pointer',
-              color: 'var(--admin-text-secondary)',
-              transition: 'all 0.15s ease'
+              transition: 'background-color 0.15s ease'
             }}
-            onMouseOver={(e) => {
-              e.currentTarget.style.backgroundColor = 'var(--admin-surface)';
-              e.currentTarget.style.color = 'var(--admin-text)';
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.backgroundColor = 'transparent';
-              e.currentTarget.style.color = 'var(--admin-text-secondary)';
-            }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F1F5F9'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
           >
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5">
               <line x1="18" y1="6" x2="6" y2="18" />
               <line x1="6" y1="6" x2="18" y2="18" />
             </svg>
           </button>
         </div>
 
-        {/* MODAL BODY */}
+        {/* Scrollable Content */}
         <div
           style={{
-            padding: '32px',
+            flex: 1,
             overflowY: 'auto',
+            padding: '24px',
             display: 'flex',
             flexDirection: 'column',
-            gap: '28px',
+            gap: '20px',
             boxSizing: 'border-box'
           }}
         >
-          {/* VISITOR CARD */}
-          <div
-            style={{
-              padding: '24px',
-              border: '1px solid var(--admin-border)',
-              borderRadius: '12px',
-              display: 'flex',
-              alignItems: 'center',
-              boxSizing: 'border-box'
-            }}
-          >
-            {download.isKnown && download.avatarUrl ? (
-              <img
-                src={download.avatarUrl}
-                alt={download.visitorName}
-                style={{
-                  width: '64px',
-                  height: '64px',
-                  borderRadius: '50%',
-                  objectFit: 'cover',
-                  border: '1px solid var(--admin-border)',
-                  flexShrink: 0
-                }}
-              />
-            ) : (
-              defaultAvatar
-            )}
+          {/* Section: Visitor Context */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <span style={{ fontSize: '11px', fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              Visitor Details
+            </span>
 
-            <div style={{ marginLeft: '24px', display: 'flex', flexDirection: 'column', gap: '3px' }}>
-              <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: 'var(--admin-text)' }}>
-                {download.visitorName}
-              </h3>
-              {download.isKnown && download.visitorEmail && (
-                <a
-                  href={`mailto:${download.visitorEmail}`}
-                  style={{
-                    fontSize: '14px',
-                    color: 'var(--admin-primary)',
-                    fontWeight: 500,
-                    textDecoration: 'none'
-                  }}
-                >
-                  {download.visitorEmail}
-                </a>
-              )}
-              <span style={{ fontSize: '13px', color: 'var(--admin-text-secondary)', fontWeight: 500 }}>
-                {download.country} <span style={{ opacity: 0.5, margin: '0 4px' }}>•</span> {download.city}
-              </span>
+            {[
+              { label: 'Visitor Name', value: download.visitorName },
+              { label: 'IP Address', value: download.ipAddress || 'Not Available' },
+              { label: 'Country', value: download.country },
+              { label: 'City', value: download.city }
+            ].map((item, idx) => (
+              <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #F1F5F9', paddingBottom: '8px' }}>
+                <span style={{ fontSize: '13px', color: '#64748B', fontWeight: 500 }}>{item.label}</span>
+                <span style={{ fontSize: '13px', color: '#0F172A', fontWeight: 600 }}>{item.value}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Section: Download Info */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '8px' }}>
+            <span style={{ fontSize: '11px', fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              Download Info
+            </span>
+
+            {[
+              { label: 'Resume Version', value: download.resumeVersion || 'Unknown' },
+              { label: 'Downloaded At', value: download.dateTime },
+              { label: 'Downloaded From', value: download.downloadedFrom },
+              { label: 'Traffic Source', value: download.source }
+            ].map((item, idx) => (
+              <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #F1F5F9', paddingBottom: '8px' }}>
+                <span style={{ fontSize: '13px', color: '#64748B', fontWeight: 500 }}>{item.label}</span>
+                <span style={{ fontSize: '13px', color: '#0F172A', fontWeight: 600 }}>{item.value}</span>
+              </div>
+            ))}
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #F1F5F9', paddingBottom: '8px', alignItems: 'center' }}>
+              <span style={{ fontSize: '13px', color: '#64748B', fontWeight: 500 }}>Status</span>
+              <DownloadStatusBadge status={download.status || 'completed'} />
             </div>
           </div>
 
-          {/* TWO-COLUMN DETAILS GRID */}
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(2, 1fr)',
-              gap: '24px',
-              boxSizing: 'border-box'
-            }}
-          >
-            {/* SECTION 1: DOWNLOAD DETAILS */}
-            <div
-              style={{
-                border: '1px solid var(--admin-border)',
-                borderRadius: '12px',
-                padding: '20px 24px',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '16px',
-                boxSizing: 'border-box'
-              }}
-            >
-              <h4
-                style={{
-                  margin: 0,
-                  fontSize: '11px',
-                  fontWeight: 700,
-                  color: 'var(--admin-text-secondary)',
-                  letterSpacing: '0.05em',
-                  textTransform: 'uppercase'
-                }}
-              >
-                Download Details
-              </h4>
-              
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <div>
-                  <span style={{ fontSize: '11px', color: 'var(--admin-text-secondary)', fontWeight: 500 }}>Date & Time</span>
-                  <div style={{ fontSize: '13.5px', fontWeight: 600, color: 'var(--admin-text)', marginTop: '2px' }}>
-                    {rawDateTime}
-                  </div>
-                </div>
+          {/* Section: Device & Environment */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '8px' }}>
+            <span style={{ fontSize: '11px', fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              Device & Browser
+            </span>
 
-                <div>
-                  <span style={{ fontSize: '11px', color: 'var(--admin-text-secondary)', fontWeight: 500 }}>Downloaded From</span>
-                  <div style={{ fontSize: '13.5px', fontWeight: 600, color: 'var(--admin-text)', marginTop: '2px' }}>
-                    {download.downloadedFrom}
-                  </div>
-                </div>
-
-                <div>
-                  <span style={{ fontSize: '11px', color: 'var(--admin-text-secondary)', fontWeight: 500 }}>Traffic Source</span>
-                  <div style={{ fontSize: '13.5px', fontWeight: 600, color: 'var(--admin-text)', marginTop: '2px' }}>
-                    {download.source}
-                  </div>
-                </div>
-
-                <div>
-                  <span style={{ fontSize: '11px', color: 'var(--admin-text-secondary)', fontWeight: 500 }}>Session Duration</span>
-                  <div style={{ fontSize: '13.5px', fontWeight: 600, color: 'var(--admin-text)', marginTop: '2px' }}>
-                    {download.duration}
-                  </div>
-                </div>
+            {[
+              { label: 'Device', value: download.device },
+              { label: 'Browser', value: download.browser },
+              { label: 'Operating System', value: download.os }
+            ].map((item, idx) => (
+              <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #F1F5F9', paddingBottom: '8px' }}>
+                <span style={{ fontSize: '13px', color: '#64748B', fontWeight: 500 }}>{item.label}</span>
+                <span style={{ fontSize: '13px', color: '#0F172A', fontWeight: 600 }}>{item.value}</span>
               </div>
+            ))}
+          </div>
+
+          {/* Section: Session Details */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '8px' }}>
+            <span style={{ fontSize: '11px', fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              Session Metadata
+            </span>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              <span style={{ fontSize: '12px', color: '#64748B', fontWeight: 500 }}>Session ID</span>
+              <code style={{ fontSize: '12px', color: '#0F172A', backgroundColor: '#F8FAFC', padding: '6px 10px', borderRadius: '6px', border: '1px solid #E2E8F0', fontFamily: 'monospace', wordBreak: 'break-all' }}>
+                {download.sessionId || 'Not Available'}
+              </code>
             </div>
 
-            {/* SECTION 2: DEVICE & BROWSER */}
-            <div
-              style={{
-                border: '1px solid var(--admin-border)',
-                borderRadius: '12px',
-                padding: '20px 24px',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '16px',
-                boxSizing: 'border-box'
-              }}
-            >
-              <h4
-                style={{
-                  margin: 0,
-                  fontSize: '11px',
-                  fontWeight: 700,
-                  color: 'var(--admin-text-secondary)',
-                  letterSpacing: '0.05em',
-                  textTransform: 'uppercase'
-                }}
-              >
-                Device & Browser
-              </h4>
-              
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <div>
-                  <span style={{ fontSize: '11px', color: 'var(--admin-text-secondary)', fontWeight: 500 }}>Device</span>
-                  <div style={{ fontSize: '13.5px', fontWeight: 600, color: 'var(--admin-text)', marginTop: '2px' }}>
-                    {download.device}
-                  </div>
-                </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '6px' }}>
+              <span style={{ fontSize: '12px', color: '#64748B', fontWeight: 500 }}>Referrer URL</span>
+              <span style={{ fontSize: '12.5px', color: '#0F172A', fontWeight: 500, wordBreak: 'break-all' }}>
+                {download.referrer || 'Direct Entry'}
+              </span>
+            </div>
 
-                <div>
-                  <span style={{ fontSize: '11px', color: 'var(--admin-text-secondary)', fontWeight: 500 }}>Browser</span>
-                  <div style={{ fontSize: '13.5px', fontWeight: 600, color: 'var(--admin-text)', marginTop: '2px' }}>
-                    {download.browser}
-                  </div>
-                </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '6px' }}>
+              <span style={{ fontSize: '12px', color: '#64748B', fontWeight: 500 }}>Landing Page</span>
+              <span style={{ fontSize: '12.5px', color: '#0F172A', fontWeight: 500, wordBreak: 'break-all' }}>
+                {download.pageSource || 'Homepage'}
+              </span>
+            </div>
 
-                <div>
-                  <span style={{ fontSize: '11px', color: 'var(--admin-text-secondary)', fontWeight: 500 }}>Operating System</span>
-                  <div style={{ fontSize: '13.5px', fontWeight: 600, color: 'var(--admin-text)', marginTop: '2px' }}>
-                    {download.os}
-                  </div>
-                </div>
-              </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '6px' }}>
+              <span style={{ fontSize: '12px', color: '#64748B', fontWeight: 500 }}>User Agent</span>
+              <p style={{ margin: 0, fontSize: '12px', color: '#475569', lineHeight: 1.5, backgroundColor: '#F8FAFC', padding: '10px 12px', borderRadius: '8px', border: '1px solid #E2E8F0', wordBreak: 'break-all' }}>
+                {download.userAgent || 'Not Available'}
+              </p>
             </div>
           </div>
         </div>
 
-        {/* MODAL FOOTER */}
+        {/* Sticky Footer */}
         <div
           style={{
-            padding: '20px 32px',
-            backgroundColor: '#FFFFFF',
-            borderTop: '1px solid #EEF2FF',
+            padding: '16px 24px',
+            borderTop: '1.5px dashed rgba(226, 232, 240, 1)',
             display: 'flex',
-            alignItems: 'center',
             justifyContent: 'flex-end',
-            boxSizing: 'border-box'
+            boxSizing: 'border-box',
+            backgroundColor: '#F8FAFC'
           }}
         >
           <button
+            type="button"
             onClick={onClose}
-            className="hover-scale active-press"
             style={{
-              padding: '10px 24px',
-              border: 'none',
-              borderRadius: '8px',
-              backgroundColor: '#F1F5F9', // Muted slate-100 bg
-              color: '#0F172A',
-              fontSize: '13px',
+              padding: '10px 20px',
+              border: '1px solid rgba(226, 232, 240, 1)',
+              borderRadius: '10px',
+              backgroundColor: '#FFFFFF',
+              color: '#475569',
+              fontSize: '13.5px',
               fontWeight: 600,
               cursor: 'pointer',
-              transition: 'all 0.15s ease'
+              transition: 'background-color 0.15s ease'
             }}
-            onMouseOver={(e) => {
-              e.currentTarget.style.backgroundColor = '#E2E8F0';
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.backgroundColor = '#F1F5F9';
-            }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F8FAFC'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#FFFFFF'}
           >
-            Close
+            Close Details
           </button>
         </div>
-      </div>
 
-      {/* Animation keyframes style tag */}
-      <style dangerouslySetInnerHTML={{__html: `
-        @keyframes modalFadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        @keyframes modalScaleUp {
-          from { transform: scale(0.95); opacity: 0; }
-          to { transform: scale(1); opacity: 1; }
-        }
-      `}} />
-    </div>
+        {/* Transition Keyframes */}
+        <style dangerouslySetInnerHTML={{__html: `
+          @keyframes drawerFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+          }
+          @keyframes drawerSlideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+          }
+        `}} />
+      </aside>
+    </>
   );
 };
 

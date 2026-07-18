@@ -6,6 +6,7 @@ import { MembersToolbar } from './components/MembersToolbar';
 import { MembersTable } from './components/MembersTable';
 import { InviteAdminModal } from './components/InviteAdminModal';
 import { MemberDetailsModal } from './components/MemberDetailsModal';
+import { Tabs } from '../../components/tabs/Tabs';
 
 export const AdminAccessPage: React.FC = () => {
   const {
@@ -107,6 +108,24 @@ export const AdminAccessPage: React.FC = () => {
           <span>Invite Admin</span>
         </button>
       </div>
+
+      {/* Sub-tab Navigation */}
+      <Tabs
+        options={[
+          { id: 'portfolio', label: 'Portfolio Settings' },
+          { id: 'social-links', label: 'Social Links' },
+          { id: 'admin-access', label: 'Admin Access' }
+        ]}
+        activeId="admin-access"
+        onChange={(id) => {
+          const path = id === 'portfolio' ? '/admin/settings/portfolio' : `/admin/settings/${id}`;
+          const hasBase = window.location.pathname.startsWith('/ashok-portfolio');
+          const targetPath = hasBase ? `/ashok-portfolio${path}` : path;
+          window.history.pushState(null, '', targetPath);
+          window.dispatchEvent(new PopStateEvent('popstate'));
+        }}
+        style={{ marginBottom: 'var(--admin-space-2)', width: '100%' }}
+      />
 
       {/* 2. Summary cards panel */}
       <SummaryCards summary={summary} />

@@ -1,4 +1,4 @@
-﻿export type Json =
+export type Json =
   | string
   | number
   | boolean
@@ -105,6 +105,66 @@ export type Database = {
           subject?: string
           submitted_from?: string
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      certifications: {
+        Row: {
+          certificate_file_url: string | null
+          certificate_image_url: string | null
+          created_at: string
+          credential_id: string | null
+          credential_url: string | null
+          description: string | null
+          display_order: number
+          expiry_date: string | null
+          id: string
+          is_featured: boolean
+          issue_date: string
+          issuer: string
+          category: string
+          skills: string[] | null
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          certificate_file_url?: string | null
+          certificate_image_url?: string | null
+          created_at?: string
+          credential_id?: string | null
+          credential_url?: string | null
+          description?: string | null
+          display_order?: number
+          expiry_date?: string | null
+          id?: string
+          is_featured?: boolean
+          issue_date: string
+          issuer: string
+          category: string
+          skills?: string[] | null
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          certificate_file_url?: string | null
+          certificate_image_url?: string | null
+          created_at?: string
+          credential_id?: string | null
+          credential_url?: string | null
+          description?: string | null
+          display_order?: number
+          expiry_date?: string | null
+          id?: string
+          is_featured?: boolean
+          issue_date?: string
+          issuer?: string
+          category?: string
+          skills?: string[] | null
+          status?: string
+          title?: string
+          updated_at?: string
         }
         Relationships: []
       }

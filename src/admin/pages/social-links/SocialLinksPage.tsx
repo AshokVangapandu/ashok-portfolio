@@ -5,6 +5,7 @@ import { SocialLinksList } from './components/SocialLinksList';
 import { AddNewLinkButton } from './components/AddNewLinkButton';
 import { StickyFooter } from './components/StickyFooter';
 import { LoadingSkeleton } from './components/LoadingSkeleton';
+import { Tabs } from '../../components/tabs/Tabs';
 
 export const SocialLinksPage: React.FC = () => {
   const {
@@ -71,6 +72,24 @@ export const SocialLinksPage: React.FC = () => {
 
         <AddNewLinkButton onClick={handleAddNew} />
       </div>
+
+      {/* Sub-tab Navigation */}
+      <Tabs
+        options={[
+          { id: 'portfolio', label: 'Portfolio Settings' },
+          { id: 'social-links', label: 'Social Links' },
+          { id: 'admin-access', label: 'Admin Access' }
+        ]}
+        activeId="social-links"
+        onChange={(id) => {
+          const path = id === 'portfolio' ? '/admin/settings/portfolio' : `/admin/settings/${id}`;
+          const hasBase = window.location.pathname.startsWith('/ashok-portfolio');
+          const targetPath = hasBase ? `/ashok-portfolio${path}` : path;
+          window.history.pushState(null, '', targetPath);
+          window.dispatchEvent(new PopStateEvent('popstate'));
+        }}
+        style={{ marginBottom: 'var(--admin-space-2)', width: '100%' }}
+      />
 
       {/* 2. Platform List Body */}
       {loading ? (

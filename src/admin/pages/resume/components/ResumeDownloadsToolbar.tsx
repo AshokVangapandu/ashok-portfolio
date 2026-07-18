@@ -4,13 +4,19 @@ import React from 'react';
 interface ResumeDownloadsToolbarProps {
   search: string;
   setSearch: (val: string) => void;
+  dateRange: string;
+  setDateRange: (val: string) => void;
   onRefresh?: () => void;
+  onExportCSV?: () => void;
 }
 
 export const ResumeDownloadsToolbar: React.FC<ResumeDownloadsToolbarProps> = ({
   search,
   setSearch,
+  dateRange,
+  setDateRange,
   onRefresh,
+  onExportCSV,
 }) => {
   return (
     <div
@@ -87,7 +93,8 @@ export const ResumeDownloadsToolbar: React.FC<ResumeDownloadsToolbarProps> = ({
 
         {/* 2. Date Range Filter */}
         <select
-          defaultValue="all"
+          value={dateRange}
+          onChange={(e) => setDateRange(e.target.value)}
           style={{
             padding: '8px 12px',
             border: '1px solid var(--admin-border)',
@@ -111,6 +118,7 @@ export const ResumeDownloadsToolbar: React.FC<ResumeDownloadsToolbarProps> = ({
       {/* Right side controls: Export CSV + Refresh */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
         <button
+          onClick={onExportCSV}
           className="hover-scale active-press"
           style={{
             display: 'inline-flex',
