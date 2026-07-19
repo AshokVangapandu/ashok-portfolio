@@ -1,16 +1,27 @@
 /* src/admin/pages/social-links/components/AddNewLinkButton.tsx */
 import React from 'react';
-import { PrimaryButton } from './PrimaryButton';
 
 interface AddNewLinkButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {}
 
 export const AddNewLinkButton: React.FC<AddNewLinkButtonProps> = ({ style, ...props }) => {
   return (
-    <PrimaryButton
+    <button
+      className="hover-scale active-press animate-glow"
       style={{
         display: 'inline-flex',
         alignItems: 'center',
         gap: '8px',
+        padding: '10px 20px',
+        border: 'none',
+        borderRadius: '8px',
+        backgroundColor: 'var(--admin-primary)',
+        color: '#FFFFFF',
+        fontSize: '13.5px',
+        fontWeight: 600,
+        cursor: 'pointer',
+        boxShadow: '0 4px 12px rgba(124, 92, 255, 0.2)',
+        transition: 'all 0.15s ease',
+        outline: 'none',
         ...style
       }}
       {...props}
@@ -20,7 +31,7 @@ export const AddNewLinkButton: React.FC<AddNewLinkButtonProps> = ({ style, ...pr
         <line x1="5" y1="12" x2="19" y2="12" />
       </svg>
       <span>Add New Link</span>
-    </PrimaryButton>
+    </button>
   );
 };
 

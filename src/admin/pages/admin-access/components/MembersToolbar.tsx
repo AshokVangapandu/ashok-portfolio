@@ -28,93 +28,123 @@ export const MembersToolbar: React.FC<MembersToolbarProps> = ({
         flexWrap: 'wrap',
         alignItems: 'center',
         justifyContent: 'space-between',
-        gap: 'var(--admin-space-4)',
-        padding: '16px 20px',
+        gap: '16px',
+        padding: '20px 24px',
         backgroundColor: '#FFFFFF',
-        borderRadius: 'var(--admin-radius-md) var(--admin-radius-md) 0 0',
+        borderRadius: '12px 12px 0 0',
         border: '1px solid var(--admin-border)',
         borderBottom: 'none',
         boxSizing: 'border-box',
         fontFamily: "'Inter', sans-serif"
       }}
     >
+      {/* Search Input & Select Dropdowns */}
       <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '12px', flex: 1 }}>
         {/* Search Input */}
-        <div style={{ position: 'relative', width: '100%', maxWidth: '240px', boxSizing: 'border-box' }}>
-          <span style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--admin-text-secondary)', display: 'flex', alignItems: 'center' }}>
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <div style={{ position: 'relative', width: '100%', maxWidth: '260px', boxSizing: 'border-box' }}>
+          <span style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94A3B8', display: 'flex', alignItems: 'center' }}>
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2.5">
               <circle cx="11" cy="11" r="8" />
               <line x1="21" y1="21" x2="16.65" y2="16.65" />
             </svg>
           </span>
           <input
             type="text"
-            placeholder="Search members..."
+            placeholder="Search members by name..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             style={{
               width: '100%',
-              padding: '8px 12px 8px 36px',
-              border: '1px solid var(--admin-border)',
+              height: '38px',
+              padding: '0 12px 0 36px',
+              border: '1.5px solid rgba(226, 232, 240, 1)',
               borderRadius: '8px',
               fontSize: '13.5px',
               color: 'var(--admin-text)',
-              backgroundColor: '#FFFFFF',
+              backgroundColor: '#F8FAFC',
               boxSizing: 'border-box',
               outline: 'none',
-              transition: 'border-color 0.15s ease'
+              transition: 'all 0.15s ease'
             }}
-            onFocus={(e) => e.currentTarget.style.borderColor = 'var(--admin-primary)'}
-            onBlur={(e) => e.currentTarget.style.borderColor = 'var(--admin-border)'}
+            onFocus={(e) => {
+              e.currentTarget.style.borderColor = 'var(--admin-primary)';
+              e.currentTarget.style.backgroundColor = '#FFFFFF';
+              e.currentTarget.style.boxShadow = '0 0 0 3px rgba(124, 58, 237, 0.1)';
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.borderColor = 'rgba(226, 232, 240, 1)';
+              e.currentTarget.style.backgroundColor = '#F8FAFC';
+              e.currentTarget.style.boxShadow = 'none';
+            }}
           />
         </div>
 
-        {/* Role Select */}
-        <select
-          value={roleFilter}
-          onChange={(e) => setRoleFilter(e.target.value as AdminRole | 'All')}
-          style={{
-            padding: '8px 12px',
-            border: '1px solid var(--admin-border)',
-            borderRadius: '8px',
-            fontSize: '13.5px',
-            color: 'var(--admin-text-secondary)',
-            backgroundColor: '#FFFFFF',
-            cursor: 'pointer',
-            outline: 'none',
-            minWidth: '110px'
-          }}
-        >
-          <option value="All">Role</option>
-          <option value="Super Admin">Super Admin</option>
-          <option value="Admin">Admin</option>
-          <option value="Portfolio Viewer">Portfolio Viewer</option>
-        </select>
+        {/* Role Filter dropdown */}
+        <div style={{ position: 'relative' }}>
+          <select
+            value={roleFilter}
+            onChange={(e) => setRoleFilter(e.target.value as AdminRole | 'All')}
+            style={{
+              height: '38px',
+              padding: '0 32px 0 12px',
+              border: '1.5px solid rgba(226, 232, 240, 1)',
+              borderRadius: '8px',
+              fontSize: '13px',
+              fontWeight: 600,
+              color: '#475569',
+              backgroundColor: '#FFFFFF',
+              cursor: 'pointer',
+              outline: 'none',
+              minWidth: '120px',
+              appearance: 'none'
+            }}
+          >
+            <option value="All">All Roles</option>
+            <option value="Super Admin">Super Admin</option>
+            <option value="Admin">Admin</option>
+            <option value="Portfolio Viewer">Portfolio Viewer</option>
+          </select>
+          <span style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', color: '#94A3B8', pointerEvents: 'none', display: 'flex', alignItems: 'center' }}>
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="3">
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </span>
+        </div>
 
-        {/* Status Select */}
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value as AdminStatus | 'All')}
-          style={{
-            padding: '8px 12px',
-            border: '1px solid var(--admin-border)',
-            borderRadius: '8px',
-            fontSize: '13.5px',
-            color: 'var(--admin-text-secondary)',
-            backgroundColor: '#FFFFFF',
-            cursor: 'pointer',
-            outline: 'none',
-            minWidth: '110px'
-          }}
-        >
-          <option value="All">Status</option>
-          <option value="Active">Active</option>
-          <option value="Pending">Pending</option>
-          <option value="Inactive">Inactive</option>
-        </select>
+        {/* Status Filter dropdown */}
+        <div style={{ position: 'relative' }}>
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value as AdminStatus | 'All')}
+            style={{
+              height: '38px',
+              padding: '0 32px 0 12px',
+              border: '1.5px solid rgba(226, 232, 240, 1)',
+              borderRadius: '8px',
+              fontSize: '13px',
+              fontWeight: 600,
+              color: '#475569',
+              backgroundColor: '#FFFFFF',
+              cursor: 'pointer',
+              outline: 'none',
+              minWidth: '120px',
+              appearance: 'none'
+            }}
+          >
+            <option value="All">All Statuses</option>
+            <option value="Active">Active</option>
+            <option value="Pending">Pending</option>
+            <option value="Inactive">Inactive</option>
+          </select>
+          <span style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', color: '#94A3B8', pointerEvents: 'none', display: 'flex', alignItems: 'center' }}>
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="3">
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </span>
+        </div>
       </div>
 
-      {/* Refresh control */}
+      {/* Refresh Button */}
       <button
         onClick={onRefresh}
         className="hover-scale active-press"
@@ -122,13 +152,22 @@ export const MembersToolbar: React.FC<MembersToolbarProps> = ({
           display: 'inline-flex',
           alignItems: 'center',
           justifyContent: 'center',
-          padding: '8px',
-          border: '1px solid var(--admin-border)',
+          width: '38px',
+          height: '38px',
+          border: '1.5px solid rgba(226, 232, 240, 1)',
           borderRadius: '8px',
           backgroundColor: '#FFFFFF',
-          color: 'var(--admin-text-secondary)',
+          color: '#475569',
           cursor: 'pointer',
           transition: 'all 0.15s ease'
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.color = 'var(--admin-primary)';
+          e.currentTarget.style.borderColor = 'rgba(124, 92, 255, 0.2)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.color = '#475569';
+          e.currentTarget.style.borderColor = 'rgba(226, 232, 240, 1)';
         }}
       >
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">

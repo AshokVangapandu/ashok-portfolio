@@ -22,6 +22,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onToggleSidebar,
 }) => {
   const { logout } = useAuth();
+  const [settingsExpanded, setSettingsExpanded] = React.useState(() => {
+    if (typeof window !== 'undefined') {
+      const path = window.location.pathname.toLowerCase();
+      return path.includes('/settings') || path.includes('/social-links') || path.includes('/access');
+    }
+    return false;
+  });
 
   // Normalize current path for comparisons (strip /ashok-portfolio and trailing slash)
   let cleanPath = currentPath.toLowerCase().replace(/\/$/, '');
@@ -135,10 +142,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
           position: 'fixed',
           top: 0,
           left: 0,
-          zIndex: 200,
+          zIndex: 1010,
           fontFamily: "'Inter', sans-serif",
           boxSizing: 'border-box',
-          overflow: 'hidden',
+          overflow: 'visible',
           transition: 'width 280ms cubic-bezier(0.4, 0, 0.2, 1), transform 280ms cubic-bezier(0.4, 0, 0.2, 1)',
         }}
       >
@@ -218,16 +225,33 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <ul className="premium-menu-list">
           {menuItems.map((item) => {
             const isDashboard = item.path === '/admin/';
+            const isSettings = item.label === 'Settings';
             const isActive = isDashboard 
               ? (cleanPath === '/admin' || cleanPath === '/admin/')
-              : (item.path === '/admin/settings' 
+              : (isSettings
                 ? (cleanPath.startsWith('/admin/settings') || cleanPath === '/admin/social-links' || cleanPath === '/admin/access')
                 : cleanPath === item.path.replace(/\/$/, '').toLowerCase());
 
+            const subItems = [
+              { label: 'Portfolio Settings', path: '/admin/settings/portfolio' },
+              { label: 'Social Links', path: '/admin/settings/social-links' },
+              { label: 'Admin Access', path: '/admin/settings/admin-access' }
+            ];
+
             return (
-              <li key={item.label} style={{ width: '100%' }}>
+              <li 
+                key={item.label} 
+                style={{ width: '100%', position: 'relative' }}
+                className="menu-item-wrapper"
+              >
                 <button
-                  onClick={() => onNavigate(item.path)}
+                  onClick={() => {
+                    if (isSettings) {
+                      setSettingsExpanded(!settingsExpanded);
+                    } else {
+                      onNavigate(item.path);
+                    }
+                  }}
                   className={`premium-menu-btn ${collapsed ? 'collapsed' : 'expanded'} ${isActive ? 'active' : ''}`}
                   title={collapsed ? item.label : undefined}
                 >
@@ -238,7 +262,156 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <span className="menu-label">
                     {item.label}
                   </span>
+
+                  {isSettings && (
+                    <svg
+                      viewBox="0 0 24 24"
+                      width="12"
+                      height="12"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="3"
+                      style={{
+                        marginLeft: 'auto',
+                        transform: settingsExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
+                        transition: 'transform 200ms ease',
+                        display: collapsed ? 'none' : 'block',
+                        color: isActive ? '#FFFFFF' : '#8E8EA8'
+                      }}
+                    >
+                      <polyline points="9 18 15 12 9 6" />
+                    </svg>
+                  )}
                 </button>
+
+                {isSettings && (
+                  <>
+                    {/* Expanded Sidebar Submenu */}
+                    <div
+                      className="settings-submenu-container"
+                      style={{
+                        maxHeight: (!collapsed && settingsExpanded) ? '150px' : '0px',
+                        overflow: 'hidden',
+                        transition: 'max-height 250ms cubic-bezier(0.4, 0, 0.2, 1)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '4px',
+                        paddingLeft: collapsed ? '0' : '28px',
+                        marginTop: (!collapsed && settingsExpanded) ? '4px' : '0px'
+                      }}
+                    >
+                      {subItems.map((sub) => {
+                        const isSubActive = sub.label === 'Portfolio Settings'
+                          ? (cleanPath === '/admin/settings/portfolio' || cleanPath === '/admin/settings')
+                          : cleanPath === sub.path;
+                        return (
+                          <button
+                            key={sub.label}
+                            onClick={() => onNavigate(sub.path)}
+                            className={`submenu-item ${isSubActive ? 'active' : ''}`}
+                            style={{
+                              height: '36px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              border: 'none',
+                              background: 'transparent',
+                              borderRadius: '8px',
+                              color: isSubActive ? '#FFFFFF' : '#8E8EA8',
+                              cursor: 'pointer',
+                              padding: '0 16px',
+                              fontSize: '12.5px',
+                              fontWeight: isSubActive ? 600 : 500,
+                              textAlign: 'left',
+                              position: 'relative',
+                              transition: 'all 200ms ease',
+                              textDecoration: 'none',
+                              outline: 'none',
+                              width: '100%'
+                            }}
+                          >
+                            {isSubActive && (
+                              <span
+                                style={{
+                                  width: '4px',
+                                  height: '4px',
+                                  borderRadius: '50%',
+                                  backgroundColor: '#6366F1',
+                                  position: 'absolute',
+                                  left: '6px',
+                                  top: '50%',
+                                  transform: 'translateY(-50%)'
+                                }}
+                              />
+                            )}
+                            <span style={{ marginLeft: isSubActive ? '4px' : '0' }}>{sub.label}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {/* Collapsed Sidebar Floating Submenu */}
+                    {collapsed && (
+                      <div className="floating-submenu">
+                        <div
+                          style={{
+                            padding: '6px 12px',
+                            borderBottom: '1px solid #F1F5F9',
+                            fontSize: '11px',
+                            fontWeight: 700,
+                            color: '#94A3B8',
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.05em',
+                            marginBottom: '4px'
+                          }}
+                        >
+                          Settings
+                        </div>
+                        {subItems.map((sub) => {
+                          const isSubActive = sub.label === 'Portfolio Settings'
+                            ? (cleanPath === '/admin/settings/portfolio' || cleanPath === '/admin/settings')
+                            : cleanPath === sub.path;
+                          return (
+                            <button
+                              key={sub.label}
+                              onClick={() => onNavigate(sub.path)}
+                              style={{
+                                height: '32px',
+                                border: 'none',
+                                background: isSubActive ? 'rgba(124, 58, 237, 0.08)' : 'transparent',
+                                borderRadius: '6px',
+                                color: isSubActive ? 'var(--admin-primary)' : '#475569',
+                                cursor: 'pointer',
+                                padding: '0 12px',
+                                fontSize: '12px',
+                                fontWeight: isSubActive ? 600 : 500,
+                                textAlign: 'left',
+                                transition: 'all 150ms ease',
+                                width: '100%',
+                                display: 'flex',
+                                alignItems: 'center',
+                                outline: 'none'
+                              }}
+                              onMouseEnter={(e) => {
+                                if (!isSubActive) {
+                                  e.currentTarget.style.color = 'var(--admin-primary)';
+                                  e.currentTarget.style.backgroundColor = 'rgba(124, 58, 237, 0.04)';
+                                }
+                              }}
+                              onMouseLeave={(e) => {
+                                if (!isSubActive) {
+                                  e.currentTarget.style.color = '#475569';
+                                  e.currentTarget.style.backgroundColor = 'transparent';
+                                }
+                              }}
+                            >
+                              {sub.label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </>
+                )}
               </li>
             );
           })}
@@ -374,8 +547,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           flex-direction: column;
           gap: 6px;
           flex: 1;
-          overflow-y: auto;
-          overflow-x: hidden;
+          overflow: visible;
           transition: padding 280ms cubic-bezier(0.4, 0, 0.2, 1);
         }
 
@@ -617,6 +789,49 @@ export const Sidebar: React.FC<SidebarProps> = ({
         .premium-sidebar .signout-btn:hover {
           background-color: rgba(239, 68, 68, 0.06) !important;
           color: #EF4444 !important;
+        }
+
+        .premium-sidebar .submenu-item:hover {
+          background-color: rgba(255, 255, 255, 0.03);
+          color: #FFFFFF;
+        }
+
+        .premium-sidebar .floating-submenu {
+          position: absolute;
+          left: 100%;
+          top: 0;
+          background-color: #FFFFFF;
+          border: 1px solid #E2E8F0;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+          border-radius: 12px;
+          padding: 8px;
+          width: 170px;
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+          z-index: 1000;
+          margin-left: 8px;
+          opacity: 0;
+          pointer-events: none;
+          transform: translateX(-10px);
+          transition: opacity 220ms ease, transform 220ms ease;
+          box-sizing: border-box;
+        }
+
+        .premium-sidebar .floating-submenu::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          left: -12px;
+          width: 12px;
+          background: transparent;
+        }
+
+        .menu-item-wrapper:hover .floating-submenu {
+          opacity: 1;
+          pointer-events: auto;
+          transform: translateX(0);
         }
       `}} />
     </>

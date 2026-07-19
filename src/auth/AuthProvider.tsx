@@ -118,6 +118,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         if (active) {
           setIsAdmin(isUserAdmin);
         }
+
+        if (isUserAdmin && (event === 'SIGNED_IN' || event === 'INITIAL_SESSION')) {
+          const name = currentUser.user_metadata?.full_name || currentUser.user_metadata?.name || 'Google User';
+          const avatar = currentUser.user_metadata?.avatar_url || currentUser.user_metadata?.picture || null;
+          
+          try {
+            await (supabase as any)
+              .from('admins')
+              .update({
+                last_login: new Date().toISOString(),
+                status: 'Active',
+                full_name: name,
+                avatar_url: avatar
+              })
+              .eq('email', currentUser.email);
+            sessionStorage.removeItem(`is_admin_${currentUser.email}`);
+          } catch (updateErr) {
+            console.error('[AuthProvider] Failed to update admin metadata:', updateErr);
+          }
+        }
       } else {
         if (active) {
           setIsAdmin(false);

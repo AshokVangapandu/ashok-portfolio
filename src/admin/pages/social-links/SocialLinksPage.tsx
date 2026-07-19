@@ -1,39 +1,61 @@
 /* src/admin/pages/social-links/SocialLinksPage.tsx */
-import React from 'react';
+import React, { useState } from 'react';
 import { useSocialLinks } from '../../hooks/useSocialLinks';
 import { SocialLinksList } from './components/SocialLinksList';
 import { AddNewLinkButton } from './components/AddNewLinkButton';
 import { StickyFooter } from './components/StickyFooter';
 import { LoadingSkeleton } from './components/LoadingSkeleton';
-import { Tabs } from '../../components/tabs/Tabs';
+import { AddSocialLinkModal } from './components/AddSocialLinkModal';
+import { EditSocialLinkModal } from './components/EditSocialLinkModal';
+import { AlertMessage } from '../settings/components/AlertMessage';
+import { SocialLink } from '../../types/socialLinks';
 
 export const SocialLinksPage: React.FC = () => {
   const {
     loading,
     links,
     updateLinkUrl,
+    addLink,
+    editLink,
+    deleteLink,
     isDirty,
     handleSave,
-    handleDiscard
+    handleDiscard,
+    error,
+    setError,
+    success,
+    setSuccess
   } = useSocialLinks();
 
+  const [addModalOpen, setAddModalOpen] = useState<boolean>(false);
+  const [editingLink, setEditingLink] = useState<SocialLink | null>(null);
+
   const handleAddNew = () => {
-    // Stub click handler for future functionality (Add Link dialog placeholder)
-    console.log('[SocialLinksPage] Add New Link clicked');
+    setAddModalOpen(true);
   };
 
   const handleEdit = (id: string) => {
-    // Stub click handler for future functionality (Edit link dialog placeholder)
-    console.log('[SocialLinksPage] Edit Link clicked for:', id);
+    const link = links.find((l) => l.id === id);
+    if (link) {
+      setEditingLink(link);
+    }
   };
 
-  const handleDelete = (id: string) => {
-    // Stub click handler for future functionality (Delete link confirmation placeholder)
-    console.log('[SocialLinksPage] Delete Link clicked for:', id);
+  const handleDelete = async (id: string) => {
+    await deleteLink(id);
   };
 
   return (
-    <div className="social-links-container">
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 'var(--admin-space-6)',
+        width: '100%',
+        boxSizing: 'border-box',
+        fontFamily: "'Inter', sans-serif"
+      }}
+    >
       {/* 1. Page Header */}
       <div
         style={{
@@ -73,23 +95,25 @@ export const SocialLinksPage: React.FC = () => {
         <AddNewLinkButton onClick={handleAddNew} />
       </div>
 
-      {/* Sub-tab Navigation */}
-      <Tabs
-        options={[
-          { id: 'portfolio', label: 'Portfolio Settings' },
-          { id: 'social-links', label: 'Social Links' },
-          { id: 'admin-access', label: 'Admin Access' }
-        ]}
-        activeId="social-links"
-        onChange={(id) => {
-          const path = id === 'portfolio' ? '/admin/settings/portfolio' : `/admin/settings/${id}`;
-          const hasBase = window.location.pathname.startsWith('/ashok-portfolio');
-          const targetPath = hasBase ? `/ashok-portfolio${path}` : path;
-          window.history.pushState(null, '', targetPath);
-          window.dispatchEvent(new PopStateEvent('popstate'));
-        }}
-        style={{ marginBottom: 'var(--admin-space-2)', width: '100%' }}
-      />
+      {/* Success Alert Banner */}
+      {success && (
+        <AlertMessage
+          type="success"
+          title="Links Updated"
+          message="Your portfolio social links have been updated successfully."
+          onClose={() => setSuccess(false)}
+        />
+      )}
+
+      {/* Error Alert Banner */}
+      {error && (
+        <AlertMessage
+          type="error"
+          title="Operation Failed"
+          message={error}
+          onClose={() => setError(null)}
+        />
+      )}
 
       {/* 2. Platform List Body */}
       {loading ? (
@@ -109,6 +133,20 @@ export const SocialLinksPage: React.FC = () => {
         isDirty={isDirty}
         onSave={handleSave}
         onDiscard={handleDiscard}
+      />
+
+      {/* MODALS OVERLAYS */}
+      <AddSocialLinkModal
+        isOpen={addModalOpen}
+        onClose={() => setAddModalOpen(false)}
+        onAdd={addLink}
+      />
+
+      <EditSocialLinkModal
+        isOpen={!!editingLink}
+        onClose={() => setEditingLink(null)}
+        link={editingLink}
+        onEdit={editLink}
       />
     </div>
   );

@@ -34,17 +34,20 @@ export const MemberRow: React.FC<MemberRowProps> = ({ user, onViewDetails }) => 
   // Status dot badges
   const renderStatusBadge = () => {
     let dotColor = '#10B981'; // Active green
-    let bgColor = 'rgba(16, 185, 129, 0.06)';
+    let bgColor = '#ECFDF5';
     let textColor = '#10B981';
+    let borderColor = 'rgba(16, 185, 129, 0.15)';
 
     if (user.status === 'Pending') {
-      dotColor = '#F59E0B'; // Pending amber
-      bgColor = 'rgba(245, 158, 11, 0.06)';
-      textColor = '#F59E0B';
+      dotColor = '#D97706'; // Pending amber
+      bgColor = '#FFFBEB';
+      textColor = '#D97706';
+      borderColor = 'rgba(217, 119, 6, 0.15)';
     } else if (user.status === 'Inactive') {
       dotColor = '#EF4444'; // Inactive red
-      bgColor = 'rgba(239, 68, 68, 0.06)';
+      bgColor = '#FEF2F2';
       textColor = '#EF4444';
+      borderColor = 'rgba(239, 68, 68, 0.15)';
     }
 
     return (
@@ -54,15 +57,16 @@ export const MemberRow: React.FC<MemberRowProps> = ({ user, onViewDetails }) => 
           alignItems: 'center',
           gap: '6px',
           padding: '4px 10px',
-          borderRadius: '12px',
+          borderRadius: '20px',
           backgroundColor: bgColor,
           color: textColor,
-          fontSize: '11.5px',
-          fontWeight: 600,
+          border: `1px solid ${borderColor}`,
+          fontSize: '11px',
+          fontWeight: 700,
           whiteSpace: 'nowrap'
         }}
       >
-        <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: dotColor }} />
+        <span style={{ width: '5px', height: '5px', borderRadius: '50%', backgroundColor: dotColor }} />
         {user.status}
       </span>
     );
@@ -71,8 +75,9 @@ export const MemberRow: React.FC<MemberRowProps> = ({ user, onViewDetails }) => 
   // Role badges matching design styling
   const renderRoleBadge = () => {
     let icon = null;
-    let bgColor = 'rgba(124, 58, 237, 0.08)'; // Purple for Super Admin
-    let textColor = 'var(--admin-primary)';
+    let bgColor = 'rgba(99, 102, 241, 0.06)'; // Indigo for Super Admin
+    let textColor = '#6366F1';
+    let borderColor = 'rgba(99, 102, 241, 0.15)';
 
     if (user.role === 'Super Admin') {
       icon = (
@@ -80,12 +85,24 @@ export const MemberRow: React.FC<MemberRowProps> = ({ user, onViewDetails }) => 
           <path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7z" />
         </svg>
       );
-    } else {
-      bgColor = 'rgba(59, 130, 246, 0.08)'; // Blue for viewers
+    } else if (user.role === 'Portfolio Viewer') {
+      bgColor = 'rgba(59, 130, 246, 0.06)'; // Blue for viewers
       textColor = '#2563EB';
+      borderColor = 'rgba(59, 130, 246, 0.15)';
       icon = (
         <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '4px' }}>
           <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+          <circle cx="12" cy="12" r="3" />
+        </svg>
+      );
+    } else {
+      bgColor = 'rgba(75, 85, 99, 0.06)'; // Gray for other roles
+      textColor = '#4B5563';
+      borderColor = 'rgba(75, 85, 99, 0.15)';
+      icon = (
+        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '4px' }}>
+          <circle cx="12" cy="12" r="10" />
+          <path d="M12 8v4l3 3" />
         </svg>
       );
     }
@@ -96,11 +113,12 @@ export const MemberRow: React.FC<MemberRowProps> = ({ user, onViewDetails }) => 
           display: 'inline-flex',
           alignItems: 'center',
           padding: '4px 10px',
-          borderRadius: '12px',
+          borderRadius: '20px',
           backgroundColor: bgColor,
           color: textColor,
-          fontSize: '11.5px',
-          fontWeight: 600,
+          border: `1px solid ${borderColor}`,
+          fontSize: '11px',
+          fontWeight: 700,
           whiteSpace: 'nowrap'
         }}
       >
@@ -117,11 +135,12 @@ export const MemberRow: React.FC<MemberRowProps> = ({ user, onViewDetails }) => 
         <span
           style={{
             fontSize: '11px',
-            fontWeight: 600,
+            fontWeight: 700,
             color: 'var(--admin-primary)',
-            backgroundColor: 'rgba(124, 58, 237, 0.08)',
+            backgroundColor: 'rgba(124, 58, 237, 0.06)',
+            border: '1px solid rgba(124, 58, 237, 0.15)',
             padding: '4px 10px',
-            borderRadius: '12px',
+            borderRadius: '6px',
             whiteSpace: 'nowrap'
           }}
         >
@@ -130,13 +149,6 @@ export const MemberRow: React.FC<MemberRowProps> = ({ user, onViewDetails }) => 
       );
     }
 
-    const maxVisible = 2; // Sarah has Dashboard, Inquiries, Testimonials +2. In the design, visible chips are 3, others are +2.
-    // Let's filter Sarah's permissions list. We map the first two or three.
-    // Dashboard, Inquiries, Testimonials +2
-    const visiblePerms = user.permissions.slice(0, 2);
-    // Hardcode matching layout references: if Sarah Johnson, visible chips are Dashboard, Inquiries, Testimonials and remaining is +2 (total permissions is 5)
-    // Wait, let's look closely at Sarah's row: "Dashboard", "Inquiries", "Testimonials" +2.
-    // So 3 items are visible: Dashboard, Inquiries, Testimonials.
     const visCount = user.permissions.includes('Testimonials') ? 3 : 2;
     const items = user.permissions.slice(0, visCount);
     const remaining = user.permissions.length - visCount;
@@ -144,24 +156,21 @@ export const MemberRow: React.FC<MemberRowProps> = ({ user, onViewDetails }) => 
     return (
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', alignItems: 'center' }}>
         {items.map((p) => {
-          // In the design, Sarah has Dashboard, Inquiries, Testimonials
-          // Marcus has Dashboard, Analytics
-          let chipLabel = p;
-          if (p === 'Inquiries') chipLabel = 'Inquiries'; // map inquiries
           return (
             <span
               key={p}
               style={{
                 fontSize: '11px',
-                fontWeight: 500,
-                color: 'var(--admin-text-secondary)',
+                fontWeight: 600,
+                color: '#475569',
                 backgroundColor: '#F1F5F9',
+                border: '1px solid #E2E8F0',
                 padding: '4px 8px',
                 borderRadius: '6px',
                 whiteSpace: 'nowrap'
               }}
             >
-              {chipLabel}
+              {p}
             </span>
           );
         })}
@@ -169,9 +178,10 @@ export const MemberRow: React.FC<MemberRowProps> = ({ user, onViewDetails }) => 
           <span
             style={{
               fontSize: '11px',
-              fontWeight: 600,
+              fontWeight: 700,
               color: 'var(--admin-primary)',
-              backgroundColor: 'rgba(124, 58, 237, 0.05)',
+              backgroundColor: 'rgba(124, 58, 237, 0.06)',
+              border: '1px solid rgba(124, 58, 237, 0.12)',
               padding: '4px 8px',
               borderRadius: '6px',
               whiteSpace: 'nowrap'
@@ -186,12 +196,12 @@ export const MemberRow: React.FC<MemberRowProps> = ({ user, onViewDetails }) => 
 
   return (
     <tr
-      style={{ borderBottom: '1px solid var(--admin-border)', transition: 'background-color 0.15s ease' }}
-      onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'rgba(248, 250, 252, 0.6)'}
+      style={{ borderBottom: '1px solid var(--admin-border)', transition: 'background-color 150ms ease' }}
+      onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'rgba(248, 250, 252, 0.65)'}
       onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
     >
       {/* Member Profile */}
-      <td style={{ padding: '16px var(--admin-space-4)' }}>
+      <td style={{ padding: '16px 20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           {user.avatarUrl ? (
             <img
@@ -213,7 +223,7 @@ export const MemberRow: React.FC<MemberRowProps> = ({ user, onViewDetails }) => 
             <span style={{ fontWeight: 700, fontSize: '13.5px', color: 'var(--admin-text)', whiteSpace: 'nowrap' }}>
               {user.name}
               {user.isYou && (
-                <span style={{ fontSize: '11px', color: 'var(--admin-primary)', fontWeight: 500, marginLeft: '6px' }}>
+                <span style={{ fontSize: '10.5px', color: 'var(--admin-primary)', fontWeight: 700, marginLeft: '6px', textTransform: 'uppercase', letterSpacing: '0.02em' }}>
                   (You)
                 </span>
               )}
@@ -226,27 +236,27 @@ export const MemberRow: React.FC<MemberRowProps> = ({ user, onViewDetails }) => 
       </td>
 
       {/* Role */}
-      <td style={{ padding: '16px var(--admin-space-4)' }}>
+      <td style={{ padding: '16px 20px' }}>
         {renderRoleBadge()}
       </td>
 
       {/* Status */}
-      <td style={{ padding: '16px var(--admin-space-4)' }}>
+      <td style={{ padding: '16px 20px' }}>
         {renderStatusBadge()}
       </td>
 
       {/* Last Login */}
-      <td style={{ padding: '16px var(--admin-space-4)', fontSize: '13px', fontWeight: 500, color: 'var(--admin-text-secondary)', whiteSpace: 'nowrap' }}>
+      <td style={{ padding: '16px 20px', fontSize: '13px', fontWeight: 500, color: 'var(--admin-text-secondary)', whiteSpace: 'nowrap' }}>
         {user.lastLogin}
       </td>
 
       {/* Permissions */}
-      <td style={{ padding: '16px var(--admin-space-4)' }}>
+      <td style={{ padding: '16px 20px' }}>
         {renderPermissionChips()}
       </td>
 
       {/* Actions */}
-      <td style={{ padding: '16px var(--admin-space-4)' }}>
+      <td style={{ padding: '16px 20px' }}>
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
           <button
             onClick={() => onViewDetails(user)}
@@ -259,15 +269,24 @@ export const MemberRow: React.FC<MemberRowProps> = ({ user, onViewDetails }) => 
               border: '1px solid #E2E8F0',
               borderRadius: '20px',
               backgroundColor: '#FFFFFF',
-              color: '#0F172A',
+              color: '#475569',
               fontSize: '12px',
-              fontWeight: 600,
+              fontWeight: 650,
               cursor: 'pointer',
               transition: 'all 0.15s ease',
-              whiteSpace: 'nowrap'
+              whiteSpace: 'nowrap',
+              outline: 'none'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = 'var(--admin-primary)';
+              e.currentTarget.style.borderColor = 'rgba(124, 92, 255, 0.2)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = '#475569';
+              e.currentTarget.style.borderColor = '#E2E8F0';
             }}
           >
-            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5">
               <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
               <circle cx="12" cy="12" r="3" />
             </svg>
@@ -289,10 +308,19 @@ export const MemberRow: React.FC<MemberRowProps> = ({ user, onViewDetails }) => 
                 backgroundColor: '#FFFFFF',
                 color: 'var(--admin-text-secondary)',
                 cursor: 'pointer',
-                transition: 'all 0.15s ease'
+                transition: 'all 0.15s ease',
+                outline: 'none'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = 'var(--admin-primary)';
+                e.currentTarget.style.borderColor = 'rgba(124, 92, 255, 0.2)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = 'var(--admin-text-secondary)';
+                e.currentTarget.style.borderColor = '#E2E8F0';
               }}
             >
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <circle cx="12" cy="12" r="1" />
                 <circle cx="12" cy="5" r="1" />
                 <circle cx="12" cy="19" r="1" />

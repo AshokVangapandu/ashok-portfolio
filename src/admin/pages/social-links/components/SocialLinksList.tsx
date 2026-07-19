@@ -26,22 +26,17 @@ export const SocialLinksList: React.FC<SocialLinksListProps> = ({
   return (
     <div
       style={{
-        backgroundColor: '#FFFFFF',
-        border: '1px solid var(--admin-border)',
-        borderRadius: '16px',
-        boxShadow: 'var(--admin-shadow-sm)',
-        display: 'flex',
-        flexDirection: 'column',
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+        gap: '20px',
         width: '100%',
-        boxSizing: 'border-box',
-        overflow: 'hidden'
+        boxSizing: 'border-box'
       }}
     >
-      {links.map((link, idx) => (
+      {links.map((link) => (
         <SocialLinkRow
           key={link.id}
           link={link}
-          isLast={idx === links.length - 1}
           onUrlChange={(newUrl) => onUrlChange(link.id, newUrl)}
           onEdit={() => onEdit?.(link.id)}
           onDelete={() => onDelete?.(link.id)}
