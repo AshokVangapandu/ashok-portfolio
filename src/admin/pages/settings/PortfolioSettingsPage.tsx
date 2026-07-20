@@ -1,23 +1,49 @@
 /* src/admin/pages/settings/PortfolioSettingsPage.tsx */
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { usePortfolioSettings } from '../../hooks/usePortfolioSettings';
 import { AlertMessage } from './components/AlertMessage';
 import { StickyFooter } from './components/StickyFooter';
 import { Card } from '../../components/cards/Card';
+import { AuthorizedUsersPage } from '../authorized-users/AuthorizedUsersPage';
+import { AccessRequestsPage } from '../access-requests/AccessRequestsPage';
+import { MaintenanceSubscribersPage } from '../maintenance-subscribers/MaintenanceSubscribersPage';
+
+type SettingsTab = 'general' | 'authorized-users' | 'access-requests' | 'subscribers';
 
 export const PortfolioSettingsPage: React.FC = () => {
+  const [activeTab, setActiveTab] = useState<SettingsTab>(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const tab = params.get('tab');
+      if (tab === 'authorized-users' || tab === 'access-requests' || tab === 'subscribers' || tab === 'maintenance-subscribers') {
+        return tab === 'maintenance-subscribers' ? 'subscribers' : tab as SettingsTab;
+      }
+    }
+    return 'general';
+  });
+
   const {
     loading,
+    saving,
     visibility,
     setVisibility,
     isOpenForWork,
     setIsOpenForWork,
-    showAlert,
-    setShowAlert,
+    alert,
+    setAlert,
     isDirty,
     handleSave,
     handleDiscard
   } = usePortfolioSettings();
+
+  const handleTabChange = (tab: SettingsTab) => {
+    setActiveTab(tab);
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      url.searchParams.set('tab', tab);
+      window.history.replaceState({}, '', url.toString());
+    }
+  };
 
   const visibilityOptions = [
     {
@@ -55,11 +81,48 @@ export const PortfolioSettingsPage: React.FC = () => {
     }
   ];
 
-  const futurePlaceholders = [
-    { title: 'SEO Settings', desc: 'Configure title tags, meta tags, and social media card previews.' },
-    { title: 'Custom Domains', desc: 'Point your public portfolio page to your own custom domain URL.' },
-    { title: 'Visitor Preferences', desc: 'Let visitors choose between Dark, Light, or System theme styles.' },
-    { title: 'Portfolio Analytics', desc: 'Track traffic source locations, page views, and daily visitors.' }
+  const tabs: { key: SettingsTab; label: string; icon: React.ReactNode }[] = [
+    {
+      key: 'general',
+      label: 'General',
+      icon: (
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="3" />
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+        </svg>
+      )
+    },
+    {
+      key: 'authorized-users',
+      label: 'Authorized Users',
+      icon: (
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+          <circle cx="9" cy="7" r="4" />
+          <path d="M22 11l-3 3L17 12" />
+        </svg>
+      )
+    },
+    {
+      key: 'access-requests',
+      label: 'Access Requests',
+      icon: (
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+          <path d="M7 11V7a5 5 0 0 1 9.9-1" />
+        </svg>
+      )
+    },
+    {
+      key: 'subscribers',
+      label: 'Subscribers',
+      icon: (
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+          <polyline points="22,6 12,13 2,6" />
+        </svg>
+      )
+    }
   ];
 
   return (
@@ -95,308 +158,257 @@ export const PortfolioSettingsPage: React.FC = () => {
             lineHeight: 1.4
           }}
         >
-          Manage visibility controls, availability toggles, and global dashboard preferences.
+          Manage visibility controls, availability toggles, authorized users, and access requests.
         </p>
       </div>
 
-      {/* Success Notification Alert */}
-      {showAlert && (
+      {/* 2. Navigation Tabs */}
+      <div
+        style={{
+          display: 'flex',
+          gap: '6px',
+          borderBottom: '1px solid var(--admin-border)',
+          paddingBottom: '2px',
+          overflowX: 'auto',
+          boxSizing: 'border-box'
+        }}
+      >
+        {tabs.map((t) => {
+          const isSelected = activeTab === t.key;
+          return (
+            <button
+              key={t.key}
+              type="button"
+              onClick={() => handleTabChange(t.key)}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '10px 18px',
+                borderRadius: '8px 8px 0 0',
+                border: 'none',
+                borderBottom: isSelected ? '2px solid var(--admin-primary)' : '2px solid transparent',
+                backgroundColor: isSelected ? '#FFFFFF' : 'transparent',
+                color: isSelected ? 'var(--admin-primary)' : 'var(--admin-text-secondary)',
+                fontWeight: isSelected ? 700 : 500,
+                fontSize: '13.5px',
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+                transition: 'all 150ms ease'
+              }}
+            >
+              {t.icon}
+              {t.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Success / Error Notification Alert */}
+      {alert && activeTab === 'general' && (
         <AlertMessage
-          type="success"
-          title="Settings Saved"
-          message="Your global portfolio visibility settings have been updated successfully."
-          onClose={() => setShowAlert(false)}
+          type={alert.type}
+          title={alert.title}
+          message={alert.message}
+          onClose={() => setAlert(null)}
         />
       )}
 
-      {/* 2. Main content grids */}
-      {loading ? (
-        <div style={{ padding: '40px 0', textAlign: 'center', color: 'var(--admin-text-secondary)' }}>
-          Loading settings...
-        </div>
-      ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', boxSizing: 'border-box' }}>
-          
-          {/* Section 1: Portfolio Visibility Options */}
-          <Card>
+      {/* 3. Tab Contents */}
+      {activeTab === 'general' && (
+        <>
+          {loading ? (
+            <div style={{ padding: '40px 0', textAlign: 'center', color: 'var(--admin-text-secondary)' }}>
+              Loading settings...
+            </div>
+          ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', boxSizing: 'border-box' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <h3 style={{ margin: 0, fontSize: '15px', fontWeight: 700, color: 'var(--admin-text)' }}>
-                  Portfolio Visibility
-                </h3>
-                <span style={{ fontSize: '12.5px', color: 'var(--admin-text-secondary)', fontWeight: 500 }}>
-                  Select the visibility status of your live portfolio project website.
-                </span>
-              </div>
+              {/* Section 1: Portfolio Visibility Segmented Control */}
+              <Card style={{ padding: '24px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', boxSizing: 'border-box' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <h3 style={{ margin: 0, fontSize: '15px', fontWeight: 700, color: 'var(--admin-text)' }}>
+                      Portfolio Visibility Mode
+                    </h3>
+                    <span style={{ fontSize: '12.5px', color: 'var(--admin-text-secondary)', fontWeight: 500 }}>
+                      Control accessibility and route guard decisions across your public site.
+                    </span>
+                  </div>
 
-              {/* Grid of selectable option cards */}
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-                  gap: '16px',
-                  boxSizing: 'border-box',
-                  marginTop: '4px'
-                }}
-              >
-                {visibilityOptions.map((opt) => {
-                  const isSelected = visibility === opt.value;
-                  return (
-                    <div
-                      key={opt.value}
-                      onClick={() => setVisibility(opt.value)}
-                      className="hover-scale active-press"
-                      style={{
-                        backgroundColor: '#FFFFFF',
-                        border: isSelected ? '2px solid var(--admin-primary)' : '1px solid var(--admin-border)',
-                        borderRadius: '12px',
-                        padding: '20px',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: '16px',
-                        position: 'relative',
-                        boxSizing: 'border-box',
-                        boxShadow: isSelected ? '0 4px 20px rgba(124, 92, 255, 0.06)' : 'var(--admin-shadow-sm)',
-                        transition: 'all 200ms ease'
-                      }}
-                    >
-                      {/* Icon header & Active Indicator */}
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <div
+                  {/* Compact Segmented Control Strip */}
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+                      gap: '8px',
+                      backgroundColor: '#F8FAFC',
+                      padding: '6px',
+                      borderRadius: '12px',
+                      border: '1px solid var(--admin-border)',
+                      boxSizing: 'border-box'
+                    }}
+                  >
+                    {visibilityOptions.map((opt) => {
+                      const isSelected = visibility === opt.value;
+                      return (
+                        <button
+                          key={opt.value}
+                          type="button"
+                          onClick={() => setVisibility(opt.value)}
+                          className="hover-scale active-press"
                           style={{
-                            width: '40px',
-                            height: '40px',
-                            borderRadius: '10px',
-                            backgroundColor: isSelected ? 'rgba(124, 92, 255, 0.08)' : '#F8FAFC',
-                            color: isSelected ? 'var(--admin-primary)' : 'var(--admin-text-secondary)',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            transition: 'all 200ms ease'
+                            gap: '8px',
+                            padding: '12px 16px',
+                            borderRadius: '8px',
+                            border: isSelected ? '1px solid rgba(124, 92, 255, 0.3)' : '1px solid transparent',
+                            backgroundColor: isSelected ? '#FFFFFF' : 'transparent',
+                            color: isSelected ? 'var(--admin-primary)' : 'var(--admin-text)',
+                            fontWeight: isSelected ? 700 : 600,
+                            fontSize: '13.5px',
+                            cursor: 'pointer',
+                            boxShadow: isSelected ? '0 2px 8px rgba(124, 92, 255, 0.12)' : 'none',
+                            transition: 'all 150ms ease'
                           }}
                         >
-                          {opt.icon}
-                        </div>
+                          <span style={{ display: 'inline-flex', alignItems: 'center' }}>
+                            {opt.icon}
+                          </span>
+                          <span>{opt.title}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
 
-                        {isSelected && (
-                          <div
-                            style={{
-                              width: '20px',
-                              height: '20px',
-                              borderRadius: '50%',
-                              backgroundColor: 'var(--admin-primary)',
-                              color: '#FFFFFF',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center'
-                            }}
-                          >
-                            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                              <polyline points="20 6 9 17 4 12" />
-                            </svg>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Content texts */}
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                        <span style={{ fontSize: '14.5px', fontWeight: 700, color: 'var(--admin-text)' }}>
-                          {opt.title}
-                        </span>
-                        <p style={{ margin: 0, fontSize: '12px', color: 'var(--admin-text-secondary)', fontWeight: 500, lineHeight: 1.4 }}>
-                          {opt.desc}
-                        </p>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </Card>
-
-          {/* Section 2: Open for Work Availability Toggle */}
-          <Card>
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '16px',
-                width: '100%',
-                boxSizing: 'border-box'
-              }}
-            >
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <h3 style={{ margin: 0, fontSize: '15px', fontWeight: 700, color: 'var(--admin-text)' }}>
-                  Availability
-                </h3>
-                <span style={{ fontSize: '12.5px', color: 'var(--admin-text-secondary)', fontWeight: 500 }}>
-                  Show or hide the availability status badge on your public portfolio.
-                </span>
-              </div>
-
-              {/* Sub-card Row containing Info + Badge & Switch */}
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  backgroundColor: '#F8FAFC',
-                  padding: '20px',
-                  borderRadius: '12px',
-                  border: '1px solid var(--admin-border)',
-                  flexWrap: 'wrap',
-                  gap: '16px',
-                  boxSizing: 'border-box'
-                }}
-              >
-                {/* Text & Status Badge */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', minWidth: '220px', flex: 1 }}>
-                  <span style={{ fontSize: '14px', fontWeight: 700, color: 'var(--admin-text)' }}>
-                    Open for Work
-                  </span>
-                  
-                  {/* Inline Status badge */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span
-                      style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        padding: '4px 10px',
-                        borderRadius: '20px',
-                        backgroundColor: isOpenForWork ? '#ECFDF5' : '#F1F5F9',
-                        color: isOpenForWork ? '#10B981' : '#64748B',
-                        fontSize: '11px',
-                        fontWeight: 700
-                      }}
-                    >
-                      <span
-                        style={{
-                          width: '6px',
-                          height: '6px',
-                          borderRadius: '50%',
-                          backgroundColor: isOpenForWork ? '#10B981' : '#64748B'
-                        }}
-                      />
-                      Status: {isOpenForWork ? 'Enabled' : 'Disabled'}
+                  {/* Selected Mode Context Helper */}
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '10px',
+                      backgroundColor: 'rgba(124, 92, 255, 0.05)',
+                      border: '1px solid rgba(124, 92, 255, 0.15)',
+                      borderRadius: '8px',
+                      padding: '10px 14px',
+                      color: 'var(--admin-text-secondary)',
+                      fontSize: '12.5px',
+                      fontWeight: 500
+                    }}
+                  >
+                    <span style={{ fontWeight: 700, color: 'var(--admin-primary)' }}>Active Mode Description:</span>
+                    <span>
+                      {visibilityOptions.find((o) => o.value === visibility)?.desc}
                     </span>
                   </div>
                 </div>
+              </Card>
 
-                {/* Switch Button */}
-                <button
-                  type="button"
-                  onClick={() => setIsOpenForWork(!isOpenForWork)}
-                  className="hover-scale active-press"
+              {/* Section 2: Open for Work Compact Status Control */}
+              <Card style={{ padding: '20px 24px' }}>
+                <div
                   style={{
-                    width: '50px',
-                    height: '26px',
-                    borderRadius: '13px',
-                    backgroundColor: isOpenForWork ? 'var(--admin-primary)' : '#CBD5E1',
-                    border: 'none',
-                    position: 'relative',
-                    cursor: 'pointer',
-                    padding: 0,
                     display: 'flex',
                     alignItems: 'center',
-                    transition: 'all 200ms ease',
-                    outline: 'none',
-                    boxShadow: isOpenForWork ? '0 4px 12px rgba(124, 92, 255, 0.2)' : 'none'
+                    justifyContent: 'space-between',
+                    flexWrap: 'wrap',
+                    gap: '16px',
+                    width: '100%',
+                    boxSizing: 'border-box'
                   }}
                 >
-                  <div
-                    style={{
-                      width: '20px',
-                      height: '20px',
-                      borderRadius: '50%',
-                      backgroundColor: '#FFFFFF',
-                      position: 'absolute',
-                      left: isOpenForWork ? '28px' : '2px',
-                      transition: 'left 200ms cubic-bezier(0.25, 1, 0.5, 1)',
-                      boxShadow: '0 1px 3px rgba(0, 0, 0, 0.15)'
-                    }}
-                  />
-                </button>
-              </div>
-            </div>
-          </Card>
-
-          {/* Section 3: Future Ready Preferences Placeholder Panel */}
-          <Card>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', boxSizing: 'border-box' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <h3 style={{ margin: 0, fontSize: '15px', fontWeight: 700, color: 'var(--admin-text)' }}>
-                  Preferences & Integrations
-                </h3>
-                <span style={{ fontSize: '12.5px', color: 'var(--admin-text-secondary)', fontWeight: 500 }}>
-                  Advanced preferences planned for upcoming dashboard releases.
-                </span>
-              </div>
-
-              {/* Grid of disabled placeholders */}
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-                  gap: '16px',
-                  boxSizing: 'border-box',
-                  marginTop: '4px'
-                }}
-              >
-                {futurePlaceholders.map((item, idx) => (
-                  <div
-                    key={idx}
-                    style={{
-                      border: '1px dashed var(--admin-border)',
-                      borderRadius: '12px',
-                      padding: '20px',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '8px',
-                      boxSizing: 'border-box',
-                      opacity: 0.75,
-                      backgroundColor: '#FAFAFA'
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
-                      <span style={{ fontSize: '13px', fontWeight: 750, color: 'var(--admin-text)' }}>
-                        {item.title}
-                      </span>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: 1, minWidth: '220px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <h3 style={{ margin: 0, fontSize: '15px', fontWeight: 700, color: 'var(--admin-text)' }}>
+                        Open for Work
+                      </h3>
                       <span
                         style={{
-                          fontSize: '9.5px',
-                          fontWeight: 700,
-                          color: 'var(--admin-primary)',
-                          backgroundColor: 'rgba(124, 92, 255, 0.08)',
-                          padding: '2px 6px',
-                          borderRadius: '4px',
-                          textTransform: 'uppercase',
-                          letterSpacing: '0.05em'
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          padding: '3px 10px',
+                          borderRadius: '20px',
+                          backgroundColor: isOpenForWork ? '#ECFDF5' : '#F1F5F9',
+                          color: isOpenForWork ? '#10B981' : '#64748B',
+                          fontSize: '11px',
+                          fontWeight: 700
                         }}
                       >
-                        Soon
+                        <span
+                          style={{
+                            width: '6px',
+                            height: '6px',
+                            borderRadius: '50%',
+                            backgroundColor: isOpenForWork ? '#10B981' : '#64748B'
+                          }}
+                        />
+                        {isOpenForWork ? 'Enabled' : 'Disabled'}
                       </span>
                     </div>
-                    <p style={{ margin: 0, fontSize: '11.5px', color: 'var(--admin-text-secondary)', fontWeight: 500, lineHeight: 1.4 }}>
-                      {item.desc}
-                    </p>
+                    <span style={{ fontSize: '12.5px', color: 'var(--admin-text-secondary)', fontWeight: 500 }}>
+                      Display the availability status badge on your public portfolio header.
+                    </span>
                   </div>
-                ))}
-              </div>
+
+                  {/* Switch Button */}
+                  <button
+                    type="button"
+                    onClick={() => setIsOpenForWork(!isOpenForWork)}
+                    className="hover-scale active-press"
+                    style={{
+                      width: '48px',
+                      height: '26px',
+                      borderRadius: '13px',
+                      backgroundColor: isOpenForWork ? 'var(--admin-primary)' : '#CBD5E1',
+                      border: 'none',
+                      position: 'relative',
+                      cursor: 'pointer',
+                      padding: 0,
+                      display: 'flex',
+                      alignItems: 'center',
+                      transition: 'all 200ms ease',
+                      outline: 'none',
+                      boxShadow: isOpenForWork ? '0 4px 12px rgba(124, 92, 255, 0.2)' : 'none'
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: '20px',
+                        height: '20px',
+                        borderRadius: '50%',
+                        backgroundColor: '#FFFFFF',
+                        position: 'absolute',
+                        left: isOpenForWork ? '26px' : '3px',
+                        transition: 'left 200ms cubic-bezier(0.25, 1, 0.5, 1)',
+                        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.15)'
+                      }}
+                    />
+                  </button>
+                </div>
+              </Card>
             </div>
-          </Card>
-        </div>
+          )}
+
+          {/* Sticky Save Footer */}
+          <StickyFooter
+            isDirty={isDirty}
+            saving={saving}
+            onSave={handleSave}
+            onDiscard={handleDiscard}
+          />
+        </>
       )}
 
-      {/* 3. Sticky Save Footer */}
-      <StickyFooter
-        isDirty={isDirty}
-        onSave={handleSave}
-        onDiscard={handleDiscard}
-      />
+      {activeTab === 'authorized-users' && <AuthorizedUsersPage />}
+
+      {activeTab === 'access-requests' && <AccessRequestsPage />}
+
+      {activeTab === 'subscribers' && <MaintenanceSubscribersPage />}
     </div>
   );
 };
 
 export default PortfolioSettingsPage;
+

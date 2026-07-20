@@ -33,17 +33,20 @@ GRANT INSERT, SELECT, UPDATE, DELETE ON public.resume_downloads TO authenticated
 GRANT ALL ON public.resume_downloads TO service_role;
 
 -- 1. INSERT POLICY: Anyone can log a download
+DROP POLICY IF EXISTS "Allow public insert of download tracking" ON public.resume_downloads;
 CREATE POLICY "Allow public insert of download tracking"
   ON public.resume_downloads FOR INSERT TO anon, authenticated
   WITH CHECK (true);
 
 -- 2. UPDATE POLICY: Anyone can update download status (e.g., if a download fails)
+DROP POLICY IF EXISTS "Allow public update of download status" ON public.resume_downloads;
 CREATE POLICY "Allow public update of download status"
   ON public.resume_downloads FOR UPDATE TO anon, authenticated
   USING (true)
   WITH CHECK (true);
 
 -- 3. ADMIN READ/WRITE POLICIES: Authenticated active admins in public.admins
+DROP POLICY IF EXISTS "Allow admin select all resume downloads" ON public.resume_downloads;
 CREATE POLICY "Allow admin select all resume downloads"
   ON public.resume_downloads FOR SELECT TO authenticated
   USING (
@@ -54,6 +57,7 @@ CREATE POLICY "Allow admin select all resume downloads"
     )
   );
 
+DROP POLICY IF EXISTS "Allow admin update all resume downloads" ON public.resume_downloads;
 CREATE POLICY "Allow admin update all resume downloads"
   ON public.resume_downloads FOR UPDATE TO authenticated
   USING (
@@ -71,6 +75,7 @@ CREATE POLICY "Allow admin update all resume downloads"
     )
   );
 
+DROP POLICY IF EXISTS "Allow admin delete all resume downloads" ON public.resume_downloads;
 CREATE POLICY "Allow admin delete all resume downloads"
   ON public.resume_downloads FOR DELETE TO authenticated
   USING (

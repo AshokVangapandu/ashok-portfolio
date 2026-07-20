@@ -103,11 +103,18 @@ const MainLayout: React.FC = () => {
   );
 };
 
+import { PortfolioSettingsProvider } from './context/PortfolioSettingsContext';
+import { GlobalRouteGuard } from './components/routing/GlobalRouteGuard';
+
 const rootElement = document.getElementById('root');
 if (rootElement) {
   ReactDOM.createRoot(rootElement).render(
     <React.StrictMode>
-      <MainLayout />
+      <PortfolioSettingsProvider>
+        <GlobalRouteGuard>
+          <MainLayout />
+        </GlobalRouteGuard>
+      </PortfolioSettingsProvider>
     </React.StrictMode>
   );
 }

@@ -9,6 +9,9 @@ import { PortfolioSettingsPage } from './pages/settings/PortfolioSettingsPage';
 import { SocialLinksPage } from './pages/social-links/SocialLinksPage';
 import { AdminAccessPage } from './pages/admin-access/AdminAccessPage';
 import { CertificationsPage } from './pages/certifications/CertificationsPage';
+import { MaintenanceSubscribersPage } from './pages/maintenance-subscribers/MaintenanceSubscribersPage';
+import { AuthorizedUsersPage } from './pages/authorized-users/AuthorizedUsersPage';
+import { AccessRequestsPage } from './pages/access-requests/AccessRequestsPage';
 
 interface RouteResolution {
   component: React.ReactNode;
@@ -49,6 +52,11 @@ export const resolveRoute = (path: string): RouteResolution => {
         component: <ContactsPage />,
         pageTitle: 'Contacts',
       };
+    case '/admin/maintenance-subscribers':
+      return {
+        component: <MaintenanceSubscribersPage />,
+        pageTitle: 'Maintenance Subscribers',
+      };
     case '/admin/testimonials':
       return {
         component: <TestimonialsPage />,
@@ -83,6 +91,18 @@ export const resolveRoute = (path: string): RouteResolution => {
       return {
         component: <AdminAccessPage />,
         pageTitle: 'Admin Access',
+      };
+    case '/admin/authorized-users':
+    case '/admin/settings/authorized-users':
+      return {
+        component: <PortfolioSettingsPage />,
+        pageTitle: 'Portfolio Settings - Authorized Users',
+      };
+    case '/admin/access-requests':
+    case '/admin/settings/access-requests':
+      return {
+        component: <PortfolioSettingsPage />,
+        pageTitle: 'Portfolio Settings - Access Requests',
       };
     case '/admin/social-links':
       return {

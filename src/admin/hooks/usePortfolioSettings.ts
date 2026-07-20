@@ -3,8 +3,15 @@ import { useState, useEffect, useCallback } from 'react';
 import { portfolioSettingsService } from '../services/portfolioSettingsService';
 import { PortfolioSettings, PortfolioVisibility } from '../types/portfolioSettings';
 
+export interface AlertState {
+  type: 'success' | 'error';
+  title: string;
+  message: string;
+}
+
 export const usePortfolioSettings = () => {
   const [loading, setLoading] = useState<boolean>(false);
+  const [saving, setSaving] = useState<boolean>(false);
   const [initialSettings, setInitialSettings] = useState<PortfolioSettings | null>(null);
 
   // Form Fields
@@ -14,8 +21,8 @@ export const usePortfolioSettings = () => {
   const [resumeLastUpdated, setResumeLastUpdated] = useState<string>('09 July 2026');
   const [resumeStatus, setResumeStatus] = useState<string>('Active');
 
-  // Success alert visibility
-  const [showAlert, setShowAlert] = useState<boolean>(true); // Display by default like in design
+  // Alert State
+  const [alert, setAlert] = useState<AlertState | null>(null);
 
   const fetchSettings = useCallback(async () => {
     setLoading(true);
@@ -29,6 +36,11 @@ export const usePortfolioSettings = () => {
       setResumeStatus(data.resumeStatus);
     } catch (err) {
       console.error('[usePortfolioSettings] Fetch error:', err);
+      setAlert({
+        type: 'error',
+        title: 'Error Loading Settings',
+        message: 'Failed to load portfolio settings from database. Please refresh the page.'
+      });
     } finally {
       setLoading(false);
     }
@@ -44,7 +56,9 @@ export const usePortfolioSettings = () => {
     : false;
 
   const handleSave = async () => {
-    setLoading(true);
+    if (saving) return; // Prevent duplicate submissions
+    setSaving(true);
+    setAlert(null);
     try {
       const updated: PortfolioSettings = {
         visibility,
@@ -53,13 +67,22 @@ export const usePortfolioSettings = () => {
         resumeLastUpdated,
         resumeStatus
       };
-      await portfolioSettingsService.updateSettings(updated);
+      const res = await portfolioSettingsService.updateSettings(updated);
       setInitialSettings(updated);
-      setShowAlert(true);
-    } catch (err) {
+      setAlert({
+        type: 'success',
+        title: 'Settings Saved',
+        message: res.workflowMessage || 'Your global portfolio visibility settings have been updated successfully.'
+      });
+    } catch (err: any) {
       console.error('[usePortfolioSettings] Save error:', err);
+      setAlert({
+        type: 'error',
+        title: 'Save Failed',
+        message: err?.message || 'Failed to save portfolio visibility settings. Please try again.'
+      });
     } finally {
-      setLoading(false);
+      setSaving(false);
     }
   };
 
@@ -67,11 +90,13 @@ export const usePortfolioSettings = () => {
     if (initialSettings) {
       setVisibility(initialSettings.visibility);
       setIsOpenForWork(initialSettings.isOpenForWork);
+      setAlert(null);
     }
   };
 
   return {
     loading,
+    saving,
     visibility,
     setVisibility,
     isOpenForWork,
@@ -81,8 +106,8 @@ export const usePortfolioSettings = () => {
     resumeStatus,
     
     // Alert handles
-    showAlert,
-    setShowAlert,
+    alert,
+    setAlert,
 
     // Actions
     isDirty,

@@ -3,12 +3,14 @@ import React from 'react';
 
 interface StickyFooterProps {
   isDirty: boolean;
+  saving?: boolean;
   onSave: () => void;
   onDiscard: () => void;
 }
 
 export const StickyFooter: React.FC<StickyFooterProps> = ({
   isDirty,
+  saving = false,
   onSave,
   onDiscard,
 }) => {
@@ -32,19 +34,19 @@ export const StickyFooter: React.FC<StickyFooterProps> = ({
     >
       <button
         type="button"
-        disabled={!isDirty}
+        disabled={!isDirty || saving}
         onClick={onDiscard}
-        className={isDirty ? 'hover-scale active-press' : ''}
+        className={isDirty && !saving ? 'hover-scale active-press' : ''}
         style={{
           padding: '10px 24px',
           border: '1px solid var(--admin-border)',
           borderRadius: '8px',
           backgroundColor: '#FFFFFF',
-          color: isDirty ? '#0F172A' : '#94A3B8',
+          color: isDirty && !saving ? '#0F172A' : '#94A3B8',
           fontSize: '13.5px',
           fontWeight: 600,
-          cursor: isDirty ? 'pointer' : 'not-allowed',
-          opacity: isDirty ? 1 : 0.6,
+          cursor: isDirty && !saving ? 'pointer' : 'not-allowed',
+          opacity: isDirty && !saving ? 1 : 0.6,
           transition: 'all 0.15s ease'
         }}
       >
@@ -53,22 +55,22 @@ export const StickyFooter: React.FC<StickyFooterProps> = ({
 
       <button
         type="button"
-        disabled={!isDirty}
+        disabled={!isDirty || saving}
         onClick={onSave}
-        className={isDirty ? 'hover-scale active-press animate-glow' : ''}
+        className={isDirty && !saving ? 'hover-scale active-press animate-glow' : ''}
         style={{
           padding: '10px 24px',
           border: 'none',
           borderRadius: '8px',
-          backgroundColor: isDirty ? 'var(--admin-primary)' : 'rgba(124, 58, 237, 0.4)',
+          backgroundColor: isDirty && !saving ? 'var(--admin-primary)' : 'rgba(124, 58, 237, 0.4)',
           color: '#FFFFFF',
           fontSize: '13.5px',
           fontWeight: 600,
-          cursor: isDirty ? 'pointer' : 'not-allowed',
+          cursor: isDirty && !saving ? 'pointer' : 'not-allowed',
           transition: 'all 0.15s ease'
         }}
       >
-        Save Changes
+        {saving ? 'Saving...' : 'Save Changes'}
       </button>
     </div>
   );

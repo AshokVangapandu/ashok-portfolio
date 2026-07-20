@@ -39,6 +39,186 @@ export type Database = {
   }
   public: {
     Tables: {
+      access_requests: {
+        Row: {
+          id: string
+          full_name: string
+          email: string
+          company: string | null
+          job_title: string | null
+          linkedin_url: string | null
+          reason: string
+          request_status: 'pending' | 'approved' | 'rejected'
+          requested_at: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          notes: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          full_name: string
+          email: string
+          company?: string | null
+          job_title?: string | null
+          linkedin_url?: string | null
+          reason: string
+          request_status?: 'pending' | 'approved' | 'rejected'
+          requested_at?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          full_name?: string
+          email?: string
+          company?: string | null
+          job_title?: string | null
+          linkedin_url?: string | null
+          reason?: string
+          request_status?: 'pending' | 'approved' | 'rejected'
+          requested_at?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      authorized_users: {
+        Row: {
+          id: string
+          email: string
+          full_name: string | null
+          access_status: 'enabled' | 'disabled'
+          access_level: 'viewer' | 'recruiter' | 'client' | 'admin'
+          invited_at: string | null
+          last_access: string | null
+          notes: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          email: string
+          full_name?: string | null
+          access_status?: 'enabled' | 'disabled'
+          access_level?: 'viewer' | 'recruiter' | 'client' | 'admin'
+          invited_at?: string | null
+          last_access?: string | null
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          email?: string
+          full_name?: string | null
+          access_status?: 'enabled' | 'disabled'
+          access_level?: 'viewer' | 'recruiter' | 'client' | 'admin'
+          invited_at?: string | null
+          last_access?: string | null
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      maintenance_notification_logs: {
+        Row: {
+          id: string
+          subscriber_id: string | null
+          email: string
+          transition_event: string | null
+          status: string
+          queued_at: string
+          sent_at: string | null
+          failure_reason: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          subscriber_id?: string | null
+          email: string
+          transition_event?: string | null
+          status?: string
+          queued_at?: string
+          sent_at?: string | null
+          failure_reason?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          subscriber_id?: string | null
+          email?: string
+          transition_event?: string | null
+          status?: string
+          queued_at?: string
+          sent_at?: string | null
+          failure_reason?: string | null
+          created_at?: string
+        }
+        Relationships: []
+      }
+      maintenance_subscribers: {
+        Row: {
+          id: string
+          email: string
+          status: string
+          notified_at: string | null
+          source: string | null
+          subscribed_at: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          email: string
+          status?: string
+          notified_at?: string | null
+          source?: string | null
+          subscribed_at?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          email?: string
+          status?: string
+          notified_at?: string | null
+          source?: string | null
+          subscribed_at?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      portfolio_settings: {
+        Row: {
+          id: string
+          visibility: 'public' | 'maintenance' | 'private'
+          is_open_for_work: boolean
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          visibility?: 'public' | 'maintenance' | 'private'
+          is_open_for_work?: boolean
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          visibility?: 'public' | 'maintenance' | 'private'
+          is_open_for_work?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
       admins: {
         Row: {
           created_at: string

@@ -1691,9 +1691,9 @@ const setupNavbarAuth = async () => {
     
     console.log('Authenticated Email:', email);
 
-    if (cached !== null) {
-      isAdmin = cached === 'true';
-      console.log(`isAdmin: ${isAdmin}`);
+    if (cached === 'true') {
+      isAdmin = true;
+      console.log(`isAdmin from cache: ${isAdmin}`);
     } else {
       try {
         const { data, error } = await window.AuthService.supabase
@@ -1706,9 +1706,10 @@ const setupNavbarAuth = async () => {
 
         if (!error && data && data.is_active === true) {
           isAdmin = true;
+          sessionStorage.setItem(`is_admin_${email}`, 'true');
+        } else {
+          sessionStorage.setItem(`is_admin_${email}`, 'false');
         }
-
-        sessionStorage.setItem(`is_admin_${email}`, String(isAdmin));
         console.log(`isAdmin: ${isAdmin}`);
       } catch (err) {
         console.error('[Navbar Auth] Failed to check admin status:', err);

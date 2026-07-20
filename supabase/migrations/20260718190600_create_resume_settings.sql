@@ -20,11 +20,13 @@ CREATE INDEX IF NOT EXISTS idx_resume_settings_is_active ON public.resume_settin
 ALTER TABLE public.resume_settings ENABLE ROW LEVEL SECURITY;
 
 -- 1. SELECT POLICY: Anyone can read the active resume
+DROP POLICY IF EXISTS "Allow public select of active resume" ON public.resume_settings;
 CREATE POLICY "Allow public select of active resume"
   ON public.resume_settings FOR SELECT TO public
   USING (is_active = TRUE);
 
 -- 2. ADMIN CRUD POLICIES: Authenticated active admins in public.admins
+DROP POLICY IF EXISTS "Allow admin select all resume settings" ON public.resume_settings;
 CREATE POLICY "Allow admin select all resume settings"
   ON public.resume_settings FOR SELECT TO authenticated
   USING (
@@ -35,6 +37,7 @@ CREATE POLICY "Allow admin select all resume settings"
     )
   );
 
+DROP POLICY IF EXISTS "Allow admin insert resume settings" ON public.resume_settings;
 CREATE POLICY "Allow admin insert resume settings"
   ON public.resume_settings FOR INSERT TO authenticated
   WITH CHECK (
@@ -45,6 +48,7 @@ CREATE POLICY "Allow admin insert resume settings"
     )
   );
 
+DROP POLICY IF EXISTS "Allow admin update resume settings" ON public.resume_settings;
 CREATE POLICY "Allow admin update resume settings"
   ON public.resume_settings FOR UPDATE TO authenticated
   USING (
@@ -62,6 +66,7 @@ CREATE POLICY "Allow admin update resume settings"
     )
   );
 
+DROP POLICY IF EXISTS "Allow admin delete resume settings" ON public.resume_settings;
 CREATE POLICY "Allow admin delete resume settings"
   ON public.resume_settings FOR DELETE TO authenticated
   USING (
@@ -73,6 +78,7 @@ CREATE POLICY "Allow admin delete resume settings"
   );
 
 -- Auto updated_at trigger
+DROP TRIGGER IF EXISTS update_resume_settings_updated_at ON public.resume_settings;
 CREATE TRIGGER update_resume_settings_updated_at
   BEFORE UPDATE ON public.resume_settings
   FOR EACH ROW
@@ -89,6 +95,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
+DROP TRIGGER IF EXISTS enforce_single_active_resume ON public.resume_settings;
 CREATE TRIGGER enforce_single_active_resume
   AFTER INSERT OR UPDATE ON public.resume_settings
   FOR EACH ROW
@@ -101,10 +108,12 @@ VALUES ('resume-files', 'resume-files', true)
 ON CONFLICT (id) DO NOTHING;
 
 -- RLS policies for resume-files bucket
+DROP POLICY IF EXISTS "Allow public read of resume-files" ON storage.objects;
 CREATE POLICY "Allow public read of resume-files"
   ON storage.objects FOR SELECT TO public
   USING (bucket_id = 'resume-files');
 
+DROP POLICY IF EXISTS "Allow admin insert of resume-files" ON storage.objects;
 CREATE POLICY "Allow admin insert of resume-files"
   ON storage.objects FOR INSERT TO authenticated
   WITH CHECK (
@@ -116,6 +125,7 @@ CREATE POLICY "Allow admin insert of resume-files"
     )
   );
 
+DROP POLICY IF EXISTS "Allow admin update of resume-files" ON storage.objects;
 CREATE POLICY "Allow admin update of resume-files"
   ON storage.objects FOR UPDATE TO authenticated
   USING (
@@ -135,6 +145,7 @@ CREATE POLICY "Allow admin update of resume-files"
     )
   );
 
+DROP POLICY IF EXISTS "Allow admin delete of resume-files" ON storage.objects;
 CREATE POLICY "Allow admin delete of resume-files"
   ON storage.objects FOR DELETE TO authenticated
   USING (

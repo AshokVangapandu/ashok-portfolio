@@ -10,11 +10,13 @@ CREATE TABLE IF NOT EXISTS public.portfolio_settings (
 ALTER TABLE public.portfolio_settings ENABLE ROW LEVEL SECURITY;
 
 -- 1. SELECT POLICY: Anyone can read portfolio settings
+DROP POLICY IF EXISTS "Allow public select of portfolio settings" ON public.portfolio_settings;
 CREATE POLICY "Allow public select of portfolio settings"
   ON public.portfolio_settings FOR SELECT TO public
   USING (true);
 
 -- 2. UPDATE POLICY: Authenticated active admins in public.admins
+DROP POLICY IF EXISTS "Allow admin update of portfolio settings" ON public.portfolio_settings;
 CREATE POLICY "Allow admin update of portfolio settings"
   ON public.portfolio_settings FOR UPDATE TO authenticated
   USING (
@@ -33,6 +35,7 @@ CREATE POLICY "Allow admin update of portfolio settings"
   );
 
 -- Auto updated_at trigger
+DROP TRIGGER IF EXISTS update_portfolio_settings_updated_at ON public.portfolio_settings;
 CREATE TRIGGER update_portfolio_settings_updated_at
   BEFORE UPDATE ON public.portfolio_settings
   FOR EACH ROW

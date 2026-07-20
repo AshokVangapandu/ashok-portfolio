@@ -9,6 +9,7 @@ ALTER TABLE public.admins
 DROP POLICY IF EXISTS "Allow authenticated users to read their own admin record" ON public.admins;
 
 -- 1. SELECT POLICY: Any active administrator can read all admin records
+DROP POLICY IF EXISTS "Allow active admins to select all admin records" ON public.admins;
 CREATE POLICY "Allow active admins to select all admin records"
   ON public.admins FOR SELECT TO authenticated
   USING (
@@ -20,6 +21,7 @@ CREATE POLICY "Allow active admins to select all admin records"
   );
 
 -- 2. INSERT POLICY: Super Admins and Admins can insert/invite new admins
+DROP POLICY IF EXISTS "Allow privileged admins to insert admin records" ON public.admins;
 CREATE POLICY "Allow privileged admins to insert admin records"
   ON public.admins FOR INSERT TO authenticated
   WITH CHECK (
@@ -32,6 +34,7 @@ CREATE POLICY "Allow privileged admins to insert admin records"
   );
 
 -- 3. UPDATE POLICY: Super Admins and Admins can update admin records
+DROP POLICY IF EXISTS "Allow privileged admins to update admin records" ON public.admins;
 CREATE POLICY "Allow privileged admins to update admin records"
   ON public.admins FOR UPDATE TO authenticated
   USING (
@@ -52,6 +55,7 @@ CREATE POLICY "Allow privileged admins to update admin records"
   );
 
 -- 4. DELETE POLICY: Super Admins and Admins can delete admin records
+DROP POLICY IF EXISTS "Allow privileged admins to delete admin records" ON public.admins;
 CREATE POLICY "Allow privileged admins to delete admin records"
   ON public.admins FOR DELETE TO authenticated
   USING (
