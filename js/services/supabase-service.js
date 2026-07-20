@@ -246,11 +246,250 @@
     }
   };
 
+  /**
+   * PortfolioSettingsService
+   * Exposes global site visibility settings and availability toggles.
+   */
+  const PortfolioSettingsService = {
+    async getSiteMode() {
+      if (!supabase) return 'public';
+      try {
+        const { data, error } = await supabase
+          .from('portfolio_settings')
+          .select('visibility')
+          .limit(1)
+          .maybeSingle();
+        if (error) {
+          console.error("Error fetching site_mode from Supabase:", error);
+          return 'public';
+        }
+        return data?.visibility || 'public';
+      } catch (err) {
+        console.error("Failed to load site mode:", err);
+        return 'public';
+      }
+    },
+    async getSettings() {
+      if (!supabase) throw new Error("Supabase Client is not initialized.");
+      return await supabase
+        .from('portfolio_settings')
+        .select('*')
+        .limit(1)
+        .maybeSingle();
+    }
+  };
+
+  /**
+   * MaintenanceService
+   * Handles subscriber registration during Maintenance mode.
+   */
+  const MaintenanceService = {
+    async subscribeToNotify(rawEmail) {
+      const email = (rawEmail || '').trim().toLowerCase();
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        return {
+          success: false,
+          isDuplicate: false,
+          message: 'Please enter a valid email address.'
+        };
+      }
+      if (!supabase) {
+        return {
+          success: false,
+          isDuplicate: false,
+          message: 'Database service unavailable. Please try again later.'
+        };
+      }
+      try {
+        const { data: existing } = await supabase
+          .from('maintenance_subscribers')
+          .select('id')
+          .eq('email', email)
+          .maybeSingle();
+
+        if (existing) {
+          return {
+            success: true,
+            isDuplicate: true,
+            message: "You're already subscribed. We'll notify you when the portfolio is live again."
+          };
+        }
+
+        const { error: insertError } = await supabase
+          .from('maintenance_subscribers')
+          .insert({
+            email: email,
+            status: 'pending',
+            source: 'maintenance_page'
+          });
+
+        if (insertError) {
+          if (insertError.code === '23505') {
+            return {
+              success: true,
+              isDuplicate: true,
+              message: "You're already subscribed. We'll notify you when the portfolio is live again."
+            };
+          }
+          throw insertError;
+        }
+
+        return {
+          success: true,
+          isDuplicate: false,
+          message: "Thank you! We'll notify you as soon as the portfolio is live."
+        };
+      } catch (err) {
+        console.error("MaintenanceService error:", err);
+        return {
+          success: false,
+          isDuplicate: false,
+          message: 'Failed to save subscription. Please try again.'
+        };
+      }
+    }
+  };
+
+  const PRIVATE_SESSION_KEY = 'portfolio_private_session';
+
+  const PrivateAccessService = {
+    hasValidSession() {
+      if (typeof window === 'undefined' || !window.sessionStorage) return false;
+      try {
+        const raw = window.sessionStorage.getItem(PRIVATE_SESSION_KEY);
+        if (!raw) return false;
+        const parsed = JSON.parse(raw);
+        return Boolean(parsed && parsed.email && parsed.token);
+      } catch (err) {
+        return false;
+      }
+    },
+
+    async verifyAccess(email) {
+      const cleanEmail = (email || '').trim().toLowerCase();
+      if (!cleanEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
+        return { success: false, message: 'Please enter a valid email address.' };
+      }
+      if (!supabase) {
+        return { success: false, message: 'Database service unavailable. Please try again later.' };
+      }
+      try {
+        const { data, error } = await supabase
+          .from('authorized_users')
+          .select('id, email, access_status')
+          .ilike('email', cleanEmail)
+          .eq('access_status', 'enabled')
+          .maybeSingle();
+
+        if (error) throw error;
+
+        if (data && data.access_status === 'enabled') {
+          supabase
+            .from('authorized_users')
+            .update({ last_access: new Date().toISOString() })
+            .eq('id', data.id)
+            .then(() => {});
+
+          const session = {
+            email: cleanEmail,
+            token: btoa(cleanEmail + ':' + Date.now()),
+            verifiedAt: new Date().toISOString()
+          };
+          window.sessionStorage.setItem(PRIVATE_SESSION_KEY, JSON.stringify(session));
+          return { success: true };
+        }
+
+        return {
+          success: false,
+          message: "This email isn't authorized to access this portfolio. If you believe this is a mistake, please request access."
+        };
+      } catch (err) {
+        console.error("PrivateAccessService error:", err);
+        return {
+          success: false,
+          message: 'An unexpected error occurred while verifying access. Please try again.'
+        };
+      }
+    },
+
+    clearSession() {
+      if (typeof window !== 'undefined' && window.sessionStorage) {
+        window.sessionStorage.removeItem(PRIVATE_SESSION_KEY);
+      }
+    }
+  };
+
+  const AccessRequestService = {
+    async submitAccessRequest(payload) {
+      const cleanEmail = (payload.email || '').trim().toLowerCase();
+      const cleanName = (payload.fullName || '').trim();
+      const cleanReason = (payload.reason || '').trim();
+
+      if (!cleanEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
+        return { success: false, message: 'Please enter a valid email address.' };
+      }
+      if (!cleanName) {
+        return { success: false, message: 'Please enter your full name.' };
+      }
+      if (!cleanReason) {
+        return { success: false, message: 'Please provide a reason for your access request.' };
+      }
+      if (!supabase) {
+        return { success: false, message: 'Database service unavailable. Please try again later.' };
+      }
+
+      try {
+        const { data: pendingReq } = await supabase
+          .from('access_requests')
+          .select('id')
+          .ilike('email', cleanEmail)
+          .eq('request_status', 'pending')
+          .maybeSingle();
+
+        if (pendingReq) {
+          return {
+            success: false,
+            message: "An access request for this email address is already pending review. You'll be notified once it's reviewed."
+          };
+        }
+
+        const { error: insertError } = await supabase
+          .from('access_requests')
+          .insert({
+            email: cleanEmail,
+            full_name: cleanName,
+            company: payload.company ? payload.company.trim() : null,
+            job_title: payload.jobTitle ? payload.jobTitle.trim() : null,
+            reason: cleanReason,
+            linkedin_url: payload.linkedinUrl ? payload.linkedinUrl.trim() : null,
+            request_status: 'pending'
+          });
+
+        if (insertError) throw insertError;
+
+        return {
+          success: true,
+          message: "Your request has been submitted successfully. You'll be notified once it's reviewed."
+        };
+      } catch (err) {
+        console.error("AccessRequestService submit error:", err);
+        return {
+          success: false,
+          message: 'Failed to submit request. Please try again.'
+        };
+      }
+    }
+  };
+
   // Expose services to window scope
   window.AuthService = AuthService;
   window.TestimonialService = TestimonialService;
   window.AdminService = AdminService;
   window.CertificationService = CertificationService;
   window.ResumeService = ResumeService;
+  window.PortfolioSettingsService = PortfolioSettingsService;
+  window.MaintenanceService = MaintenanceService;
+  window.PrivateAccessService = PrivateAccessService;
+  window.AccessRequestService = AccessRequestService;
   window.supabaseInstance = supabase;
 })();
