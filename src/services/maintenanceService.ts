@@ -32,11 +32,25 @@ export const maintenanceService = {
       }
 
       if (existing) {
-        return {
-          success: true,
-          isDuplicate: true,
-          message: "You're already subscribed. We'll notify you when the portfolio is live again."
-        };
+        if (existing.status === 'pending' || existing.status === 'queued') {
+          return {
+            success: true,
+            isDuplicate: true,
+            message: "You're already subscribed. We'll notify you when the portfolio is live again."
+          };
+        } else {
+          // If status was 'notified' from a previous maintenance cycle, re-arm subscriber to 'pending'
+          await supabase
+            .from('maintenance_subscribers')
+            .update({ status: 'pending', updated_at: new Date().toISOString() })
+            .eq('id', existing.id);
+
+          return {
+            success: true,
+            isDuplicate: false,
+            message: "Thank you! We'll notify you as soon as the portfolio is live."
+          };
+        }
       }
 
       // 2. Insert subscriber
@@ -73,6 +87,34 @@ export const maintenanceService = {
         isDuplicate: false,
         message: 'Failed to save subscription. Please try again.'
       };
+    }
+  },
+
+  async checkSubscriptionStatus(rawEmail: string): Promise<{ isSubscribed: boolean; message?: string }> {
+    const email = (rawEmail || '').trim().toLowerCase();
+    if (!email) return { isSubscribed: false };
+    try {
+      const { data, error } = await supabase
+        .from('maintenance_subscribers')
+        .select('id, status')
+        .eq('email', email)
+        .maybeSingle();
+
+      if (error) {
+        console.warn('[maintenanceService] Error checking subscriber:', error);
+        return { isSubscribed: false };
+      }
+
+      if (data && (data.status === 'pending' || data.status === 'queued')) {
+        return {
+          isSubscribed: true,
+          message: "You're already subscribed! We'll notify you as soon as the portfolio is live again."
+        };
+      }
+      return { isSubscribed: false };
+    } catch (err) {
+      console.error('[maintenanceService] Unexpected error checking status:', err);
+      return { isSubscribed: false };
     }
   }
 };

@@ -142,6 +142,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         if (active) {
           setIsAdmin(false);
         }
+        Object.keys(sessionStorage).forEach((key) => {
+          if (key.startsWith('is_admin_')) {
+            sessionStorage.removeItem(key);
+          }
+        });
       }
       setLoading(false);
     });
@@ -179,17 +184,28 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setError(null);
     setLoading(true);
     try {
+      if (typeof window !== 'undefined' && window.sessionStorage) {
+        Object.keys(sessionStorage).forEach((key) => {
+          if (key.startsWith('is_admin_')) {
+            sessionStorage.removeItem(key);
+          }
+        });
+      }
       const res = await authService.signOut();
+      setUser(null);
+      setSession(null);
+      setIsAdmin(false);
       if (res.error) {
         setError(parseAuthError(res.error).message);
         return { error: res.error };
       }
-      setUser(null);
-      setSession(null);
       return { error: null };
     } catch (err: any) {
       const parsed = parseAuthError(err);
       setError(parsed.message);
+      setUser(null);
+      setSession(null);
+      setIsAdmin(false);
       return { error: err as AuthError };
     } finally {
       setLoading(false);

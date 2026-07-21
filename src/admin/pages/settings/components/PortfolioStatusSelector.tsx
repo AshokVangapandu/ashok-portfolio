@@ -6,6 +6,8 @@ interface StatusOption {
   value: PortfolioVisibility;
   title: string;
   desc: string;
+  visitorAccess: string;
+  adminAccess: string;
   icon: React.ReactNode;
   dotColor: string;
 }
@@ -24,6 +26,8 @@ export const PortfolioStatusSelector: React.FC<PortfolioStatusSelectorProps> = (
       value: 'public',
       title: 'Public',
       desc: 'Your portfolio is publicly accessible to everyone.',
+      visitorAccess: 'Full Access',
+      adminAccess: 'Full Access',
       dotColor: '#10B981', // green
       icon: (
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
@@ -37,6 +41,8 @@ export const PortfolioStatusSelector: React.FC<PortfolioStatusSelectorProps> = (
       value: 'maintenance',
       title: 'Maintenance',
       desc: 'Visitors will see a maintenance page while updates are in progress.',
+      visitorAccess: 'Maintenance Page',
+      adminAccess: 'Full Access (Bypass)',
       dotColor: '#F59E0B', // amber
       icon: (
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
@@ -48,7 +54,9 @@ export const PortfolioStatusSelector: React.FC<PortfolioStatusSelectorProps> = (
       value: 'private',
       title: 'Private',
       desc: 'Only authorized users can access the portfolio.',
-      dotColor: '#64748B', // grey
+      visitorAccess: 'Private Access Page',
+      adminAccess: 'Full Access (Bypass)',
+      dotColor: '#6366F1', // indigo
       icon: (
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
           <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
@@ -58,14 +66,18 @@ export const PortfolioStatusSelector: React.FC<PortfolioStatusSelectorProps> = (
     }
   ];
 
+  const currentOption = options.find((o) => o.value === selected) || options[0];
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', boxSizing: 'border-box' }}>
-      <label style={{ fontSize: '13px', fontWeight: 700, color: '#0F172A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-        Portfolio Status
-      </label>
-      <p style={{ margin: '0 0 4px 0', fontSize: '13px', color: 'var(--admin-text-secondary)' }}>
-        Control who can access your portfolio.
-      </p>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', boxSizing: 'border-box' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+        <label style={{ fontSize: '13px', fontWeight: 700, color: '#0F172A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          Portfolio Status
+        </label>
+        <p style={{ margin: 0, fontSize: '13px', color: 'var(--admin-text-secondary)' }}>
+          Control who can access your portfolio and preview visitor vs admin experiences.
+        </p>
+      </div>
 
       {/* Grid wrapper - responsive row layout */}
       <div
@@ -136,7 +148,7 @@ export const PortfolioStatusSelector: React.FC<PortfolioStatusSelectorProps> = (
                 )}
               </div>
 
-              {/* Bottom Info Row */}
+              {/* Title & Desc */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                 <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
                   <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: opt.dotColor }} />
@@ -148,9 +160,66 @@ export const PortfolioStatusSelector: React.FC<PortfolioStatusSelectorProps> = (
                   {opt.desc}
                 </p>
               </div>
+
+              {/* Access Rights Breakdown */}
+              <div style={{ borderTop: '1px solid #F1F5F9', paddingTop: '10px', display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '11.5px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', color: '#64748B' }}>
+                  <span>Public Visitors:</span>
+                  <span style={{ fontWeight: 600, color: '#334155' }}>{opt.visitorAccess}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', color: '#64748B' }}>
+                  <span>Administrator:</span>
+                  <span style={{ fontWeight: 700, color: '#7C3AED' }}>{opt.adminAccess}</span>
+                </div>
+              </div>
             </div>
           );
         })}
+      </div>
+
+      {/* Visibility Informational Preview Card */}
+      <div
+        style={{
+          marginTop: '4px',
+          padding: '16px 20px',
+          borderRadius: '12px',
+          backgroundColor: selected === 'maintenance' ? '#FEF3C7' : selected === 'private' ? '#EEF2FF' : '#ECFDF5',
+          border: selected === 'maintenance' ? '1px solid #FDE68A' : selected === 'private' ? '1px solid #C7D2FE' : '1px solid #A7F3D0',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px',
+          boxSizing: 'border-box'
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ fontSize: '15px' }}>
+            {selected === 'maintenance' ? '🟠' : selected === 'private' ? '🔒' : '🟢'}
+          </span>
+          <span style={{ fontSize: '13px', fontWeight: 700, color: selected === 'maintenance' ? '#92400E' : selected === 'private' ? '#3730A3' : '#065F46' }}>
+            Visibility Preview: {currentOption.title} Mode
+          </span>
+        </div>
+
+        <div style={{ fontSize: '12.5px', lineHeight: 1.5, color: selected === 'maintenance' ? '#78350F' : selected === 'private' ? '#312E81' : '#047857' }}>
+          {selected === 'maintenance' && (
+            <>
+              <strong>Public Visitors will see:</strong> ✔ Maintenance Page & "Notify Me" subscription.<br />
+              <strong>Authenticated Administrators:</strong> ✔ Will continue to have full access (Admin Mode bypass).
+            </>
+          )}
+          {selected === 'private' && (
+            <>
+              <strong>Public Visitors will see:</strong> ✔ Private Access Page & Request Access workflow.<br />
+              <strong>Authenticated Administrators:</strong> ✔ Will continue to have full access (Admin Preview bypass).
+            </>
+          )}
+          {selected === 'public' && (
+            <>
+              <strong>Public Visitors will see:</strong> ✔ Full live portfolio.<br />
+              <strong>Everyone:</strong> ✔ Full access enabled for all visitors and administrators.
+            </>
+          )}
+        </div>
       </div>
     </div>
   );

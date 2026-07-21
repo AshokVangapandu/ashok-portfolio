@@ -90,8 +90,102 @@
     document.addEventListener('DOMContentLoaded', injectOverlay);
   }
 
+  async function checkAdminBypass() {
+    try {
+      const client = (window.AuthService && window.AuthService.supabase) ||
+                     (window.supabase ? window.supabase.createClient("https://txoszrnjkrlbjzpjisvp.supabase.co", "sb_publishable_DS3aReX7DKPTUeFrfndvAQ_4p7QTYfB") : null);
+      if (!client) return false;
+
+      const { data: sessionData } = await client.auth.getSession();
+      const userEmail = sessionData?.session?.user?.email;
+      if (!userEmail) return false;
+
+      const cached = sessionStorage.getItem(`is_admin_${userEmail}`);
+      if (cached !== null) {
+        return cached === 'true';
+      }
+
+      const { data: adminRecord, error } = await client
+        .from('admins')
+        .select('email, is_active')
+        .eq('email', userEmail)
+        .maybeSingle();
+
+      if (error) {
+        console.warn('[visibility-guard] Admin query error:', error);
+        return false;
+      }
+
+      const isAdmin = !!(adminRecord && adminRecord.is_active === true);
+      sessionStorage.setItem(`is_admin_${userEmail}`, String(isAdmin));
+      return isAdmin;
+    } catch (err) {
+      console.warn('[visibility-guard] Admin bypass check exception:', err);
+      return false;
+    }
+  }
+
+  function renderAdminModeBanner(mode) {
+    let existing = document.getElementById('admin-bypass-banner');
+    if (existing) existing.remove();
+    if (!mode || mode === 'public') return;
+
+    const isMaint = mode === 'maintenance';
+    const banner = document.createElement('div');
+    banner.id = 'admin-bypass-banner';
+    banner.setAttribute('role', 'status');
+    banner.setAttribute('aria-live', 'polite');
+    banner.style.cssText = `
+      position: sticky;
+      top: 0;
+      z-index: 999999;
+      width: 100%;
+      background-color: ${isMaint ? '#1E1B13' : '#171426'};
+      border-bottom: ${isMaint ? '1px solid rgba(245, 158, 11, 0.4)' : '1px solid rgba(124, 58, 237, 0.4)'};
+      color: ${isMaint ? '#FBBF24' : '#C4B5FD'};
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+      font-family: 'Inter', system-ui, sans-serif;
+      box-sizing: border-box;
+    `;
+    banner.innerHTML = `
+      <span style="font-size: 14px;">${isMaint ? '🟠' : '🔒'}</span>
+      <span style="font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em;">
+        ${isMaint ? 'Admin Mode' : 'Admin Preview'}
+      </span>
+      <span style="color: #E2E8F0; font-weight: 500;">
+        — ${isMaint ? 'Portfolio is currently in Maintenance Mode. Visitors are seeing the Maintenance page.' : 'Portfolio is in Private Mode. Visitors see the Private Access page.'}
+      </span>
+    `;
+    if (document.body) {
+      document.body.insertBefore(banner, document.body.firstChild);
+    }
+  }
+
   async function checkVisibility() {
     try {
+      const isAdmin = await checkAdminBypass();
+      if (isAdmin) {
+        console.log('[visibility-guard] Authenticated administrator detected. Granting full portfolio bypass.');
+        removeOverlay();
+        const service = window.PortfolioSettingsService;
+        let mode = 'public';
+        if (service && typeof service.getSiteMode === 'function') {
+          mode = await service.getSiteMode();
+        }
+        renderAdminModeBanner(mode);
+        return;
+      }
+
+      const existingBanner = document.getElementById('admin-bypass-banner');
+      if (existingBanner) existingBanner.remove();
+
       if (!window.PortfolioSettingsService) {
         await new Promise((resolve) => setTimeout(resolve, 200));
       }
@@ -106,6 +200,52 @@
       }
 
       if (mode === 'maintenance') {
+        const client = (window.AuthService && window.AuthService.supabase) ||
+                       (window.supabase ? window.supabase.createClient("https://txoszrnjkrlbjzpjisvp.supabase.co", "sb_publishable_DS3aReX7DKPTUeFrfndvAQ_4p7QTYfB") : null);
+        let currentUser = null;
+        if (client) {
+          const { data: s } = await client.auth.getSession();
+          currentUser = s?.session?.user || null;
+        }
+
+        let isAlreadySubscribed = false;
+        let subscribedMsg = "";
+        if (currentUser?.email && window.MaintenanceService && typeof window.MaintenanceService.checkSubscriptionStatus === 'function') {
+          const check = await window.MaintenanceService.checkSubscriptionStatus(currentUser.email);
+          isAlreadySubscribed = check.isSubscribed;
+          subscribedMsg = check.message || "You're already subscribed! We'll notify you as soon as the portfolio is live again.";
+        }
+
+        const userContent = currentUser ? `
+          <div style="display:flex; flex-direction:column; align-items:center; gap:14px; width:100%; background:rgba(15, 23, 42, 0.6); border:1px solid rgba(255, 255, 255, 0.1); border-radius:16px; padding:20px; box-sizing:border-box;">
+            <div style="display:flex; align-items:center; gap:12px; width:100%;">
+              ${currentUser.user_metadata?.avatar_url || currentUser.user_metadata?.picture ? `<img src="${currentUser.user_metadata.avatar_url || currentUser.user_metadata.picture}" style="width:42px; height:42px; border-radius:50%; border:2px solid #7C3AED;" />` : `<div style="width:42px; height:42px; border-radius:50%; background:#7C3AED; color:#FFF; display:flex; align-items:center; justify-content:center; font-weight:700;">${(currentUser.user_metadata?.full_name || currentUser.email || 'U').charAt(0).toUpperCase()}</div>`}
+              <div style="display:flex; flex-direction:column; text-align:left;">
+                <span style="font-size:14.5px; font-weight:700; color:#F8FAFC;">👤 ${currentUser.user_metadata?.full_name || currentUser.user_metadata?.name || 'Google User'}</span>
+                <span style="font-size:13px; color:#94A3B8;">${currentUser.email}</span>
+              </div>
+              <span style="margin-left:auto; font-size:11px; font-weight:700; color:#10B981; background:rgba(16, 185, 129, 0.15); border:1px solid rgba(16, 185, 129, 0.3); padding:3px 8px; border-radius:12px; white-space:nowrap;">✓ Signed in</span>
+            </div>
+            ${isAlreadySubscribed ? `
+              <div style="width:100%; background:rgba(245, 158, 11, 0.1); border:1px solid rgba(245, 158, 11, 0.3); border-radius:10px; padding:12px; color:#F59E0B; font-size:13px; font-weight:600; line-height:1.5; text-align:center;">ℹ ${subscribedMsg}</div>
+            ` : `
+              <button id="maint-btn-submit" type="button" data-user-email="${currentUser.email}" onclick="window.handleMaintenanceNotifySubmit(event)" style="width:100%; padding:12px; border-radius:10px; background:linear-gradient(135deg, #7C3AED, #6D28D9); color:#FFF; border:none; font-weight:600; font-size:14px; cursor:pointer; box-shadow:0 4px 14px rgba(124, 58, 237, 0.3);">Notify Me</button>
+              <div id="maint-error-feedback" style="display:none; font-size:12px; color:#EF4444; text-align:left; width:100%;"></div>
+            `}
+            <button type="button" onclick="window.AuthService && window.AuthService.signOut()" style="background:none; border:none; color:#94A3B8; font-size:12px; cursor:pointer; text-decoration:underline;">Not your account? Sign Out</button>
+          </div>
+        ` : `
+          <div style="display:flex; flex-direction:column; align-items:center; gap:12px; width:100%;">
+            <span style="font-size:14.5px; font-weight:600; color:#E2E8F0; letter-spacing:-0.01em;">
+              Want to get notified when we're back online?
+            </span>
+            <button id="maint-btn-google" type="button" onclick="window.AuthService && window.AuthService.signInWithGoogle()" style="display:inline-flex; align-items:center; justify-content:center; gap:10px; padding:12px 24px; border-radius:12px; background:#FFFFFF; color:#0F172A; border:none; font-weight:600; font-size:14px; cursor:pointer; width:100%; box-shadow:0 4px 14px rgba(0,0,0,0.2);">
+              <svg viewBox="0 0 24 24" width="18" height="18"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+              Continue with Google
+            </button>
+          </div>
+        `;
+
         overlayNode.innerHTML = `
           <div class="vis-card maint" style="max-width:520px; padding:44px 36px; gap:24px; border:1px solid rgba(255,255,255,0.08); background:rgba(18,24,36,0.85); backdrop-filter:blur(16px); box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);">
             <div style="display:flex; flex-direction:column; align-items:center; gap:16px;">
@@ -127,11 +267,7 @@
               <span>Expected to be back soon</span>
             </div>
             <div id="maint-notify-wrapper" style="width:100%; display:flex; flex-direction:column; gap:12px; margin-top:4px;">
-              <form id="maint-notify-form" style="display:flex; gap:8px; width:100%; flex-wrap:wrap;" onsubmit="window.handleMaintenanceNotifySubmit(event)">
-                <input id="maint-email-input" type="email" required placeholder="Enter your email address" style="flex:1; min-width:220px; padding:12px 16px; border-radius:10px; background:rgba(15, 23, 42, 0.6); border:1px solid rgba(255,255,255,0.12); color:#FFF; font-size:13.5px; outline:none;" />
-                <button id="maint-btn-submit" type="submit" style="padding:12px 20px; border-radius:10px; background:linear-gradient(135deg, #7C3AED, #6D28D9); color:#FFF; border:none; font-weight:600; font-size:13.5px; cursor:pointer; white-space:nowrap; box-shadow:0 4px 14px rgba(124, 58, 237, 0.3);">Notify Me</button>
-              </form>
-              <div id="maint-error-feedback" style="display:none; font-size:12px; color:#EF4444; text-align:left; margin-left:4px;"></div>
+              ${userContent}
             </div>
             <div style="width:100%; height:1px; background:rgba(255, 255, 255, 0.08); margin:4px 0;"></div>
             <div style="display:flex; align-items:center; justify-content:center; gap:20px;">
@@ -211,21 +347,20 @@
 
   window.handleMaintenanceNotifySubmit = async function(e) {
     if (e) e.preventDefault();
-    const input = document.getElementById('maint-email-input');
     const btn = document.getElementById('maint-btn-submit');
     const wrapper = document.getElementById('maint-notify-wrapper');
     const errBox = document.getElementById('maint-error-feedback');
 
-    if (!input || !btn || !wrapper) return;
+    if (!btn || !wrapper) return;
     if (errBox) {
       errBox.style.display = 'none';
       errBox.textContent = '';
     }
 
-    const email = (input.value || '').trim();
+    const email = (btn.getAttribute('data-user-email') || '').trim();
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       if (errBox) {
-        errBox.textContent = 'Please enter a valid email address.';
+        errBox.textContent = 'Invalid account email address.';
         errBox.style.display = 'block';
       }
       return;
@@ -471,9 +606,29 @@
     }
   };
 
+  // Subscribe to auth state changes to re-evaluate visibility immediately on SIGNED_IN / SIGNED_OUT
+  try {
+    const client = (window.AuthService && window.AuthService.supabase) ||
+                   (window.supabase ? window.supabase.createClient("https://txoszrnjkrlbjzpjisvp.supabase.co", "sb_publishable_DS3aReX7DKPTUeFrfndvAQ_4p7QTYfB") : null);
+    if (client && client.auth) {
+      client.auth.onAuthStateChange((event) => {
+        if (event === 'SIGNED_OUT') {
+          console.log('[visibility-guard] Admin signed out. Immediately revoking bypass and re-checking visibility.');
+          injectOverlay();
+          checkVisibility();
+        } else if (event === 'SIGNED_IN') {
+          checkVisibility();
+        }
+      });
+    }
+  } catch (authSubErr) {
+    console.warn('[visibility-guard] Auth state listener error:', authSubErr);
+  }
+
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', checkVisibility);
   } else {
     checkVisibility();
   }
 })();
+

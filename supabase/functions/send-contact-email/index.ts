@@ -1,4 +1,5 @@
 import "@supabase/functions-js/edge-runtime.d.ts";
+import { sendEmail } from "../_shared/emailProvider.ts";
 
 console.log("send-contact-email function initialized");
 
@@ -35,24 +36,10 @@ Deno.serve(async (req) => {
 
     const { full_name, email, subject, message, created_at } = record;
 
-    const resendApiKey = Deno.env.get('RESEND_API_KEY');
-    if (!resendApiKey) {
-      console.error("RESEND_API_KEY is not set");
-      return new Response(JSON.stringify({ error: "Email configuration missing." }), {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' }
-      });
-    }
-
-    const toEmail = Deno.env.get('NOTIFICATION_EMAIL_TO') || 'ashokvangapandu45@gmail.com';
-    const fromEmail = Deno.env.get('NOTIFICATION_EMAIL_FROM') || 'Portfolio Contact <onboarding@resend.dev>';
+    const toEmail = Deno.env.get('NOTIFICATION_EMAIL_TO') || Deno.env.get('ADMIN_NOTIFICATION_EMAIL') || 'contact@ashokvangapandu.com';
     const submittedTime = created_at ? new Date(created_at).toLocaleString('en-US', { timeZone: 'UTC' }) + ' UTC' : new Date().toLocaleString();
 
-    const emailBody = {
-      from: fromEmail,
-      to: toEmail,
-      subject: `New Portfolio Message: ${subject || 'No Subject'}`,
-      html: `
+    const htmlContent = `
         <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e5e7eb; border-radius: 12px; background-color: #ffffff;">
           <h2 style="color: #6C3CFF; margin-top: 0; border-bottom: 2px solid #f3f4f6; padding-bottom: 10px;">New Portfolio Contact Message</h2>
           
@@ -84,8 +71,9 @@ Deno.serve(async (req) => {
             Sent automatically from your portfolio website database webhook.
           </div>
         </div>
-      `,
-      text: `
+      `;
+
+    const textContent = `
         New Portfolio Contact Message
         ----------------------------
         Sender Name: ${full_name}
@@ -95,26 +83,23 @@ Deno.serve(async (req) => {
 
         Message:
         ${message}
-      `
-    };
+      `.trim();
 
-    console.log(`Sending email from ${fromEmail} to ${toEmail}...`);
-    const res = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${resendApiKey}`
-      },
-      body: JSON.stringify(emailBody)
+    console.log(`Sending email to ${toEmail}...`);
+
+    const result = await sendEmail({
+      to: { email: toEmail },
+      subject: `New Portfolio Message: ${subject || 'No Subject'}`,
+      html: htmlContent,
+      text: textContent
     });
 
-    const result = await res.json();
-    if (!res.ok) {
-      throw new Error(result.message || "Failed to send email via Resend");
+    if (!result.success) {
+      throw new Error(result.error || "Failed to send email via shared provider");
     }
 
-    console.log("Email sent successfully. Resend ID:", result.id);
-    return new Response(JSON.stringify({ success: true, id: result.id }), {
+    console.log("Email sent successfully. Message ID:", result.messageId);
+    return new Response(JSON.stringify({ success: true, id: result.messageId }), {
       status: 200,
       headers: { 
         'Content-Type': 'application/json',
@@ -122,7 +107,7 @@ Deno.serve(async (req) => {
       }
     });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error sending notification:", error.message);
     return new Response(JSON.stringify({ error: error.message }), {
       status: 400,

@@ -15,3 +15,10 @@ enabled = true
 verify_jwt = false
 import_map = "./functions/send-testimonial-email/deno.json"
 entrypoint = "./functions/send-testimonial-email/index.ts"
+
+[functions.send-maintenance-notification]
+enabled = true
+verify_jwt = false
+import_map = "./functions/send-maintenance-notification/deno.json"
+entrypoint = "./functions/send-maintenance-notification/index.ts"
+

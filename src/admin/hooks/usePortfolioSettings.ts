@@ -69,10 +69,22 @@ export const usePortfolioSettings = () => {
       };
       const res = await portfolioSettingsService.updateSettings(updated);
       setInitialSettings(updated);
+
+      let successMessage = 'Your global portfolio visibility settings have been updated successfully.';
+      if (res.workflowMessage) {
+        successMessage = res.workflowMessage;
+      } else if (visibility === 'public') {
+        successMessage = 'Portfolio is now public. Visitors can access the site.';
+      } else if (visibility === 'maintenance') {
+        successMessage = 'Maintenance Mode is active. Visitors will now see the maintenance page.';
+      } else if (visibility === 'private') {
+        successMessage = 'Private Mode is active. Only authorized visitors can access the portfolio.';
+      }
+
       setAlert({
         type: 'success',
         title: 'Settings Saved',
-        message: res.workflowMessage || 'Your global portfolio visibility settings have been updated successfully.'
+        message: successMessage
       });
     } catch (err: any) {
       console.error('[usePortfolioSettings] Save error:', err);

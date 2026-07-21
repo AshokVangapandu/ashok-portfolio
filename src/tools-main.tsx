@@ -102,6 +102,7 @@ const MainLayout: React.FC = () => {
   );
 };
 
+import { AuthProvider } from './auth/AuthProvider';
 import { PortfolioSettingsProvider } from './context/PortfolioSettingsContext';
 import { GlobalRouteGuard } from './components/routing/GlobalRouteGuard';
 
@@ -109,12 +110,15 @@ const rootElement = document.getElementById('root');
 if (rootElement) {
   ReactDOM.createRoot(rootElement).render(
     <React.StrictMode>
-      <PortfolioSettingsProvider>
-        <GlobalRouteGuard>
-          <MainLayout />
-        </GlobalRouteGuard>
-      </PortfolioSettingsProvider>
+      <AuthProvider>
+        <PortfolioSettingsProvider>
+          <GlobalRouteGuard>
+            <MainLayout />
+          </GlobalRouteGuard>
+        </PortfolioSettingsProvider>
+      </AuthProvider>
     </React.StrictMode>
   );
 }
 export default MainLayout;
+

@@ -15,6 +15,9 @@ export const authService = {
           redirectTo,
         },
       });
+      if (data?.url) {
+        window.location.href = data.url;
+      }
       return { data, error };
     } catch (err: any) {
       return { data: null, error: err as AuthError };

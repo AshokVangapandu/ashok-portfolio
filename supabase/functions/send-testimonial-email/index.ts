@@ -1,4 +1,5 @@
 import "@supabase/functions-js/edge-runtime.d.ts";
+import { sendEmail } from "../_shared/emailProvider.ts";
 
 console.log("send-testimonial-email function initialized");
 
@@ -55,23 +56,12 @@ Deno.serve(async (req) => {
 
     const { google_name, google_email, google_avatar, linkedin_url, designation, company, rating, testimonial, consent_public, status, created_at } = record;
 
-    const resendApiKey = Deno.env.get('RESEND_API_KEY');
-    if (!resendApiKey) {
-      console.error("RESEND_API_KEY is not set");
-      return new Response(JSON.stringify({ error: "Email configuration missing." }), {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' }
-      });
-    }
-
-    // Recipient email (ADMIN_NOTIFICATION_EMAIL or default to ashok's email)
-    const toEmail = Deno.env.get('ADMIN_NOTIFICATION_EMAIL') || 'ashokvangapandu45@gmail.com';
-    const fromEmail = Deno.env.get('NOTIFICATION_EMAIL_FROM') || 'Portfolio Testimonials <onboarding@resend.dev>';
+    // Recipient email (ADMIN_NOTIFICATION_EMAIL or default to contact email)
+    const toEmail = Deno.env.get('ADMIN_NOTIFICATION_EMAIL') || Deno.env.get('NOTIFICATION_EMAIL_TO') || 'contact@ashokvangapandu.com';
     const adminUrl = Deno.env.get('ADMIN_PORTAL_URL') || 'https://ashokvangapandu.in/admin';
     const submittedTime = created_at ? new Date(created_at).toLocaleString('en-US', { timeZone: 'UTC' }) + ' UTC' : new Date().toLocaleString();
 
     const emailBody = {
-      from: fromEmail,
       to: toEmail,
       subject: "New Testimonial Awaiting Approval",
       html: `
@@ -254,21 +244,18 @@ Deno.serve(async (req) => {
     };
 
     console.log(`Sending testimonial notification email to ${toEmail}...`);
-    const res = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${resendApiKey}`
-      },
-      body: JSON.stringify(emailBody)
+    const adminResult = await sendEmail({
+      to: { email: toEmail },
+      subject: "New Testimonial Awaiting Approval",
+      html: emailBody.html,
+      text: emailBody.text
     });
 
-    const result = await res.json();
-    if (!res.ok) {
-      throw new Error(result.message || "Failed to send email via Resend");
+    if (!adminResult.success) {
+      throw new Error(adminResult.error || "Failed to send admin notification email");
     }
 
-    console.log("✔ Email sent successfully. Resend ID:", result.id);
+    console.log("✔ Admin notification email sent successfully. Message ID:", adminResult.messageId);
 
     // Send thank-you email to submitter
     try {
@@ -276,7 +263,6 @@ Deno.serve(async (req) => {
         console.log("record.google_email value:", google_email);
         console.log(`Sending thank-you email to submitter: ${google_email}...`);
         const thankYouEmailBody = {
-          from: 'Portfolio Team <onboarding@resend.dev>',
           to: google_email,
           subject: 'Thank you for sharing your experience ❤️',
           html: `
@@ -419,30 +405,22 @@ Deno.serve(async (req) => {
           `
         };
 
-        const thankYouRes = await fetch('https://api.resend.com/emails', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${resendApiKey}`
-          },
-          body: JSON.stringify(thankYouEmailBody)
+        const thankYouResult = await sendEmail({
+          to: { email: google_email, name: google_name || 'Valued Visitor' },
+          subject: 'Thank you for sharing your experience ❤️',
+          html: thankYouEmailBody.html,
+          text: thankYouEmailBody.text
         });
 
-        const thankYouStatus = thankYouRes.status;
-        const thankYouBodyText = await thankYouRes.text();
-        debugInfo.thankYouResStatus = thankYouStatus;
-        debugInfo.thankYouResBody = thankYouBodyText;
-        console.log("HTTP Status:", thankYouStatus);
-        console.log("Response Body:", thankYouBodyText);
-        debugLog(`Resend thank-you API status: ${thankYouStatus}`);
-        debugLog(`Resend thank-you API response: ${thankYouBodyText}`);
+        debugInfo.thankYouResStatus = thankYouResult.statusCode || (thankYouResult.success ? 200 : 400);
+        debugInfo.thankYouResBody = thankYouResult.messageId || thankYouResult.error;
 
-        if (!thankYouRes.ok) {
-          throw new Error(`Resend API returned status ${thankYouStatus}: ${thankYouBodyText}`);
+        if (!thankYouResult.success) {
+          throw new Error(thankYouResult.error || 'Failed to send thank-you email');
         }
         debugLog("Thank-you email sent.");
       }
-    } catch (thankYouError) {
+    } catch (thankYouError: any) {
       debugInfo.thankYouError = thankYouError.message;
       console.error("Failed to send thank-you email.");
       console.error("Error Message:", thankYouError.message);
@@ -450,7 +428,7 @@ Deno.serve(async (req) => {
 
     return new Response(JSON.stringify({ 
       success: true, 
-      id: result.id,
+      id: adminResult.messageId,
       debug: debugInfo
     }), {
       status: 200,
