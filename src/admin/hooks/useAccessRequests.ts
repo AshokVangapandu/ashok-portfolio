@@ -57,10 +57,15 @@ export const useAccessRequests = () => {
     return { total, pending, approved, rejected };
   }, [requests]);
 
-  const approveRequest = async (id: string): Promise<boolean> => {
+  const approveRequest = async (
+    id: string,
+    options?: { role?: string; comment?: string; sendEmail?: boolean }
+  ): Promise<{ success: boolean; warning?: string }> => {
     try {
       const adminEmail = currentUser?.email || 'admin';
-      await accessRequestService.approveRequest(id, adminEmail);
+      const result = await accessRequestService.approveRequest(id, adminEmail, options);
+      
+      // Update local state instantly
       setRequests((prev) =>
         prev.map((r) =>
           r.id === id
@@ -69,12 +74,17 @@ export const useAccessRequests = () => {
                 requestStatus: 'approved',
                 reviewedAt: new Date().toISOString(),
                 reviewedBy: adminEmail,
+                notes: options?.comment || r.notes,
                 updatedAt: new Date().toISOString()
               }
             : r
         )
       );
-      return true;
+
+      // Re-fetch all requests to sync counts and other lists
+      await fetchRequests();
+      
+      return result;
     } catch (err: any) {
       console.error('[useAccessRequests] Approve error:', err);
       throw err;

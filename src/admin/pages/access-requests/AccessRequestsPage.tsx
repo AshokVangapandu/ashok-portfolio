@@ -23,22 +23,55 @@ export const AccessRequestsPage: React.FC = () => {
   const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
   const [adminNotesInput, setAdminNotesInput] = useState('');
 
+  // Approval Dialog States
+  const [isApprovalDialogOpen, setIsApprovalDialogOpen] = useState(false);
+  const [requestToApprove, setRequestToApprove] = useState<AccessRequest | null>(null);
+  const [selectedRole, setSelectedRole] = useState('viewer');
+  const [approvalComment, setApprovalComment] = useState('');
+  const [sendEmailEnabled, setSendEmailEnabled] = useState(true);
+  const [isApproving, setIsApproving] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3500);
+  };
+
   const handleOpenDetails = (req: AccessRequest) => {
     setSelectedRequest(req);
     setAdminNotesInput(req.notes || '');
   };
 
-  const handleApprove = async (id: string) => {
-    setActionLoadingId(id);
+  const handleOpenApprovalDialog = (req: AccessRequest) => {
+    // Hide details modal if open to prevent stacking modals
+    setSelectedRequest(null);
+    setRequestToApprove(req);
+    setSelectedRole('viewer');
+    setApprovalComment('');
+    setSendEmailEnabled(true);
+    setIsApprovalDialogOpen(true);
+  };
+
+  const handleConfirmApprove = async () => {
+    if (!requestToApprove) return;
+    setIsApproving(true);
     try {
-      await approveRequest(id);
-      if (selectedRequest && selectedRequest.id === id) {
-        setSelectedRequest((prev) => (prev ? { ...prev, requestStatus: 'approved' } : null));
+      const res = await approveRequest(requestToApprove.id, {
+        role: selectedRole,
+        comment: approvalComment,
+        sendEmail: sendEmailEnabled
+      });
+      setIsApprovalDialogOpen(false);
+      setRequestToApprove(null);
+      if (res && res.warning) {
+        showToast(`Approved with warning: ${res.warning}`);
+      } else {
+        showToast('Visitor access request approved successfully!');
       }
     } catch (err: any) {
       alert(err?.message || 'Failed to approve request.');
     } finally {
-      setActionLoadingId(null);
+      setIsApproving(false);
     }
   };
 
@@ -49,6 +82,7 @@ export const AccessRequestsPage: React.FC = () => {
       if (selectedRequest && selectedRequest.id === id) {
         setSelectedRequest((prev) => (prev ? { ...prev, requestStatus: 'rejected', notes: adminNotesInput } : null));
       }
+      showToast('Access request rejected.');
     } catch (err: any) {
       alert(err?.message || 'Failed to reject request.');
     } finally {
@@ -402,7 +436,7 @@ export const AccessRequestsPage: React.FC = () => {
                               <button
                                 type="button"
                                 disabled={isBusy}
-                                onClick={() => handleApprove(req.id)}
+                                onClick={() => handleOpenApprovalDialog(req)}
                                 className="hover-scale active-press"
                                 style={{
                                   padding: '5px 12px',
@@ -571,7 +605,7 @@ export const AccessRequestsPage: React.FC = () => {
 
                   <button
                     type="button"
-                    onClick={() => handleApprove(selectedRequest.id)}
+                    onClick={() => handleOpenApprovalDialog(selectedRequest)}
                     style={{ padding: '9px 20px', borderRadius: '8px', border: 'none', backgroundColor: '#10B981', color: '#FFFFFF', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}
                   >
                     Approve & Authorize User
@@ -580,6 +614,264 @@ export const AccessRequestsPage: React.FC = () => {
               )}
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Approval Configuration Dialog */}
+      {isApprovalDialogOpen && requestToApprove && (
+        <div
+          role="dialog"
+          aria-labelledby="approval-dialog-title"
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            backdropFilter: 'blur(4px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 99999,
+            padding: '20px',
+            boxSizing: 'border-box'
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: '16px',
+              maxWidth: '540px',
+              width: '100%',
+              padding: '28px',
+              boxShadow: '0 20px 40px rgba(0, 0, 0, 0.2)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '18px',
+              fontFamily: "'Inter', sans-serif"
+            }}
+          >
+            {/* Header */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                <h3 id="approval-dialog-title" style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: 'var(--admin-text)' }}>
+                  Configure Access Approval
+                </h3>
+                <span style={{ fontSize: '12px', color: 'var(--admin-text-secondary)' }}>
+                  Customize authorization privileges before confirming access
+                </span>
+              </div>
+              <button
+                type="button"
+                disabled={isApproving}
+                onClick={() => {
+                  setIsApprovalDialogOpen(false);
+                  setRequestToApprove(null);
+                }}
+                style={{ background: 'none', border: 'none', cursor: isApproving ? 'not-allowed' : 'pointer', color: '#64748B', fontSize: '18px' }}
+                aria-label="Close dialog"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Visitor Info Summary (Read Only) */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', backgroundColor: '#F8FAFC', padding: '14px', borderRadius: '10px', fontSize: '13px', border: '1px solid var(--admin-border)' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                <div>
+                  <span style={{ fontSize: '10.5px', fontWeight: 700, color: 'var(--admin-text-secondary)', textTransform: 'uppercase' }}>Visitor</span>
+                  <div style={{ fontWeight: 600, color: 'var(--admin-text)' }}>{requestToApprove.fullName}</div>
+                </div>
+                <div>
+                  <span style={{ fontSize: '10.5px', fontWeight: 700, color: 'var(--admin-text-secondary)', textTransform: 'uppercase' }}>Email</span>
+                  <div style={{ fontWeight: 600, color: 'var(--admin-text)', wordBreak: 'break-all' }}>{requestToApprove.email}</div>
+                </div>
+                <div>
+                  <span style={{ fontSize: '10.5px', fontWeight: 700, color: 'var(--admin-text-secondary)', textTransform: 'uppercase' }}>Company & Title</span>
+                  <div style={{ fontWeight: 500, color: 'var(--admin-text)' }}>
+                    {requestToApprove.company || 'N/A'} {requestToApprove.jobTitle ? `(${requestToApprove.jobTitle})` : ''}
+                  </div>
+                </div>
+                <div>
+                  <span style={{ fontSize: '10.5px', fontWeight: 700, color: 'var(--admin-text-secondary)', textTransform: 'uppercase' }}>Requested On</span>
+                  <div style={{ fontWeight: 500, color: 'var(--admin-text)' }}>{formatDate(requestToApprove.requestedAt)}</div>
+                </div>
+              </div>
+              {requestToApprove.reason && (
+                <div style={{ borderTop: '1px solid #E2E8F0', paddingTop: '8px', marginTop: '4px' }}>
+                  <span style={{ fontSize: '10.5px', fontWeight: 700, color: 'var(--admin-text-secondary)', textTransform: 'uppercase' }}>Reason</span>
+                  <p style={{ margin: '2px 0 0 0', color: 'var(--admin-text)', lineHeight: 1.4, fontStyle: 'italic' }}>
+                    "{requestToApprove.reason}"
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Settings Form */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', fontSize: '13.5px' }}>
+              {/* Role Configuration */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <label htmlFor="assign-role-select" style={{ fontSize: '12px', fontWeight: 700, color: 'var(--admin-text-secondary)' }}>
+                  Assign User Role *
+                </label>
+                <select
+                  id="assign-role-select"
+                  disabled={isApproving}
+                  value={selectedRole}
+                  onChange={(e) => setSelectedRole(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '8px 10px',
+                    borderRadius: '8px',
+                    border: '1px solid var(--admin-border)',
+                    fontSize: '13px',
+                    backgroundColor: '#FFFFFF',
+                    color: 'var(--admin-text)',
+                    outline: 'none',
+                    cursor: isApproving ? 'not-allowed' : 'pointer'
+                  }}
+                >
+                  <option value="viewer">Portfolio Visitor</option>
+                  <option value="admin">Admin</option>
+                  <option value="admin">Super Admin</option>
+                </select>
+                <span style={{ fontSize: '11px', color: 'var(--admin-text-secondary)' }}>
+                  Role levels can be updated dynamically at any time inside settings tabs.
+                </span>
+              </div>
+
+              {/* Approval Comment */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <label htmlFor="approval-notes-comment" style={{ fontSize: '12px', fontWeight: 700, color: 'var(--admin-text-secondary)' }}>
+                  Approval Comment / Notes (Optional)
+                </label>
+                <textarea
+                  id="approval-notes-comment"
+                  rows={2}
+                  disabled={isApproving}
+                  value={approvalComment}
+                  onChange={(e) => setApprovalComment(e.target.value)}
+                  placeholder="Welcome to the portfolio / Access approved for recruitment purposes..."
+                  style={{
+                    width: '100%',
+                    padding: '8px 12px',
+                    borderRadius: '8px',
+                    border: '1px solid var(--admin-border)',
+                    fontSize: '13px',
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                    resize: 'vertical',
+                    cursor: isApproving ? 'not-allowed' : 'default'
+                  }}
+                />
+              </div>
+
+              {/* Email Toggle */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '4px 0' }}>
+                <input
+                  type="checkbox"
+                  id="send-approval-email-checkbox"
+                  disabled={isApproving}
+                  checked={sendEmailEnabled}
+                  onChange={(e) => setSendEmailEnabled(e.target.checked)}
+                  style={{
+                    width: '16px',
+                    height: '16px',
+                    accentColor: 'var(--admin-primary)',
+                    cursor: isApproving ? 'not-allowed' : 'pointer'
+                  }}
+                />
+                <label
+                  htmlFor="send-approval-email-checkbox"
+                  style={{
+                    fontSize: '13px',
+                    fontWeight: 600,
+                    color: 'var(--admin-text)',
+                    cursor: isApproving ? 'not-allowed' : 'pointer',
+                    userSelect: 'none'
+                  }}
+                >
+                  Send access approval notification email
+                </label>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', borderTop: '1px solid var(--admin-border)', paddingTop: '16px', marginTop: '4px' }}>
+              <button
+                type="button"
+                disabled={isApproving}
+                onClick={() => {
+                  setIsApprovalDialogOpen(false);
+                  setRequestToApprove(null);
+                }}
+                style={{
+                  padding: '9px 16px',
+                  borderRadius: '8px',
+                  border: '1px solid var(--admin-border)',
+                  backgroundColor: '#FFFFFF',
+                  color: 'var(--admin-text)',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  cursor: isApproving ? 'not-allowed' : 'pointer',
+                  opacity: isApproving ? 0.6 : 1
+                }}
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                disabled={isApproving}
+                onClick={handleConfirmApprove}
+                style={{
+                  padding: '9px 22px',
+                  borderRadius: '8px',
+                  border: 'none',
+                  backgroundColor: '#10B981',
+                  color: '#FFFFFF',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  cursor: isApproving ? 'not-allowed' : 'pointer',
+                  boxShadow: '0 4px 10px rgba(16, 185, 129, 0.2)',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  opacity: isApproving ? 0.8 : 1
+                }}
+              >
+                {isApproving ? 'Approving...' : 'Approve Access'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Floating Success Toast */}
+      {toastMessage && (
+        <div
+          role="status"
+          style={{
+            position: 'fixed',
+            top: '20px',
+            right: '20px',
+            backgroundColor: '#10B981',
+            color: '#FFFFFF',
+            padding: '12px 24px',
+            borderRadius: '8px',
+            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+            zIndex: 99999,
+            fontWeight: 600,
+            fontSize: '13.5px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            animation: 'fadeIn 0.2s ease-out'
+          }}
+        >
+          <span>✓</span>
+          {toastMessage}
         </div>
       )}
     </div>

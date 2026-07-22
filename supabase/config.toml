@@ -22,3 +22,15 @@ verify_jwt = false
 import_map = "./functions/send-maintenance-notification/deno.json"
 entrypoint = "./functions/send-maintenance-notification/index.ts"
 
+[functions.send-access-approval-email]
+enabled = true
+verify_jwt = false
+import_map = "./functions/send-access-approval-email/deno.json"
+entrypoint = "./functions/send-access-approval-email/index.ts"
+
+[functions.notify-admins-new-request]
+enabled = true
+verify_jwt = false
+import_map = "./functions/notify-admins-new-request/deno.json"
+entrypoint = "./functions/notify-admins-new-request/index.ts"
+

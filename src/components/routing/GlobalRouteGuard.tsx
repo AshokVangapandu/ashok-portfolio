@@ -1,5 +1,5 @@
 /* src/components/routing/GlobalRouteGuard.tsx */
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useState, useEffect } from 'react';
 import { usePortfolioSettingsContext } from '../../context/PortfolioSettingsContext';
 import { useAuth } from '../../hooks/useAuth';
 import {
@@ -10,6 +10,7 @@ import {
 } from './VisibilityPlaceholders';
 
 import { privateAccessService } from '../../services/privateAccessService';
+import { supabase } from '../../services/supabase/client';
 
 interface GlobalRouteGuardProps {
   children: ReactNode;
@@ -17,9 +18,71 @@ interface GlobalRouteGuardProps {
 
 export const GlobalRouteGuard: React.FC<GlobalRouteGuardProps> = ({ children }) => {
   const { siteMode, isLoading, error, refreshSiteMode } = usePortfolioSettingsContext();
-  const { isAdmin, loading: authLoading } = useAuth();
+  const { isAdmin, user, loading: authLoading } = useAuth();
+  const [dbAuthorized, setDbAuthorized] = useState<boolean | null>(null);
 
-  if (isLoading || authLoading) {
+  useEffect(() => {
+    // Reset dbAuthorized if user email, siteMode, or admin status changes
+    setDbAuthorized(null);
+  }, [user?.email, siteMode, isAdmin]);
+
+  useEffect(() => {
+    if (siteMode !== 'private') {
+      return;
+    }
+    if (isAdmin) {
+      setDbAuthorized(true);
+      return;
+    }
+    if (authLoading) {
+      return;
+    }
+    if (!user?.email) {
+      setDbAuthorized(false);
+      return;
+    }
+
+    let active = true;
+    const checkDbAccess = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('authorized_users')
+          .select('access_status')
+          .ilike('email', user.email!)
+          .eq('access_status', 'enabled')
+          .maybeSingle();
+
+        if (active) {
+          if (!error && data && data.access_status === 'enabled') {
+            setDbAuthorized(true);
+            // Sync with sessionStorage session
+            const session = {
+              email: user.email!.trim().toLowerCase(),
+              token: btoa(`${user.email!.trim().toLowerCase()}:${Date.now()}`),
+              verifiedAt: new Date().toISOString()
+            };
+            sessionStorage.setItem('portfolio_private_session', JSON.stringify(session));
+          } else {
+            setDbAuthorized(false);
+            sessionStorage.removeItem('portfolio_private_session');
+          }
+        }
+      } catch (err) {
+        if (active) {
+          setDbAuthorized(false);
+          sessionStorage.removeItem('portfolio_private_session');
+        }
+      }
+    };
+
+    checkDbAccess();
+
+    return () => {
+      active = false;
+    };
+  }, [user?.email, siteMode, isAdmin, authLoading]);
+
+  if (isLoading || authLoading || (siteMode === 'private' && !isAdmin && dbAuthorized === null)) {
     return <GlobalLoadingScreen />;
   }
 
@@ -75,7 +138,7 @@ export const GlobalRouteGuard: React.FC<GlobalRouteGuardProps> = ({ children }) 
     case 'maintenance':
       return <MaintenanceModePlaceholder />;
     case 'private':
-      if (privateAccessService.hasValidSession()) {
+      if (dbAuthorized === true) {
         return <>{children}</>;
       }
       return <PrivateModePlaceholder />;
@@ -86,4 +149,5 @@ export const GlobalRouteGuard: React.FC<GlobalRouteGuardProps> = ({ children }) 
 };
 
 export default GlobalRouteGuard;
+
 

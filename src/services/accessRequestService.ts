@@ -99,7 +99,11 @@ export const accessRequestService = {
     }));
   },
 
-  async approveRequest(id: string, adminEmail?: string): Promise<boolean> {
+  async approveRequest(
+    id: string,
+    adminEmail?: string,
+    options?: { role?: string; comment?: string; sendEmail?: boolean }
+  ): Promise<{ success: boolean; warning?: string }> {
     // 1. Fetch request details
     const { data: request, error: fetchError } = await supabase
       .from('access_requests')
@@ -112,6 +116,9 @@ export const accessRequestService = {
       throw fetchError || new Error('Request not found');
     }
 
+    const targetRole = (options?.role || 'viewer') as 'viewer' | 'recruiter' | 'client' | 'admin';
+    const targetNotes = options?.comment?.trim() || `Approved access request from ${request.company || 'visitor'}`;
+
     // 2. Upsert into authorized_users table
     const { data: existingUser } = await supabase
       .from('authorized_users')
@@ -119,25 +126,35 @@ export const accessRequestService = {
       .ilike('email', request.email)
       .maybeSingle();
 
+    let upsertError: any = null;
     if (existingUser) {
-      await supabase
+      const { error } = await supabase
         .from('authorized_users')
         .update({
           access_status: 'enabled',
+          access_level: targetRole,
+          notes: targetNotes,
           full_name: request.full_name || undefined,
           updated_at: new Date().toISOString()
         })
         .eq('id', existingUser.id);
+      upsertError = error;
     } else {
-      await supabase
+      const { error } = await supabase
         .from('authorized_users')
         .insert({
           email: request.email,
           full_name: request.full_name,
           access_status: 'enabled',
-          access_level: 'viewer',
-          notes: `Approved access request from ${request.company || 'visitor'}`
+          access_level: targetRole,
+          notes: targetNotes
         });
+      upsertError = error;
+    }
+
+    if (upsertError) {
+      console.error('[accessRequestService] Error upserting authorized user:', upsertError);
+      throw upsertError;
     }
 
     // 3. Update request status to approved
@@ -147,6 +164,7 @@ export const accessRequestService = {
         request_status: 'approved',
         reviewed_at: new Date().toISOString(),
         reviewed_by: adminEmail || 'admin',
+        notes: options?.comment?.trim() || null,
         updated_at: new Date().toISOString()
       })
       .eq('id', id);
@@ -156,7 +174,27 @@ export const accessRequestService = {
       throw updateError;
     }
 
-    return true;
+    // 4. Invoke email Edge Function after successful DB updates, only if enabled
+    let warning: string | undefined = undefined;
+    if (options?.sendEmail !== false) {
+      try {
+        const { error: invokeError } = await supabase.functions.invoke('send-access-approval-email', {
+          body: {
+            name: request.full_name,
+            email: request.email
+          }
+        });
+        if (invokeError) {
+          console.error('[accessRequestService] send-access-approval-email function returned error:', invokeError);
+          warning = 'Failed to send approval email notification.';
+        }
+      } catch (err: any) {
+        console.error('[accessRequestService] send-access-approval-email function invocation exception:', err);
+        warning = 'Failed to send approval email notification.';
+      }
+    }
+
+    return { success: true, warning };
   },
 
   async rejectRequest(id: string, adminEmail?: string, notes?: string): Promise<boolean> {
