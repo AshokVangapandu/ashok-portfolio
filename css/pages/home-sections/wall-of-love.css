@@ -1124,17 +1124,24 @@ body.modal-open {
 
 /* LinkedIn profile icon inside live carousel testimonial cards */
 .wall-card-linkedin {
-  position: absolute;
-  top: 28px;
-  right: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   color: rgba(255, 255, 255, 0.35);
   transition: color 200ms ease, transform 200ms ease;
   line-height: 1;
+  cursor: pointer;
+}
+
+.wall-card-linkedin svg {
+  display: block;
+  width: 18px;
+  height: 18px;
 }
 
 .wall-card-linkedin:hover {
   color: #0a66c2;
-  transform: scale(1.12);
+  transform: scale(1.1);
 }
 
 .wall-card-top {
@@ -1628,6 +1635,12 @@ body.modal-open {
   display: flex;
   flex-direction: column;
   gap: 2px;
+}
+
+.author-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .author-meta h4 {
