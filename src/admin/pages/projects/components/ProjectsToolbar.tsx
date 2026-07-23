@@ -1,11 +1,11 @@
-/* src/admin/pages/certifications/components/CertificationsToolbar.tsx */
+/* src/admin/pages/projects/components/ProjectsToolbar.tsx */
 import React from 'react';
 import { PortfolioContentToolbar } from '../../../layout/PortfolioContentLayout';
 import { SearchBar } from '../../../components/portfolio-content/SearchBar';
 import { FilterControl } from '../../../components/portfolio-content/FilterControl';
 import { SortControl } from '../../../components/portfolio-content/SortControl';
 
-interface CertificationsToolbarProps {
+interface ProjectsToolbarProps {
   searchVal: string;
   setSearchVal: (val: string) => void;
   filterVal: string;
@@ -14,7 +14,7 @@ interface CertificationsToolbarProps {
   setSortVal: (val: string) => void;
 }
 
-export const CertificationsToolbar: React.FC<CertificationsToolbarProps> = ({
+export const ProjectsToolbar: React.FC<ProjectsToolbarProps> = ({
   searchVal,
   setSearchVal,
   filterVal,
@@ -41,10 +41,9 @@ export const CertificationsToolbar: React.FC<CertificationsToolbarProps> = ({
       <SearchBar
         value={searchVal}
         onChange={setSearchVal}
-        placeholder="Search certifications by title, organization, or skills..."
+        placeholder="Search projects by title, client, technology, or category..."
       />
 
-      {/* Action Buttons (Positioned on the right) */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
         <FilterControl
           value={filterVal}
@@ -62,4 +61,4 @@ export const CertificationsToolbar: React.FC<CertificationsToolbarProps> = ({
   );
 };
 
-export default CertificationsToolbar;
+export default ProjectsToolbar;

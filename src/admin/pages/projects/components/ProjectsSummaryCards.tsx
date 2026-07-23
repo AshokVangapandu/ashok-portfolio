@@ -1,16 +1,16 @@
-/* src/admin/pages/certifications/components/CertificationsSummaryCards.tsx */
+/* src/admin/pages/projects/components/ProjectsSummaryCards.tsx */
 import React from 'react';
 import { PortfolioContentStats } from '../../../layout/PortfolioContentLayout';
 import { StatisticsCard } from '../../../components/portfolio-content/StatisticsCard';
 
-interface CertificationsSummaryCardsProps {
+interface ProjectsSummaryCardsProps {
   total: number;
   published: number;
   draft: number;
   featured: number;
 }
 
-export const CertificationsSummaryCards: React.FC<CertificationsSummaryCardsProps> = ({
+export const ProjectsSummaryCards: React.FC<ProjectsSummaryCardsProps> = ({
   total,
   published,
   draft,
@@ -18,22 +18,21 @@ export const CertificationsSummaryCards: React.FC<CertificationsSummaryCardsProp
 }) => {
   const cards = [
     {
-      title: 'Total Certifications',
+      title: 'Total Projects',
       value: total,
-      helperText: 'All registered credentials',
+      helperText: 'Registered portfolio projects',
       iconColor: '#7C5CFF', // Soft Indigo
       iconBg: 'rgba(124, 92, 255, 0.1)',
       icon: (
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="12" cy="8" r="6" />
-          <path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11" />
+          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
         </svg>
       )
     },
     {
       title: 'Published',
       value: published,
-      helperText: 'Live on your portfolio',
+      helperText: 'Visible on portfolio',
       iconColor: '#22C55E', // Green
       iconBg: 'rgba(34, 197, 94, 0.1)',
       icon: (
@@ -46,7 +45,7 @@ export const CertificationsSummaryCards: React.FC<CertificationsSummaryCardsProp
     {
       title: 'Draft',
       value: draft,
-      helperText: 'Work in progress',
+      helperText: 'Projects in progress',
       iconColor: '#F59E0B', // Amber
       iconBg: 'rgba(245, 158, 11, 0.1)',
       icon: (
@@ -59,7 +58,7 @@ export const CertificationsSummaryCards: React.FC<CertificationsSummaryCardsProp
     {
       title: 'Featured',
       value: featured,
-      helperText: 'Highlighted at the top',
+      helperText: 'Pinned projects',
       iconColor: '#A78BFA', // Purple
       iconBg: 'rgba(167, 139, 250, 0.1)',
       icon: (
@@ -87,4 +86,4 @@ export const CertificationsSummaryCards: React.FC<CertificationsSummaryCardsProp
   );
 };
 
-export default CertificationsSummaryCards;
+export default ProjectsSummaryCards;

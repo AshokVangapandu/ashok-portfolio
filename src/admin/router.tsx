@@ -12,6 +12,8 @@ import { CertificationsPage } from './pages/certifications/CertificationsPage';
 import { MaintenanceSubscribersPage } from './pages/maintenance-subscribers/MaintenanceSubscribersPage';
 import { AuthorizedUsersPage } from './pages/authorized-users/AuthorizedUsersPage';
 import { AccessRequestsPage } from './pages/access-requests/AccessRequestsPage';
+import { ToolsProductsPage } from './pages/tools-products/ToolsProductsPage';
+import { ProjectsPage } from './pages/projects/ProjectsPage';
 
 interface RouteResolution {
   component: React.ReactNode;
@@ -42,10 +44,20 @@ export const resolveRoute = (path: string): RouteResolution => {
         component: <DashboardPage />,
         pageTitle: 'Admin Dashboard',
       };
+    case '/admin/projects':
+      return {
+        component: <ProjectsPage />,
+        pageTitle: 'Projects',
+      };
     case '/admin/certifications':
       return {
         component: <CertificationsPage />,
         pageTitle: 'Certifications',
+      };
+    case '/admin/tools-products':
+      return {
+        component: <ToolsProductsPage />,
+        pageTitle: 'Tools & Products',
       };
     case '/admin/contacts':
       return {

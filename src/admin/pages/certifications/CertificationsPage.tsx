@@ -1,6 +1,5 @@
 /* src/admin/pages/certifications/CertificationsPage.tsx */
 import React, { useState, useEffect, useCallback } from 'react';
-import { CertificationsHeader } from './components/CertificationsHeader';
 import { CertificationsSummaryCards } from './components/CertificationsSummaryCards';
 import { CertificationsToolbar } from './components/CertificationsToolbar';
 import { CertificationsTable } from './components/CertificationsTable';
@@ -8,6 +7,8 @@ import { CertificationDrawer } from './components/CertificationDrawer';
 import { Certification } from './mockCertifications';
 import { certificationService } from '../../services/certificationService';
 import { LoadingSkeleton } from '../testimonials/components/LoadingSkeleton';
+import { PortfolioContentLayout } from '../../layout/PortfolioContentLayout';
+import { DeleteDialog } from '../../components/portfolio-content/DeleteDialog';
 
 export const CertificationsPage: React.FC = () => {
   const [certifications, setCertifications] = useState<Certification[]>([]);
@@ -16,6 +17,11 @@ export const CertificationsPage: React.FC = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [drawerMode, setDrawerMode] = useState<'create' | 'edit'>('create');
   const [selectedCert, setSelectedCert] = useState<Certification | null>(null);
+
+  // Delete modal states
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [certToDelete, setCertToDelete] = useState<Certification | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Search, Filter, Sort States
   const [searchVal, setSearchVal] = useState('');
@@ -124,43 +130,54 @@ export const CertificationsPage: React.FC = () => {
     setIsDrawerOpen(false);
   };
 
-  // Delete callback
-  const handleDeleteClick = async (id: string) => {
-    const certToDelete = certifications.find(c => c.id === id);
-    if (!certToDelete) return;
+  // Trigger Delete confirmation modal
+  const handleDeleteClick = (id: string) => {
+    const cert = certifications.find(c => c.id === id);
+    if (!cert) return;
+    setCertToDelete(cert);
+    setDeleteDialogOpen(true);
+  };
 
-    if (window.confirm(`Are you sure you want to delete the certification "${certToDelete.title}"? This action cannot be undone.`)) {
-      try {
-        await certificationService.deleteCertification(id);
-        
-        if (typeof window !== 'undefined' && (window as any).showToast) {
-          (window as any).showToast('success', 'Certification Deleted', 'Certification deleted successfully.', 4000);
-        }
-        
-        fetchData();
-      } catch (err: any) {
-        if (typeof window !== 'undefined' && (window as any).showToast) {
-          (window as any).showToast('error', 'Delete Failed', err.message || 'Failed to delete certification.', 5000);
-        }
+  // Confirm delete handler
+  const handleConfirmDelete = async () => {
+    if (!certToDelete) return;
+    setIsDeleting(true);
+    try {
+      await certificationService.deleteCertification(certToDelete.id);
+      
+      if (typeof window !== 'undefined' && (window as any).showToast) {
+        (window as any).showToast('success', 'Certification Deleted', 'Certification deleted successfully.', 4000);
       }
+      
+      fetchData();
+      setDeleteDialogOpen(false);
+    } catch (err: any) {
+      if (typeof window !== 'undefined' && (window as any).showToast) {
+        (window as any).showToast('error', 'Delete Failed', err.message || 'Failed to delete certification.', 5000);
+      }
+    } finally {
+      setIsDeleting(false);
+      setCertToDelete(null);
     }
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--admin-space-5)' }}>
-      {/* 1. Page Header */}
-      <CertificationsHeader onAddClick={handleAddClick} />
-
-      {/* 2. Overview Statistics Cards */}
-      <CertificationsSummaryCards 
-        total={total}
-        published={published}
-        draft={draft}
-        featured={featured}
-      />
-
-      {/* 3. Search Bar and Table contents */}
-      <div style={{ display: 'flex', flexDirection: 'column' }}>
+    <PortfolioContentLayout
+      title="🏆 Certifications"
+      description="Manage and publish professional certifications displayed on your portfolio."
+      primaryAction={{
+        label: 'Add Certification',
+        onClick: handleAddClick
+      }}
+      stats={
+        <CertificationsSummaryCards 
+          total={total}
+          published={published}
+          draft={draft}
+          featured={featured}
+        />
+      }
+      toolbar={
         <CertificationsToolbar 
           searchVal={searchVal}
           setSearchVal={setSearchVal}
@@ -169,24 +186,25 @@ export const CertificationsPage: React.FC = () => {
           sortVal={sortVal}
           setSortVal={setSortVal}
         />
-        {loading ? (
-          <LoadingSkeleton />
-        ) : error ? (
-          <div style={{ padding: '24px', textAlign: 'center', color: '#EF4444', backgroundColor: '#FFFFFF', borderRadius: 'var(--admin-radius-md)', border: '1px solid var(--admin-border)' }}>
-            Error loading certifications: {error}
-          </div>
-        ) : (
-          <CertificationsTable 
-            certifications={displayedCertifications} 
-            onEditClick={handleEditClick} 
-            onDeleteClick={handleDeleteClick}
-            isFiltered={searchVal.trim() !== '' || filterVal !== 'all'}
-            onClearFilters={handleClearFilters}
-          />
-        )}
-      </div>
+      }
+    >
+      {loading ? (
+        <LoadingSkeleton />
+      ) : error ? (
+        <div style={{ padding: '24px', textAlign: 'center', color: '#EF4444', backgroundColor: '#FFFFFF', borderRadius: 'var(--admin-radius-md)', border: '1px solid var(--admin-border)' }}>
+          Error loading certifications: {error}
+        </div>
+      ) : (
+        <CertificationsTable 
+          certifications={displayedCertifications} 
+          onEditClick={handleEditClick} 
+          onDeleteClick={handleDeleteClick}
+          isFiltered={searchVal.trim() !== '' || filterVal !== 'all'}
+          onClearFilters={handleClearFilters}
+        />
+      )}
 
-      {/* 4. Slide-in Edit/Create Drawer */}
+      {/* Slide-in Edit/Create Drawer */}
       <CertificationDrawer
         isOpen={isDrawerOpen}
         mode={drawerMode}
@@ -194,7 +212,20 @@ export const CertificationsPage: React.FC = () => {
         onClose={() => setIsDrawerOpen(false)}
         onSave={handleSave}
       />
-    </div>
+
+      {/* Delete Confirmation Modal */}
+      <DeleteDialog
+        isOpen={deleteDialogOpen}
+        onClose={() => {
+          setDeleteDialogOpen(false);
+          setCertToDelete(null);
+        }}
+        onConfirm={handleConfirmDelete}
+        title="Delete Certification"
+        description={`Are you sure you want to delete the certification "${certToDelete?.title || ''}"? This action cannot be undone.`}
+        isDeleting={isDeleting}
+      />
+    </PortfolioContentLayout>
   );
 };
 

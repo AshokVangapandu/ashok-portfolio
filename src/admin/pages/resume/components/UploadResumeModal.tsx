@@ -1,6 +1,7 @@
 /* src/admin/pages/resume/components/UploadResumeModal.tsx */
 import React, { useState, useEffect, useRef } from 'react';
 import { ResumeSetting } from '../../../types/resume';
+import { MediaUpload } from '../../../components/portfolio-content/MediaUpload';
 
 interface UploadResumeModalProps {
   isOpen: boolean;
@@ -21,7 +22,6 @@ export const UploadResumeModal: React.FC<UploadResumeModalProps> = ({
   const [version, setVersion] = useState('');
   const [file, setFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -40,18 +40,7 @@ export const UploadResumeModal: React.FC<UploadResumeModalProps> = ({
 
   if (!isOpen) return null;
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0];
-    if (selectedFile) {
-      if (selectedFile.type !== 'application/pdf') {
-        if (typeof window !== 'undefined' && (window as any).showToast) {
-          (window as any).showToast('error', 'Invalid File Type', 'Please upload a PDF file only.', 5000);
-        }
-        return;
-      }
-      setFile(selectedFile);
-    }
-  };
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -200,51 +189,19 @@ export const UploadResumeModal: React.FC<UploadResumeModalProps> = ({
           </div>
 
           {/* File Upload Zone */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            <label style={{ fontSize: '13px', fontWeight: 650, color: '#475569' }}>
-              Select PDF Document *
-            </label>
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={handleFileChange}
-              accept="application/pdf"
-              style={{ display: 'none' }}
-            />
-            <div
-              onClick={() => !isSubmitting && fileInputRef.current?.click()}
-              style={{
-                border: '1.5px dashed rgba(124, 92, 255, 0.25)',
-                borderRadius: '10px',
-                backgroundColor: 'rgba(124, 92, 255, 0.02)',
-                padding: '24px',
-                textAlign: 'center',
-                cursor: isSubmitting ? 'not-allowed' : 'pointer',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: '8px'
-              }}
-            >
-              <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#7C5CFF" strokeWidth="2">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                <polyline points="14 2 14 8 20 8" />
-                <line x1="12" y1="18" x2="12" y2="12" />
-                <polyline points="9 15 12 18 15 15" />
-              </svg>
-              {file ? (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                  <span style={{ fontSize: '13px', fontWeight: 700, color: '#0F172A' }}>{file.name}</span>
-                  <span style={{ fontSize: '11px', color: '#64748B' }}>{(file.size / 1024).toFixed(1)} KB · Ready to upload</span>
-                </div>
-              ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                  <span style={{ fontSize: '13px', fontWeight: 700, color: '#475569' }}>Click to select PDF resume</span>
-                  <span style={{ fontSize: '10px', color: '#94A3B8' }}>PDF format only, up to 10MB</span>
-                </div>
-              )}
-            </div>
-          </div>
+          <MediaUpload
+            label="Select PDF Document"
+            helperText="PDF format only, up to 10MB"
+            accept="application/pdf"
+            previewUrl={file ? 'resume.pdf' : null}
+            file={file}
+            onChange={(selectedFile) => {
+              setFile(selectedFile);
+            }}
+            required
+            disabled={isSubmitting}
+            height="140px"
+          />
 
           {/* Footer Actions */}
           <div

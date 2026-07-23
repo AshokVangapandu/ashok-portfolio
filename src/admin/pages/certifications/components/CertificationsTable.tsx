@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import { Card } from '../../../components/cards/Card';
 import { Button } from '../../../components/buttons/Button';
 import { Certification } from '../mockCertifications';
+import { EmptyState } from '../../../components/portfolio-content/EmptyState';
+import { StatusBadge } from '../../../components/portfolio-content/StatusBadge';
 
 interface CertificationsTableProps {
   certifications: Certification[];
@@ -36,35 +38,17 @@ export const CertificationsTable: React.FC<CertificationsTableProps> = ({ certif
   if (!certifications || certifications.length === 0) {
     if (isFiltered) {
       return (
-        <Card style={{ padding: '60px 40px', textAlign: 'center', backgroundColor: '#FFFFFF' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px' }}>
-            <div
-              style={{
-                width: '80px',
-                height: '80px',
-                borderRadius: '50%',
-                backgroundColor: 'var(--admin-surface)',
-                color: 'var(--admin-text-secondary)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                opacity: 0.8
-              }}
-            >
-              <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="11" cy="11" r="8" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-              </svg>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: 'var(--admin-text)' }}>
-                No matching certifications
-              </h3>
-              <p style={{ margin: 0, fontSize: '14px', color: 'var(--admin-text-secondary)', maxWidth: '320px' }}>
-                We couldn't find any certifications matching your search/filters. Try clearing your search term or filter parameters.
-              </p>
-            </div>
-            {onClearFilters && (
+        <EmptyState
+          icon={
+            <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+          }
+          title="No matching certifications"
+          description="We couldn't find any certifications matching your search/filters. Try clearing your search term or filter parameters."
+          actionButton={
+            onClearFilters && (
               <Button
                 variant="primary"
                 onClick={onClearFilters}
@@ -72,44 +56,26 @@ export const CertificationsTable: React.FC<CertificationsTableProps> = ({ certif
               >
                 Clear Search & Filters
               </Button>
-            )}
-          </div>
-        </Card>
+            )
+          }
+        />
       );
     }
 
     return (
-      <Card style={{ padding: '60px 40px', textAlign: 'center', backgroundColor: '#FFFFFF' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px' }}>
-          <div
-            style={{
-              width: '80px',
-              height: '80px',
-              borderRadius: '50%',
-              backgroundColor: 'var(--admin-surface)',
-              color: 'var(--admin-text-secondary)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              opacity: 0.8
-            }}
-          >
-            <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
-              <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
-              <path d="M4 22h16" />
-              <path d="M10 14.66V17c0 .55-.45 1-1 1H4v2h16v-2h-5c-.55 0-1-.45-1-1v-2.34" />
-              <path d="M12 2a5 5 0 0 0-5 5v3c0 2.2 1.8 4 4 4h2c2.2 0 4-1.8 4-4V7a5 5 0 0 0-5-5z" />
-            </svg>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: 'var(--admin-text)' }}>
-              No certifications found
-            </h3>
-            <p style={{ margin: 0, fontSize: '14px', color: 'var(--admin-text-secondary)', maxWidth: '320px' }}>
-              Add your first credential to showcase your professional certifications on your portfolio.
-            </p>
-          </div>
+      <EmptyState
+        icon={
+          <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
+            <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
+            <path d="M4 22h16" />
+            <path d="M10 14.66V17c0 .55-.45 1-1 1H4v2h16v-2h-5c-.55 0-1-.45-1-1v-2.34" />
+            <path d="M12 2a5 5 0 0 0-5 5v3c0 2.2 1.8 4 4 4h2c2.2 0 4-1.8 4-4V7a5 5 0 0 0-5-5z" />
+          </svg>
+        }
+        title="No certifications found"
+        description="Add your first credential to showcase your professional certifications on your portfolio."
+        actionButton={
           <Button
             variant="primary"
             onClick={() => console.log('TODO: Add Certification')}
@@ -121,43 +87,10 @@ export const CertificationsTable: React.FC<CertificationsTableProps> = ({ certif
             </svg>
             Add Certification
           </Button>
-        </div>
-      </Card>
+        }
+      />
     );
   }
-
-  // Get color styles for status badges
-  const getBadgeStyle = (status: Certification['status']) => {
-    switch (status) {
-      case 'Published':
-      case 'published':
-      case 'Featured':
-        return {
-          bg: 'rgba(16, 185, 129, 0.08)',
-          color: '#10B981',
-          border: '1px solid rgba(16, 185, 129, 0.15)'
-        };
-      case 'Draft':
-      case 'draft':
-        return {
-          bg: 'rgba(245, 158, 11, 0.08)',
-          color: '#F59E0B',
-          border: '1px solid rgba(245, 158, 11, 0.15)'
-        };
-      case 'Expired':
-        return {
-          bg: 'rgba(239, 68, 68, 0.08)',
-          color: '#EF4444',
-          border: '1px solid rgba(239, 68, 68, 0.15)'
-        };
-      case 'Archived':
-        return {
-          bg: 'rgba(100, 116, 139, 0.08)',
-          color: '#64748B',
-          border: '1px solid rgba(100, 116, 139, 0.15)'
-        };
-    }
-  };
 
   return (
     <div
@@ -321,7 +254,6 @@ export const CertificationsTable: React.FC<CertificationsTableProps> = ({ certif
           </thead>
           <tbody>
             {certifications.map((cert) => {
-              const badge = getBadgeStyle(cert.status);
               const isSelected = selectedIds.includes(cert.id);
               const isHovered = hoveredRow === cert.id;
 
@@ -407,26 +339,7 @@ export const CertificationsTable: React.FC<CertificationsTableProps> = ({ certif
 
                   {/* Status Badge Cell (Standardized Badges) */}
                   <td style={{ padding: '12px 16px', verticalAlign: 'middle' }}>
-                    <span
-                      style={{
-                        fontSize: '11px',
-                        fontWeight: 700,
-                        height: '24px',
-                        padding: '0 12px',
-                        borderRadius: '999px',
-                        backgroundColor: badge.bg,
-                        color: badge.color,
-                        border: badge.border,
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.04em',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        boxSizing: 'border-box'
-                      }}
-                    >
-                      {cert.status}
-                    </span>
+                    <StatusBadge status={cert.status} />
                   </td>
 
                   {/* Row Actions Cell */}

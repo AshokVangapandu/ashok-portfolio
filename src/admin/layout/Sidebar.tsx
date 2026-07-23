@@ -29,6 +29,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
     }
     return false;
   });
+  const [portfolioContentExpanded, setPortfolioContentExpanded] = React.useState(() => {
+    if (typeof window !== 'undefined') {
+      const path = window.location.pathname.toLowerCase();
+      return path.includes('/admin/projects') || path.includes('/admin/certifications') || path.includes('/admin/tools-products');
+    }
+    return false;
+  });
 
   // Normalize current path for comparisons (strip /ashok-portfolio and trailing slash)
   let cleanPath = currentPath.toLowerCase().replace(/\/$/, '');
@@ -52,6 +59,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
       ), 
       path: '/admin/' 
     },
+    {
+      label: 'Portfolio Content',
+      icon: () => (
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+        </svg>
+      ),
+      path: '/admin/portfolio-content'
+    },
     { 
       label: 'Contacts', 
       icon: () => (
@@ -74,16 +90,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
       path: '/admin/testimonials' 
     },
     { 
-      label: 'Certifications', 
-      icon: () => (
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="12" cy="8" r="7" />
-          <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88" />
-        </svg>
-      ), 
-      path: '/admin/certifications' 
-    },
-    { 
       label: 'Resume Downloads', 
       icon: () => (
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
@@ -94,16 +100,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </svg>
       ), 
       path: '/admin/resume' 
-    },
-    { 
-      label: 'Projects', 
-      icon: () => (
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-          <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
-          <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
-        </svg>
-      ), 
-      path: '/admin/projects' 
     },
     { 
       label: 'Analytics', 
@@ -226,16 +222,25 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {menuItems.map((item) => {
             const isDashboard = item.path === '/admin/';
             const isSettings = item.label === 'Settings';
+            const isPortfolioContent = item.label === 'Portfolio Content';
             const isActive = isDashboard 
               ? (cleanPath === '/admin' || cleanPath === '/admin/')
               : (isSettings
                 ? (cleanPath.startsWith('/admin/settings') || cleanPath === '/admin/social-links' || cleanPath === '/admin/access')
-                : cleanPath === item.path.replace(/\/$/, '').toLowerCase());
+                : (isPortfolioContent
+                  ? (cleanPath === '/admin/projects' || cleanPath === '/admin/certifications' || cleanPath === '/admin/tools-products')
+                  : cleanPath === item.path.replace(/\/$/, '').toLowerCase()));
 
             const subItems = [
               { label: 'Portfolio Settings', path: '/admin/settings/portfolio' },
               { label: 'Social Links', path: '/admin/settings/social-links' },
               { label: 'Admin Access', path: '/admin/settings/admin-access' }
+            ];
+
+            const portfolioSubItems = [
+              { label: 'Projects', path: '/admin/projects' },
+              { label: 'Certifications', path: '/admin/certifications' },
+              { label: 'Tools & Products', path: '/admin/tools-products' }
             ];
 
             return (
@@ -248,6 +253,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   onClick={() => {
                     if (isSettings) {
                       setSettingsExpanded(!settingsExpanded);
+                    } else if (isPortfolioContent) {
+                      setPortfolioContentExpanded(!portfolioContentExpanded);
                     } else {
                       onNavigate(item.path);
                     }
@@ -263,7 +270,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     {item.label}
                   </span>
 
-                  {isSettings && (
+                  {(isSettings || isPortfolioContent) && (
                     <svg
                       viewBox="0 0 24 24"
                       width="12"
@@ -273,7 +280,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       strokeWidth="3"
                       style={{
                         marginLeft: 'auto',
-                        transform: settingsExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
+                        transform: (isSettings ? settingsExpanded : portfolioContentExpanded) ? 'rotate(90deg)' : 'rotate(0deg)',
                         transition: 'transform 200ms ease',
                         display: collapsed ? 'none' : 'block',
                         color: isActive ? '#FFFFFF' : '#8E8EA8'
@@ -283,6 +290,131 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     </svg>
                   )}
                 </button>
+
+                {isPortfolioContent && (
+                  <>
+                    {/* Expanded Sidebar Submenu */}
+                    <div
+                      className="portfolio-content-submenu-container"
+                      style={{
+                        maxHeight: (!collapsed && portfolioContentExpanded) ? '150px' : '0px',
+                        overflow: 'hidden',
+                        transition: 'max-height 250ms cubic-bezier(0.4, 0, 0.2, 1)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '4px',
+                        paddingLeft: collapsed ? '0' : '28px',
+                        marginTop: (!collapsed && portfolioContentExpanded) ? '4px' : '0px'
+                      }}
+                    >
+                      {portfolioSubItems.map((sub) => {
+                        const isSubActive = cleanPath === sub.path;
+                        return (
+                          <button
+                            key={sub.label}
+                            onClick={() => onNavigate(sub.path)}
+                            className={`submenu-item ${isSubActive ? 'active' : ''}`}
+                            style={{
+                              height: '36px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              border: 'none',
+                              background: 'transparent',
+                              borderRadius: '8px',
+                              color: isSubActive ? '#FFFFFF' : '#8E8EA8',
+                              cursor: 'pointer',
+                              padding: '0 16px',
+                              fontSize: '12.5px',
+                              fontWeight: isSubActive ? 600 : 500,
+                              textAlign: 'left',
+                              position: 'relative',
+                              transition: 'all 200ms ease',
+                              textDecoration: 'none',
+                              outline: 'none',
+                              width: '100%'
+                            }}
+                          >
+                            {isSubActive && (
+                              <span
+                                style={{
+                                  width: '4px',
+                                  height: '4px',
+                                  borderRadius: '50%',
+                                  backgroundColor: '#6366F1',
+                                  position: 'absolute',
+                                  left: '6px',
+                                  top: '50%',
+                                  transform: 'translateY(-50%)'
+                                }}
+                              />
+                            )}
+                            <span style={{ marginLeft: isSubActive ? '4px' : '0' }}>{sub.label}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {/* Collapsed Sidebar Floating Submenu */}
+                    {collapsed && (
+                      <div className="floating-submenu">
+                        <div
+                          style={{
+                            padding: '6px 12px',
+                            borderBottom: '1px solid #F1F5F9',
+                            fontSize: '11px',
+                            fontWeight: 700,
+                            color: '#94A3B8',
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.05em',
+                            marginBottom: '4px'
+                          }}
+                        >
+                          Portfolio Content
+                        </div>
+                        {portfolioSubItems.map((sub) => {
+                          const isSubActive = cleanPath === sub.path;
+                          return (
+                            <button
+                              key={sub.label}
+                              onClick={() => onNavigate(sub.path)}
+                              style={{
+                                height: '32px',
+                                border: 'none',
+                                background: isSubActive ? 'rgba(124, 58, 237, 0.08)' : 'transparent',
+                                borderRadius: '6px',
+                                color: isSubActive ? 'var(--admin-primary)' : '#475569',
+                                cursor: 'pointer',
+                                padding: '0 12px',
+                                fontSize: '12px',
+                                fontWeight: isSubActive ? 600 : 500,
+                                textAlign: 'left',
+                                transition: 'all 150ms ease',
+                                width: '100%',
+                                display: 'flex',
+                                alignItems: 'center',
+                                outline: 'none'
+                              }}
+                              onMouseEnter={(e) => {
+                                if (!isSubActive) {
+                                  e.currentTarget.style.color = 'var(--admin-primary)';
+                                  e.currentTarget.style.backgroundColor = 'rgba(124, 58, 237, 0.04)';
+                                }
+                              }}
+                              onMouseLeave={(e) => {
+                                if (!isSubActive) {
+                                  e.currentTarget.style.color = '#475569';
+                                  e.currentTarget.style.backgroundColor = 'transparent';
+                                }
+                              }}
+                            >
+                              {sub.label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </>
+                )}
 
                 {isSettings && (
                   <>
