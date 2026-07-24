@@ -27,3 +27,9 @@ copyDir('assets/images', 'dist/assets/images');
 copyDir('assets/icons', 'dist/assets/icons');
 copyDir('assets/documents', 'dist/assets/documents');
 console.log('Static assets subdirectories copied successfully!');
+
+// Copy CNAME file if it exists
+if (fs.existsSync('CNAME')) {
+  fs.copyFileSync('CNAME', 'dist/CNAME');
+  console.log('CNAME file copied to dist successfully!');
+}
