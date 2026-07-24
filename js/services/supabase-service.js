@@ -9,16 +9,35 @@
  */
 
 (function() {
-  const supabaseUrl = (window.APP_CONFIG && window.APP_CONFIG.SUPABASE_URL) || "";
-  const supabaseKey = (window.APP_CONFIG && window.APP_CONFIG.SUPABASE_ANON_KEY) || "";
-  const supabase = window.supabase && supabaseUrl && supabaseKey ? window.supabase.createClient(supabaseUrl, supabaseKey) : null;
+  let supabase = null;
+
+  function initSupabase() {
+    if (supabase) return;
+    const supabaseUrl = (window.APP_CONFIG && window.APP_CONFIG.SUPABASE_URL) || "";
+    const supabaseKey = (window.APP_CONFIG && window.APP_CONFIG.SUPABASE_ANON_KEY) || "";
+    if (window.supabase && supabaseUrl && supabaseKey) {
+      supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+      window.supabaseInstance = supabase;
+    }
+  }
+
+  // Attempt immediate initialization
+  initSupabase();
+
+  // Setup event fallback listeners to run after module scripts have executed
+  if (typeof document !== 'undefined') {
+    document.addEventListener('DOMContentLoaded', initSupabase);
+  }
+  if (typeof window !== 'undefined') {
+    window.addEventListener('load', initSupabase);
+  }
 
   /**
    * AuthService
    * Handles social authentication flow state operations.
    */
   const AuthService = {
-    supabase: supabase,
+    get supabase() { return supabase; },
     async signInWithGoogle() {
       console.log("AuthService: signInWithGoogle invoked");
       if (!supabase) {
