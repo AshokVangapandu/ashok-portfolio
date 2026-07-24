@@ -93,7 +93,7 @@
   async function checkAdminBypass() {
     try {
       const client = (window.AuthService && window.AuthService.supabase) ||
-                     (window.supabase ? window.supabase.createClient("https://txoszrnjkrlbjzpjisvp.supabase.co", "sb_publishable_DS3aReX7DKPTUeFrfndvAQ_4p7QTYfB") : null);
+                     (window.supabase && window.APP_CONFIG?.SUPABASE_URL && window.APP_CONFIG?.SUPABASE_ANON_KEY ? window.supabase.createClient(window.APP_CONFIG.SUPABASE_URL, window.APP_CONFIG.SUPABASE_ANON_KEY) : null);
       if (!client) return false;
 
       const { data: sessionData } = await client.auth.getSession();
@@ -201,7 +201,7 @@
 
       if (mode === 'maintenance') {
         const client = (window.AuthService && window.AuthService.supabase) ||
-                       (window.supabase ? window.supabase.createClient("https://txoszrnjkrlbjzpjisvp.supabase.co", "sb_publishable_DS3aReX7DKPTUeFrfndvAQ_4p7QTYfB") : null);
+                       (window.supabase && window.APP_CONFIG?.SUPABASE_URL && window.APP_CONFIG?.SUPABASE_ANON_KEY ? window.supabase.createClient(window.APP_CONFIG.SUPABASE_URL, window.APP_CONFIG.SUPABASE_ANON_KEY) : null);
         let currentUser = null;
         if (client) {
           const { data: s } = await client.auth.getSession();
@@ -285,7 +285,7 @@
         `;
       } else if (mode === 'private') {
         const client = (window.AuthService && window.AuthService.supabase) ||
-                       (window.supabase ? window.supabase.createClient("https://txoszrnjkrlbjzpjisvp.supabase.co", "sb_publishable_DS3aReX7DKPTUeFrfndvAQ_4p7QTYfB") : null);
+                       (window.supabase && window.APP_CONFIG?.SUPABASE_URL && window.APP_CONFIG?.SUPABASE_ANON_KEY ? window.supabase.createClient(window.APP_CONFIG.SUPABASE_URL, window.APP_CONFIG.SUPABASE_ANON_KEY) : null);
         let currentUser = null;
         if (client) {
           const { data: s } = await client.auth.getSession();
@@ -562,7 +562,7 @@
     if (existing) existing.remove();
 
     const client = (window.AuthService && window.AuthService.supabase) ||
-                   (window.supabase ? window.supabase.createClient("https://txoszrnjkrlbjzpjisvp.supabase.co", "sb_publishable_DS3aReX7DKPTUeFrfndvAQ_4p7QTYfB") : null);
+                   (window.supabase && window.APP_CONFIG?.SUPABASE_URL && window.APP_CONFIG?.SUPABASE_ANON_KEY ? window.supabase.createClient(window.APP_CONFIG.SUPABASE_URL, window.APP_CONFIG.SUPABASE_ANON_KEY) : null);
     let currentUser = null;
     if (client) {
       const { data: s } = await client.auth.getSession();
@@ -717,7 +717,7 @@
   // Subscribe to auth state changes to re-evaluate visibility immediately on SIGNED_IN / SIGNED_OUT
   try {
     const client = (window.AuthService && window.AuthService.supabase) ||
-                   (window.supabase ? window.supabase.createClient("https://txoszrnjkrlbjzpjisvp.supabase.co", "sb_publishable_DS3aReX7DKPTUeFrfndvAQ_4p7QTYfB") : null);
+                   (window.supabase && window.APP_CONFIG?.SUPABASE_URL && window.APP_CONFIG?.SUPABASE_ANON_KEY ? window.supabase.createClient(window.APP_CONFIG.SUPABASE_URL, window.APP_CONFIG.SUPABASE_ANON_KEY) : null);
     if (client && client.auth) {
       client.auth.onAuthStateChange((event) => {
         if (event === 'SIGNED_OUT') {

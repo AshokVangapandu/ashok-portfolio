@@ -70,9 +70,9 @@ const showContactToast = (type, title, message) => {
 };
 
 // Initialize Supabase Client
-const supabaseUrl = "https://txoszrnjkrlbjzpjisvp.supabase.co";
-const supabaseKey = "sb_publishable_DS3aReX7DKPTUeFrfndvAQ_4p7QTYfB";
-const supabaseClient = window.supabase ? window.supabase.createClient(supabaseUrl, supabaseKey) : null;
+const supabaseUrl = (window.APP_CONFIG && window.APP_CONFIG.SUPABASE_URL) || "";
+const supabaseKey = (window.APP_CONFIG && window.APP_CONFIG.SUPABASE_ANON_KEY) || "";
+const supabaseClient = window.supabase && supabaseUrl && supabaseKey ? window.supabase.createClient(supabaseUrl, supabaseKey) : null;
 
 // Validation UI Helpers
 const showFieldError = (inputElement, errorMessage) => {
