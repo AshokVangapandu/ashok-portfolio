@@ -8,6 +8,7 @@ import { FormSection } from '../../../components/portfolio-content/FormSection';
 import { FormTextField } from '../../../components/portfolio-content/FormTextField';
 import { FormToggle } from '../../../components/portfolio-content/FormToggle';
 import { FormTagSelector } from '../../../components/portfolio-content/FormTagSelector';
+import { supabase } from '../../../../services/supabase/client';
 
 interface ProjectDrawerProps {
   isOpen: boolean;
@@ -179,7 +180,7 @@ export const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
       if (coverFile) {
         const path = `projects/${Date.now()}-${coverFile.name}`;
         // Since asset uploading isn't connected to backend storage in this phase, simulate public url
-        iconUrl = `https://txoszrnjkrlbjzpjisvp.supabase.co/storage/v1/object/public/projects/${path}`;
+        iconUrl = supabase.storage.from('projects').getPublicUrl(path).data.publicUrl;
       }
 
       const payload: AdminProject = {

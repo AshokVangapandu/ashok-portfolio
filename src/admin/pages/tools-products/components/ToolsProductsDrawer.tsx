@@ -8,6 +8,7 @@ import { FormSection } from '../../../components/portfolio-content/FormSection';
 import { FormTextField } from '../../../components/portfolio-content/FormTextField';
 import { FormToggle } from '../../../components/portfolio-content/FormToggle';
 import { FormTagSelector } from '../../../components/portfolio-content/FormTagSelector';
+import { supabase } from '../../../../services/supabase/client';
 
 interface ToolsProductsDrawerProps {
   isOpen: boolean;
@@ -174,11 +175,11 @@ export const ToolsProductsDrawer: React.FC<ToolsProductsDrawerProps> = ({
       // Simulate file upload mapping urls
       if (coverFile) {
         const path = `cover-${Date.now()}-${coverFile.name}`;
-        coverUrl = `https://txoszrnjkrlbjzpjisvp.supabase.co/storage/v1/object/public/tools-products/${path}`;
+        coverUrl = supabase.storage.from('tools-products').getPublicUrl(path).data.publicUrl;
       }
       if (previewFile) {
         const path = `preview-${Date.now()}-${previewFile.name}`;
-        previewUrl = `https://txoszrnjkrlbjzpjisvp.supabase.co/storage/v1/object/public/tools-products/${path}`;
+        previewUrl = supabase.storage.from('tools-products').getPublicUrl(path).data.publicUrl;
       }
 
       const payload: ToolsProduct = {

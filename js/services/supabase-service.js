@@ -9,9 +9,9 @@
  */
 
 (function() {
-  const supabaseUrl = "https://txoszrnjkrlbjzpjisvp.supabase.co";
-  const supabaseKey = "sb_publishable_DS3aReX7DKPTUeFrfndvAQ_4p7QTYfB";
-  const supabase = window.supabase ? window.supabase.createClient(supabaseUrl, supabaseKey) : null;
+  const supabaseUrl = (window.APP_CONFIG && window.APP_CONFIG.SUPABASE_URL) || "";
+  const supabaseKey = (window.APP_CONFIG && window.APP_CONFIG.SUPABASE_ANON_KEY) || "";
+  const supabase = window.supabase && supabaseUrl && supabaseKey ? window.supabase.createClient(supabaseUrl, supabaseKey) : null;
 
   /**
    * AuthService

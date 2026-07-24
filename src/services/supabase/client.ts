@@ -1,8 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 import { Database } from '../../../lib/supabase/types';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || (typeof window !== 'undefined' && (window as any).APP_CONFIG?.SUPABASE_URL) || '';
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || (typeof window !== 'undefined' && (window as any).APP_CONFIG?.SUPABASE_ANON_KEY) || '';
 
 if (!supabaseUrl || !supabaseAnonKey) {
   console.warn(
@@ -13,6 +13,6 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 // Reusable, single-instance Supabase Client
 export const supabase = createClient<Database>(
-  supabaseUrl || 'https://txoszrnjkrlbjzpjisvp.supabase.co',
-  supabaseAnonKey || 'sb_publishable_DS3aReX7DKPTUeFrfndvAQ_4p7QTYfB'
+  supabaseUrl,
+  supabaseAnonKey
 );
