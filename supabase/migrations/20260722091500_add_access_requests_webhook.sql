@@ -24,3 +24,6 @@ drop trigger if exists tr_on_access_request_inserted on public.access_requests;
 create trigger tr_on_access_request_inserted
   after insert on public.access_requests
   for each row execute function public.on_access_request_inserted();
+
+
+--  A dunmy commit 
