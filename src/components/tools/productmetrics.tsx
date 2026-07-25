@@ -1,7 +1,36 @@
 /* src/components/tools/ProductMetrics.tsx */
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { portfolioStatsService, PortfolioStats } from '../../services/portfolioStatsService';
 
 export const ProductMetrics: React.FC = () => {
+  const [stats, setStats] = useState<PortfolioStats | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+    portfolioStatsService.getPortfolioStatistics()
+      .then((data) => {
+        if (isMounted) {
+          setStats(data);
+          setLoading(false);
+        }
+      })
+      .catch((err) => {
+        console.error('[ProductMetrics] Failed to load statistics:', err);
+        if (isMounted) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const totalDownloadsStr = stats ? portfolioStatsService.formatNumber(stats.totalDownloads) : '0';
+  const averageRatingStr = stats ? stats.averageRating.toFixed(2) : '0.00';
+  const totalReviews = stats ? stats.totalReviews : 0;
+
   return (
     <div
       style={{
@@ -47,7 +76,7 @@ export const ProductMetrics: React.FC = () => {
             cursor: 'default'
           }}
         >
-          {/* Subtle Ambient Radial Glow inside the card */}
+          {/* Subtle Ambient Glow */}
           <div
             style={{
               position: 'absolute',
@@ -93,41 +122,47 @@ export const ProductMetrics: React.FC = () => {
                 <span style={{ fontSize: '11px', color: '#94A3B8', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.06em', lineHeight: 1.2 }}>
                   Active Downloads
                 </span>
-                <span
-                  style={{
-                    fontSize: '26px',
-                    fontWeight: 700,
-                    color: '#FFFFFF',
-                    letterSpacing: '-0.02em',
-                    lineHeight: 1.1,
-                    background: 'linear-gradient(180deg, #FFFFFF 30%, #C4B5FD 100%)',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent'
-                  }}
-                >
-                  40,200+
-                </span>
+                {loading ? (
+                  <div className="skeleton-pulse" style={{ width: '80px', height: '28px', marginTop: '4px', backgroundColor: 'rgba(255, 255, 255, 0.08)', borderRadius: '4px' }} />
+                ) : (
+                  <span
+                    style={{
+                      fontSize: '26px',
+                      fontWeight: 700,
+                      color: '#FFFFFF',
+                      letterSpacing: '-0.02em',
+                      lineHeight: 1.1,
+                      background: 'linear-gradient(180deg, #FFFFFF 30%, #C4B5FD 100%)',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent'
+                    }}
+                  >
+                    {totalDownloadsStr}
+                  </span>
+                )}
               </div>
             </div>
 
-            <span
-              style={{
-                fontSize: '11px',
-                color: '#10B981',
-                fontWeight: 500,
-                backgroundColor: 'rgba(16, 185, 129, 0.06)',
-                border: '1px solid rgba(16, 185, 129, 0.12)',
-                borderRadius: '999px',
-                padding: '4px 10px',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '4px',
-                flexShrink: 0
-              }}
-            >
-              <span style={{ width: '4px', height: '4px', backgroundColor: '#10B981', borderRadius: '50%' }} />
-              ↑ 12%
-            </span>
+            {!loading && stats && stats.totalDownloads > 0 && (
+              <span
+                style={{
+                  fontSize: '11px',
+                  color: '#10B981',
+                  fontWeight: 500,
+                  backgroundColor: 'rgba(16, 185, 129, 0.06)',
+                  border: '1px solid rgba(16, 185, 129, 0.12)',
+                  borderRadius: '999px',
+                  padding: '4px 10px',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  flexShrink: 0
+                }}
+              >
+                <span style={{ width: '4px', height: '4px', backgroundColor: '#10B981', borderRadius: '50%' }} />
+                Live
+              </span>
+            )}
           </div>
         </div>
 
@@ -149,7 +184,7 @@ export const ProductMetrics: React.FC = () => {
             cursor: 'default'
           }}
         >
-          {/* Subtle Ambient Radial Glow inside the card */}
+          {/* Subtle Ambient Glow */}
           <div
             style={{
               position: 'absolute',
@@ -193,48 +228,64 @@ export const ProductMetrics: React.FC = () => {
                 <span style={{ fontSize: '11px', color: '#94A3B8', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.06em', lineHeight: 1.2 }}>
                   User Satisfaction
                 </span>
-                <span
-                  style={{
-                    fontSize: '26px',
-                    fontWeight: 700,
-                    color: '#FFFFFF',
-                    letterSpacing: '-0.02em',
-                    lineHeight: 1.1,
-                    background: 'linear-gradient(180deg, #FFFFFF 30%, #FDA4AF 100%)',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    display: 'inline-flex',
-                    alignItems: 'baseline',
-                    gap: '3px'
-                  }}
-                >
-                  4.92 <span style={{ fontSize: '13px', color: '#64748B', fontWeight: 400 }}>/ 5.0</span>
-                </span>
+                {loading ? (
+                  <div className="skeleton-pulse" style={{ width: '110px', height: '28px', marginTop: '4px', backgroundColor: 'rgba(255, 255, 255, 0.08)', borderRadius: '4px' }} />
+                ) : (
+                  <span
+                    style={{
+                      fontSize: '26px',
+                      fontWeight: 700,
+                      color: '#FFFFFF',
+                      letterSpacing: '-0.02em',
+                      lineHeight: 1.1,
+                      background: 'linear-gradient(180deg, #FFFFFF 30%, #FDA4AF 100%)',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      display: 'inline-flex',
+                      alignItems: 'baseline',
+                      gap: '3px'
+                    }}
+                  >
+                    {averageRatingStr} <span style={{ fontSize: '13px', color: '#64748B', fontWeight: 400 }}>/ 5.0</span>
+                  </span>
+                )}
               </div>
             </div>
 
-            <span
-              style={{
-                fontSize: '11px',
-                color: '#E2E8F0',
-                fontWeight: 500,
-                backgroundColor: 'rgba(255, 255, 255, 0.04)',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
-                borderRadius: '999px',
-                padding: '4px 10px',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '4px',
-                flexShrink: 0
-              }}
-            >
-              140+ reviews
-            </span>
+            {loading ? (
+              <div className="skeleton-pulse" style={{ width: '70px', height: '22px', backgroundColor: 'rgba(255, 255, 255, 0.04)', borderRadius: '999px' }} />
+            ) : (
+              <span
+                style={{
+                  fontSize: '11px',
+                  color: '#E2E8F0',
+                  fontWeight: 500,
+                  backgroundColor: 'rgba(255, 255, 255, 0.04)',
+                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                  borderRadius: '999px',
+                  padding: '4px 10px',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  flexShrink: 0
+                }}
+              >
+                {totalReviews} review{totalReviews === 1 ? '' : 's'}
+              </span>
+            )}
           </div>
         </div>
       </div>
 
       <style dangerouslySetInnerHTML={{__html: `
+        .skeleton-pulse {
+          animation: pulse-glow 1.5s infinite ease-in-out;
+        }
+        @keyframes pulse-glow {
+          0% { opacity: 0.6; }
+          50% { opacity: 1; }
+          100% { opacity: 0.6; }
+        }
         .highlight-detail-card:hover {
           border-color: rgba(255, 255, 255, 0.12) !important;
           background-color: rgba(14, 21, 38, 0.5) !important;
@@ -279,3 +330,4 @@ export const ProductMetrics: React.FC = () => {
 };
 
 export default ProductMetrics;
+

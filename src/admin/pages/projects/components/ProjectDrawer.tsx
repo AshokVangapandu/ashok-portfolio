@@ -178,9 +178,8 @@ export const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
 
       // Upload hero image if present
       if (coverFile) {
-        const path = `projects/${Date.now()}-${coverFile.name}`;
-        // Since asset uploading isn't connected to backend storage in this phase, simulate public url
-        iconUrl = supabase.storage.from('projects').getPublicUrl(path).data.publicUrl;
+        const path = `cover-${Date.now()}-${coverFile.name}`;
+        iconUrl = await projectService.uploadAsset(coverFile, path);
       }
 
       const payload: AdminProject = {

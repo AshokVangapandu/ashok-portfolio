@@ -68,6 +68,14 @@ export const toolsProductsService = {
       if (error) throw error;
       const insertedProduct = mapSupabaseToToolsProduct(data);
 
+      // If this product is featured, unset any other featured products
+      if (product.isFeatured) {
+        await (supabase as any)
+          .from('tools_products')
+          .update({ is_featured: false })
+          .neq('id', insertedProduct.id);
+      }
+
       // 2. Insert capabilities
       if (product.capabilities.length > 0) {
         const caps = product.capabilities.map((c, idx) => ({
@@ -139,6 +147,14 @@ export const toolsProductsService = {
         .eq('id', id);
 
       if (error) throw error;
+
+      // If this product is featured, unset any other featured products
+      if (updates.isFeatured) {
+        await (supabase as any)
+          .from('tools_products')
+          .update({ is_featured: false })
+          .neq('id', id);
+      }
 
       // 2. Cascade delete existing caps and techs
       await (supabase as any).from('product_capabilities').delete().eq('product_id', id);

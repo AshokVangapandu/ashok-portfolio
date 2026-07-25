@@ -159,8 +159,8 @@ export const ToolsProductsTable: React.FC<ToolsProductsTableProps> = ({
                         overflow: 'hidden'
                       }}
                     >
-                      {prod.coverImageUrl ? (
-                        <img src={prod.coverImageUrl} alt={prod.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      {prod.coverImageUrl || prod.previewImageUrl ? (
+                        <img src={prod.coverImageUrl || prod.previewImageUrl || undefined} alt={prod.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                       ) : (
                         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5">
                           <rect x="2" y="2" width="20" height="20" rx="4" />
