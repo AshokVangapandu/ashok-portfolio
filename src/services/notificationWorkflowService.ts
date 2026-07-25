@@ -90,10 +90,6 @@ export const notificationWorkflowService = {
 
       for (const sub of eligibleSubscribers) {
         try {
-          const { data, error } = await supabase.functions.invoke('send-maintenance-notification', {
-            body: { subscriber_id: sub.id, email: sub.email }
-          });
-
           let isSuccess = false;
           let failureReason = '';
 
@@ -109,17 +105,6 @@ export const notificationWorkflowService = {
             }
           } catch (fnErr: any) {
             failureReason = fnErr?.message || 'Edge Function invocation error';
-          }
-
-          // 2. Fallback to direct Brevo API if Edge Function failed and VITE_BREVO_API_KEY is present
-          const clientApiKey = (import.meta as any).env?.VITE_BREVO_API_KEY || (import.meta as any).env?.VITE_RESEND_API_KEY;
-          if (!isSuccess && clientApiKey) {
-            const directRes = await sendDirectBrevoEmail(sub.email, clientApiKey);
-            if (directRes.success) {
-              isSuccess = true;
-            } else {
-              failureReason = directRes.error || failureReason;
-            }
           }
 
           const nowIso = new Date().toISOString();
@@ -229,15 +214,7 @@ export const notificationWorkflowService = {
           failureReason = fnErr?.message || 'Edge Function invocation error';
         }
 
-        const clientApiKey = (import.meta as any).env?.VITE_BREVO_API_KEY || (import.meta as any).env?.VITE_RESEND_API_KEY;
-        if (!isSuccess && clientApiKey) {
-          const directRes = await sendDirectBrevoEmail(sub.email, clientApiKey);
-          if (directRes.success) {
-            isSuccess = true;
-          } else {
-            failureReason = directRes.error || failureReason;
-          }
-        }
+
 
         const nowIso = new Date().toISOString();
 
@@ -304,44 +281,5 @@ export const notificationWorkflowService = {
   }
 };
 
-async function sendDirectBrevoEmail(email: string, apiKey: string): Promise<{ success: boolean; error?: string }> {
-  try {
-    const portfolioUrl = window.location.origin;
-    const htmlContent = `
-      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #1E293B; border-radius: 16px; background-color: #0A0D14; color: #FFFFFF;">
-        <h2 style="color: #F59E0B; margin-top: 0;">🚀 Portfolio is Live!</h2>
-        <p style="color: #CBD5E1;">Hello,</p>
-        <p style="color: #CBD5E1;">Thank you for your patience while the portfolio was undergoing planned maintenance and updates.</p>
-        <p style="color: #CBD5E1;">All system updates have been deployed. The site is now live and fully operational for you to view projects, case studies, and latest work.</p>
-        <div style="margin-top: 24px;">
-          <a href="${portfolioUrl}" style="padding: 12px 24px; border-radius: 10px; background: linear-gradient(135deg, #7C3AED, #6D28D9); color: #ffffff; text-decoration: none; font-weight: bold; display: inline-block;">Visit Live Portfolio</a>
-        </div>
-      </div>
-    `;
-
-    const res = await fetch('https://api.brevo.com/v3/smtp/email', {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'api-key': apiKey
-      },
-      body: JSON.stringify({
-        sender: { name: 'Ashok Portfolio', email: 'noreply@ashokvangapandu.com' },
-        to: [{ email }],
-        subject: '🚀 Portfolio is Live! Maintenance Complete',
-        htmlContent: htmlContent
-      })
-    });
-
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok) {
-      return { success: false, error: data?.message || data?.code || `HTTP ${res.status}` };
-    }
-    return { success: true };
-  } catch (err: any) {
-    return { success: false, error: err?.message || 'Direct email fetch failed' };
-  }
-}
 
 export default notificationWorkflowService;
