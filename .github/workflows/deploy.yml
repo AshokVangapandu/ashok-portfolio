@@ -16,6 +16,11 @@ jobs:
       - name: Checkout 🛎️
         uses: actions/checkout@v4
 
+      - name: Verify Environment Variables 🔍
+        run: |
+          if [ -n "${{ secrets.VITE_SUPABASE_URL }}" ]; then echo "✓ VITE_SUPABASE_URL detected"; else echo "✗ VITE_SUPABASE_URL missing"; fi
+          if [ -n "${{ secrets.VITE_SUPABASE_ANON_KEY }}" ]; then echo "✓ VITE_SUPABASE_ANON_KEY detected"; else echo "✗ VITE_SUPABASE_ANON_KEY missing"; fi
+
       - name: Install and Build 🔧
         run: |
           npm ci
