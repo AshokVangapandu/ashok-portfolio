@@ -11,13 +11,32 @@
 (function() {
   let supabase = null;
 
+  const isValidSupabaseConfig = (url, key) => {
+    if (!url || !key) return false;
+    if (url.startsWith('%VITE_') || url.includes('%') || key.startsWith('%VITE_') || key.includes('%')) return false;
+    try {
+      const parsed = new URL(url);
+      return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+    } catch (e) {
+      return false;
+    }
+  };
+
   function initSupabase() {
     if (supabase) return;
     const supabaseUrl = (window.APP_CONFIG && window.APP_CONFIG.SUPABASE_URL) || "";
     const supabaseKey = (window.APP_CONFIG && window.APP_CONFIG.SUPABASE_ANON_KEY) || "";
-    if (window.supabase && supabaseUrl && supabaseKey) {
-      supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
-      window.supabaseInstance = supabase;
+    if (window.supabase && isValidSupabaseConfig(supabaseUrl, supabaseKey)) {
+      try {
+        supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        window.supabaseInstance = supabase;
+      } catch (err) {
+        console.warn('[supabase-service] Failed to initialize Supabase client:', err);
+      }
+    } else {
+      console.warn(
+        '[Portfolio]\n\nSupabase disabled.\n\nReason:\nInvalid configuration.\n\nThe website will continue running with fallback behaviour.'
+      );
     }
   }
 

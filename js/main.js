@@ -72,7 +72,30 @@ const showContactToast = (type, title, message) => {
 // Initialize Supabase Client
 const supabaseUrl = (window.APP_CONFIG && window.APP_CONFIG.SUPABASE_URL) || "";
 const supabaseKey = (window.APP_CONFIG && window.APP_CONFIG.SUPABASE_ANON_KEY) || "";
-const supabaseClient = window.supabase && supabaseUrl && supabaseKey ? window.supabase.createClient(supabaseUrl, supabaseKey) : null;
+
+const isValidSupabaseConfig = (url, key) => {
+  if (!url || !key) return false;
+  if (url.startsWith('%VITE_') || url.includes('%') || key.startsWith('%VITE_') || key.includes('%')) return false;
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+  } catch (e) {
+    return false;
+  }
+};
+
+const supabaseClient = window.supabase && isValidSupabaseConfig(supabaseUrl, supabaseKey)
+  ? (function() {
+      try {
+        return window.supabase.createClient(supabaseUrl, supabaseKey);
+      } catch (err) {
+        console.warn('[main] Failed to create Supabase client:', err);
+        return null;
+      }
+    })()
+  : (console.warn(
+      '[Portfolio]\n\nSupabase disabled.\n\nReason:\nInvalid configuration.\n\nThe website will continue running with fallback behaviour.'
+    ), null);
 
 // Validation UI Helpers
 const showFieldError = (inputElement, errorMessage) => {
