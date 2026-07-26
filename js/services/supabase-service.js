@@ -260,6 +260,21 @@
     }
   };
 
+  /**
+   * ProjectService
+   * Handles public projects queries.
+   */
+  const ProjectService = {
+    async getPublishedProjects() {
+      if (!supabase) throw new Error("Supabase Client is not initialized.");
+      return await supabase
+        .from('projects')
+        .select('*')
+        .eq('status', 'published')
+        .order('created_at', { ascending: false });
+    }
+  };
+
   const ResumeService = {
     async getActiveResume() {
       if (!supabase) throw new Error("Supabase Client is not initialized.");
@@ -562,6 +577,7 @@
   window.TestimonialService = TestimonialService;
   window.AdminService = AdminService;
   window.CertificationService = CertificationService;
+  window.ProjectService = ProjectService;
   window.ResumeService = ResumeService;
   window.PortfolioSettingsService = PortfolioSettingsService;
   window.MaintenanceService = MaintenanceService;
