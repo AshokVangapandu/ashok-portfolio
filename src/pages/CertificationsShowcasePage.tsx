@@ -12,12 +12,16 @@ interface CertificationCard {
   skills?: string[];
   verificationUrl?: string;
   pdfUrl?: string;
+  isFeatured?: boolean;
 }
 
-const getProviderLogo = (issuer: string) => {
+const getProviderLogo = (issuer: string, certificateImageUrl?: string | null) => {
+  if (certificateImageUrl && certificateImageUrl.trim() !== '') {
+    return <img src={certificateImageUrl} alt={issuer} style={{ maxHeight: '28px', maxWidth: '28px', objectFit: 'contain', display: 'block' }} />;
+  }
   const name = (issuer || '').toLowerCase().trim();
   if (name.includes('mendix')) {
-    return <img src="../assets/images/Mendix-Brandmark.webp" alt="Mendix" style={{ height: '24px', width: 'auto', objectFit: 'contain' }} />;
+    return <img src="../assets/images/Mendix-Brandmark.webp" alt="Mendix" style={{ maxHeight: '28px', maxWidth: '28px', objectFit: 'contain', display: 'block' }} />;
   }
   if (name.includes('google')) {
     return (
@@ -67,12 +71,24 @@ export const CertificationsShowcasePage: React.FC = () => {
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
   const [searchFocused, setSearchFocused] = useState(false);
   const [selectedCard, setSelectedCard] = useState<CertificationCard | null>(null);
+  const [displayCard, setDisplayCard] = useState<CertificationCard | null>(null);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   const [certifications, setCertifications] = useState<CertificationCard[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [visibleCount, setVisibleCount] = useState(6);
+
+  const handleCardSelect = (card: CertificationCard) => {
+    if (card.id === selectedCard?.id) return;
+    setIsTransitioning(true);
+    setSelectedCard(card);
+    setTimeout(() => {
+      setDisplayCard(card);
+      setIsTransitioning(false);
+    }, 150);
+  };
 
   useEffect(() => {
     const fetchCerts = async () => {
@@ -93,16 +109,18 @@ export const CertificationsShowcasePage: React.FC = () => {
           title: c.title,
           issuer: c.issuer,
           issueDate: c.issue_date,
-          logo: getProviderLogo(c.issuer),
+          logo: getProviderLogo(c.issuer, c.certificate_image_url),
           credentialId: c.credential_id || undefined,
           skills: c.skills || [],
           verificationUrl: c.credential_url || undefined,
-          pdfUrl: c.certificate_file_url || undefined
+          pdfUrl: c.certificate_file_url || undefined,
+          isFeatured: c.is_featured
         }));
 
         setCertifications(mapped);
         if (mapped.length > 0) {
           setSelectedCard(mapped[0]);
+          setDisplayCard(mapped[0]);
         }
       } catch (err: any) {
         console.error('[CertificationsShowcasePage] Fetch failed:', err);
@@ -197,9 +215,11 @@ export const CertificationsShowcasePage: React.FC = () => {
       const stillVisible = filteredCertifications.some(c => c.id === selectedCard?.id);
       if (!stillVisible) {
         setSelectedCard(filteredCertifications[0]);
+        setDisplayCard(filteredCertifications[0]);
       }
     } else {
       setSelectedCard(null);
+      setDisplayCard(null);
     }
   }, [filteredCertifications, selectedCard?.id]);
 
@@ -236,10 +256,9 @@ export const CertificationsShowcasePage: React.FC = () => {
         <div style={{ flex: 1, display: 'flex', alignItems: 'flex-start', gap: '20px' }}>
           {/* Medal Icon on the left */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '4px', flexShrink: 0 }}>
-            <svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="#a855f7" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ filter: 'drop-shadow(0 0 8px rgba(168, 85, 247, 0.25))' }}>
-              <circle cx="12" cy="8" r="7" />
-              <path d="M8.21 13.89L7 23l5-3 5 3-1.21-9.12" />
-              <polygon points="12 5 13 8 16 8 13.5 10 14.5 13 12 11 9.5 13 10.5 10 8 8 11 8 12 5" fill="#a855f7" />
+            <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: '#a855f7', filter: 'drop-shadow(0 0 12px rgba(168, 85, 247, 0.4))' }}>
+              <path d="M12 2L3 7v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5z" />
+              <polygon points="12 8 13.5 11 16.5 11 14 13 15 16 12 14 9 16 10 13 7.5 11 10.5 11" fill="rgba(168, 85, 247, 0.2)" stroke="#a855f7" strokeWidth="1.5" />
             </svg>
           </div>
           {/* Text Stack on the right of the icon */}
@@ -299,7 +318,7 @@ export const CertificationsShowcasePage: React.FC = () => {
                   {stat.icon}
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                  <div style={{ fontSize: '26px', fontWeight: 800, color: '#ffffff', lineHeight: '1.1' }}>
+                  <div style={{ fontSize: '26px', fontWeight: 650, color: '#ffffff', lineHeight: '1.1' }}>
                     {stat.value}
                   </div>
                   <div style={{ fontSize: '11.5px', fontWeight: 550, color: '#94A3B8', marginTop: '1px' }}>
@@ -421,74 +440,85 @@ export const CertificationsShowcasePage: React.FC = () => {
                 ) : (
                   visibleCards.map((card) => {
                     const isHovered = hoveredCard === card.id;
+                    const isActive = selectedCard?.id === card.id;
                     return (
                       <div
                         key={card.id}
                         onMouseEnter={() => setHoveredCard(card.id)}
                         onMouseLeave={() => setHoveredCard(null)}
-                        onClick={() => setSelectedCard(card)}
+                        onClick={() => handleCardSelect(card)}
                         style={{
-                          background: 'rgba(23, 29, 49, 0.54)',
-                          border: isHovered ? '1px solid rgba(124, 92, 255, 0.45)' : '1px solid rgba(255, 255, 255, 0.09)',
+                          background: isActive ? 'rgba(34, 43, 73, 0.85)' : (isHovered ? 'rgba(28, 35, 60, 0.7)' : 'rgba(23, 29, 49, 0.54)'),
+                          border: isActive 
+                            ? '1px solid #7C5CFF' 
+                            : (isHovered 
+                              ? (card.isFeatured ? '1px solid rgba(251, 191, 36, 0.55)' : '1px solid rgba(124, 92, 255, 0.45)') 
+                              : (card.isFeatured ? '1px solid rgba(251, 191, 36, 0.22)' : '1px solid rgba(255, 255, 255, 0.09)')),
                           borderRadius: '16px',
                           padding: '24px',
                           display: 'flex',
                           flexDirection: 'column',
                           justifyContent: 'space-between',
-                          boxShadow: isHovered 
-                            ? '0 24px 48px rgba(0, 0, 0, 0.35), 0 0 30px rgba(124, 92, 255, 0.16)' 
-                            : '0 14px 40px rgba(0, 0, 0, 0.28)',
-                          transform: isHovered ? 'translateY(-6px)' : 'translateY(0)',
-                          transition: 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
+                          boxShadow: isActive
+                            ? (card.isFeatured ? '0 14px 40px rgba(0, 0, 0, 0.35), 0 0 25px rgba(251, 191, 36, 0.22)' : '0 14px 40px rgba(0, 0, 0, 0.35), 0 0 25px rgba(124, 92, 255, 0.25)')
+                            : (isHovered 
+                              ? (card.isFeatured ? '0 24px 48px rgba(0, 0, 0, 0.35), 0 0 30px rgba(251, 191, 36, 0.14)' : '0 24px 48px rgba(0, 0, 0, 0.35), 0 0 30px rgba(124, 92, 255, 0.16)') 
+                              : '0 14px 40px rgba(0, 0, 0, 0.28)'),
+                          transform: isHovered ? 'translateY(-6px) scale(1.01)' : (isActive ? 'translateY(-2px)' : 'translateY(0)'),
+                          transition: 'all 250ms cubic-bezier(0.16, 1, 0.3, 1)',
                           cursor: 'pointer',
                           boxSizing: 'border-box',
-                          height: '240px',
+                          minHeight: '240px',
+                          height: '100%',
                           backdropFilter: 'blur(20px)',
                           WebkitBackdropFilter: 'blur(20px)'
                         }}
                       >
-                        {/* Top: Logo and Verified badge */}
+                        {/* Top: Logo and badges */}
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
                           <div
                             style={{
                               width: '44px',
                               height: '44px',
                               borderRadius: '10px',
-                              background: 'rgba(255, 255, 255, 0.02)',
-                              border: '1px solid rgba(255, 255, 255, 0.05)',
+                              background: 'rgba(255, 255, 255, 0.03)',
+                              border: '1px solid rgba(255, 255, 255, 0.08)',
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'center',
-                              color: '#FFFFFF'
+                              overflow: 'hidden',
+                              boxSizing: 'border-box'
                             }}
                           >
                             {card.logo}
                           </div>
 
-                          <span
-                            style={{
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              gap: '4px',
-                              fontSize: '11px',
-                              fontWeight: 600,
-                              color: '#10B981',
-                              background: 'rgba(16, 185, 129, 0.06)',
-                              padding: '4px 10px',
-                              borderRadius: '999px',
-                              border: '1px solid rgba(16, 185, 129, 0.1)',
-                              textTransform: 'capitalize',
-                              lineHeight: 1
-                            }}
-                          >
-                            <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-                              <polyline points="20 6 9 17 4 12" />
-                            </svg>
-                            Verified
-                          </span>
+                          {card.isFeatured && (
+                            <span
+                              style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '4px',
+                                fontSize: '10.5px',
+                                fontWeight: 650,
+                                color: '#FBBF24',
+                                background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(251, 191, 36, 0.08) 100%)',
+                                padding: '4px 10px',
+                                borderRadius: '999px',
+                                border: '1px solid rgba(251, 191, 36, 0.3)',
+                                boxShadow: '0 0 10px rgba(251, 191, 36, 0.08)',
+                                backdropFilter: 'blur(4px)',
+                                WebkitBackdropFilter: 'blur(4px)',
+                                lineHeight: 1
+                              }}
+                            >
+                              <span style={{ fontSize: '9px' }}>⭐</span>
+                              <span>Featured</span>
+                            </span>
+                          )}
                         </div>
 
-                        {/* Middle: Title & Issuer */}
+                        {/* Middle: Title, Issuer, and Verified badge */}
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '16px', flex: 1 }}>
                           <h3
                             style={{
@@ -502,9 +532,32 @@ export const CertificationsShowcasePage: React.FC = () => {
                           >
                             {card.title}
                           </h3>
-                          <p style={{ margin: 0, fontSize: '13px', color: '#64748B', fontWeight: 500 }}>
+                          <p style={{ margin: 0, fontSize: '13px', color: '#64748B', fontWeight: 500, marginBottom: '2px' }}>
                             {card.issuer}
                           </p>
+                          <div style={{ display: 'flex' }}>
+                            <span
+                              style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '4px',
+                                fontSize: '10.5px',
+                                fontWeight: 600,
+                                color: '#10B981',
+                                background: 'rgba(16, 185, 129, 0.06)',
+                                padding: '3px 8px',
+                                borderRadius: '999px',
+                                border: '1px solid rgba(16, 185, 129, 0.08)',
+                                textTransform: 'capitalize',
+                                lineHeight: 1
+                              }}
+                            >
+                              <svg viewBox="0 0 24 24" width="9" height="9" fill="none" stroke="currentColor" strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                                <polyline points="20 6 9 17 4 12" />
+                              </svg>
+                              Verified
+                            </span>
+                          </div>
                         </div>
 
                         {/* Date with calendar icon */}
@@ -648,285 +701,271 @@ export const CertificationsShowcasePage: React.FC = () => {
               <h3 style={{ fontSize: '17px', fontWeight: 750, color: '#ffffff', margin: 0, letterSpacing: '-0.01em' }}>
                 Certificate Preview
               </h3>
-                  <span style={{ fontSize: '13px', color: '#64748B', fontWeight: 500 }}>
+              <span style={{ fontSize: '13px', color: '#64748B', fontWeight: 500 }}>
                 Click on any certificate to view full details.
               </span>
             </div>
           </div>
 
-          {/* Large Certificate Preview/Mockup */}
-          <div style={{ width: '100%', boxSizing: 'border-box', height: '252px', position: 'relative' }}>
-            {selectedCard && selectedCard.pdfUrl ? (
-              selectedCard.pdfUrl.toLowerCase().includes('.pdf') ? (
-                <iframe
-                  src={`${selectedCard.pdfUrl}#toolbar=0&navpanes=0`}
-                  title={selectedCard.title}
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    border: 'none',
-                    borderRadius: '12px',
-                    backgroundColor: '#FFFFFF',
-                    boxShadow: '0 10px 25px rgba(0, 0, 0, 0.2)'
-                  }}
-                />
-              ) : (
-                <img
-                  src={selectedCard.pdfUrl}
-                  alt={selectedCard.title}
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'contain',
-                    borderRadius: '12px',
-                    backgroundColor: '#FFFFFF',
-                    border: '1px solid rgba(255, 255, 255, 0.08)',
-                    boxShadow: '0 10px 25px rgba(0, 0, 0, 0.2)',
-                    display: 'block'
-                  }}
-                />
-              )
-            ) : (
-              <div
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  borderRadius: '12px',
-                  border: '1.5px dashed rgba(255, 255, 255, 0.15)',
-                  backgroundColor: 'rgba(255, 255, 255, 0.02)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '12px',
-                  color: '#94A3B8',
-                  boxSizing: 'border-box'
-                }}
-              >
-                <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" strokeWidth="1.5">
-                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                  <circle cx="8.5" cy="8.5" r="1.5" />
-                  <polyline points="21 15 16 10 5 21" />
-                </svg>
-                <span style={{ fontSize: '13px', fontWeight: 500 }}>
-                  No Certificate Image Available
-                </span>
-              </div>
-            )}
-          </div>
-
-          {/* Details Card Content */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            {/* Header / Verified Badge row */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px' }}>
-              <h4 style={{ fontSize: '18px', fontWeight: 800, color: '#ffffff', margin: 0, lineHeight: 1.3 }}>
-                {selectedCard?.title || 'No Certificate Selected'}
-              </h4>
-              {selectedCard && (
-                <span
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '4px',
-                    fontSize: '11px',
-                    fontWeight: 700,
-                    color: '#10B981',
-                    background: 'rgba(16, 185, 129, 0.08)',
-                    padding: '4px 10px',
-                    borderRadius: '999px',
-                    border: '1px solid rgba(16, 185, 129, 0.15)',
-                    textTransform: 'capitalize',
-                    lineHeight: 1,
-                    flexShrink: 0
-                  }}
-                >
-                  <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                  Verified Credential
-                </span>
-              )}
+          {!displayCard ? (
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: '300px',
+                color: '#64748B',
+                gap: '8px',
+                border: '1.5px dashed rgba(255, 255, 255, 0.08)',
+                borderRadius: '12px'
+              }}
+            >
+              <span>No certificate selected</span>
             </div>
-
-            {/* Grid of metadata and skills */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '24px', width: '100%' }}>
-              {/* Left Column: Metadata details */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                {[
-                  {
-                    label: 'Issued By',
-                    value: selectedCard?.issuer || '—',
-                    icon: (
-                      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#A78BFA" strokeWidth="2.2">
-                        <circle cx="12" cy="8" r="6" />
-                        <path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11" />
-                      </svg>
-                    )
-                  },
-                  {
-                    label: 'Issue Date',
-                    value: selectedCard?.issueDate || '—',
-                    icon: (
-                      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#A78BFA" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-                        <line x1="16" y1="2" x2="16" y2="6" />
-                        <line x1="8" y1="2" x2="8" y2="6" />
-                        <line x1="3" y1="10" x2="21" y2="10" />
-                      </svg>
-                    )
-                  },
-                  {
-                    label: 'Credential ID',
-                    value: selectedCard?.credentialId || '—',
-                    icon: (
-                      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#A78BFA" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                      </svg>
-                    )
-                  }
-                ].map((item, idx) => (
-                  <div key={idx} style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
-                    <div
+          ) : (
+            <div
+              style={{
+                opacity: isTransitioning ? 0 : 1,
+                transform: isTransitioning ? 'translateY(6px)' : 'translateY(0)',
+                transition: 'opacity 150ms ease, transform 150ms ease',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '24px',
+                width: '100%',
+                boxSizing: 'border-box'
+              }}
+            >
+              {/* Large Certificate Preview/Mockup */}
+              <div style={{ width: '100%', boxSizing: 'border-box', height: '252px', position: 'relative' }}>
+                {displayCard.pdfUrl ? (
+                  displayCard.pdfUrl.toLowerCase().includes('.pdf') ? (
+                    <iframe
+                      src={`${displayCard.pdfUrl}#toolbar=0&navpanes=0`}
+                      title={displayCard.title}
                       style={{
-                        width: '28px',
-                        height: '28px',
-                        borderRadius: '8px',
-                        background: 'rgba(255,255,255,0.02)',
-                        border: '1px solid rgba(255,255,255,0.05)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        flexShrink: 0,
-                        marginTop: '2px'
+                        width: '100%',
+                        height: '100%',
+                        border: 'none',
+                        borderRadius: '12px',
+                        backgroundColor: '#FFFFFF',
+                        boxShadow: '0 10px 25px rgba(0, 0, 0, 0.2)'
                       }}
-                    >
-                      {item.icon}
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                      <span style={{ fontSize: '11px', color: '#64748B', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.02em' }}>
-                        {item.label}
-                      </span>
-                      <span style={{ fontSize: '13.5px', color: '#E2E8F0', fontWeight: 600 }}>
-                        {item.value}
-                      </span>
+                    />
+                  ) : (
+                    <img
+                      src={displayCard.pdfUrl}
+                      alt={displayCard.title}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'contain',
+                        borderRadius: '12px',
+                        backgroundColor: '#FFFFFF',
+                        border: '1px solid rgba(255, 255, 255, 0.08)',
+                        boxShadow: '0 10px 25px rgba(0, 0, 0, 0.2)',
+                        display: 'block'
+                      }}
+                    />
+                  )
+                ) : (
+                  <div
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      borderRadius: '12px',
+                      border: '1.5px dashed rgba(255, 255, 255, 0.15)',
+                      backgroundColor: 'rgba(255, 255, 255, 0.02)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '12px',
+                      color: '#94A3B8',
+                      boxSizing: 'border-box'
+                    }}
+                  >
+                    <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" strokeWidth="1.5">
+                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                      <circle cx="8.5" cy="8.5" r="1.5" />
+                      <polyline points="21 15 16 10 5 21" />
+                    </svg>
+                    <span style={{ fontSize: '13px', fontWeight: 500 }}>
+                      No Certificate Image Available
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {/* Details Card Content */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                {/* Header / Verified Badge row */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px' }}>
+                  <h4 style={{ fontSize: '18px', fontWeight: 800, color: '#ffffff', margin: 0, lineHeight: 1.3 }}>
+                    {displayCard.title}
+                  </h4>
+                  <span
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      fontSize: '11px',
+                      fontWeight: 700,
+                      color: '#10B981',
+                      background: 'rgba(16, 185, 129, 0.08)',
+                      padding: '4px 10px',
+                      borderRadius: '999px',
+                      border: '1px solid rgba(16, 185, 129, 0.15)',
+                      textTransform: 'capitalize',
+                      lineHeight: 1,
+                      flexShrink: 0
+                    }}
+                  >
+                    <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                    Verified Credential
+                  </span>
+                </div>
+
+                {/* Grid of metadata and skills */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '24px', width: '100%' }}>
+                  {/* Left Column: Metadata details */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    {[
+                      {
+                        label: 'Issued By',
+                        value: displayCard.issuer || '—',
+                        icon: (
+                          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#A78BFA" strokeWidth="2.2">
+                            <circle cx="12" cy="8" r="6" />
+                            <path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11" />
+                          </svg>
+                        )
+                      },
+                      {
+                        label: 'Issue Date',
+                        value: displayCard.issueDate || '—',
+                        icon: (
+                          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#A78BFA" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                            <line x1="16" y1="2" x2="16" y2="6" />
+                            <line x1="8" y1="2" x2="8" y2="6" />
+                            <line x1="3" y1="10" x2="21" y2="10" />
+                          </svg>
+                        )
+                      },
+                      {
+                        label: 'Credential ID',
+                        value: displayCard.credentialId || '—',
+                        icon: (
+                          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#A78BFA" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                          </svg>
+                        )
+                      }
+                    ].map((item, idx) => (
+                      <div key={idx} style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
+                        <div
+                          style={{
+                            width: '28px',
+                            height: '28px',
+                            borderRadius: '8px',
+                            background: 'rgba(255,255,255,0.02)',
+                            border: '1px solid rgba(255,255,255,0.05)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0,
+                            marginTop: '2px'
+                          }}
+                        >
+                          {item.icon}
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                          <span style={{ fontSize: '11px', color: '#64748B', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.02em' }}>
+                            {item.label}
+                          </span>
+                          <span style={{ fontSize: '13.5px', color: '#E2E8F0', fontWeight: 600 }}>
+                            {item.value}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Right Column: Validated Skills */}
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <span style={{ fontSize: '11px', color: '#64748B', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '10px' }}>
+                      Skills Validated
+                    </span>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      {displayCard.skills && displayCard.skills.length > 0 ? (
+                        displayCard.skills.map((skill, index) => (
+                          <div key={index} style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                            <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="#A78BFA" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                              <polyline points="20 6 9 17 4 12" />
+                            </svg>
+                            <span style={{ fontSize: '11.5px', color: '#94A3B8', fontWeight: 500, lineHeight: 1.2 }}>
+                              {skill}
+                            </span>
+                          </div>
+                        ))
+                      ) : (
+                        <span style={{ fontSize: '12.5px', color: '#64748B', fontWeight: 500 }}>—</span>
+                      )}
                     </div>
                   </div>
-                ))}
-              </div>
-
-              {/* Right Column: Validated Skills */}
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <span style={{ fontSize: '11px', color: '#64748B', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '10px' }}>
-                  Skills Validated
-                </span>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  {selectedCard?.skills && selectedCard.skills.length > 0 ? (
-                    selectedCard.skills.map((skill, index) => (
-                      <div key={index} style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-                        <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="#A78BFA" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-                          <polyline points="20 6 9 17 4 12" />
-                        </svg>
-                        <span style={{ fontSize: '11.5px', color: '#94A3B8', fontWeight: 500, lineHeight: 1.2 }}>
-                          {skill}
-                        </span>
-                      </div>
-                    ))
-                  ) : (
-                    <span style={{ fontSize: '12.5px', color: '#64748B', fontWeight: 500 }}>—</span>
-                  )}
                 </div>
               </div>
+
+              {/* Action Buttons */}
+              <div style={{ width: '100%', boxSizing: 'border-box' }}>
+                <button
+                  type="button"
+                  disabled={!displayCard.pdfUrl}
+                  onClick={() => displayCard.pdfUrl && window.open(displayCard.pdfUrl, '_blank')}
+                  style={{
+                    width: '100%',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    padding: '12px 0',
+                    background: 'rgba(255,255,255,0.02)',
+                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                    borderRadius: '8px',
+                    color: displayCard.pdfUrl ? '#FFFFFF' : '#64748B',
+                    fontSize: '13px',
+                    fontWeight: 750,
+                    cursor: displayCard.pdfUrl ? 'pointer' : 'not-allowed',
+                    transition: 'all 0.2s ease',
+                    boxSizing: 'border-box'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (displayCard.pdfUrl) {
+                      e.currentTarget.style.background = 'rgba(255, 255, 255, 0.06)';
+                      e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.15)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (displayCard.pdfUrl) {
+                      e.currentTarget.style.background = 'rgba(255, 255, 255, 0.02)';
+                      e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+                    }
+                  }}
+                >
+                  <span>Download PDF</span>
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="7 10 12 15 17 10" />
+                    <line x1="12" y1="15" x2="12" y2="3" />
+                  </svg>
+                </button>
+              </div>
             </div>
-          </div>
-
-          {/* Action Buttons */}
-          <div style={{ display: 'flex', gap: '12px', width: '100%', boxSizing: 'border-box' }}>
-            <button
-              type="button"
-              disabled={!selectedCard?.verificationUrl}
-              onClick={() => selectedCard?.verificationUrl && window.open(selectedCard.verificationUrl, '_blank')}
-              style={{
-                flex: 1,
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
-                padding: '12px 0',
-                background: selectedCard?.verificationUrl ? '#4F46E5' : 'rgba(255,255,255,0.02)',
-                border: selectedCard?.verificationUrl ? 'none' : '1px solid rgba(255, 255, 255, 0.08)',
-                borderRadius: '8px',
-                color: selectedCard?.verificationUrl ? '#FFFFFF' : '#64748B',
-                fontSize: '13px',
-                fontWeight: 700,
-                cursor: selectedCard?.verificationUrl ? 'pointer' : 'not-allowed',
-                boxShadow: selectedCard?.verificationUrl ? '0 4px 14px rgba(79, 70, 229, 0.3)' : 'none',
-                transition: 'all 0.2s ease',
-                boxSizing: 'border-box'
-              }}
-              onMouseEnter={(e) => {
-                if (selectedCard?.verificationUrl) {
-                  e.currentTarget.style.background = '#4338CA';
-                  e.currentTarget.style.boxShadow = '0 6px 18px rgba(79, 70, 229, 0.45)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (selectedCard?.verificationUrl) {
-                  e.currentTarget.style.background = '#4F46E5';
-                  e.currentTarget.style.boxShadow = '0 4px 14px rgba(79, 70, 229, 0.3)';
-                }
-              }}
-            >
-              <span>View Full Certificate</span>
-              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                <polyline points="15 3 21 3 21 9" />
-                <line x1="10" y1="14" x2="21" y2="3" />
-              </svg>
-            </button>
-
-            <button
-              type="button"
-              disabled={!selectedCard?.pdfUrl}
-              onClick={() => selectedCard?.pdfUrl && window.open(selectedCard.pdfUrl, '_blank')}
-              style={{
-                flex: 1,
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
-                padding: '12px 0',
-                background: 'rgba(255,255,255,0.02)',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
-                borderRadius: '8px',
-                color: selectedCard?.pdfUrl ? '#FFFFFF' : '#64748B',
-                fontSize: '13px',
-                fontWeight: 750,
-                cursor: selectedCard?.pdfUrl ? 'pointer' : 'not-allowed',
-                transition: 'all 0.2s ease',
-                boxSizing: 'border-box'
-              }}
-              onMouseEnter={(e) => {
-                if (selectedCard?.pdfUrl) {
-                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.06)';
-                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.15)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (selectedCard?.pdfUrl) {
-                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.02)';
-                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)';
-                }
-              }}
-            >
-              <span>Download PDF</span>
-              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                <polyline points="7 10 12 15 17 10" />
-                <line x1="12" y1="15" x2="12" y2="3" />
-              </svg>
-            </button>
-          </div>
+          )}
 
           {/* Footer Note */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'center', marginTop: '4px' }}>
