@@ -1,18 +1,64 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { Database } from '../../../lib/supabase/types';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || (typeof window !== 'undefined' && (window as any).APP_CONFIG?.SUPABASE_URL) || '';
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || (typeof window !== 'undefined' && (window as any).APP_CONFIG?.SUPABASE_ANON_KEY) || '';
 
-if (!supabaseUrl || !supabaseAnonKey) {
+const isValidSupabaseConfig = (url: string, key: string): boolean => {
+  if (!url || !key) return false;
+  if (url.startsWith('%VITE_') || url.includes('%') || key.startsWith('%VITE_') || key.includes('%')) return false;
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+  } catch (e) {
+    return false;
+  }
+};
+
+const createDummyClient = (): any => {
+  const dummyPromise = Promise.resolve({ data: null, error: new Error('Supabase Client not configured.') });
+
+  const chainableHandler = {
+    get(target: any, prop: string | symbol): any {
+      if (prop === 'then') {
+        return (onfulfilled: any) => {
+          return Promise.resolve({ data: null, error: null }).then(onfulfilled);
+        };
+      }
+      
+      if (prop === 'auth') {
+        return new Proxy({}, {
+          get(_, authProp) {
+            if (authProp === 'onAuthStateChange') {
+              return () => ({ data: { subscription: { unsubscribe: () => {} } } });
+            }
+            if (authProp === 'getSession') {
+              return () => Promise.resolve({ data: { session: null }, error: null });
+            }
+            if (authProp === 'getUser') {
+              return () => Promise.resolve({ data: { user: null }, error: null });
+            }
+            return () => dummyPromise;
+          }
+        });
+      }
+
+      return () => new Proxy({}, chainableHandler);
+    }
+  };
+
+  return new Proxy({}, chainableHandler);
+};
+
+let clientInstance: SupabaseClient<Database>;
+
+if (isValidSupabaseConfig(supabaseUrl, supabaseAnonKey)) {
+  clientInstance = createClient<Database>(supabaseUrl, supabaseAnonKey);
+} else {
   console.warn(
-    'Supabase environment variables (VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY) are missing. ' +
-    'Please configure them in your .env file.'
+    '[Portfolio]\n\nSupabase disabled.\n\nReason:\nInvalid configuration.\n\nThe website will continue running with fallback behaviour.'
   );
+  clientInstance = createDummyClient() as SupabaseClient<Database>;
 }
 
-// Reusable, single-instance Supabase Client
-export const supabase = createClient<Database>(
-  supabaseUrl,
-  supabaseAnonKey
-);
+export const supabase = clientInstance;

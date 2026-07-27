@@ -6,7 +6,7 @@ language plpgsql
 as $$
 begin
   perform net.http_post(
-    url := 'https://txoszrnjkrlbjzpjisvp.supabase.co/functions/v1/notify-admins-new-request',
+    url := public.get_supabase_url() || '/functions/v1/notify-admins-new-request',
     headers := jsonb_build_object(
       'Content-Type', 'application/json',
       'X-Webhook-Secret', 'db_webhook_secret_99882244'
@@ -24,3 +24,6 @@ drop trigger if exists tr_on_access_request_inserted on public.access_requests;
 create trigger tr_on_access_request_inserted
   after insert on public.access_requests
   for each row execute function public.on_access_request_inserted();
+
+
+--  A dunmy commit 

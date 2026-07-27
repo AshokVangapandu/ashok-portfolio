@@ -14,6 +14,18 @@ export const AdminPage: React.FC = () => {
 
   useEffect(() => {
     const handlePopState = () => {
+      const path = window.location.pathname.toLowerCase();
+      let cleanPath = path;
+      if (cleanPath.startsWith('/ashok-portfolio')) {
+        cleanPath = cleanPath.substring('/ashok-portfolio'.length);
+      }
+      
+      if (!cleanPath.startsWith('/admin')) {
+        // Force a hard reload to fetch the actual public HTML file from the server
+        window.location.href = window.location.href;
+        return;
+      }
+      
       setCurrentPath(window.location.pathname);
     };
     window.addEventListener('popstate', handlePopState);

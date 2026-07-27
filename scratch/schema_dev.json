@@ -1,0 +1,3292 @@
+{
+  "extensions": [
+    {
+      "extname": "pg_stat_statements",
+      "extversion": "1.11"
+    },
+    {
+      "extname": "pgcrypto",
+      "extversion": "1.3"
+    },
+    {
+      "extname": "plpgsql",
+      "extversion": "1.0"
+    },
+    {
+      "extname": "supabase_vault",
+      "extversion": "0.3.1"
+    },
+    {
+      "extname": "uuid-ossp",
+      "extversion": "1.1"
+    }
+  ],
+  "enums": [],
+  "tables": [
+    {
+      "force_rls": false,
+      "rls_enabled": true,
+      "table_name": "access_requests"
+    },
+    {
+      "force_rls": false,
+      "rls_enabled": true,
+      "table_name": "admins"
+    },
+    {
+      "force_rls": false,
+      "rls_enabled": true,
+      "table_name": "authorized_users"
+    },
+    {
+      "force_rls": false,
+      "rls_enabled": true,
+      "table_name": "certifications"
+    },
+    {
+      "force_rls": true,
+      "rls_enabled": true,
+      "table_name": "contact_messages"
+    },
+    {
+      "force_rls": false,
+      "rls_enabled": true,
+      "table_name": "maintenance_notification_logs"
+    },
+    {
+      "force_rls": false,
+      "rls_enabled": true,
+      "table_name": "maintenance_subscribers"
+    },
+    {
+      "force_rls": false,
+      "rls_enabled": true,
+      "table_name": "portfolio_settings"
+    },
+    {
+      "force_rls": false,
+      "rls_enabled": true,
+      "table_name": "product_capabilities"
+    },
+    {
+      "force_rls": false,
+      "rls_enabled": true,
+      "table_name": "product_technologies"
+    },
+    {
+      "force_rls": false,
+      "rls_enabled": true,
+      "table_name": "projects"
+    },
+    {
+      "force_rls": false,
+      "rls_enabled": true,
+      "table_name": "resume_downloads"
+    },
+    {
+      "force_rls": false,
+      "rls_enabled": true,
+      "table_name": "resume_settings"
+    },
+    {
+      "force_rls": false,
+      "rls_enabled": true,
+      "table_name": "social_links"
+    },
+    {
+      "force_rls": false,
+      "rls_enabled": true,
+      "table_name": "testimonials"
+    },
+    {
+      "force_rls": false,
+      "rls_enabled": true,
+      "table_name": "tools_products"
+    }
+  ],
+  "columns": [
+    {
+      "character_maximum_length": null,
+      "column_default": "gen_random_uuid()",
+      "column_name": "id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "access_requests"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "full_name",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "access_requests"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "email",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "access_requests"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "company",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "access_requests"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "job_title",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "access_requests"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "linkedin_url",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "access_requests"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "reason",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "access_requests"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "'pending'::text",
+      "column_name": "request_status",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "access_requests"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "timezone('utc'::text, now())",
+      "column_name": "requested_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "access_requests"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "reviewed_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "access_requests"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "reviewed_by",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "access_requests"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "notes",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "access_requests"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "timezone('utc'::text, now())",
+      "column_name": "created_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "access_requests"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "timezone('utc'::text, now())",
+      "column_name": "updated_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "access_requests"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "gen_random_uuid()",
+      "column_name": "id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "admins"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "email",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "admins"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "full_name",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "admins"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "'admin'::text",
+      "column_name": "role",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "admins"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "true",
+      "column_name": "is_active",
+      "data_type": "boolean",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "admins"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "now()",
+      "column_name": "created_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "admins"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "'Active'::text",
+      "column_name": "status",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "admins"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "last_login",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "admins"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "ARRAY[]::text[]",
+      "column_name": "permissions",
+      "data_type": "ARRAY",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "admins"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "avatar_url",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "admins"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "gen_random_uuid()",
+      "column_name": "id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "authorized_users"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "email",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "authorized_users"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "full_name",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "authorized_users"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "'enabled'::text",
+      "column_name": "access_status",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "authorized_users"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "'viewer'::text",
+      "column_name": "access_level",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "authorized_users"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "timezone('utc'::text, now())",
+      "column_name": "invited_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "authorized_users"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "last_access",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "authorized_users"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "notes",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "authorized_users"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "timezone('utc'::text, now())",
+      "column_name": "created_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "authorized_users"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "timezone('utc'::text, now())",
+      "column_name": "updated_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "authorized_users"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "gen_random_uuid()",
+      "column_name": "id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "certifications"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "timezone('utc'::text, now())",
+      "column_name": "created_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "certifications"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "timezone('utc'::text, now())",
+      "column_name": "updated_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "certifications"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "title",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "certifications"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "issuer",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "certifications"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "category",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "certifications"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "description",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "certifications"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "issue_date",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "certifications"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "expiry_date",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "certifications"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "credential_id",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "certifications"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "credential_url",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "certifications"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "certificate_image_url",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "certifications"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "certificate_file_url",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "certifications"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "'{}'::text[]",
+      "column_name": "skills",
+      "data_type": "ARRAY",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "certifications"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "'draft'::text",
+      "column_name": "status",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "certifications"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "false",
+      "column_name": "is_featured",
+      "data_type": "boolean",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "certifications"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "0",
+      "column_name": "display_order",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "numeric_precision": 32,
+      "numeric_scale": 0,
+      "table_name": "certifications"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "gen_random_uuid()",
+      "column_name": "id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "contact_messages"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "full_name",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "contact_messages"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "email",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "contact_messages"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "subject",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "contact_messages"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "message",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "contact_messages"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "'New'::text",
+      "column_name": "status",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "contact_messages"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "now()",
+      "column_name": "created_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "contact_messages"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "'Portfolio Website'::text",
+      "column_name": "submitted_from",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "contact_messages"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "false",
+      "column_name": "is_read",
+      "data_type": "boolean",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "contact_messages"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "replied_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "contact_messages"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "now()",
+      "column_name": "updated_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "contact_messages"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "gen_random_uuid()",
+      "column_name": "id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "maintenance_notification_logs"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "subscriber_id",
+      "data_type": "uuid",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "maintenance_notification_logs"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "email",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "maintenance_notification_logs"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "'maintenance_to_public'::text",
+      "column_name": "transition_event",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "maintenance_notification_logs"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "'queued'::text",
+      "column_name": "status",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "maintenance_notification_logs"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "timezone('utc'::text, now())",
+      "column_name": "queued_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "maintenance_notification_logs"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "sent_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "maintenance_notification_logs"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "failure_reason",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "maintenance_notification_logs"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "timezone('utc'::text, now())",
+      "column_name": "created_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "maintenance_notification_logs"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "gen_random_uuid()",
+      "column_name": "id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "maintenance_subscribers"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "email",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "maintenance_subscribers"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "'pending'::text",
+      "column_name": "status",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "maintenance_subscribers"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "notified_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "maintenance_subscribers"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "'maintenance_page'::text",
+      "column_name": "source",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "maintenance_subscribers"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "timezone('utc'::text, now())",
+      "column_name": "subscribed_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "maintenance_subscribers"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "timezone('utc'::text, now())",
+      "column_name": "created_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "maintenance_subscribers"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "timezone('utc'::text, now())",
+      "column_name": "updated_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "maintenance_subscribers"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "gen_random_uuid()",
+      "column_name": "id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "portfolio_settings"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "'public'::text",
+      "column_name": "visibility",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "portfolio_settings"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "true",
+      "column_name": "is_open_for_work",
+      "data_type": "boolean",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "portfolio_settings"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "timezone('utc'::text, now())",
+      "column_name": "updated_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "portfolio_settings"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "gen_random_uuid()",
+      "column_name": "id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "product_capabilities"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "product_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "product_capabilities"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "title",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "product_capabilities"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "description",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "product_capabilities"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "icon",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "product_capabilities"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "0",
+      "column_name": "display_order",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "numeric_precision": 32,
+      "numeric_scale": 0,
+      "table_name": "product_capabilities"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "timezone('utc'::text, now())",
+      "column_name": "created_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "product_capabilities"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "gen_random_uuid()",
+      "column_name": "id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "product_technologies"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "product_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "product_technologies"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "name",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "product_technologies"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "0",
+      "column_name": "display_order",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "numeric_precision": 32,
+      "numeric_scale": 0,
+      "table_name": "product_technologies"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "timezone('utc'::text, now())",
+      "column_name": "created_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "product_technologies"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "gen_random_uuid()",
+      "column_name": "id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "projects"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "timezone('utc'::text, now())",
+      "column_name": "created_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "projects"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "timezone('utc'::text, now())",
+      "column_name": "updated_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "projects"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "title",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "projects"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "description",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "projects"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "full_description",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "projects"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "category",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "projects"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "client",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "projects"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "role",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "projects"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "timeline",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "projects"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "platform",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "projects"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "users",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "projects"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "'draft'::text",
+      "column_name": "status",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "projects"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "business_value",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "projects"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "'{}'::text[]",
+      "column_name": "technologies",
+      "data_type": "ARRAY",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "projects"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "cover_image_url",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "projects"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "'{}'::text[]",
+      "column_name": "images",
+      "data_type": "ARRAY",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "projects"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "problem_solved",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "projects"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "solution",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "projects"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "'{}'::text[]",
+      "column_name": "features",
+      "data_type": "ARRAY",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "projects"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "'[]'::jsonb",
+      "column_name": "impact_metrics",
+      "data_type": "jsonb",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "projects"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "'medium'::text",
+      "column_name": "layout_type",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "projects"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "demo_url",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "projects"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "github_url",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "projects"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "docs_url",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "projects"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "false",
+      "column_name": "is_featured",
+      "data_type": "boolean",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "projects"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "gen_random_uuid()",
+      "column_name": "id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "resume_downloads"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "resume_id",
+      "data_type": "uuid",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "resume_downloads"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "timezone('utc'::text, now())",
+      "column_name": "downloaded_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "resume_downloads"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "session_id",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "resume_downloads"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "visitor_id",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "resume_downloads"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "page_source",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "resume_downloads"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "referrer",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "resume_downloads"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "user_agent",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "resume_downloads"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "browser",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "resume_downloads"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "operating_system",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "resume_downloads"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "device_type",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "resume_downloads"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "country",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "resume_downloads"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "city",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "resume_downloads"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "ip_address",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "resume_downloads"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "'completed'::text",
+      "column_name": "download_status",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "resume_downloads"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "gen_random_uuid()",
+      "column_name": "id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "resume_settings"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "resume_name",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "resume_settings"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "file_name",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "resume_settings"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "storage_path",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "resume_settings"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "public_url",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "resume_settings"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "preview_url",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "resume_settings"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "version",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "resume_settings"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "file_size",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "numeric_precision": 32,
+      "numeric_scale": 0,
+      "table_name": "resume_settings"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "timezone('utc'::text, now())",
+      "column_name": "uploaded_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "resume_settings"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "timezone('utc'::text, now())",
+      "column_name": "updated_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "resume_settings"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "false",
+      "column_name": "is_active",
+      "data_type": "boolean",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "resume_settings"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "gen_random_uuid()",
+      "column_name": "id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "social_links"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "platform",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "social_links"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "url",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "social_links"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "0",
+      "column_name": "display_order",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "numeric_precision": 32,
+      "numeric_scale": 0,
+      "table_name": "social_links"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "timezone('utc'::text, now())",
+      "column_name": "updated_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "social_links"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "gen_random_uuid()",
+      "column_name": "id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "testimonials"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "timezone('utc'::text, now())",
+      "column_name": "created_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "testimonials"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "timezone('utc'::text, now())",
+      "column_name": "updated_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "testimonials"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "full_name",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "testimonials"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "email",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "testimonials"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "company",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "testimonials"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "designation",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "testimonials"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "country",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "testimonials"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "avatar_url",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "testimonials"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "5",
+      "column_name": "rating",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "numeric_precision": 32,
+      "numeric_scale": 0,
+      "table_name": "testimonials"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "testimonial",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "testimonials"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "'pending'::text",
+      "column_name": "status",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "testimonials"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "false",
+      "column_name": "featured",
+      "data_type": "boolean",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "testimonials"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "display_order",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "numeric_precision": 32,
+      "numeric_scale": 0,
+      "table_name": "testimonials"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "false",
+      "column_name": "is_visible",
+      "data_type": "boolean",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "testimonials"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "linkedin_url",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "testimonials"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "admin_notes",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "testimonials"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "user_id",
+      "data_type": "uuid",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "testimonials"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "deleted_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "testimonials"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "approved_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "testimonials"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "approved_by",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "testimonials"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "rejected_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "testimonials"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "rejected_by",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "testimonials"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "gen_random_uuid()",
+      "column_name": "id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "tools_products"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "timezone('utc'::text, now())",
+      "column_name": "created_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "tools_products"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "timezone('utc'::text, now())",
+      "column_name": "updated_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "tools_products"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "title",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "tools_products"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "description",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "tools_products"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "'Widget'::text",
+      "column_name": "type",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "tools_products"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "'1.0.0'::text",
+      "column_name": "version",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "tools_products"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "'General'::text",
+      "column_name": "category",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "tools_products"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "cover_image_url",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "tools_products"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "preview_image_url",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "tools_products"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "5.0",
+      "column_name": "rating",
+      "data_type": "numeric",
+      "is_nullable": "YES",
+      "numeric_precision": 3,
+      "numeric_scale": 2,
+      "table_name": "tools_products"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "0",
+      "column_name": "downloads",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "numeric_precision": 32,
+      "numeric_scale": 0,
+      "table_name": "tools_products"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "0",
+      "column_name": "views",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "numeric_precision": 32,
+      "numeric_scale": 0,
+      "table_name": "tools_products"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "marketplace_url",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "tools_products"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "github_url",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "tools_products"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "docs_url",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "tools_products"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "demo_url",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "tools_products"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "false",
+      "column_name": "is_featured",
+      "data_type": "boolean",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "tools_products"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "false",
+      "column_name": "is_coming_soon",
+      "data_type": "boolean",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "tools_products"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": null,
+      "column_name": "problem_solved",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "tools_products"
+    },
+    {
+      "character_maximum_length": null,
+      "column_default": "'draft'::text",
+      "column_name": "status",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "table_name": "tools_products"
+    }
+  ],
+  "primary_keys": [
+    {
+      "column_name": "id",
+      "constraint_name": "access_requests_pkey",
+      "table_name": "access_requests"
+    },
+    {
+      "column_name": "id",
+      "constraint_name": "admins_pkey",
+      "table_name": "admins"
+    },
+    {
+      "column_name": "id",
+      "constraint_name": "authorized_users_pkey",
+      "table_name": "authorized_users"
+    },
+    {
+      "column_name": "id",
+      "constraint_name": "certifications_pkey",
+      "table_name": "certifications"
+    },
+    {
+      "column_name": "id",
+      "constraint_name": "contact_messages_pkey",
+      "table_name": "contact_messages"
+    },
+    {
+      "column_name": "id",
+      "constraint_name": "maintenance_notification_logs_pkey",
+      "table_name": "maintenance_notification_logs"
+    },
+    {
+      "column_name": "id",
+      "constraint_name": "maintenance_subscribers_pkey",
+      "table_name": "maintenance_subscribers"
+    },
+    {
+      "column_name": "id",
+      "constraint_name": "portfolio_settings_pkey",
+      "table_name": "portfolio_settings"
+    },
+    {
+      "column_name": "id",
+      "constraint_name": "product_capabilities_pkey",
+      "table_name": "product_capabilities"
+    },
+    {
+      "column_name": "id",
+      "constraint_name": "product_technologies_pkey",
+      "table_name": "product_technologies"
+    },
+    {
+      "column_name": "id",
+      "constraint_name": "projects_pkey",
+      "table_name": "projects"
+    },
+    {
+      "column_name": "id",
+      "constraint_name": "resume_downloads_pkey",
+      "table_name": "resume_downloads"
+    },
+    {
+      "column_name": "id",
+      "constraint_name": "resume_settings_pkey",
+      "table_name": "resume_settings"
+    },
+    {
+      "column_name": "id",
+      "constraint_name": "social_links_pkey",
+      "table_name": "social_links"
+    },
+    {
+      "column_name": "id",
+      "constraint_name": "testimonials_pkey",
+      "table_name": "testimonials"
+    },
+    {
+      "column_name": "id",
+      "constraint_name": "tools_products_pkey",
+      "table_name": "tools_products"
+    }
+  ],
+  "foreign_keys": [
+    {
+      "column_name": "subscriber_id",
+      "constraint_name": "maintenance_notification_logs_subscriber_id_fkey",
+      "delete_rule": "CASCADE",
+      "foreign_column_name": "id",
+      "foreign_table_name": "maintenance_subscribers",
+      "table_name": "maintenance_notification_logs",
+      "update_rule": "NO ACTION"
+    },
+    {
+      "column_name": "product_id",
+      "constraint_name": "product_capabilities_product_id_fkey",
+      "delete_rule": "CASCADE",
+      "foreign_column_name": "id",
+      "foreign_table_name": "tools_products",
+      "table_name": "product_capabilities",
+      "update_rule": "NO ACTION"
+    },
+    {
+      "column_name": "product_id",
+      "constraint_name": "product_technologies_product_id_fkey",
+      "delete_rule": "CASCADE",
+      "foreign_column_name": "id",
+      "foreign_table_name": "tools_products",
+      "table_name": "product_technologies",
+      "update_rule": "NO ACTION"
+    },
+    {
+      "column_name": "resume_id",
+      "constraint_name": "resume_downloads_resume_id_fkey",
+      "delete_rule": "SET NULL",
+      "foreign_column_name": "id",
+      "foreign_table_name": "resume_settings",
+      "table_name": "resume_downloads",
+      "update_rule": "NO ACTION"
+    }
+  ],
+  "indexes": [
+    {
+      "indexdef": "CREATE UNIQUE INDEX access_requests_pkey ON public.access_requests USING btree (id)",
+      "indexname": "access_requests_pkey",
+      "table_name": "access_requests"
+    },
+    {
+      "indexdef": "CREATE INDEX idx_access_requests_email ON public.access_requests USING btree (email)",
+      "indexname": "idx_access_requests_email",
+      "table_name": "access_requests"
+    },
+    {
+      "indexdef": "CREATE INDEX idx_access_requests_status ON public.access_requests USING btree (request_status)",
+      "indexname": "idx_access_requests_status",
+      "table_name": "access_requests"
+    },
+    {
+      "indexdef": "CREATE UNIQUE INDEX admins_email_key ON public.admins USING btree (email)",
+      "indexname": "admins_email_key",
+      "table_name": "admins"
+    },
+    {
+      "indexdef": "CREATE UNIQUE INDEX admins_pkey ON public.admins USING btree (id)",
+      "indexname": "admins_pkey",
+      "table_name": "admins"
+    },
+    {
+      "indexdef": "CREATE UNIQUE INDEX authorized_users_email_key ON public.authorized_users USING btree (email)",
+      "indexname": "authorized_users_email_key",
+      "table_name": "authorized_users"
+    },
+    {
+      "indexdef": "CREATE UNIQUE INDEX authorized_users_pkey ON public.authorized_users USING btree (id)",
+      "indexname": "authorized_users_pkey",
+      "table_name": "authorized_users"
+    },
+    {
+      "indexdef": "CREATE INDEX idx_authorized_users_email ON public.authorized_users USING btree (email)",
+      "indexname": "idx_authorized_users_email",
+      "table_name": "authorized_users"
+    },
+    {
+      "indexdef": "CREATE INDEX idx_authorized_users_status ON public.authorized_users USING btree (access_status)",
+      "indexname": "idx_authorized_users_status",
+      "table_name": "authorized_users"
+    },
+    {
+      "indexdef": "CREATE UNIQUE INDEX certifications_pkey ON public.certifications USING btree (id)",
+      "indexname": "certifications_pkey",
+      "table_name": "certifications"
+    },
+    {
+      "indexdef": "CREATE INDEX idx_certifications_status_featured ON public.certifications USING btree (status, is_featured DESC, display_order, created_at DESC)",
+      "indexname": "idx_certifications_status_featured",
+      "table_name": "certifications"
+    },
+    {
+      "indexdef": "CREATE UNIQUE INDEX contact_messages_pkey ON public.contact_messages USING btree (id)",
+      "indexname": "contact_messages_pkey",
+      "table_name": "contact_messages"
+    },
+    {
+      "indexdef": "CREATE UNIQUE INDEX maintenance_notification_logs_pkey ON public.maintenance_notification_logs USING btree (id)",
+      "indexname": "maintenance_notification_logs_pkey",
+      "table_name": "maintenance_notification_logs"
+    },
+    {
+      "indexdef": "CREATE INDEX idx_maintenance_subscribers_email ON public.maintenance_subscribers USING btree (email)",
+      "indexname": "idx_maintenance_subscribers_email",
+      "table_name": "maintenance_subscribers"
+    },
+    {
+      "indexdef": "CREATE INDEX idx_maintenance_subscribers_status ON public.maintenance_subscribers USING btree (status)",
+      "indexname": "idx_maintenance_subscribers_status",
+      "table_name": "maintenance_subscribers"
+    },
+    {
+      "indexdef": "CREATE UNIQUE INDEX maintenance_subscribers_email_key ON public.maintenance_subscribers USING btree (email)",
+      "indexname": "maintenance_subscribers_email_key",
+      "table_name": "maintenance_subscribers"
+    },
+    {
+      "indexdef": "CREATE UNIQUE INDEX maintenance_subscribers_pkey ON public.maintenance_subscribers USING btree (id)",
+      "indexname": "maintenance_subscribers_pkey",
+      "table_name": "maintenance_subscribers"
+    },
+    {
+      "indexdef": "CREATE INDEX idx_portfolio_settings_visibility ON public.portfolio_settings USING btree (visibility)",
+      "indexname": "idx_portfolio_settings_visibility",
+      "table_name": "portfolio_settings"
+    },
+    {
+      "indexdef": "CREATE UNIQUE INDEX portfolio_settings_pkey ON public.portfolio_settings USING btree (id)",
+      "indexname": "portfolio_settings_pkey",
+      "table_name": "portfolio_settings"
+    },
+    {
+      "indexdef": "CREATE INDEX idx_capabilities_product_id ON public.product_capabilities USING btree (product_id, display_order)",
+      "indexname": "idx_capabilities_product_id",
+      "table_name": "product_capabilities"
+    },
+    {
+      "indexdef": "CREATE UNIQUE INDEX product_capabilities_pkey ON public.product_capabilities USING btree (id)",
+      "indexname": "product_capabilities_pkey",
+      "table_name": "product_capabilities"
+    },
+    {
+      "indexdef": "CREATE INDEX idx_technologies_product_id ON public.product_technologies USING btree (product_id, display_order)",
+      "indexname": "idx_technologies_product_id",
+      "table_name": "product_technologies"
+    },
+    {
+      "indexdef": "CREATE UNIQUE INDEX product_technologies_pkey ON public.product_technologies USING btree (id)",
+      "indexname": "product_technologies_pkey",
+      "table_name": "product_technologies"
+    },
+    {
+      "indexdef": "CREATE INDEX idx_projects_status_featured ON public.projects USING btree (status, is_featured DESC, created_at DESC)",
+      "indexname": "idx_projects_status_featured",
+      "table_name": "projects"
+    },
+    {
+      "indexdef": "CREATE UNIQUE INDEX projects_pkey ON public.projects USING btree (id)",
+      "indexname": "projects_pkey",
+      "table_name": "projects"
+    },
+    {
+      "indexdef": "CREATE INDEX idx_resume_downloads_downloaded_at ON public.resume_downloads USING btree (downloaded_at DESC)",
+      "indexname": "idx_resume_downloads_downloaded_at",
+      "table_name": "resume_downloads"
+    },
+    {
+      "indexdef": "CREATE INDEX idx_resume_downloads_resume_id ON public.resume_downloads USING btree (resume_id)",
+      "indexname": "idx_resume_downloads_resume_id",
+      "table_name": "resume_downloads"
+    },
+    {
+      "indexdef": "CREATE UNIQUE INDEX resume_downloads_pkey ON public.resume_downloads USING btree (id)",
+      "indexname": "resume_downloads_pkey",
+      "table_name": "resume_downloads"
+    },
+    {
+      "indexdef": "CREATE INDEX idx_resume_settings_is_active ON public.resume_settings USING btree (is_active) WHERE (is_active = true)",
+      "indexname": "idx_resume_settings_is_active",
+      "table_name": "resume_settings"
+    },
+    {
+      "indexdef": "CREATE UNIQUE INDEX resume_settings_pkey ON public.resume_settings USING btree (id)",
+      "indexname": "resume_settings_pkey",
+      "table_name": "resume_settings"
+    },
+    {
+      "indexdef": "CREATE UNIQUE INDEX social_links_pkey ON public.social_links USING btree (id)",
+      "indexname": "social_links_pkey",
+      "table_name": "social_links"
+    },
+    {
+      "indexdef": "CREATE UNIQUE INDEX social_links_platform_key ON public.social_links USING btree (platform)",
+      "indexname": "social_links_platform_key",
+      "table_name": "social_links"
+    },
+    {
+      "indexdef": "CREATE INDEX idx_testimonials_status_visibility ON public.testimonials USING btree (status, is_visible, display_order, created_at DESC)",
+      "indexname": "idx_testimonials_status_visibility",
+      "table_name": "testimonials"
+    },
+    {
+      "indexdef": "CREATE UNIQUE INDEX testimonials_pkey ON public.testimonials USING btree (id)",
+      "indexname": "testimonials_pkey",
+      "table_name": "testimonials"
+    },
+    {
+      "indexdef": "CREATE INDEX idx_tools_products_status ON public.tools_products USING btree (status, is_featured DESC, created_at DESC)",
+      "indexname": "idx_tools_products_status",
+      "table_name": "tools_products"
+    },
+    {
+      "indexdef": "CREATE UNIQUE INDEX tools_products_pkey ON public.tools_products USING btree (id)",
+      "indexname": "tools_products_pkey",
+      "table_name": "tools_products"
+    }
+  ],
+  "constraints": [
+    {
+      "constraint_def": "CHECK ((request_status = ANY (ARRAY['pending'::text, 'approved'::text, 'rejected'::text])))",
+      "constraint_name": "access_requests_request_status_check",
+      "constraint_type": "CHECK",
+      "table_name": "access_requests"
+    },
+    {
+      "constraint_def": "UNIQUE (email)",
+      "constraint_name": "admins_email_key",
+      "constraint_type": "UNIQUE",
+      "table_name": "admins"
+    },
+    {
+      "constraint_def": "CHECK ((status = ANY (ARRAY['Active'::text, 'Pending'::text, 'Inactive'::text])))",
+      "constraint_name": "admins_status_check",
+      "constraint_type": "CHECK",
+      "table_name": "admins"
+    },
+    {
+      "constraint_def": "CHECK ((access_level = ANY (ARRAY['viewer'::text, 'recruiter'::text, 'client'::text, 'admin'::text])))",
+      "constraint_name": "authorized_users_access_level_check",
+      "constraint_type": "CHECK",
+      "table_name": "authorized_users"
+    },
+    {
+      "constraint_def": "CHECK ((access_status = ANY (ARRAY['enabled'::text, 'disabled'::text])))",
+      "constraint_name": "authorized_users_access_status_check",
+      "constraint_type": "CHECK",
+      "table_name": "authorized_users"
+    },
+    {
+      "constraint_def": "UNIQUE (email)",
+      "constraint_name": "authorized_users_email_key",
+      "constraint_type": "UNIQUE",
+      "table_name": "authorized_users"
+    },
+    {
+      "constraint_def": "CHECK ((status = ANY (ARRAY['draft'::text, 'published'::text])))",
+      "constraint_name": "certifications_status_check",
+      "constraint_type": "CHECK",
+      "table_name": "certifications"
+    },
+    {
+      "constraint_def": "CHECK ((char_length(TRIM(BOTH FROM email)) > 0))",
+      "constraint_name": "contact_messages_email_check",
+      "constraint_type": "CHECK",
+      "table_name": "contact_messages"
+    },
+    {
+      "constraint_def": "CHECK ((char_length(TRIM(BOTH FROM full_name)) > 0))",
+      "constraint_name": "contact_messages_full_name_check",
+      "constraint_type": "CHECK",
+      "table_name": "contact_messages"
+    },
+    {
+      "constraint_def": "CHECK ((char_length(TRIM(BOTH FROM message)) > 0))",
+      "constraint_name": "contact_messages_message_check",
+      "constraint_type": "CHECK",
+      "table_name": "contact_messages"
+    },
+    {
+      "constraint_def": "CHECK ((char_length(TRIM(BOTH FROM subject)) > 0))",
+      "constraint_name": "contact_messages_subject_check",
+      "constraint_type": "CHECK",
+      "table_name": "contact_messages"
+    },
+    {
+      "constraint_def": "CHECK ((char_length(TRIM(BOTH FROM submitted_from)) > 0))",
+      "constraint_name": "contact_messages_submitted_from_check",
+      "constraint_type": "CHECK",
+      "table_name": "contact_messages"
+    },
+    {
+      "constraint_def": "CHECK ((status = ANY (ARRAY['queued'::text, 'sending'::text, 'sent'::text, 'failed'::text])))",
+      "constraint_name": "maintenance_notification_logs_status_check",
+      "constraint_type": "CHECK",
+      "table_name": "maintenance_notification_logs"
+    },
+    {
+      "constraint_def": "UNIQUE (email)",
+      "constraint_name": "maintenance_subscribers_email_key",
+      "constraint_type": "UNIQUE",
+      "table_name": "maintenance_subscribers"
+    },
+    {
+      "constraint_def": "CHECK ((status = ANY (ARRAY['pending'::text, 'queued'::text, 'notified'::text, 'unsubscribed'::text])))",
+      "constraint_name": "maintenance_subscribers_status_check",
+      "constraint_type": "CHECK",
+      "table_name": "maintenance_subscribers"
+    },
+    {
+      "constraint_def": "CHECK ((visibility = ANY (ARRAY['public'::text, 'maintenance'::text, 'private'::text])))",
+      "constraint_name": "portfolio_settings_visibility_check",
+      "constraint_type": "CHECK",
+      "table_name": "portfolio_settings"
+    },
+    {
+      "constraint_def": "CHECK ((status = ANY (ARRAY['draft'::text, 'published'::text])))",
+      "constraint_name": "projects_status_check",
+      "constraint_type": "CHECK",
+      "table_name": "projects"
+    },
+    {
+      "constraint_def": "UNIQUE (platform)",
+      "constraint_name": "social_links_platform_key",
+      "constraint_type": "UNIQUE",
+      "table_name": "social_links"
+    },
+    {
+      "constraint_def": "CHECK (((rating >= 1) AND (rating <= 5)))",
+      "constraint_name": "testimonials_rating_check",
+      "constraint_type": "CHECK",
+      "table_name": "testimonials"
+    },
+    {
+      "constraint_def": "CHECK ((status = ANY (ARRAY['pending'::text, 'approved'::text, 'rejected'::text])))",
+      "constraint_name": "testimonials_status_check",
+      "constraint_type": "CHECK",
+      "table_name": "testimonials"
+    },
+    {
+      "constraint_def": "CHECK ((status = ANY (ARRAY['draft'::text, 'published'::text])))",
+      "constraint_name": "tools_products_status_check",
+      "constraint_type": "CHECK",
+      "table_name": "tools_products"
+    },
+    {
+      "constraint_def": "CHECK ((type = ANY (ARRAY['Widget'::text, 'Action'::text, 'Template'::text, 'Plugin'::text, 'Tool'::text])))",
+      "constraint_name": "tools_products_type_check",
+      "constraint_type": "CHECK",
+      "table_name": "tools_products"
+    }
+  ],
+  "triggers": [
+    {
+      "table_name": "contact_messages",
+      "trigger_def": "CREATE TRIGGER tr_on_contact_message_inserted AFTER INSERT ON public.contact_messages FOR EACH ROW EXECUTE FUNCTION on_contact_message_inserted()",
+      "trigger_name": "tr_on_contact_message_inserted"
+    },
+    {
+      "table_name": "testimonials",
+      "trigger_def": "CREATE TRIGGER update_testimonials_updated_at BEFORE UPDATE ON public.testimonials FOR EACH ROW EXECUTE FUNCTION update_updated_at_column()",
+      "trigger_name": "update_testimonials_updated_at"
+    },
+    {
+      "table_name": "testimonials",
+      "trigger_def": "CREATE TRIGGER tr_on_testimonial_inserted AFTER INSERT ON public.testimonials FOR EACH ROW EXECUTE FUNCTION on_testimonial_inserted()",
+      "trigger_name": "tr_on_testimonial_inserted"
+    },
+    {
+      "table_name": "certifications",
+      "trigger_def": "CREATE TRIGGER update_certifications_updated_at BEFORE UPDATE ON public.certifications FOR EACH ROW EXECUTE FUNCTION update_updated_at_column()",
+      "trigger_name": "update_certifications_updated_at"
+    },
+    {
+      "table_name": "resume_settings",
+      "trigger_def": "CREATE TRIGGER update_resume_settings_updated_at BEFORE UPDATE ON public.resume_settings FOR EACH ROW EXECUTE FUNCTION update_updated_at_column()",
+      "trigger_name": "update_resume_settings_updated_at"
+    },
+    {
+      "table_name": "resume_settings",
+      "trigger_def": "CREATE TRIGGER enforce_single_active_resume AFTER INSERT OR UPDATE ON public.resume_settings FOR EACH ROW WHEN ((new.is_active = true)) EXECUTE FUNCTION handle_resume_is_active_deactivation()",
+      "trigger_name": "enforce_single_active_resume"
+    },
+    {
+      "table_name": "portfolio_settings",
+      "trigger_def": "CREATE TRIGGER update_portfolio_settings_updated_at BEFORE UPDATE ON public.portfolio_settings FOR EACH ROW EXECUTE FUNCTION update_updated_at_column()",
+      "trigger_name": "update_portfolio_settings_updated_at"
+    },
+    {
+      "table_name": "social_links",
+      "trigger_def": "CREATE TRIGGER update_social_links_updated_at BEFORE UPDATE ON public.social_links FOR EACH ROW EXECUTE FUNCTION update_updated_at_column()",
+      "trigger_name": "update_social_links_updated_at"
+    },
+    {
+      "table_name": "maintenance_subscribers",
+      "trigger_def": "CREATE TRIGGER update_maintenance_subscribers_updated_at BEFORE UPDATE ON public.maintenance_subscribers FOR EACH ROW EXECUTE FUNCTION update_updated_at_column()",
+      "trigger_name": "update_maintenance_subscribers_updated_at"
+    },
+    {
+      "table_name": "access_requests",
+      "trigger_def": "CREATE TRIGGER tr_on_access_request_inserted AFTER INSERT ON public.access_requests FOR EACH ROW EXECUTE FUNCTION on_access_request_inserted()",
+      "trigger_name": "tr_on_access_request_inserted"
+    },
+    {
+      "table_name": "projects",
+      "trigger_def": "CREATE TRIGGER update_projects_updated_at BEFORE UPDATE ON public.projects FOR EACH ROW EXECUTE FUNCTION update_updated_at_column()",
+      "trigger_name": "update_projects_updated_at"
+    },
+    {
+      "table_name": "tools_products",
+      "trigger_def": "CREATE TRIGGER update_tools_products_updated_at BEFORE UPDATE ON public.tools_products FOR EACH ROW EXECUTE FUNCTION update_updated_at_column()",
+      "trigger_name": "update_tools_products_updated_at"
+    }
+  ],
+  "functions": [
+    {
+      "function_args": "",
+      "function_def": "CREATE OR REPLACE FUNCTION public.handle_resume_is_active_deactivation()\n RETURNS trigger\n LANGUAGE plpgsql\n SECURITY DEFINER\nAS $function$\r\nBEGIN\r\n  UPDATE public.resume_settings\r\n  SET is_active = FALSE, updated_at = timezone('utc'::text, now())\r\n  WHERE id != NEW.id AND is_active = TRUE;\r\n  RETURN NEW;\r\nEND;\r\n$function$\n",
+      "function_name": "handle_resume_is_active_deactivation",
+      "schema_name": "public"
+    },
+    {
+      "function_args": "",
+      "function_def": "CREATE OR REPLACE FUNCTION public.on_access_request_inserted()\n RETURNS trigger\n LANGUAGE plpgsql\n SECURITY DEFINER\nAS $function$\nbegin\n  perform net.http_post(\n    url := 'https://txoszrnjkrlbjzpjisvp.supabase.co/functions/v1/notify-admins-new-request',\n    headers := jsonb_build_object(\n      'Content-Type', 'application/json',\n      'X-Webhook-Secret', 'db_webhook_secret_99882244'\n    ),\n    body := jsonb_build_object(\n      'record', to_jsonb(new)\n    )\n  );\n  return new;\nend;\n$function$\n",
+      "function_name": "on_access_request_inserted",
+      "schema_name": "public"
+    },
+    {
+      "function_args": "",
+      "function_def": "CREATE OR REPLACE FUNCTION public.on_contact_message_inserted()\n RETURNS trigger\n LANGUAGE plpgsql\n SECURITY DEFINER\nAS $function$\nbegin\n  perform net.http_post(\n    url := 'https://txoszrnjkrlbjzpjisvp.supabase.co/functions/v1/send-contact-email',\n    headers := jsonb_build_object(\n      'Content-Type', 'application/json',\n      'X-Webhook-Secret', 'db_webhook_secret_99882244'\n    ),\n    body := jsonb_build_object(\n      'record', to_jsonb(new)\n    )\n  );\n  return new;\nend;\n$function$\n",
+      "function_name": "on_contact_message_inserted",
+      "schema_name": "public"
+    },
+    {
+      "function_args": "",
+      "function_def": "CREATE OR REPLACE FUNCTION public.on_testimonial_inserted()\n RETURNS trigger\n LANGUAGE plpgsql\n SECURITY DEFINER\nAS $function$\r\nBEGIN\r\n  PERFORM net.http_post(\r\n    url := 'https://txoszrnjkrlbjzpjisvp.supabase.co/functions/v1/send-testimonial-email',\r\n    headers := jsonb_build_object(\r\n      'Content-Type', 'application/json',\r\n      'X-Webhook-Secret', 'db_webhook_secret_99882244'\r\n    ),\r\n    body := jsonb_build_object(\r\n      'record', jsonb_build_object(\r\n        'id', new.id,\r\n        'google_name', new.full_name,\r\n        'google_email', new.email,\r\n        'google_avatar', new.avatar_url,\r\n        'linkedin_url', new.linkedin_url,\r\n        'designation', new.designation,\r\n        'company', new.company,\r\n        'rating', new.rating,\r\n        'testimonial', new.testimonial,\r\n        'consent_public', true,\r\n        'status', new.status,\r\n        'created_at', new.created_at\r\n      )\r\n    )\r\n  );\r\n  RETURN new;\r\nEND;\r\n$function$\n",
+      "function_name": "on_testimonial_inserted",
+      "schema_name": "public"
+    },
+    {
+      "function_args": "",
+      "function_def": "CREATE OR REPLACE FUNCTION public.update_updated_at_column()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\r\nBEGIN\r\n   NEW.updated_at = now();\r\n   RETURN NEW;\r\nEND;\r\n$function$\n",
+      "function_name": "update_updated_at_column",
+      "schema_name": "public"
+    }
+  ],
+  "views": [],
+  "policies": [
+    {
+      "cmd": "ALL",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow admin full access to access_requests",
+      "qual": "(EXISTS ( SELECT 1\n   FROM admins\n  WHERE ((admins.email = ( SELECT (auth.jwt() ->> 'email'::text))) AND (admins.is_active = true))))",
+      "roles": "{authenticated}",
+      "schemaname": "public",
+      "tablename": "access_requests",
+      "with_check": "(EXISTS ( SELECT 1\n   FROM admins\n  WHERE ((admins.email = ( SELECT (auth.jwt() ->> 'email'::text))) AND (admins.is_active = true))))"
+    },
+    {
+      "cmd": "INSERT",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow public insert of access_requests",
+      "qual": null,
+      "roles": "{public}",
+      "schemaname": "public",
+      "tablename": "access_requests",
+      "with_check": "true"
+    },
+    {
+      "cmd": "SELECT",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow public select of access_requests",
+      "qual": "true",
+      "roles": "{public}",
+      "schemaname": "public",
+      "tablename": "access_requests",
+      "with_check": null
+    },
+    {
+      "cmd": "DELETE",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow privileged admins to delete admin records",
+      "qual": "(EXISTS ( SELECT 1\n   FROM admins admins_1\n  WHERE ((admins_1.email = ( SELECT (auth.jwt() ->> 'email'::text))) AND (admins_1.is_active = true) AND (admins_1.role = ANY (ARRAY['super_admin'::text, 'admin'::text])))))",
+      "roles": "{authenticated}",
+      "schemaname": "public",
+      "tablename": "admins",
+      "with_check": null
+    },
+    {
+      "cmd": "INSERT",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow privileged admins to insert admin records",
+      "qual": null,
+      "roles": "{authenticated}",
+      "schemaname": "public",
+      "tablename": "admins",
+      "with_check": "(EXISTS ( SELECT 1\n   FROM admins admins_1\n  WHERE ((admins_1.email = ( SELECT (auth.jwt() ->> 'email'::text))) AND (admins_1.is_active = true) AND (admins_1.role = ANY (ARRAY['super_admin'::text, 'admin'::text])))))"
+    },
+    {
+      "cmd": "UPDATE",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow privileged admins to update admin records",
+      "qual": "(EXISTS ( SELECT 1\n   FROM admins admins_1\n  WHERE ((admins_1.email = ( SELECT (auth.jwt() ->> 'email'::text))) AND (admins_1.is_active = true) AND (admins_1.role = ANY (ARRAY['super_admin'::text, 'admin'::text])))))",
+      "roles": "{authenticated}",
+      "schemaname": "public",
+      "tablename": "admins",
+      "with_check": "(EXISTS ( SELECT 1\n   FROM admins admins_1\n  WHERE ((admins_1.email = ( SELECT (auth.jwt() ->> 'email'::text))) AND (admins_1.is_active = true) AND (admins_1.role = ANY (ARRAY['super_admin'::text, 'admin'::text])))))"
+    },
+    {
+      "cmd": "SELECT",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow public select of admins",
+      "qual": "true",
+      "roles": "{public}",
+      "schemaname": "public",
+      "tablename": "admins",
+      "with_check": null
+    },
+    {
+      "cmd": "ALL",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow admin full access to authorized_users",
+      "qual": "(EXISTS ( SELECT 1\n   FROM admins\n  WHERE ((admins.email = ( SELECT (auth.jwt() ->> 'email'::text))) AND (admins.is_active = true))))",
+      "roles": "{authenticated}",
+      "schemaname": "public",
+      "tablename": "authorized_users",
+      "with_check": "(EXISTS ( SELECT 1\n   FROM admins\n  WHERE ((admins.email = ( SELECT (auth.jwt() ->> 'email'::text))) AND (admins.is_active = true))))"
+    },
+    {
+      "cmd": "SELECT",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow public select of authorized_users",
+      "qual": "true",
+      "roles": "{public}",
+      "schemaname": "public",
+      "tablename": "authorized_users",
+      "with_check": null
+    },
+    {
+      "cmd": "DELETE",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow admin delete all",
+      "qual": "(EXISTS ( SELECT 1\n   FROM admins\n  WHERE ((admins.email = ( SELECT (auth.jwt() ->> 'email'::text))) AND (admins.is_active = true))))",
+      "roles": "{authenticated}",
+      "schemaname": "public",
+      "tablename": "certifications",
+      "with_check": null
+    },
+    {
+      "cmd": "INSERT",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow admin insert all",
+      "qual": null,
+      "roles": "{authenticated}",
+      "schemaname": "public",
+      "tablename": "certifications",
+      "with_check": "(EXISTS ( SELECT 1\n   FROM admins\n  WHERE ((admins.email = ( SELECT (auth.jwt() ->> 'email'::text))) AND (admins.is_active = true))))"
+    },
+    {
+      "cmd": "SELECT",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow admin select all",
+      "qual": "(EXISTS ( SELECT 1\n   FROM admins\n  WHERE ((admins.email = ( SELECT (auth.jwt() ->> 'email'::text))) AND (admins.is_active = true))))",
+      "roles": "{authenticated}",
+      "schemaname": "public",
+      "tablename": "certifications",
+      "with_check": null
+    },
+    {
+      "cmd": "UPDATE",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow admin update all",
+      "qual": "(EXISTS ( SELECT 1\n   FROM admins\n  WHERE ((admins.email = ( SELECT (auth.jwt() ->> 'email'::text))) AND (admins.is_active = true))))",
+      "roles": "{authenticated}",
+      "schemaname": "public",
+      "tablename": "certifications",
+      "with_check": "(EXISTS ( SELECT 1\n   FROM admins\n  WHERE ((admins.email = ( SELECT (auth.jwt() ->> 'email'::text))) AND (admins.is_active = true))))"
+    },
+    {
+      "cmd": "SELECT",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow public select of published certifications",
+      "qual": "(status = 'published'::text)",
+      "roles": "{public}",
+      "schemaname": "public",
+      "tablename": "certifications",
+      "with_check": null
+    },
+    {
+      "cmd": "DELETE",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow admin delete",
+      "qual": "(EXISTS ( SELECT 1\n   FROM admins\n  WHERE ((admins.email = ( SELECT (auth.jwt() ->> 'email'::text))) AND (admins.is_active = true))))",
+      "roles": "{authenticated}",
+      "schemaname": "public",
+      "tablename": "contact_messages",
+      "with_check": null
+    },
+    {
+      "cmd": "SELECT",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow admin select",
+      "qual": "(EXISTS ( SELECT 1\n   FROM admins\n  WHERE ((admins.email = ( SELECT (auth.jwt() ->> 'email'::text))) AND (admins.is_active = true))))",
+      "roles": "{authenticated}",
+      "schemaname": "public",
+      "tablename": "contact_messages",
+      "with_check": null
+    },
+    {
+      "cmd": "UPDATE",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow admin update",
+      "qual": "(EXISTS ( SELECT 1\n   FROM admins\n  WHERE ((admins.email = ( SELECT (auth.jwt() ->> 'email'::text))) AND (admins.is_active = true))))",
+      "roles": "{authenticated}",
+      "schemaname": "public",
+      "tablename": "contact_messages",
+      "with_check": "(EXISTS ( SELECT 1\n   FROM admins\n  WHERE ((admins.email = ( SELECT (auth.jwt() ->> 'email'::text))) AND (admins.is_active = true))))"
+    },
+    {
+      "cmd": "INSERT",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow anonymous inserts",
+      "qual": null,
+      "roles": "{anon}",
+      "schemaname": "public",
+      "tablename": "contact_messages",
+      "with_check": "true"
+    },
+    {
+      "cmd": "INSERT",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow authenticated inserts",
+      "qual": null,
+      "roles": "{authenticated}",
+      "schemaname": "public",
+      "tablename": "contact_messages",
+      "with_check": "true"
+    },
+    {
+      "cmd": "ALL",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow admin full access to maintenance notification logs",
+      "qual": "(EXISTS ( SELECT 1\n   FROM admins\n  WHERE ((admins.email = ( SELECT (auth.jwt() ->> 'email'::text))) AND (admins.is_active = true))))",
+      "roles": "{authenticated}",
+      "schemaname": "public",
+      "tablename": "maintenance_notification_logs",
+      "with_check": "(EXISTS ( SELECT 1\n   FROM admins\n  WHERE ((admins.email = ( SELECT (auth.jwt() ->> 'email'::text))) AND (admins.is_active = true))))"
+    },
+    {
+      "cmd": "INSERT",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow public insert of maintenance notification logs",
+      "qual": null,
+      "roles": "{public}",
+      "schemaname": "public",
+      "tablename": "maintenance_notification_logs",
+      "with_check": "true"
+    },
+    {
+      "cmd": "SELECT",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow public select of maintenance notification logs",
+      "qual": "true",
+      "roles": "{public}",
+      "schemaname": "public",
+      "tablename": "maintenance_notification_logs",
+      "with_check": null
+    },
+    {
+      "cmd": "ALL",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow admin full access to maintenance subscribers",
+      "qual": "(EXISTS ( SELECT 1\n   FROM admins\n  WHERE ((admins.email = ( SELECT (auth.jwt() ->> 'email'::text))) AND (admins.is_active = true))))",
+      "roles": "{authenticated}",
+      "schemaname": "public",
+      "tablename": "maintenance_subscribers",
+      "with_check": "(EXISTS ( SELECT 1\n   FROM admins\n  WHERE ((admins.email = ( SELECT (auth.jwt() ->> 'email'::text))) AND (admins.is_active = true))))"
+    },
+    {
+      "cmd": "INSERT",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow public insert of maintenance subscribers",
+      "qual": null,
+      "roles": "{public}",
+      "schemaname": "public",
+      "tablename": "maintenance_subscribers",
+      "with_check": "true"
+    },
+    {
+      "cmd": "SELECT",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow public select of maintenance subscribers",
+      "qual": "true",
+      "roles": "{public}",
+      "schemaname": "public",
+      "tablename": "maintenance_subscribers",
+      "with_check": null
+    },
+    {
+      "cmd": "UPDATE",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow admin update of portfolio settings",
+      "qual": "(EXISTS ( SELECT 1\n   FROM admins\n  WHERE ((admins.email = ( SELECT (auth.jwt() ->> 'email'::text))) AND (admins.is_active = true))))",
+      "roles": "{authenticated}",
+      "schemaname": "public",
+      "tablename": "portfolio_settings",
+      "with_check": "(EXISTS ( SELECT 1\n   FROM admins\n  WHERE ((admins.email = ( SELECT (auth.jwt() ->> 'email'::text))) AND (admins.is_active = true))))"
+    },
+    {
+      "cmd": "SELECT",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow public select of portfolio settings",
+      "qual": "true",
+      "roles": "{public}",
+      "schemaname": "public",
+      "tablename": "portfolio_settings",
+      "with_check": null
+    },
+    {
+      "cmd": "DELETE",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow admin delete all capabilities",
+      "qual": "(EXISTS ( SELECT 1\n   FROM admins\n  WHERE ((admins.email = ( SELECT (auth.jwt() ->> 'email'::text))) AND (admins.is_active = true))))",
+      "roles": "{authenticated}",
+      "schemaname": "public",
+      "tablename": "product_capabilities",
+      "with_check": null
+    },
+    {
+      "cmd": "INSERT",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow admin insert all capabilities",
+      "qual": null,
+      "roles": "{authenticated}",
+      "schemaname": "public",
+      "tablename": "product_capabilities",
+      "with_check": "(EXISTS ( SELECT 1\n   FROM admins\n  WHERE ((admins.email = ( SELECT (auth.jwt() ->> 'email'::text))) AND (admins.is_active = true))))"
+    },
+    {
+      "cmd": "SELECT",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow admin select all capabilities",
+      "qual": "(EXISTS ( SELECT 1\n   FROM admins\n  WHERE ((admins.email = ( SELECT (auth.jwt() ->> 'email'::text))) AND (admins.is_active = true))))",
+      "roles": "{authenticated}",
+      "schemaname": "public",
+      "tablename": "product_capabilities",
+      "with_check": null
+    },
+    {
+      "cmd": "UPDATE",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow admin update all capabilities",
+      "qual": "(EXISTS ( SELECT 1\n   FROM admins\n  WHERE ((admins.email = ( SELECT (auth.jwt() ->> 'email'::text))) AND (admins.is_active = true))))",
+      "roles": "{authenticated}",
+      "schemaname": "public",
+      "tablename": "product_capabilities",
+      "with_check": "(EXISTS ( SELECT 1\n   FROM admins\n  WHERE ((admins.email = ( SELECT (auth.jwt() ->> 'email'::text))) AND (admins.is_active = true))))"
+    },
+    {
+      "cmd": "SELECT",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow public select of capabilities",
+      "qual": "(EXISTS ( SELECT 1\n   FROM tools_products\n  WHERE ((tools_products.id = product_capabilities.product_id) AND (tools_products.status = 'published'::text))))",
+      "roles": "{public}",
+      "schemaname": "public",
+      "tablename": "product_capabilities",
+      "with_check": null
+    },
+    {
+      "cmd": "DELETE",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow admin delete all product technologies",
+      "qual": "(EXISTS ( SELECT 1\n   FROM admins\n  WHERE ((admins.email = ( SELECT (auth.jwt() ->> 'email'::text))) AND (admins.is_active = true))))",
+      "roles": "{authenticated}",
+      "schemaname": "public",
+      "tablename": "product_technologies",
+      "with_check": null
+    },
+    {
+      "cmd": "INSERT",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow admin insert all product technologies",
+      "qual": null,
+      "roles": "{authenticated}",
+      "schemaname": "public",
+      "tablename": "product_technologies",
+      "with_check": "(EXISTS ( SELECT 1\n   FROM admins\n  WHERE ((admins.email = ( SELECT (auth.jwt() ->> 'email'::text))) AND (admins.is_active = true))))"
+    },
+    {
+      "cmd": "SELECT",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow admin select all product technologies",
+      "qual": "(EXISTS ( SELECT 1\n   FROM admins\n  WHERE ((admins.email = ( SELECT (auth.jwt() ->> 'email'::text))) AND (admins.is_active = true))))",
+      "roles": "{authenticated}",
+      "schemaname": "public",
+      "tablename": "product_technologies",
+      "with_check": null
+    },
+    {
+      "cmd": "UPDATE",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow admin update all product technologies",
+      "qual": "(EXISTS ( SELECT 1\n   FROM admins\n  WHERE ((admins.email = ( SELECT (auth.jwt() ->> 'email'::text))) AND (admins.is_active = true))))",
+      "roles": "{authenticated}",
+      "schemaname": "public",
+      "tablename": "product_technologies",
+      "with_check": "(EXISTS ( SELECT 1\n   FROM admins\n  WHERE ((admins.email = ( SELECT (auth.jwt() ->> 'email'::text))) AND (admins.is_active = true))))"
+    },
+    {
+      "cmd": "SELECT",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow public select of technologies",
+      "qual": "(EXISTS ( SELECT 1\n   FROM tools_products\n  WHERE ((tools_products.id = product_technologies.product_id) AND (tools_products.status = 'published'::text))))",
+      "roles": "{public}",
+      "schemaname": "public",
+      "tablename": "product_technologies",
+      "with_check": null
+    },
+    {
+      "cmd": "DELETE",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow admin delete all projects",
+      "qual": "(EXISTS ( SELECT 1\n   FROM admins\n  WHERE ((admins.email = ( SELECT (auth.jwt() ->> 'email'::text))) AND (admins.is_active = true))))",
+      "roles": "{authenticated}",
+      "schemaname": "public",
+      "tablename": "projects",
+      "with_check": null
+    },
+    {
+      "cmd": "INSERT",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow admin insert all projects",
+      "qual": null,
+      "roles": "{authenticated}",
+      "schemaname": "public",
+      "tablename": "projects",
+      "with_check": "(EXISTS ( SELECT 1\n   FROM admins\n  WHERE ((admins.email = ( SELECT (auth.jwt() ->> 'email'::text))) AND (admins.is_active = true))))"
+    },
+    {
+      "cmd": "SELECT",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow admin select all projects",
+      "qual": "(EXISTS ( SELECT 1\n   FROM admins\n  WHERE ((admins.email = ( SELECT (auth.jwt() ->> 'email'::text))) AND (admins.is_active = true))))",
+      "roles": "{authenticated}",
+      "schemaname": "public",
+      "tablename": "projects",
+      "with_check": null
+    },
+    {
+      "cmd": "UPDATE",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow admin update all projects",
+      "qual": "(EXISTS ( SELECT 1\n   FROM admins\n  WHERE ((admins.email = ( SELECT (auth.jwt() ->> 'email'::text))) AND (admins.is_active = true))))",
+      "roles": "{authenticated}",
+      "schemaname": "public",
+      "tablename": "projects",
+      "with_check": "(EXISTS ( SELECT 1\n   FROM admins\n  WHERE ((admins.email = ( SELECT (auth.jwt() ->> 'email'::text))) AND (admins.is_active = true))))"
+    },
+    {
+      "cmd": "SELECT",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow public select of published projects",
+      "qual": "(status = 'published'::text)",
+      "roles": "{public}",
+      "schemaname": "public",
+      "tablename": "projects",
+      "with_check": null
+    },
+    {
+      "cmd": "DELETE",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow admin delete all resume downloads",
+      "qual": "(EXISTS ( SELECT 1\n   FROM admins\n  WHERE ((admins.email = ( SELECT (auth.jwt() ->> 'email'::text))) AND (admins.is_active = true))))",
+      "roles": "{authenticated}",
+      "schemaname": "public",
+      "tablename": "resume_downloads",
+      "with_check": null
+    },
+    {
+      "cmd": "SELECT",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow admin select all resume downloads",
+      "qual": "(EXISTS ( SELECT 1\n   FROM admins\n  WHERE ((admins.email = ( SELECT (auth.jwt() ->> 'email'::text))) AND (admins.is_active = true))))",
+      "roles": "{authenticated}",
+      "schemaname": "public",
+      "tablename": "resume_downloads",
+      "with_check": null
+    },
+    {
+      "cmd": "UPDATE",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow admin update all resume downloads",
+      "qual": "(EXISTS ( SELECT 1\n   FROM admins\n  WHERE ((admins.email = ( SELECT (auth.jwt() ->> 'email'::text))) AND (admins.is_active = true))))",
+      "roles": "{authenticated}",
+      "schemaname": "public",
+      "tablename": "resume_downloads",
+      "with_check": "(EXISTS ( SELECT 1\n   FROM admins\n  WHERE ((admins.email = ( SELECT (auth.jwt() ->> 'email'::text))) AND (admins.is_active = true))))"
+    },
+    {
+      "cmd": "INSERT",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow public insert of download tracking",
+      "qual": null,
+      "roles": "{anon,authenticated}",
+      "schemaname": "public",
+      "tablename": "resume_downloads",
+      "with_check": "true"
+    },
+    {
+      "cmd": "UPDATE",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow public update of download status",
+      "qual": "true",
+      "roles": "{anon,authenticated}",
+      "schemaname": "public",
+      "tablename": "resume_downloads",
+      "with_check": "true"
+    },
+    {
+      "cmd": "DELETE",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow admin delete resume settings",
+      "qual": "(EXISTS ( SELECT 1\n   FROM admins\n  WHERE ((admins.email = ( SELECT (auth.jwt() ->> 'email'::text))) AND (admins.is_active = true))))",
+      "roles": "{authenticated}",
+      "schemaname": "public",
+      "tablename": "resume_settings",
+      "with_check": null
+    },
+    {
+      "cmd": "INSERT",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow admin insert resume settings",
+      "qual": null,
+      "roles": "{authenticated}",
+      "schemaname": "public",
+      "tablename": "resume_settings",
+      "with_check": "(EXISTS ( SELECT 1\n   FROM admins\n  WHERE ((admins.email = ( SELECT (auth.jwt() ->> 'email'::text))) AND (admins.is_active = true))))"
+    },
+    {
+      "cmd": "SELECT",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow admin select all resume settings",
+      "qual": "(EXISTS ( SELECT 1\n   FROM admins\n  WHERE ((admins.email = ( SELECT (auth.jwt() ->> 'email'::text))) AND (admins.is_active = true))))",
+      "roles": "{authenticated}",
+      "schemaname": "public",
+      "tablename": "resume_settings",
+      "with_check": null
+    },
+    {
+      "cmd": "UPDATE",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow admin update resume settings",
+      "qual": "(EXISTS ( SELECT 1\n   FROM admins\n  WHERE ((admins.email = ( SELECT (auth.jwt() ->> 'email'::text))) AND (admins.is_active = true))))",
+      "roles": "{authenticated}",
+      "schemaname": "public",
+      "tablename": "resume_settings",
+      "with_check": "(EXISTS ( SELECT 1\n   FROM admins\n  WHERE ((admins.email = ( SELECT (auth.jwt() ->> 'email'::text))) AND (admins.is_active = true))))"
+    },
+    {
+      "cmd": "SELECT",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow public select of active resume",
+      "qual": "(is_active = true)",
+      "roles": "{public}",
+      "schemaname": "public",
+      "tablename": "resume_settings",
+      "with_check": null
+    },
+    {
+      "cmd": "DELETE",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow admin delete of social links",
+      "qual": "(EXISTS ( SELECT 1\n   FROM admins\n  WHERE ((admins.email = ( SELECT (auth.jwt() ->> 'email'::text))) AND (admins.is_active = true))))",
+      "roles": "{authenticated}",
+      "schemaname": "public",
+      "tablename": "social_links",
+      "with_check": null
+    },
+    {
+      "cmd": "ALL",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow admin full access to social links",
+      "qual": "(EXISTS ( SELECT 1\n   FROM admins\n  WHERE ((admins.email = ( SELECT (auth.jwt() ->> 'email'::text))) AND (admins.is_active = true))))",
+      "roles": "{authenticated}",
+      "schemaname": "public",
+      "tablename": "social_links",
+      "with_check": "(EXISTS ( SELECT 1\n   FROM admins\n  WHERE ((admins.email = ( SELECT (auth.jwt() ->> 'email'::text))) AND (admins.is_active = true))))"
+    },
+    {
+      "cmd": "SELECT",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow public select of social links",
+      "qual": "true",
+      "roles": "{public}",
+      "schemaname": "public",
+      "tablename": "social_links",
+      "with_check": null
+    },
+    {
+      "cmd": "DELETE",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow admin delete all",
+      "qual": "(EXISTS ( SELECT 1\n   FROM admins\n  WHERE ((admins.email = ( SELECT (auth.jwt() ->> 'email'::text))) AND (admins.is_active = true))))",
+      "roles": "{authenticated}",
+      "schemaname": "public",
+      "tablename": "testimonials",
+      "with_check": null
+    },
+    {
+      "cmd": "INSERT",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow admin insert all",
+      "qual": null,
+      "roles": "{authenticated}",
+      "schemaname": "public",
+      "tablename": "testimonials",
+      "with_check": "(EXISTS ( SELECT 1\n   FROM admins\n  WHERE ((admins.email = ( SELECT (auth.jwt() ->> 'email'::text))) AND (admins.is_active = true))))"
+    },
+    {
+      "cmd": "SELECT",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow admin select all",
+      "qual": "(EXISTS ( SELECT 1\n   FROM admins\n  WHERE ((admins.email = ( SELECT (auth.jwt() ->> 'email'::text))) AND (admins.is_active = true))))",
+      "roles": "{authenticated}",
+      "schemaname": "public",
+      "tablename": "testimonials",
+      "with_check": null
+    },
+    {
+      "cmd": "UPDATE",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow admin update all",
+      "qual": "(EXISTS ( SELECT 1\n   FROM admins\n  WHERE ((admins.email = ( SELECT (auth.jwt() ->> 'email'::text))) AND (admins.is_active = true))))",
+      "roles": "{authenticated}",
+      "schemaname": "public",
+      "tablename": "testimonials",
+      "with_check": "(EXISTS ( SELECT 1\n   FROM admins\n  WHERE ((admins.email = ( SELECT (auth.jwt() ->> 'email'::text))) AND (admins.is_active = true))))"
+    },
+    {
+      "cmd": "INSERT",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow public insert of pending testimonials",
+      "qual": null,
+      "roles": "{public}",
+      "schemaname": "public",
+      "tablename": "testimonials",
+      "with_check": "((status = 'pending'::text) AND (featured = false) AND (is_visible = false))"
+    },
+    {
+      "cmd": "SELECT",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow public select of approved testimonials",
+      "qual": "((status = 'approved'::text) AND (is_visible = true))",
+      "roles": "{public}",
+      "schemaname": "public",
+      "tablename": "testimonials",
+      "with_check": null
+    },
+    {
+      "cmd": "DELETE",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow admin delete all products",
+      "qual": "(EXISTS ( SELECT 1\n   FROM admins\n  WHERE ((admins.email = ( SELECT (auth.jwt() ->> 'email'::text))) AND (admins.is_active = true))))",
+      "roles": "{authenticated}",
+      "schemaname": "public",
+      "tablename": "tools_products",
+      "with_check": null
+    },
+    {
+      "cmd": "INSERT",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow admin insert all products",
+      "qual": null,
+      "roles": "{authenticated}",
+      "schemaname": "public",
+      "tablename": "tools_products",
+      "with_check": "(EXISTS ( SELECT 1\n   FROM admins\n  WHERE ((admins.email = ( SELECT (auth.jwt() ->> 'email'::text))) AND (admins.is_active = true))))"
+    },
+    {
+      "cmd": "SELECT",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow admin select all products",
+      "qual": "(EXISTS ( SELECT 1\n   FROM admins\n  WHERE ((admins.email = ( SELECT (auth.jwt() ->> 'email'::text))) AND (admins.is_active = true))))",
+      "roles": "{authenticated}",
+      "schemaname": "public",
+      "tablename": "tools_products",
+      "with_check": null
+    },
+    {
+      "cmd": "UPDATE",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow admin update all products",
+      "qual": "(EXISTS ( SELECT 1\n   FROM admins\n  WHERE ((admins.email = ( SELECT (auth.jwt() ->> 'email'::text))) AND (admins.is_active = true))))",
+      "roles": "{authenticated}",
+      "schemaname": "public",
+      "tablename": "tools_products",
+      "with_check": "(EXISTS ( SELECT 1\n   FROM admins\n  WHERE ((admins.email = ( SELECT (auth.jwt() ->> 'email'::text))) AND (admins.is_active = true))))"
+    },
+    {
+      "cmd": "SELECT",
+      "permissive": "PERMISSIVE",
+      "policyname": "Allow public select of published products",
+      "qual": "(status = 'published'::text)",
+      "roles": "{public}",
+      "schemaname": "public",
+      "tablename": "tools_products",
+      "with_check": null
+    }
+  ],
+  "storage_buckets": [
+    {
+      "allowed_mime_types": null,
+      "file_size_limit": null,
+      "id": "certifications",
+      "name": "certifications",
+      "public": true
+    },
+    {
+      "allowed_mime_types": null,
+      "file_size_limit": null,
+      "id": "projects",
+      "name": "projects",
+      "public": true
+    },
+    {
+      "allowed_mime_types": null,
+      "file_size_limit": null,
+      "id": "resume-files",
+      "name": "resume-files",
+      "public": true
+    },
+    {
+      "allowed_mime_types": null,
+      "file_size_limit": null,
+      "id": "tools-products",
+      "name": "tools-products",
+      "public": true
+    }
+  ]
+}

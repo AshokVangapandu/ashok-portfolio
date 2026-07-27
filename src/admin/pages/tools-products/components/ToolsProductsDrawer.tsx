@@ -172,14 +172,14 @@ export const ToolsProductsDrawer: React.FC<ToolsProductsDrawerProps> = ({
       let coverUrl = coverPreview;
       let previewUrl = previewPreview;
 
-      // Simulate file upload mapping urls
+      // Upload files to Supabase Storage if selected
       if (coverFile) {
         const path = `cover-${Date.now()}-${coverFile.name}`;
-        coverUrl = supabase.storage.from('tools-products').getPublicUrl(path).data.publicUrl;
+        coverUrl = await toolsProductsService.uploadAsset(coverFile, path);
       }
       if (previewFile) {
         const path = `preview-${Date.now()}-${previewFile.name}`;
-        previewUrl = supabase.storage.from('tools-products').getPublicUrl(path).data.publicUrl;
+        previewUrl = await toolsProductsService.uploadAsset(previewFile, path);
       }
 
       const payload: ToolsProduct = {
@@ -191,17 +191,17 @@ export const ToolsProductsDrawer: React.FC<ToolsProductsDrawerProps> = ({
         category,
         coverImageUrl: coverUrl,
         previewImageUrl: previewUrl,
-        rating: Number(rating) || 5.0,
-        downloads: Number(downloads) || 0,
-        views: Number(views) || 0,
+        rating: isComingSoon ? 0.0 : (Number(rating) || 5.0),
+        downloads: isComingSoon ? 0 : (Number(downloads) || 0),
+        views: isComingSoon ? 0 : (Number(views) || 0),
         updatedAt: new Date().toISOString(),
-        marketplaceUrl: marketplaceUrl || null,
-        githubUrl: githubUrl || null,
-        docsUrl: docsUrl || null,
-        demoUrl: demoUrl || null,
+        marketplaceUrl: isComingSoon ? null : (marketplaceUrl || null),
+        githubUrl: isComingSoon ? null : (githubUrl || null),
+        docsUrl: isComingSoon ? null : (docsUrl || null),
+        demoUrl: isComingSoon ? null : (demoUrl || null),
         isFeatured,
         isComingSoon,
-        problemSolved: problemSolved || null,
+        problemSolved: problemSolved || '',
         status: currentStatus,
         capabilities,
         technologies,
@@ -403,7 +403,8 @@ export const ToolsProductsDrawer: React.FC<ToolsProductsDrawerProps> = ({
               fontSize: '13.5px',
               fontFamily: 'inherit',
               backgroundColor: '#FFFFFF',
-              boxSizing: 'border-box'
+              boxSizing: 'border-box',
+              outline: 'none'
             }}
           >
             <option value="Widget">Widget</option>
@@ -428,16 +429,18 @@ export const ToolsProductsDrawer: React.FC<ToolsProductsDrawerProps> = ({
           required
           disabled={isSubmitting}
         />
-        <FormTextField
-          label="Problem Solved"
-          placeholder="What challenges does this product solve?"
-          value={problemSolved}
-          onChange={setProblemSolved}
-          type="textarea"
-          rows={2}
-          disabled={isSubmitting}
-        />
-        <div style={{ display: 'flex', alignItems: 'center', height: '100%', marginTop: '16px' }}>
+        <div style={{ gridColumn: 'span 2' }}>
+          <FormTextField
+            label="Problem Solved"
+            placeholder="What challenges does this product solve?"
+            value={problemSolved}
+            onChange={setProblemSolved}
+            type="textarea"
+            rows={2}
+            disabled={isSubmitting}
+          />
+        </div>
+        <div style={{ gridColumn: 'span 2', display: 'flex', alignItems: 'center', height: '100%', marginTop: '8px' }}>
           <FormToggle
             label="Is Coming Soon?"
             checked={isComingSoon}
@@ -492,27 +495,28 @@ export const ToolsProductsDrawer: React.FC<ToolsProductsDrawerProps> = ({
           </span>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             {capabilities.map((cap, idx) => (
-              <div key={idx} style={{ padding: '16px', border: '1px solid var(--admin-border)', borderRadius: '10px', backgroundColor: 'var(--admin-bg-hover)', display: 'flex', flexDirection: 'column', gap: '10px', position: 'relative' }}>
+              <div key={idx} style={{ padding: '20px', border: '1px solid var(--admin-border)', borderRadius: '12px', backgroundColor: 'var(--admin-bg-hover)', display: 'flex', flexDirection: 'column', gap: '12px', position: 'relative' }}>
                 <button
                   type="button"
                   onClick={() => handleRemoveCapability(idx)}
                   disabled={isSubmitting}
                   style={{
                     position: 'absolute',
-                    top: '12px',
-                    right: '12px',
+                    top: '16px',
+                    right: '16px',
                     border: 'none',
                     backgroundColor: 'transparent',
                     color: '#EF4444',
                     cursor: 'pointer',
-                    fontSize: '16px',
-                    fontWeight: 700
+                    fontSize: '18px',
+                    fontWeight: 700,
+                    lineHeight: 1
                   }}
                   title="Remove Capability"
                 >
                   &times;
                 </button>
-                <div style={{ display: 'flex', gap: '10px', width: '92%' }}>
+                <div style={{ display: 'flex', gap: '12px', width: '90%' }}>
                   <div style={{ flex: 2 }}>
                     <input
                       type="text"
@@ -520,7 +524,7 @@ export const ToolsProductsDrawer: React.FC<ToolsProductsDrawerProps> = ({
                       value={cap.title}
                       onChange={(e) => handleCapabilityChange(idx, 'title', e.target.value)}
                       disabled={isSubmitting}
-                      style={{ width: '100%', padding: '9px 12px', border: '1px solid var(--admin-border)', borderRadius: '6px', fontSize: '13px', boxSizing: 'border-box' }}
+                      style={{ width: '100%', padding: '10px 14px', border: '1px solid var(--admin-border)', borderRadius: '8px', fontSize: '13px', backgroundColor: '#FFFFFF', boxSizing: 'border-box', outline: 'none' }}
                     />
                   </div>
                   <div style={{ flex: 1 }}>
@@ -530,7 +534,7 @@ export const ToolsProductsDrawer: React.FC<ToolsProductsDrawerProps> = ({
                       value={cap.icon || ''}
                       onChange={(e) => handleCapabilityChange(idx, 'icon', e.target.value)}
                       disabled={isSubmitting}
-                      style={{ width: '100%', padding: '9px 12px', border: '1px solid var(--admin-border)', borderRadius: '6px', fontSize: '13px', boxSizing: 'border-box' }}
+                      style={{ width: '100%', padding: '10px 14px', border: '1px solid var(--admin-border)', borderRadius: '8px', fontSize: '13px', backgroundColor: '#FFFFFF', boxSizing: 'border-box', outline: 'none' }}
                     />
                   </div>
                 </div>
@@ -540,7 +544,7 @@ export const ToolsProductsDrawer: React.FC<ToolsProductsDrawerProps> = ({
                   onChange={(e) => handleCapabilityChange(idx, 'description', e.target.value)}
                   disabled={isSubmitting}
                   rows={2}
-                  style={{ width: '100%', padding: '9px 12px', border: '1px solid var(--admin-border)', borderRadius: '6px', fontSize: '13px', fontFamily: 'inherit', boxSizing: 'border-box', resize: 'vertical' }}
+                  style={{ width: '100%', padding: '10px 14px', border: '1px solid var(--admin-border)', borderRadius: '8px', fontSize: '13px', fontFamily: 'inherit', backgroundColor: '#FFFFFF', boxSizing: 'border-box', resize: 'vertical', outline: 'none' }}
                 />
               </div>
             ))}
@@ -581,57 +585,59 @@ export const ToolsProductsDrawer: React.FC<ToolsProductsDrawerProps> = ({
         />
       </FormSection>
 
-      <FormSection title="Section 6 — Metrics & External Links" columns="1fr 1fr">
-        <FormTextField
-          label="Downloads Count"
-          placeholder="e.g., 2500"
-          value={downloads}
-          onChange={setDownloads}
-          disabled={isSubmitting}
-        />
-        <FormTextField
-          label="Views Count"
-          placeholder="e.g., 10450"
-          value={views}
-          onChange={setViews}
-          disabled={isSubmitting}
-        />
-        <FormTextField
-          label="Rating (0.00 to 5.00)"
-          placeholder="e.g., 4.8"
-          value={rating}
-          onChange={setRating}
-          disabled={isSubmitting}
-        />
-        <FormTextField
-          label="Marketplace URL"
-          placeholder="https://marketplace.mendix.com/link"
-          value={marketplaceUrl}
-          onChange={setMarketplaceUrl}
-          disabled={isSubmitting}
-        />
-        <FormTextField
-          label="GitHub Link"
-          placeholder="https://github.com/username/project"
-          value={githubUrl}
-          onChange={setGithubUrl}
-          disabled={isSubmitting}
-        />
-        <FormTextField
-          label="Documentation URL"
-          placeholder="https://docs.example.com"
-          value={docsUrl}
-          onChange={setDocsUrl}
-          disabled={isSubmitting}
-        />
-        <FormTextField
-          label="Live Demo Link"
-          placeholder="https://example.com/demo"
-          value={demoUrl}
-          onChange={setDemoUrl}
-          disabled={isSubmitting}
-        />
-      </FormSection>
+      {!isComingSoon && (
+        <FormSection title="Section 6 — Metrics & External Links" columns="1fr 1fr">
+          <FormTextField
+            label="Downloads Count"
+            placeholder="e.g., 2500"
+            value={downloads}
+            onChange={setDownloads}
+            disabled={isSubmitting}
+          />
+          <FormTextField
+            label="Views Count"
+            placeholder="e.g., 10450"
+            value={views}
+            onChange={setViews}
+            disabled={isSubmitting}
+          />
+          <FormTextField
+            label="Rating (0.00 to 5.00)"
+            placeholder="e.g., 4.8"
+            value={rating}
+            onChange={setRating}
+            disabled={isSubmitting}
+          />
+          <FormTextField
+            label="Marketplace URL"
+            placeholder="https://marketplace.mendix.com/link"
+            value={marketplaceUrl}
+            onChange={setMarketplaceUrl}
+            disabled={isSubmitting}
+          />
+          <FormTextField
+            label="GitHub Link"
+            placeholder="https://github.com/username/project"
+            value={githubUrl}
+            onChange={setGithubUrl}
+            disabled={isSubmitting}
+          />
+          <FormTextField
+            label="Documentation URL"
+            placeholder="https://docs.example.com"
+            value={docsUrl}
+            onChange={setDocsUrl}
+            disabled={isSubmitting}
+          />
+          <FormTextField
+            label="Live Demo Link"
+            placeholder="https://example.com/demo"
+            value={demoUrl}
+            onChange={setDemoUrl}
+            disabled={isSubmitting}
+          />
+        </FormSection>
+      )}
 
       <FormSection title="Section 7 — Status">
         <FormToggle

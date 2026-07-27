@@ -6,7 +6,7 @@ language plpgsql
 as $$
 begin
   perform net.http_post(
-    url := 'https://txoszrnjkrlbjzpjisvp.supabase.co/functions/v1/send-contact-email',
+    url := public.get_supabase_url() || '/functions/v1/send-contact-email',
     headers := jsonb_build_object(
       'Content-Type', 'application/json',
       'X-Webhook-Secret', 'db_webhook_secret_99882244'

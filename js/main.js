@@ -14,32 +14,29 @@ const rewriteNavLinks = () => {
     brandLogo.setAttribute("href", base);
   }
 
-  const navMenu = document.querySelector("[data-nav-menu]");
-  if (navMenu) {
-    navMenu.querySelectorAll("a").forEach((link) => {
-      const href = link.getAttribute("href");
-      if (!href) return;
+  document.querySelectorAll("a").forEach((link) => {
+    const href = link.getAttribute("href");
+    if (!href) return;
 
-      if (href.startsWith("#")) {
-        const currentPath = window.location.pathname;
-        const isAtRoot = currentPath === base || currentPath === base + 'index.html';
-        if (!isAtRoot) {
-          link.setAttribute("href", base + href);
-        }
-      } else if (href.includes("index.html#")) {
-        const hash = href.substring(href.indexOf("#"));
-        link.setAttribute("href", base + hash);
-      } else if (href.includes("index.html") && !href.includes("widgets") && !href.includes("projects") && !href.includes("certifications")) {
-        link.setAttribute("href", base);
-      } else if (href.includes("widgets/index.html")) {
-        link.setAttribute("href", base + "widgets/index.html");
-      } else if (href.includes("pages/projects/index.html")) {
-        link.setAttribute("href", base + "pages/projects/index.html");
-      } else if (href.includes("certifications/index.html")) {
-        link.setAttribute("href", base + "certifications/index.html");
+    if (href.startsWith("#")) {
+      const currentPath = window.location.pathname;
+      const isAtRoot = currentPath === base || currentPath === base + 'index.html';
+      if (!isAtRoot) {
+        link.setAttribute("href", base + href);
       }
-    });
-  }
+    } else if (href.includes("index.html#")) {
+      const hash = href.substring(href.indexOf("#"));
+      link.setAttribute("href", base + hash);
+    } else if (href.includes("index.html") && !href.includes("widgets") && !href.includes("projects") && !href.includes("certifications")) {
+      link.setAttribute("href", base);
+    } else if (href.includes("widgets/index.html")) {
+      link.setAttribute("href", base + "widgets/index.html");
+    } else if (href.includes("pages/projects/index.html")) {
+      link.setAttribute("href", base + "pages/projects/index.html");
+    } else if (href.includes("certifications/index.html")) {
+      link.setAttribute("href", base + "certifications/index.html");
+    }
+  });
 };
 
 rewriteNavLinks();
@@ -72,7 +69,30 @@ const showContactToast = (type, title, message) => {
 // Initialize Supabase Client
 const supabaseUrl = (window.APP_CONFIG && window.APP_CONFIG.SUPABASE_URL) || "";
 const supabaseKey = (window.APP_CONFIG && window.APP_CONFIG.SUPABASE_ANON_KEY) || "";
-const supabaseClient = window.supabase && supabaseUrl && supabaseKey ? window.supabase.createClient(supabaseUrl, supabaseKey) : null;
+
+const isValidSupabaseConfig = (url, key) => {
+  if (!url || !key) return false;
+  if (url.startsWith('%VITE_') || url.includes('%') || key.startsWith('%VITE_') || key.includes('%')) return false;
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+  } catch (e) {
+    return false;
+  }
+};
+
+const supabaseClient = window.supabase && isValidSupabaseConfig(supabaseUrl, supabaseKey)
+  ? (function() {
+      try {
+        return window.supabase.createClient(supabaseUrl, supabaseKey);
+      } catch (err) {
+        console.warn('[main] Failed to create Supabase client:', err);
+        return null;
+      }
+    })()
+  : (console.warn(
+      '[Portfolio]\n\nSupabase disabled.\n\nReason:\nInvalid configuration.\n\nThe website will continue running with fallback behaviour.'
+    ), null);
 
 // Validation UI Helpers
 const showFieldError = (inputElement, errorMessage) => {
@@ -1291,7 +1311,10 @@ const loadDynamicCertifications = async () => {
             const norm = c.issuer.toLowerCase().trim();
             if (!seenProviders.has(norm)) {
               seenProviders.add(norm);
-              uniqueProviders.push(c.issuer);
+              uniqueProviders.push({
+                name: c.issuer,
+                iconUrl: c.certificate_image_url || null
+              });
             }
           }
         });
@@ -1307,7 +1330,10 @@ const loadDynamicCertifications = async () => {
           gridEl.innerHTML = `<div style="grid-column: span 6; text-align: center; color: #94A3B8; padding: 40px 0; font-size: 14px;">No certifications published yet.</div>`;
         } else {
           // Inner helper function to get SVG / Webp logo brandmark
-          const getProviderLogo = (name) => {
+          const getProviderLogo = (name, iconUrl) => {
+            if (iconUrl && iconUrl.trim() !== '') {
+              return `<img src="${iconUrl}" alt="${name}" style="height: 32px; width: auto; object-fit: contain;" />`;
+            }
             const key = name.toLowerCase().trim();
             if (key.includes('mendix')) {
               return `<img src="assets/images/Mendix-Brandmark.webp" alt="Mendix" style="height: 32px; width: auto; object-fit: contain;" />`;
@@ -1347,9 +1373,9 @@ const loadDynamicCertifications = async () => {
           gridEl.innerHTML = maxProviders.map(provider => `
             <div class="provider-logo-card">
               <div class="provider-logo-container">
-                ${getProviderLogo(provider)}
+                ${getProviderLogo(provider.name, provider.iconUrl)}
               </div>
-              <span class="provider-name">${provider}</span>
+              <span class="provider-name">${provider.name}</span>
               <div class="provider-glow-dot"></div>
             </div>
           `).join('');
@@ -1362,6 +1388,57 @@ const loadDynamicCertifications = async () => {
 };
 
 loadDynamicCertifications();
+
+// Dynamic projects highlights load helper
+const loadDynamicProjects = async () => {
+  try {
+    if (window.ProjectService) {
+      const { data: projects, error } = await window.ProjectService.getPublishedProjects();
+      if (error) throw error;
+
+      // 1. Projects Delivered: count of published projects
+      const totalPublished = projects ? projects.length : 0;
+      const projectsDeliveredEl = document.getElementById('stat-projects-delivered');
+      if (projectsDeliveredEl) {
+        projectsDeliveredEl.textContent = `${totalPublished}+`;
+      }
+
+      // 2. Industries Served: unique industries (categories)
+      const uniqueIndustries = new Set();
+      const seenLower = new Set();
+      if (projects) {
+        projects.forEach(p => {
+          if (p.category) {
+            const industry = p.category.trim();
+            const lower = industry.toLowerCase();
+            if (industry && !seenLower.has(lower)) {
+              seenLower.add(lower);
+              uniqueIndustries.add(industry);
+            }
+          }
+        });
+      }
+      const totalIndustries = uniqueIndustries.size;
+      const industriesServedEl = document.getElementById('stat-industries-served');
+      if (industriesServedEl) {
+        industriesServedEl.textContent = `${totalIndustries}+`;
+      }
+    }
+  } catch (err) {
+    console.warn('Failed to load dynamic projects stats:', err);
+    // Fallback UI
+    const projectsDeliveredEl = document.getElementById('stat-projects-delivered');
+    if (projectsDeliveredEl) {
+      projectsDeliveredEl.textContent = '0+';
+    }
+    const industriesServedEl = document.getElementById('stat-industries-served');
+    if (industriesServedEl) {
+      industriesServedEl.textContent = '0+';
+    }
+  }
+};
+
+loadDynamicProjects();
 
 // Geolocation caching for resume downloads
 let cachedGeoData = { ip_address: 'Unknown', country: 'Unknown', city: 'Unknown' };

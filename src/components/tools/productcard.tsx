@@ -26,6 +26,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     views,
     updatedAt,
     comingSoon = false,
+    featured = false,
   } = product;
 
   return (
@@ -34,7 +35,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         width: '380px',
         backgroundColor: 'rgba(15, 20, 33, 0.45)',
         backdropFilter: 'blur(12px)',
-        border: '1px solid rgba(255, 255, 255, 0.06)',
+        border: featured ? '1px solid rgba(212, 163, 89, 0.22)' : '1px solid rgba(255, 255, 255, 0.06)',
+        borderTop: featured ? '2px solid rgba(212, 163, 89, 0.4)' : undefined,
         borderRadius: '16px',
         padding: '20px',
         display: 'flex',
@@ -42,7 +44,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         gap: '16px',
         boxSizing: 'border-box',
         transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.15)',
+        boxShadow: featured 
+          ? '0 12px 40px rgba(212, 163, 89, 0.04), 0 8px 32px rgba(0, 0, 0, 0.2)' 
+          : '0 8px 32px rgba(0, 0, 0, 0.15)',
         fontFamily: "'Inter', sans-serif",
         position: 'relative',
         cursor: comingSoon ? 'not-allowed' : 'pointer',
@@ -55,6 +59,26 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       {/* 1. Card Top Badges */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '6px' }}>
         <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+          {featured && (
+            <span
+              style={{
+                fontSize: '9px',
+                fontWeight: 700,
+                padding: '3px 8px',
+                borderRadius: '6px',
+                backgroundColor: 'rgba(212, 163, 89, 0.08)',
+                color: '#D4A359',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+                border: '1px solid rgba(212, 163, 89, 0.18)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '3px'
+              }}
+            >
+              ⭐ SIGNATURE
+            </span>
+          )}
           <span
             style={{
               fontSize: '10px',

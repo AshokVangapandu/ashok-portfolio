@@ -62,8 +62,8 @@ assert(maintenanceContent.includes('sendEmail({'), 'send-maintenance-notificatio
 assert(!maintenanceContent.includes('api.resend.com'), 'send-maintenance-notification has 0 Resend references');
 
 const workflowContent = fs.readFileSync(workflowServicePath, 'utf8');
-assert(workflowContent.includes('sendDirectBrevoEmail'), 'Workflow service direct fallback uses Brevo API');
-assert(workflowContent.includes('https://api.brevo.com/v3/smtp/email'), 'Workflow fallback targets Brevo v3 endpoint');
+assert(!workflowContent.includes('sendDirectBrevoEmail'), 'Workflow service direct fallback has been removed for security');
+assert(!workflowContent.includes('https://api.brevo.com/v3/smtp/email'), 'Workflow fallback targets zero client-side endpoints');
 
 // STEP 6: Failure Simulation & Error Handling
 console.log('\n--- Step 6: Failure & Resilience Simulation ---');

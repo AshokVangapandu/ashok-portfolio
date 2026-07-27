@@ -9,16 +9,54 @@
  */
 
 (function() {
-  const supabaseUrl = (window.APP_CONFIG && window.APP_CONFIG.SUPABASE_URL) || "";
-  const supabaseKey = (window.APP_CONFIG && window.APP_CONFIG.SUPABASE_ANON_KEY) || "";
-  const supabase = window.supabase && supabaseUrl && supabaseKey ? window.supabase.createClient(supabaseUrl, supabaseKey) : null;
+  let supabase = null;
+
+  const isValidSupabaseConfig = (url, key) => {
+    if (!url || !key) return false;
+    if (url.startsWith('%VITE_') || url.includes('%') || key.startsWith('%VITE_') || key.includes('%')) return false;
+    try {
+      const parsed = new URL(url);
+      return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+    } catch (e) {
+      return false;
+    }
+  };
+
+  function initSupabase() {
+    if (supabase) return;
+    const supabaseUrl = (window.APP_CONFIG && window.APP_CONFIG.SUPABASE_URL) || "";
+    const supabaseKey = (window.APP_CONFIG && window.APP_CONFIG.SUPABASE_ANON_KEY) || "";
+    if (window.supabase && isValidSupabaseConfig(supabaseUrl, supabaseKey)) {
+      try {
+        supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        window.supabaseInstance = supabase;
+      } catch (err) {
+        console.warn('[supabase-service] Failed to initialize Supabase client:', err);
+      }
+    } else {
+      console.warn(
+        '[Portfolio]\n\nSupabase disabled.\n\nReason:\nInvalid configuration.\n\nThe website will continue running with fallback behaviour.'
+      );
+    }
+  }
+
+  // Attempt immediate initialization
+  initSupabase();
+
+  // Setup event fallback listeners to run after module scripts have executed
+  if (typeof document !== 'undefined') {
+    document.addEventListener('DOMContentLoaded', initSupabase);
+  }
+  if (typeof window !== 'undefined') {
+    window.addEventListener('load', initSupabase);
+  }
 
   /**
    * AuthService
    * Handles social authentication flow state operations.
    */
   const AuthService = {
-    supabase: supabase,
+    get supabase() { return supabase; },
     async signInWithGoogle() {
       console.log("AuthService: signInWithGoogle invoked");
       if (!supabase) {
@@ -216,6 +254,21 @@
       if (!supabase) throw new Error("Supabase Client is not initialized.");
       return await supabase
         .from('certifications')
+        .select('*')
+        .eq('status', 'published')
+        .order('created_at', { ascending: false });
+    }
+  };
+
+  /**
+   * ProjectService
+   * Handles public projects queries.
+   */
+  const ProjectService = {
+    async getPublishedProjects() {
+      if (!supabase) throw new Error("Supabase Client is not initialized.");
+      return await supabase
+        .from('projects')
         .select('*')
         .eq('status', 'published')
         .order('created_at', { ascending: false });
@@ -545,6 +598,7 @@
   window.TestimonialService = TestimonialService;
   window.AdminService = AdminService;
   window.CertificationService = CertificationService;
+  window.ProjectService = ProjectService;
   window.ResumeService = ResumeService;
   window.PortfolioSettingsService = PortfolioSettingsService;
   window.MaintenanceService = MaintenanceService;
