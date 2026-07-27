@@ -1,23 +1,16 @@
 /* src/admin/pages/social-links/SocialLinksPage.tsx */
-import React, { useState } from 'react';
+import React from 'react';
 import { useSocialLinks } from '../../hooks/useSocialLinks';
 import { SocialLinksList } from './components/SocialLinksList';
-import { AddNewLinkButton } from './components/AddNewLinkButton';
 import { StickyFooter } from './components/StickyFooter';
 import { LoadingSkeleton } from './components/LoadingSkeleton';
-import { AddSocialLinkModal } from './components/AddSocialLinkModal';
-import { EditSocialLinkModal } from './components/EditSocialLinkModal';
 import { AlertMessage } from '../settings/components/AlertMessage';
-import { SocialLink } from '../../types/socialLinks';
 
 export const SocialLinksPage: React.FC = () => {
   const {
     loading,
     links,
     updateLinkUrl,
-    addLink,
-    editLink,
-    deleteLink,
     isDirty,
     handleSave,
     handleDiscard,
@@ -26,24 +19,6 @@ export const SocialLinksPage: React.FC = () => {
     success,
     setSuccess
   } = useSocialLinks();
-
-  const [addModalOpen, setAddModalOpen] = useState<boolean>(false);
-  const [editingLink, setEditingLink] = useState<SocialLink | null>(null);
-
-  const handleAddNew = () => {
-    setAddModalOpen(true);
-  };
-
-  const handleEdit = (id: string) => {
-    const link = links.find((l) => l.id === id);
-    if (link) {
-      setEditingLink(link);
-    }
-  };
-
-  const handleDelete = async (id: string) => {
-    await deleteLink(id);
-  };
 
   return (
     <div
@@ -88,11 +63,9 @@ export const SocialLinksPage: React.FC = () => {
               lineHeight: 1.4
             }}
           >
-            Manage and update your links displayed on the portfolio.
+            Configure URLs for the social profile links displayed on your portfolio.
           </p>
         </div>
-
-        <AddNewLinkButton onClick={handleAddNew} />
       </div>
 
       {/* Success Alert Banner */}
@@ -122,9 +95,6 @@ export const SocialLinksPage: React.FC = () => {
         <SocialLinksList
           links={links}
           onUrlChange={updateLinkUrl}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-          onAddClick={handleAddNew}
         />
       )}
 
@@ -133,20 +103,6 @@ export const SocialLinksPage: React.FC = () => {
         isDirty={isDirty}
         onSave={handleSave}
         onDiscard={handleDiscard}
-      />
-
-      {/* MODALS OVERLAYS */}
-      <AddSocialLinkModal
-        isOpen={addModalOpen}
-        onClose={() => setAddModalOpen(false)}
-        onAdd={addLink}
-      />
-
-      <EditSocialLinkModal
-        isOpen={!!editingLink}
-        onClose={() => setEditingLink(null)}
-        link={editingLink}
-        onEdit={editLink}
       />
     </div>
   );

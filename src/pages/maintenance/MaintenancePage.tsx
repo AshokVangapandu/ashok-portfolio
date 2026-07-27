@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { maintenanceService } from '../../services/maintenanceService';
 import { useAuth } from '../../hooks/useAuth';
+import { socialLinksService } from '../../admin/services/socialLinksService';
 
 export const MaintenancePage: React.FC = () => {
   const { user, signIn, signOut } = useAuth();
@@ -10,6 +11,42 @@ export const MaintenancePage: React.FC = () => {
   const [isDuplicate, setIsDuplicate] = useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
+  const [socialLinks, setSocialLinks] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    let active = true;
+    socialLinksService.getLinks().then((data) => {
+      if (!active) return;
+      const map: Record<string, string> = {};
+      data.forEach((item) => {
+        if (item.platform && item.url) {
+          map[item.platform.toLowerCase()] = item.url.trim();
+        }
+      });
+      setSocialLinks(map);
+    }).catch(err => {
+      console.error("[MaintenancePage] Failed to fetch social links:", err);
+    });
+    return () => { active = false; };
+  }, []);
+
+  const handleSocialClick = (e: React.MouseEvent<HTMLAnchorElement>, platform: string) => {
+    const url = socialLinks[platform.toLowerCase()];
+    if (!url || !url.trim()) {
+      e.preventDefault();
+      const platformNames: Record<string, string> = {
+        linkedin: 'LinkedIn profile',
+        github: 'GitHub profile',
+        email: 'Email address'
+      };
+      const name = platformNames[platform.toLowerCase()] || platform;
+      if (typeof window !== 'undefined' && (window as any).showToast) {
+        (window as any).showToast('info', 'Link Not Configured', `${name} has not been configured yet.`, 5000);
+      } else {
+        alert(`${name} has not been configured yet.`);
+      }
+    }
+  };
 
   useEffect(() => {
     let active = true;
@@ -357,7 +394,8 @@ export const MaintenancePage: React.FC = () => {
         {/* Social Links Footer */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '20px' }}>
           <a
-            href="https://linkedin.com/in/ashokvangapandu"
+            href={socialLinks.linkedin || '#'}
+            onClick={(e) => handleSocialClick(e, 'linkedin')}
             target="_blank"
             rel="noopener noreferrer"
             style={{
@@ -379,7 +417,8 @@ export const MaintenancePage: React.FC = () => {
             LinkedIn
           </a>
           <a
-            href="https://github.com/ashokvangapandu"
+            href={socialLinks.github || '#'}
+            onClick={(e) => handleSocialClick(e, 'github')}
             target="_blank"
             rel="noopener noreferrer"
             style={{
@@ -399,7 +438,8 @@ export const MaintenancePage: React.FC = () => {
             GitHub
           </a>
           <a
-            href="mailto:ashokvangapandu45@gmail.com"
+            href={socialLinks.email ? (socialLinks.email.startsWith('mailto:') ? socialLinks.email : `mailto:${socialLinks.email}`) : '#'}
+            onClick={(e) => handleSocialClick(e, 'email')}
             style={{
               color: '#94A3B8',
               fontSize: '13px',

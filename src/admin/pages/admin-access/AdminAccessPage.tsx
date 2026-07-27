@@ -29,7 +29,10 @@ export const AdminAccessPage: React.FC = () => {
 
     // Actions
     refresh,
-    handleInviteSubmit
+    handleInviteSubmit,
+    handleDeactivate,
+    handleReactivate,
+    handleRemoveAccess
   } = useAdminAccess();
 
   return (
@@ -169,6 +172,10 @@ export const AdminAccessPage: React.FC = () => {
       <MemberDetailsModal
         user={detailsModalUser}
         onClose={() => setDetailsModalUser(null)}
+        onDeactivate={handleDeactivate}
+        onReactivate={handleReactivate}
+        onRemoveAccess={handleRemoveAccess}
+        currentUserRole={members.find(m => m.isYou)?.role}
       />
     </div>
   );

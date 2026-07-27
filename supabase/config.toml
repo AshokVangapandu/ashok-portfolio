@@ -34,3 +34,10 @@ verify_jwt = false
 import_map = "./functions/notify-admins-new-request/deno.json"
 entrypoint = "./functions/notify-admins-new-request/index.ts"
 
+[functions.send-admin-invitation]
+enabled = true
+verify_jwt = false
+import_map = "./functions/send-admin-invitation/deno.json"
+entrypoint = "./functions/send-admin-invitation/index.ts"
+
+

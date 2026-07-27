@@ -89,10 +89,10 @@ export const adminAccessService = {
         status: u.status as AdminStatus,
         lastLogin: formatDateTime(u.last_login),
         permissions: u.permissions || [],
-        joinedDate: formatDate(u.created_at),
+        joinedDate: u.invitation_accepted_at ? formatDate(u.invitation_accepted_at) : formatDate(u.created_at),
         recentLogin: formatDateTime(u.last_login),
         lastActivity: formatDateTime(u.last_login),
-        invitationAcceptedDate: u.status === 'Active' ? formatDate(u.created_at) : null,
+        invitationAcceptedDate: u.invitation_accepted_at ? formatDate(u.invitation_accepted_at) : null,
         isYou: u.email === currentUserEmail
       };
     });
@@ -118,6 +118,7 @@ export const adminAccessService = {
   },
 
   async inviteAdmin(email: string, role: AdminRole): Promise<boolean> {
+    const cleanEmail = (email || '').trim().toLowerCase();
     const dbRole = mapUiRoleToDb(role);
 
     // Dynamic data-driven default permissions
@@ -154,7 +155,7 @@ export const adminAccessService = {
     }
 
     const payload = {
-      email,
+      email: cleanEmail,
       role: dbRole,
       status: 'Pending',
       is_active: true,
@@ -171,6 +172,60 @@ export const adminAccessService = {
       throw error;
     }
 
+    // Invoke the send-admin-invitation edge function to send welcome email
+    try {
+      const { error: invokeError } = await supabase.functions.invoke('send-admin-invitation', {
+        body: {
+          email: cleanEmail,
+          role: role
+        }
+      });
+      if (invokeError) {
+        console.error('[adminAccessService] send-admin-invitation edge function returned error:', invokeError);
+      }
+    } catch (invokeErr) {
+      console.error('[adminAccessService] send-admin-invitation edge function exception:', invokeErr);
+    }
+
+    return true;
+  },
+
+  async deactivateAdmin(id: string): Promise<boolean> {
+    const { error } = await (supabase as any)
+      .from('admins')
+      .update({ status: 'Inactive', is_active: false })
+      .eq('id', id);
+
+    if (error) {
+      console.error('[adminAccessService] Error deactivating admin:', error);
+      throw error;
+    }
+    return true;
+  },
+
+  async reactivateAdmin(id: string): Promise<boolean> {
+    const { error } = await (supabase as any)
+      .from('admins')
+      .update({ status: 'Active', is_active: true })
+      .eq('id', id);
+
+    if (error) {
+      console.error('[adminAccessService] Error reactivating admin:', error);
+      throw error;
+    }
+    return true;
+  },
+
+  async removeAdmin(id: string): Promise<boolean> {
+    const { error } = await (supabase as any)
+      .from('admins')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.error('[adminAccessService] Error removing admin:', error);
+      throw error;
+    }
     return true;
   }
 };

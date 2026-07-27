@@ -16,44 +16,18 @@ export const socialLinksService = {
 
     return (data || []).map((item: any) => ({
       id: item.id,
-      platform: item.platform,
+      platform: item.platform.toLowerCase(), // Ensure key is lowercase
       url: item.url
     }));
   },
 
-  async deleteLink(id: string): Promise<boolean> {
-    // Only proceed if it is a real database ID (i.e. not a temporary client-side uuid)
-    if (!id || id.startsWith('temp-')) {
-      return true;
-    }
-
-    const { error } = await (supabase as any)
-      .from('social_links')
-      .delete()
-      .eq('id', id);
-
-    if (error) {
-      console.error('[socialLinksService] Error deleting social link:', error);
-      throw error;
-    }
-
-    return true;
-  },
-
   async updateLinks(links: SocialLink[]): Promise<boolean> {
-    // Separate links into inserts (with temp IDs) and updates (with real IDs)
-    const payload = links.map((link, idx) => {
-      const isNew = !link.id || link.id.startsWith('temp-');
-      const item: any = {
-        platform: link.platform,
-        url: link.url,
-        display_order: idx + 1
-      };
-      if (!isNew) {
-        item.id = link.id;
-      }
-      return item;
-    });
+    // Upsert using the unique 'platform' key, omitting 'id' to prevent primary key constraint conflicts
+    const payload = links.map((link, idx) => ({
+      platform: link.platform.toLowerCase(),
+      url: link.url,
+      display_order: idx + 1
+    }));
 
     const { error } = await (supabase as any)
       .from('social_links')

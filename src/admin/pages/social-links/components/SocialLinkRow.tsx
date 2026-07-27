@@ -6,18 +6,25 @@ import { SocialPlatformIcon } from './SocialPlatformIcon';
 interface SocialLinkRowProps {
   link: SocialLink;
   onUrlChange: (url: string) => void;
-  onEdit?: () => void;
-  onDelete?: () => void;
 }
 
 export const SocialLinkRow: React.FC<SocialLinkRowProps> = ({
   link,
-  onUrlChange,
-  onEdit,
-  onDelete
+  onUrlChange
 }) => {
   const isConnected = !!(link.url && link.url.trim());
-  const helperText = `${link.platform} profile displayed on your public portfolio.`;
+
+  const platformDisplayNames: Record<string, string> = {
+    linkedin: 'LinkedIn',
+    github: 'GitHub',
+    behance: 'Behance',
+    email: 'Email',
+    whatsapp: 'WhatsApp',
+    instagram: 'Instagram'
+  };
+
+  const displayName = platformDisplayNames[link.platform.toLowerCase()] || link.platform;
+  const helperText = `${displayName} link configured for your public portfolio.`;
 
   return (
     <div
@@ -64,7 +71,7 @@ export const SocialLinkRow: React.FC<SocialLinkRowProps> = ({
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
           <span style={{ fontSize: '15px', fontWeight: 700, color: 'var(--admin-text)' }}>
-            {link.platform}
+            {displayName}
           </span>
           <span style={{ fontSize: '11.5px', color: 'var(--admin-text-secondary)', fontWeight: 500 }}>
             {helperText}
@@ -75,7 +82,7 @@ export const SocialLinkRow: React.FC<SocialLinkRowProps> = ({
       {/* 2. URL Input with leading icon */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
         <label style={{ fontSize: '11px', fontWeight: 700, color: 'var(--admin-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-          URL
+          URL / Destination
         </label>
         <div style={{ position: 'relative', width: '100%', boxSizing: 'border-box' }}>
           <span
@@ -89,15 +96,22 @@ export const SocialLinkRow: React.FC<SocialLinkRowProps> = ({
               alignItems: 'center'
             }}
           >
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
-              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
-            </svg>
+            {link.platform === 'email' ? (
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                <polyline points="22,6 12,13 2,6" />
+              </svg>
+            ) : (
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+              </svg>
+            )}
           </span>
           <input
             type="text"
             value={link.url}
-            placeholder={`Enter your ${link.platform} profile link`}
+            placeholder={link.platform === 'email' ? 'e.g. mailto:name@example.com or name@example.com' : `Enter your ${displayName} URL`}
             onChange={(e) => onUrlChange(e.target.value)}
             style={{
               width: '100%',
@@ -126,7 +140,7 @@ export const SocialLinkRow: React.FC<SocialLinkRowProps> = ({
         </div>
       </div>
 
-      {/* 3. Footer: Connection Status & Actions */}
+      {/* 3. Footer: Connection Status */}
       <div
         style={{
           display: 'flex',
@@ -160,63 +174,8 @@ export const SocialLinkRow: React.FC<SocialLinkRowProps> = ({
               backgroundColor: isConnected ? '#10B981' : '#64748B'
             }}
           />
-          {isConnected ? 'Connected' : 'Not Connected'}
+          {isConnected ? 'Configured' : 'Not Configured'}
         </span>
-
-        {/* Action button row */}
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '14px' }}>
-          <button
-            type="button"
-            onClick={onEdit}
-            style={{
-              border: 'none',
-              background: 'transparent',
-              color: '#475569',
-              fontSize: '12px',
-              fontWeight: 650,
-              cursor: 'pointer',
-              padding: '4px 8px',
-              borderRadius: '6px',
-              transition: 'all 0.15s ease'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.color = 'var(--admin-primary)';
-              e.currentTarget.style.backgroundColor = 'rgba(124, 92, 255, 0.05)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.color = '#475569';
-              e.currentTarget.style.backgroundColor = 'transparent';
-            }}
-          >
-            Edit
-          </button>
-          
-          <button
-            type="button"
-            onClick={onDelete}
-            style={{
-              border: 'none',
-              background: 'transparent',
-              color: '#64748B',
-              fontSize: '12px',
-              fontWeight: 650,
-              cursor: 'pointer',
-              padding: '4px 8px',
-              borderRadius: '6px',
-              transition: 'all 0.15s ease'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.color = '#EF4444';
-              e.currentTarget.style.backgroundColor = '#FEF2F2';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.color = '#64748B';
-              e.currentTarget.style.backgroundColor = 'transparent';
-            }}
-          >
-            Delete
-          </button>
-        </div>
       </div>
     </div>
   );

@@ -1,7 +1,37 @@
 /* src/components/projects/CTASection.tsx */
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { socialLinksService } from '../../admin/services/socialLinksService';
 
 export const CTASection: React.FC = () => {
+  const [emailUrl, setEmailUrl] = useState<string>('');
+
+  useEffect(() => {
+    let active = true;
+    socialLinksService.getLinks().then((data) => {
+      if (!active) return;
+      const emailObj = data.find(item => item.platform.toLowerCase() === 'email');
+      if (emailObj && emailObj.url) {
+        const url = emailObj.url.trim();
+        const mailtoUrl = url.startsWith('mailto:') ? url : `mailto:${url}`;
+        setEmailUrl(mailtoUrl);
+      }
+    }).catch(err => {
+      console.error("[CTASection] Failed to load email link:", err);
+    });
+    return () => { active = false; };
+  }, []);
+
+  const handleEmailClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (!emailUrl) {
+      e.preventDefault();
+      if (typeof window !== 'undefined' && (window as any).showToast) {
+        (window as any).showToast('info', 'Link Not Configured', 'Email address has not been configured yet.', 5000);
+      } else {
+        alert('Email address has not been configured yet.');
+      }
+    }
+  };
+
   return (
     <div
       style={{
@@ -76,7 +106,8 @@ export const CTASection: React.FC = () => {
           Let's Collaborate
         </a>
         <a
-          href="mailto:ashokvangapandu45@gmail.com"
+          href={emailUrl || '#'}
+          onClick={handleEmailClick}
           className="hover-scale active-press"
           style={{
             padding: '12px 28px',

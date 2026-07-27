@@ -50,6 +50,54 @@ export const useAdminAccess = () => {
     }
   };
 
+  const handleDeactivate = async (id: string) => {
+    setLoading(true);
+    try {
+      await adminAccessService.deactivateAdmin(id);
+      await fetchAccessData();
+      if ((window as any).showToast) {
+        (window as any).showToast('Administrator deactivated successfully.', 'info');
+      }
+    } catch (err: any) {
+      console.error('[useAdminAccess] Deactivate error:', err);
+      alert(err?.message || 'Failed to deactivate administrator.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleReactivate = async (id: string) => {
+    setLoading(true);
+    try {
+      await adminAccessService.reactivateAdmin(id);
+      await fetchAccessData();
+      if ((window as any).showToast) {
+        (window as any).showToast('Administrator reactivated successfully.', 'success');
+      }
+    } catch (err: any) {
+      console.error('[useAdminAccess] Reactivate error:', err);
+      alert(err?.message || 'Failed to reactivate administrator.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRemoveAccess = async (id: string) => {
+    setLoading(true);
+    try {
+      await adminAccessService.removeAdmin(id);
+      await fetchAccessData();
+      if ((window as any).showToast) {
+        (window as any).showToast('Administrator access removed successfully.', 'warning');
+      }
+    } catch (err: any) {
+      console.error('[useAdminAccess] Remove access error:', err);
+      alert(err?.message || 'Failed to remove administrator access.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     loading,
     summary,
@@ -71,7 +119,10 @@ export const useAdminAccess = () => {
 
     // Refresh action
     refresh: fetchAccessData,
-    handleInviteSubmit
+    handleInviteSubmit,
+    handleDeactivate,
+    handleReactivate,
+    handleRemoveAccess
   };
 };
 

@@ -1,16 +1,75 @@
 /* src/admin/pages/admin-access/components/MemberDetailsModal.tsx */
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AdminUser } from '../../../types/adminAccess';
 
 interface MemberDetailsModalProps {
   user: AdminUser | null;
   onClose: () => void;
+  onDeactivate: (id: string) => Promise<void>;
+  onReactivate: (id: string) => Promise<void>;
+  onRemoveAccess: (id: string) => Promise<void>;
+  currentUserRole: string | undefined;
 }
 
 export const MemberDetailsModal: React.FC<MemberDetailsModalProps> = ({
   user,
   onClose,
+  onDeactivate,
+  onReactivate,
+  onRemoveAccess,
+  currentUserRole
 }) => {
+  const [isPending, setIsPending] = useState(false);
+  const isSuperAdmin = currentUserRole === 'Super Admin';
+
+  const handleDeactivateClick = async () => {
+    if (!user || isPending) return;
+    const confirmed = window.confirm(`Are you sure you want to deactivate ${user.name || user.email}? The user will immediately lose access to the Admin Dashboard.`);
+    if (!confirmed) return;
+
+    setIsPending(true);
+    try {
+      await onDeactivate(user.id);
+      onClose();
+    } catch (err) {
+      // Handled by service/hook
+    } finally {
+      setIsPending(false);
+    }
+  };
+
+  const handleReactivateClick = async () => {
+    if (!user || isPending) return;
+    const confirmed = window.confirm(`Are you sure you want to reactivate ${user.name || user.email}?`);
+    if (!confirmed) return;
+
+    setIsPending(true);
+    try {
+      await onReactivate(user.id);
+      onClose();
+    } catch (err) {
+      // Handled by service/hook
+    } finally {
+      setIsPending(false);
+    }
+  };
+
+  const handleRemoveClick = async () => {
+    if (!user || isPending) return;
+    const confirmed = window.confirm(`Are you sure you want to permanently remove access for ${user.name || user.email}? This action cannot be undone.`);
+    if (!confirmed) return;
+
+    setIsPending(true);
+    try {
+      await onRemoveAccess(user.id);
+      onClose();
+    } catch (err) {
+      // Handled by service/hook
+    } finally {
+      setIsPending(false);
+    }
+  };
+
   // ESC key dismissal
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -382,56 +441,94 @@ export const MemberDetailsModal: React.FC<MemberDetailsModalProps> = ({
             boxSizing: 'border-box'
           }}
         >
-          {/* Deactivate/Remove actions - disabled for own superadmin account */}
-          <div style={{ display: 'flex', gap: '8px' }}>
-            <button
-              disabled={user.isYou}
-              className={user.isYou ? '' : 'hover-scale active-press'}
-              style={{
-                padding: '10px 18px',
-                border: '1px solid #EF4444',
-                borderRadius: '8px',
-                backgroundColor: 'transparent',
-                color: '#EF4444',
-                fontSize: '13px',
-                fontWeight: 600,
-                cursor: user.isYou ? 'not-allowed' : 'pointer',
-                opacity: user.isYou ? 0.4 : 1,
-                transition: 'all 0.15s ease'
-              }}
-              onMouseOver={(e) => {
-                if (!user.isYou) e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.05)';
-              }}
-              onMouseOut={(e) => {
-                if (!user.isYou) e.currentTarget.style.backgroundColor = 'transparent';
-              }}
-            >
-              Deactivate
-            </button>
-            <button
-              disabled={user.isYou}
-              className={user.isYou ? '' : 'hover-scale active-press'}
-              style={{
-                padding: '10px 18px',
-                border: 'none',
-                borderRadius: '8px',
-                backgroundColor: '#EF4444',
-                color: '#FFFFFF',
-                fontSize: '13px',
-                fontWeight: 600,
-                cursor: user.isYou ? 'not-allowed' : 'pointer',
-                opacity: user.isYou ? 0.4 : 1,
-                transition: 'all 0.15s ease'
-              }}
-              onMouseOver={(e) => {
-                if (!user.isYou) e.currentTarget.style.backgroundColor = '#DC2626';
-              }}
-              onMouseOut={(e) => {
-                if (!user.isYou) e.currentTarget.style.backgroundColor = '#EF4444';
-              }}
-            >
-              Remove Access
-            </button>
+          {/* Deactivate/Remove actions - conditional on super_admin and loading state */}
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            {!isSuperAdmin ? (
+              <span style={{ fontSize: '12px', color: 'var(--admin-text-secondary)', fontStyle: 'italic' }}>
+                Only Super Admins can manage access settings.
+              </span>
+            ) : (
+              <>
+                {user.status === 'Inactive' ? (
+                  <button
+                    disabled={user.isYou || isPending}
+                    onClick={handleReactivateClick}
+                    className={(user.isYou || isPending) ? '' : 'hover-scale active-press'}
+                    style={{
+                      padding: '10px 18px',
+                      border: '1px solid #10B981',
+                      borderRadius: '8px',
+                      backgroundColor: 'transparent',
+                      color: '#10B981',
+                      fontSize: '13px',
+                      fontWeight: 600,
+                      cursor: (user.isYou || isPending) ? 'not-allowed' : 'pointer',
+                      opacity: (user.isYou || isPending) ? 0.4 : 1,
+                      transition: 'all 0.15s ease'
+                    }}
+                    onMouseOver={(e) => {
+                      if (!user.isYou && !isPending) e.currentTarget.style.backgroundColor = 'rgba(16, 185, 129, 0.05)';
+                    }}
+                    onMouseOut={(e) => {
+                      if (!user.isYou && !isPending) e.currentTarget.style.backgroundColor = 'transparent';
+                    }}
+                  >
+                    {isPending ? 'Processing...' : 'Reactivate'}
+                  </button>
+                ) : (
+                  <button
+                    disabled={user.isYou || isPending}
+                    onClick={handleDeactivateClick}
+                    className={(user.isYou || isPending) ? '' : 'hover-scale active-press'}
+                    style={{
+                      padding: '10px 18px',
+                      border: '1px solid #EF4444',
+                      borderRadius: '8px',
+                      backgroundColor: 'transparent',
+                      color: '#EF4444',
+                      fontSize: '13px',
+                      fontWeight: 600,
+                      cursor: (user.isYou || isPending) ? 'not-allowed' : 'pointer',
+                      opacity: (user.isYou || isPending) ? 0.4 : 1,
+                      transition: 'all 0.15s ease'
+                    }}
+                    onMouseOver={(e) => {
+                      if (!user.isYou && !isPending) e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.05)';
+                    }}
+                    onMouseOut={(e) => {
+                      if (!user.isYou && !isPending) e.currentTarget.style.backgroundColor = 'transparent';
+                    }}
+                  >
+                    {isPending ? 'Processing...' : 'Deactivate'}
+                  </button>
+                )}
+                <button
+                  disabled={user.isYou || isPending}
+                  onClick={handleRemoveClick}
+                  className={(user.isYou || isPending) ? '' : 'hover-scale active-press'}
+                  style={{
+                    padding: '10px 18px',
+                    border: 'none',
+                    borderRadius: '8px',
+                    backgroundColor: '#EF4444',
+                    color: '#FFFFFF',
+                    fontSize: '13px',
+                    fontWeight: 600,
+                    cursor: (user.isYou || isPending) ? 'not-allowed' : 'pointer',
+                    opacity: (user.isYou || isPending) ? 0.4 : 1,
+                    transition: 'all 0.15s ease'
+                  }}
+                  onMouseOver={(e) => {
+                    if (!user.isYou && !isPending) e.currentTarget.style.backgroundColor = '#DC2626';
+                  }}
+                  onMouseOut={(e) => {
+                    if (!user.isYou && !isPending) e.currentTarget.style.backgroundColor = '#EF4444';
+                  }}
+                >
+                  {isPending ? 'Removing...' : 'Remove Access'}
+                </button>
+              </>
+            )}
           </div>
 
           <button

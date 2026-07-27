@@ -43,8 +43,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, [user]);
 
   const checkAdminPrivilege = async (email: string): Promise<boolean> => {
-    const cached = sessionStorage.getItem(`is_admin_${email}`);
-    console.log('Checking Admin Privilege for Email:', email);
+    const cleanEmail = (email || '').trim().toLowerCase();
+    const cached = sessionStorage.getItem(`is_admin_${cleanEmail}`);
+    console.log('Checking Admin Privilege for Email:', cleanEmail);
 
     if (cached !== null) {
       console.log('[AuthProvider] Loaded admin status from session storage cache:', cached);
@@ -55,7 +56,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const { data, error } = await supabase
         .from('admins')
         .select('email, role, is_active')
-        .eq('email', email)
+        .eq('email', cleanEmail)
         .maybeSingle();
 
       console.log('Admin Query Result:', { data, error });
@@ -66,7 +67,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
 
       const isUserAdmin = data !== null && data.is_active === true;
-      sessionStorage.setItem(`is_admin_${email}`, String(isUserAdmin));
+      sessionStorage.setItem(`is_admin_${cleanEmail}`, String(isUserAdmin));
       return isUserAdmin;
     } catch (err: any) {
       console.error('[AuthProvider] Failed to verify administrator privilege claims:', err);
@@ -114,7 +115,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setUser(currentUser);
       
       if (currentUser?.email) {
-        const isUserAdmin = await checkAdminPrivilege(currentUser.email);
+        const cleanEmail = currentUser.email.trim().toLowerCase();
+        if (event === 'SIGNED_IN') {
+          sessionStorage.removeItem(`is_admin_${cleanEmail}`);
+        }
+        const isUserAdmin = await checkAdminPrivilege(cleanEmail);
         if (active) {
           setIsAdmin(isUserAdmin);
         }
@@ -124,16 +129,30 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           const avatar = currentUser.user_metadata?.avatar_url || currentUser.user_metadata?.picture || null;
           
           try {
-            await (supabase as any)
+            const { data: adminRecord, error: fetchErr } = await (supabase as any)
               .from('admins')
-              .update({
+              .select('status, invitation_accepted_at')
+              .eq('email', cleanEmail)
+              .maybeSingle();
+
+            if (!fetchErr && adminRecord) {
+              const updatePayload: any = {
                 last_login: new Date().toISOString(),
-                status: 'Active',
                 full_name: name,
                 avatar_url: avatar
-              })
-              .eq('email', currentUser.email);
-            sessionStorage.removeItem(`is_admin_${currentUser.email}`);
+              };
+
+              if (adminRecord.status === 'Pending' || !adminRecord.invitation_accepted_at) {
+                updatePayload.status = 'Active';
+                updatePayload.invitation_accepted_at = new Date().toISOString();
+              }
+
+              await (supabase as any)
+                .from('admins')
+                .update(updatePayload)
+                .eq('email', cleanEmail);
+            }
+            sessionStorage.removeItem(`is_admin_${cleanEmail}`);
           } catch (updateErr) {
             console.error('[AuthProvider] Failed to update admin metadata:', updateErr);
           }

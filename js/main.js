@@ -1690,7 +1690,7 @@ const setupNavbarAuth = async () => {
   const renderDropdown = async (user) => {
     const avatar = user.user_metadata?.avatar_url || "";
     const name = user.user_metadata?.full_name || user.email.split("@")[0];
-    const email = user.email;
+    const email = (user.email || "").trim().toLowerCase();
 
     // Retrieve and verify administrator privileges with caching
     let isAdmin = false;
@@ -1896,6 +1896,103 @@ if (window.AuthService) {
 } else {
   document.addEventListener("DOMContentLoaded", () => {
     if (window.AuthService) setupNavbarAuth();
+  });
+}
+
+// Initialize Dynamic Social Links configuration
+const initDynamicSocialLinks = async () => {
+  if (!window.SocialLinksService) return;
+  try {
+    const links = await window.SocialLinksService.getLinks();
+    const linkMap = {};
+    links.forEach(item => {
+      if (item.platform && item.url) {
+        linkMap[item.platform.toLowerCase()] = item.url.trim();
+      }
+    });
+
+    window.configuredSocialLinks = linkMap;
+
+    const socialElements = document.querySelectorAll("[data-social-key]");
+    const prefersMobileWhatsApp = window.matchMedia("(max-width: 768px), (hover: none) and (pointer: coarse)").matches;
+
+    socialElements.forEach(el => {
+      const key = el.dataset.socialKey.toLowerCase();
+      const url = linkMap[key];
+
+      if (!url) {
+        el.href = '#';
+        if (key === 'email' && (el.textContent.includes('@') || el.textContent === 'Not Configured')) {
+          el.textContent = 'Not Configured';
+        }
+        return;
+      }
+
+      if (key === 'whatsapp') {
+        let desktopUrl = url;
+        if (url.includes("wa.me/")) {
+          desktopUrl = url.replace("wa.me/", "web.whatsapp.com/send?phone=");
+          const firstQuestionIdx = desktopUrl.indexOf('?');
+          if (firstQuestionIdx !== -1) {
+            const secondQuestionIdx = desktopUrl.indexOf('?', firstQuestionIdx + 1);
+            if (secondQuestionIdx !== -1) {
+              desktopUrl = desktopUrl.substring(0, secondQuestionIdx) + '&' + desktopUrl.substring(secondQuestionIdx + 1);
+            }
+          }
+        }
+        el.dataset.mobileHref = url;
+        el.dataset.desktopHref = desktopUrl;
+        el.href = prefersMobileWhatsApp ? url : desktopUrl;
+      } else if (key === 'email') {
+        const mailtoUrl = url.startsWith('mailto:') ? url : `mailto:${url}`;
+        el.href = mailtoUrl;
+        
+        // Update text content if it shows an email address
+        const emailText = url.startsWith('mailto:') ? url.substring(7) : url;
+        if (el.textContent.includes('@') || el.textContent === 'Not Configured') {
+          el.textContent = emailText;
+        }
+      } else {
+        el.href = url;
+      }
+    });
+  } catch (err) {
+    console.error("Failed to initialize dynamic social links:", err);
+  }
+};
+
+// Global interceptor for unconfigured links
+document.addEventListener('click', (e) => {
+  const anchor = e.target.closest('a[data-social-key]');
+  if (!anchor) return;
+  
+  const key = anchor.dataset.socialKey.toLowerCase();
+  const url = window.configuredSocialLinks ? window.configuredSocialLinks[key] : null;
+  
+  if (!url || !url.trim()) {
+    e.preventDefault();
+    const platformNames = {
+      linkedin: 'LinkedIn profile',
+      github: 'GitHub profile',
+      behance: 'Behance profile',
+      email: 'Email address',
+      whatsapp: 'WhatsApp number',
+      instagram: 'Instagram profile'
+    };
+    const name = platformNames[key] || key;
+    if (window.showToast) {
+      window.showToast('info', 'Link Not Configured', `${name} has not been configured yet.`, 5000);
+    } else {
+      alert(`${name} has not been configured yet.`);
+    }
+  }
+});
+
+if (window.SocialLinksService) {
+  initDynamicSocialLinks();
+} else {
+  document.addEventListener("DOMContentLoaded", () => {
+    if (window.SocialLinksService) initDynamicSocialLinks();
   });
 }
 

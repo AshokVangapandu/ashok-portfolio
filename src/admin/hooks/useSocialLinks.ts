@@ -14,9 +14,21 @@ export const useSocialLinks = () => {
     setLoading(true);
     setError(null);
     try {
+      const REQUIRED_PLATFORMS = ['linkedin', 'github', 'behance', 'email', 'whatsapp', 'instagram'];
       const data = await socialLinksService.getLinks();
-      setInitialLinks(data);
-      setLinks(data.map((item) => ({ ...item })));
+      
+      // Enforce that exactly the 6 required platforms exist in hook state, initializing missing ones.
+      const mappedData: SocialLink[] = REQUIRED_PLATFORMS.map((platform) => {
+        const found = data.find((item) => item.platform.toLowerCase() === platform);
+        return found || {
+          id: `temp-${platform}`,
+          platform: platform,
+          url: ''
+        };
+      });
+
+      setInitialLinks(mappedData);
+      setLinks(mappedData.map((item) => ({ ...item })));
     } catch (err) {
       console.error('[useSocialLinks] Fetch error:', err);
       setError('Failed to load social links from database.');
@@ -35,67 +47,12 @@ export const useSocialLinks = () => {
     );
   };
 
-  const addLink = (platform: string, url: string) => {
-    setError(null);
-    // Check duplicate platform locally
-    if (links.some((l) => l.platform.toLowerCase() === platform.toLowerCase())) {
-      setError(`Platform "${platform}" has already been added.`);
-      return false;
-    }
-
-    const newLink: SocialLink = {
-      id: `temp-${Date.now()}`,
-      platform,
-      url
-    };
-    setLinks((prev) => [...prev, newLink]);
-    return true;
-  };
-
-  const editLink = (id: string, platform: string, url: string) => {
-    setError(null);
-    // Check duplicate platform locally (excluding itself)
-    if (links.some((l) => l.id !== id && l.platform.toLowerCase() === platform.toLowerCase())) {
-      setError(`Another link already exists for platform "${platform}".`);
-      return false;
-    }
-
-    setLinks((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, platform, url } : item))
-    );
-    return true;
-  };
-
-  const deleteLink = async (id: string) => {
-    setError(null);
-    if (!window.confirm('Are you sure you want to delete this social link? This action cannot be undone.')) {
-      return false;
-    }
-
-    setLoading(true);
-    try {
-      await socialLinksService.deleteLink(id);
-      // Remove from states
-      setInitialLinks((prev) => prev.filter((item) => item.id !== id));
-      setLinks((prev) => prev.filter((item) => item.id !== id));
-      setSuccess(true);
-      setTimeout(() => setSuccess(false), 3000);
-      return true;
-    } catch (err) {
-      console.error('[useSocialLinks] Delete error:', err);
-      setError('Failed to delete social link from database.');
-      return false;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Check if any links differ from initial values (length or values)
+  // Check if any URLs differ from their initial database values
   const isDirty =
     initialLinks.length !== links.length ||
     links.some((link, idx) => {
       const init = initialLinks[idx];
-      return !init || link.platform !== init.platform || link.url !== init.url;
+      return !init || link.url !== init.url;
     });
 
   const handleSave = async () => {
@@ -103,16 +60,34 @@ export const useSocialLinks = () => {
     setError(null);
     setSuccess(false);
 
-    // URL validation
-    const urlPattern = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([\/\w .-]*)*\/?$/i;
-    for (const link of links) {
-      if (!link.url || !link.url.trim()) {
-        setError(`URL for ${link.platform} cannot be empty.`);
-        setLoading(false);
-        return;
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/i;
+
+    const isValidUrl = (urlStr: string): boolean => {
+      try {
+        const hasProtocol = /^https?:\/\//i.test(urlStr);
+        new URL(hasProtocol ? urlStr : `https://${urlStr}`);
+        return true;
+      } catch {
+        return false;
       }
-      if (!urlPattern.test(link.url)) {
-        setError(`Invalid URL format for ${link.platform}: "${link.url}".`);
+    };
+
+    for (const link of links) {
+      const trimmedUrl = link.url ? link.url.trim() : '';
+      if (!trimmedUrl) {
+        // Empty is allowed, it will just disable/hide it on the public portfolio
+        continue;
+      }
+
+      if (link.platform === 'email') {
+        const cleanEmail = trimmedUrl.startsWith('mailto:') ? trimmedUrl.substring(7) : trimmedUrl;
+        if (!emailPattern.test(cleanEmail) && !isValidUrl(trimmedUrl)) {
+          setError(`Invalid format for Email: "${trimmedUrl}". Must be a valid email or URL.`);
+          setLoading(false);
+          return;
+        }
+      } else if (!isValidUrl(trimmedUrl)) {
+        setError(`Invalid URL format for ${link.platform}: "${trimmedUrl}".`);
         setLoading(false);
         return;
       }
@@ -140,9 +115,6 @@ export const useSocialLinks = () => {
     loading,
     links,
     updateLinkUrl,
-    addLink,
-    editLink,
-    deleteLink,
     isDirty,
     handleSave,
     handleDiscard,
