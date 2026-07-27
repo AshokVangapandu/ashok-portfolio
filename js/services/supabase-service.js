@@ -572,6 +572,27 @@
     }
   };
 
+  /**
+   * SocialLinksService
+   * Handles public social links configuration queries.
+   */
+  const SocialLinksService = {
+    async getLinks() {
+      if (!supabase) return [];
+      try {
+        const { data, error } = await supabase
+          .from('social_links')
+          .select('platform, url')
+          .order('display_order', { ascending: true });
+        if (error) throw error;
+        return data || [];
+      } catch (err) {
+        console.error("Error fetching social links:", err);
+        return [];
+      }
+    }
+  };
+
   // Expose services to window scope
   window.AuthService = AuthService;
   window.TestimonialService = TestimonialService;
@@ -583,5 +604,6 @@
   window.MaintenanceService = MaintenanceService;
   window.PrivateAccessService = PrivateAccessService;
   window.AccessRequestService = AccessRequestService;
+  window.SocialLinksService = SocialLinksService;
   window.supabaseInstance = supabase;
 })();
