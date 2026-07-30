@@ -3,6 +3,34 @@ import { resolve } from 'path';
 
 export default defineConfig({
   base: '/',
+  plugins: [
+    {
+      name: 'admin-fallback-middleware',
+      configureServer(server) {
+        server.middlewares.use((req, res, next) => {
+          if (req.url) {
+            const urlObj = new URL(req.url, 'http://localhost');
+            const pathname = urlObj.pathname;
+            
+            // 1. Intercept asset/source files resolved relatively under nested admin routes and rewrite to root
+            const assetMatch = pathname.match(/\/(src|css|assets|node_modules|@vite|@id|@fs)\/(.*)$/i);
+            if (assetMatch) {
+              req.url = '/' + assetMatch[1] + '/' + assetMatch[2] + urlObj.search;
+              next();
+              return;
+            }
+
+            // 2. Intercept admin sub-pages and fallback to admin index.html
+            const lowerPath = pathname.toLowerCase();
+            if (lowerPath.startsWith('/admin') && !lowerPath.includes('.')) {
+              req.url = '/admin/index.html' + urlObj.search;
+            }
+          }
+          next();
+        });
+      }
+    }
+  ],
   build: {
     rollupOptions: {
       input: {

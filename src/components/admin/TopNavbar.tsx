@@ -1,6 +1,8 @@
 import React from 'react';
 import { useAuth } from '../../hooks/useAuth';
 
+import { Avatar } from '../Avatar';
+
 interface TopNavbarProps {
   onToggleSidebar: () => void;
 }
@@ -60,11 +62,12 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({ onToggleSidebar }) => {
         </button>
 
         {/* User Profile Avatar */}
-        <img
+        <Avatar
+          imageUrl={avatarUrl}
+          displayName={userName}
           className="navbar-user-avatar"
-          src={avatarUrl}
-          alt={userName}
-          title={userName}
+          size={32}
+          style={{ objectFit: 'cover' }}
         />
       </div>
     </header>

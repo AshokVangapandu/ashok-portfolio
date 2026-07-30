@@ -49,6 +49,28 @@ export const Topbar: React.FC<TopbarProps> = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [greeting, setGreeting] = useState('Good Afternoon');
+  const [adminName, setAdminName] = useState<string | null>(null);
+ 
+  // Fetch admin name from database if authenticated
+  useEffect(() => {
+    const fetchAdminName = async () => {
+      if (user?.email) {
+        try {
+          const { data, error } = await supabase
+            .from('admins')
+            .select('full_name')
+            .eq('email', user.email.trim().toLowerCase())
+            .maybeSingle();
+          if (!error && data?.full_name) {
+            setAdminName(data.full_name);
+          }
+        } catch (err) {
+          console.error('Error fetching admin full_name:', err);
+        }
+      }
+    };
+    fetchAdminName();
+  }, [user]);
 
   // Dynamic notifications state
   const [pendingCount, setPendingCount] = useState(0);
@@ -125,7 +147,7 @@ export const Topbar: React.FC<TopbarProps> = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const userDisplayName = user?.user_metadata?.full_name || 'Administrator';
+  const userDisplayName = adminName || user?.user_metadata?.full_name || 'Administrator';
   
   const getInitials = (name: string) => {
     return name

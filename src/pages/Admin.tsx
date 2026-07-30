@@ -9,7 +9,17 @@ import { resolveRoute } from '../admin/router';
  */
 export const AdminPage: React.FC = () => {
   const [currentPath, setCurrentPath] = useState<string>(() => {
-    return typeof window !== 'undefined' ? window.location.pathname : '/admin/';
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const redirectPath = urlParams.get('redirect');
+      if (redirectPath && redirectPath.startsWith('/admin')) {
+        const fullUrl = window.location.origin + redirectPath + window.location.hash;
+        window.history.replaceState(null, '', fullUrl);
+        return redirectPath;
+      }
+      return window.location.pathname;
+    }
+    return '/admin/';
   });
 
   useEffect(() => {

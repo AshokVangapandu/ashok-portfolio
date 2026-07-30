@@ -2,8 +2,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { socialLinksService } from '../services/socialLinksService';
 import { SocialLink } from '../types/socialLinks';
+import { useAuth } from '../../hooks/useAuth';
 
 export const useSocialLinks = () => {
+  const { user, isAdmin } = useAuth();
   const [loading, setLoading] = useState<boolean>(false);
   const [initialLinks, setInitialLinks] = useState<SocialLink[]>([]);
   const [links, setLinks] = useState<SocialLink[]>([]);
@@ -15,11 +17,29 @@ export const useSocialLinks = () => {
     setError(null);
     try {
       const REQUIRED_PLATFORMS = ['linkedin', 'github', 'behance', 'email', 'whatsapp', 'instagram'];
-      const data = await socialLinksService.getLinks();
+      let data = await socialLinksService.getLinks();
+
+      // Check if self-healing is needed (capitalized platforms or duplicates)
+      const hasInvalidPlatform = data.some(
+        (item) => item.platform !== item.platform.toLowerCase() || 
+                  data.filter((d) => d.platform.toLowerCase() === item.platform.toLowerCase()).length > 1
+      );
+
+      if (hasInvalidPlatform && user && isAdmin) {
+        console.log('[useSocialLinks] Stale or duplicate platforms detected. Running self-healing cleanup...');
+        try {
+          await socialLinksService.cleanUpDatabase(data);
+          data = await socialLinksService.getLinks(); // Re-fetch clean data
+        } catch (cleanupErr) {
+          console.error('[useSocialLinks] Self-healing cleanup failed (possibly due to RLS constraints in dev bypass):', cleanupErr);
+        }
+      }
       
       // Enforce that exactly the 6 required platforms exist in hook state, initializing missing ones.
       const mappedData: SocialLink[] = REQUIRED_PLATFORMS.map((platform) => {
-        const found = data.find((item) => item.platform.toLowerCase() === platform);
+        // Prioritize exact lowercase match first, then fall back to case-insensitive match
+        const found = data.find((item) => item.platform === platform) || 
+                      data.find((item) => item.platform.toLowerCase() === platform);
         return found || {
           id: `temp-${platform}`,
           platform: platform,
@@ -35,7 +55,7 @@ export const useSocialLinks = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [user, isAdmin]);
 
   useEffect(() => {
     fetchLinks();
@@ -93,14 +113,23 @@ export const useSocialLinks = () => {
       }
     }
 
+    const processedLinks = links.map((link) => {
+      const trimmedUrl = link.url ? link.url.trim() : '';
+      if (trimmedUrl && link.platform !== 'email' && !/^https?:\/\//i.test(trimmedUrl)) {
+        return { ...link, url: `https://${trimmedUrl}` };
+      }
+      return { ...link, url: trimmedUrl };
+    });
+
     try {
-      await socialLinksService.updateLinks(links);
+      await socialLinksService.updateLinks(processedLinks);
       await fetchLinks(); // reload from database to sync IDs
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
-    } catch (err) {
+    } catch (err: any) {
       console.error('[useSocialLinks] Save error:', err);
-      setError('Failed to save changes to database.');
+      const errorMessage = err?.message || 'Failed to save changes to database.';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

@@ -1,3 +1,16 @@
+(function() {
+  const path = window.location.pathname;
+  const base = path.startsWith('/ashok-portfolio') ? '/ashok-portfolio' : '';
+  const cleanPath = path.substring(base.length);
+  if (cleanPath.startsWith('/admin') && !cleanPath.includes('.')) {
+    window.location.replace(window.location.origin + base + '/admin/index.html?redirect=' + encodeURIComponent(cleanPath));
+  }
+})();
+
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import Avatar from '../src/components/Avatar';
+
 const getBaseUrl = () => {
   const path = window.location.pathname;
   if (path.startsWith('/ashok-portfolio')) {
@@ -1040,7 +1053,7 @@ const initWallOfLoveCarousel = () => {
     const delta = Math.min((time - lastTime) / 1000, 0.05);
     lastTime = time;
 
-    if (!isHoverPaused && !isUserPaused && !isDragging && !isAnimating) {
+    if (!isHoverPaused && !isUserPaused && !isDragging && !isAnimating && !isReadingModeActive) {
       offset -= speed * delta;
       wrapOffset();
       setTrackX();
@@ -1122,6 +1135,23 @@ const initWallOfLoveCarousel = () => {
 };
 
 // Render testimonials helper
+// State variables for testimonial Reading Mode
+let dynamicTestimonials = [];
+let isReadingModeActive = false;
+let currentReadingIndex = 0;
+let previousScrollY = 0;
+
+// Truncate helper
+const truncateTestimonial = (text, wordLimit = 40) => {
+  if (!text) return { text: "", truncated: false };
+  const words = text.trim().split(/\s+/);
+  if (words.length <= wordLimit) {
+    return { text, truncated: false };
+  }
+  return { text: words.slice(0, wordLimit).join(" ") + "...", truncated: true };
+};
+
+// Render testimonials helper
 const renderTestimonials = (testimonials = []) => {
   const track = document.querySelector("[data-wall-marquee]");
   const emptyState = document.querySelector(".wall-empty-state");
@@ -1130,6 +1160,9 @@ const renderTestimonials = (testimonials = []) => {
   const nextButton = document.querySelector("[data-wall-next]");
 
   if (!track) return;
+
+  // Store testimonials locally for Reading Mode navigation
+  dynamicTestimonials = testimonials || [];
 
   // Clear existing content
   track.innerHTML = "";
@@ -1153,7 +1186,7 @@ const renderTestimonials = (testimonials = []) => {
   if (prevButton) prevButton.style.display = "flex";
   if (nextButton) nextButton.style.display = "flex";
 
-  track.innerHTML = testimonials.map(t => {
+  track.innerHTML = testimonials.map((t, index) => {
     const displayName = t.full_name || t.google_name || "Collaborator";
     const avatarSrc = t.avatar_url || t.google_avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80";
     const roleStr = t.designation ? (t.company ? `${t.designation} at ${t.company}` : t.designation) : (t.company || "Collaborator");
@@ -1172,9 +1205,9 @@ const renderTestimonials = (testimonials = []) => {
     ` : '';
 
     const starsHtml = '★'.repeat(t.rating || 5) + '☆'.repeat(5 - (t.rating || 5));
-    const avatarHtml = (avatarSrc.includes('unsplash') || avatarSrc.includes('google') || avatarSrc.includes('http') || avatarSrc.includes('photo-'))
-      ? `<img src="${avatarSrc}" alt="${displayName}" class="author-avatar" loading="lazy">`
-      : `<div class="author-avatar author-avatar-initials">${displayName.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase()}</div>`;
+    const avatarHtml = `<div class="avatar-mount-point" data-image-url="${avatarSrc || ''}" data-display-name="${displayName}" data-class-name="author-avatar"></div>`;
+
+    const truncated = truncateTestimonial(t.testimonial, 40);
 
     return `
       <article class="wall-card">
@@ -1188,7 +1221,19 @@ const renderTestimonials = (testimonials = []) => {
             <span>${starsHtml}</span>
           </div>
         </div>
-        <blockquote class="card-testimonial-text">${t.testimonial}</blockquote>
+        
+        <div class="card-text-container">
+          <blockquote class="card-testimonial-text">${truncated.text}</blockquote>
+          
+          <button type="button" class="read-more-btn" data-testimonial-id="${t.id}" data-original-index="${index}" aria-label="Read full review from ${displayName}">
+            <span>Read Full Review</span>
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M5 12h14" />
+              <path d="m12 5 7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+
         <div class="card-divider"></div>
         <div class="card-author-row">
           ${avatarHtml}
@@ -1204,7 +1249,31 @@ const renderTestimonials = (testimonials = []) => {
     `;
   }).join("");
 
+  // Setup click listeners for Read Full Review buttons
+  const setupReadMoreListeners = () => {
+    const btns = track.querySelectorAll(".read-more-btn");
+    btns.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const id = btn.getAttribute("data-testimonial-id");
+        const idx = dynamicTestimonials.findIndex(item => item.id === id);
+        if (idx !== -1) {
+          enterReadingMode(idx);
+        }
+      });
+    });
+  };
+
   initWallOfLoveCarousel();
+  setupReadMoreListeners();
+
+  // Mount React Avatar components on all card placeholders
+  track.querySelectorAll(".avatar-mount-point").forEach(el => {
+    const imageUrl = el.getAttribute("data-image-url");
+    const nameVal = el.getAttribute("data-display-name");
+    const className = el.getAttribute("data-class-name");
+    const root = ReactDOM.createRoot(el);
+    root.render(<Avatar imageUrl={imageUrl} displayName={nameVal} className={className} />);
+  });
 };
 
 // Dynamic testimonial load helper
@@ -1800,13 +1869,8 @@ const setupNavbarAuth = async () => {
       }
     }
 
-    const avatarHtml = avatar
-      ? `<img src="${avatar}" alt="${name}">`
-      : `<div class="navbar-user-avatar-fallback">${name.substring(0, 2).toUpperCase()}</div>`;
-
-    const dropdownAvatarHtml = avatar
-      ? `<img src="${avatar}" alt="${name}">`
-      : `<div class="dropdown-user-header-avatar-fallback">${name.substring(0, 2).toUpperCase()}</div>`;
+    const avatarHtml = `<div class="avatar-mount-point" data-image-url="${avatar || ''}" data-display-name="${name}" data-class-name="navbar-user-avatar"></div>`;
+    const dropdownAvatarHtml = `<div class="avatar-mount-point" data-image-url="${avatar || ''}" data-display-name="${name}" data-class-name="dropdown-user-header-avatar"></div>`;
 
     container.innerHTML = `
       <button type="button" class="navbar-user-avatar-btn" id="navbar-user-btn" aria-label="Open user menu" aria-expanded="false">
@@ -1835,6 +1899,14 @@ const setupNavbarAuth = async () => {
         </button>
       </div>
     `;
+
+    container.querySelectorAll(".avatar-mount-point").forEach(el => {
+      const imageUrl = el.getAttribute("data-image-url");
+      const nameVal = el.getAttribute("data-display-name");
+      const className = el.getAttribute("data-class-name");
+      const root = ReactDOM.createRoot(el);
+      root.render(<Avatar imageUrl={imageUrl} displayName={nameVal} className={className} />);
+    });
 
     const userBtn = container.querySelector("#navbar-user-btn");
     const dropdown = container.querySelector("#navbar-user-dropdown");
@@ -2030,7 +2102,8 @@ const initDynamicSocialLinks = async () => {
           el.textContent = emailText;
         }
       } else {
-        el.href = url;
+        const absoluteUrl = /^https?:\/\//i.test(url) ? url : `https://${url}`;
+        el.href = absoluteUrl;
       }
     });
   } catch (err) {
@@ -2071,5 +2144,260 @@ if (window.SocialLinksService) {
   document.addEventListener("DOMContentLoaded", () => {
     if (window.SocialLinksService) initDynamicSocialLinks();
   });
+}
+
+// Reading Mode transitions and setup
+let lastClickedReadMoreBtn = null;
+
+const updateExpandedCard = (index, animate = true) => {
+  try {
+    const testimonial = dynamicTestimonials[index];
+    if (!testimonial) {
+      console.warn("Testimonial not found at index:", index);
+      return;
+    }
+
+    const starsHtml = '★'.repeat(testimonial.rating || 5) + '☆'.repeat(5 - (testimonial.rating || 5));
+    const displayName = testimonial.full_name || testimonial.google_name || "Collaborator";
+    const avatarSrc = testimonial.avatar_url || testimonial.google_avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80";
+    const roleStr = testimonial.designation ? (testimonial.company ? `${testimonial.designation} &bull; ${testimonial.company}` : testimonial.designation) : (testimonial.company || "Collaborator");
+
+    const cardBody = document.querySelector(".reading-card-body");
+    const authorName = document.querySelector("#reading-author-name");
+    const authorTitle = document.querySelector("#reading-author-title");
+    const avatarSlot = document.querySelector("#reading-avatar-slot");
+    const counterEl = document.querySelector("#reading-counter");
+
+    // Parse raw text into HTML paragraphs
+    const formattedTestimonial = (testimonial.testimonial || "")
+      .split(/\n\s*\n/)
+      .map(para => `<p>${para.replace(/\n/g, "<br>")}</p>`)
+      .join("");
+
+    const updateDOM = () => {
+      const starsEl = document.querySelector("#reading-stars");
+      const textEl = document.querySelector("#reading-text");
+      if (starsEl) starsEl.innerHTML = starsHtml;
+      if (textEl) textEl.innerHTML = formattedTestimonial;
+      if (authorName) authorName.textContent = displayName;
+      if (authorTitle) authorTitle.innerHTML = roleStr;
+      if (avatarSlot) {
+        const root = avatarSlot._reactRoot || ReactDOM.createRoot(avatarSlot);
+        avatarSlot._reactRoot = root;
+        root.render(<Avatar imageUrl={avatarSrc} displayName={displayName} className="popover-avatar" size={48} style={{ borderRadius: "50%", objectFit: "cover" }} />);
+      }
+      if (counterEl) counterEl.textContent = `${index + 1} of ${dynamicTestimonials.length}`;
+    };
+
+    if (animate && cardBody) {
+      cardBody.style.opacity = "0";
+      cardBody.style.transform = "translateY(10px)";
+      cardBody.style.transition = "opacity 200ms ease, transform 200ms ease";
+
+      setTimeout(() => {
+        updateDOM();
+        cardBody.style.opacity = "1";
+        cardBody.style.transform = "translateY(0)";
+      }, 200);
+    } else {
+      updateDOM();
+    }
+  } catch (error) {
+    console.error("Error inside updateExpandedCard:", error);
+  }
+};
+
+const enterReadingMode = (index) => {
+  isReadingModeActive = true;
+  currentReadingIndex = index;
+  previousScrollY = window.scrollY;
+
+  // Save the trigger element for focus recovery
+  lastClickedReadMoreBtn = document.activeElement;
+
+  const section = document.querySelector("#heard");
+  section?.classList.add("reading-mode-active");
+  document.body.classList.add("reading-mode-on");
+
+  // Lock background scroll library
+  if (window.lenis) {
+    window.lenis.stop();
+  }
+
+  // Fade out carousel wrapper
+  const carouselWrapper = document.querySelector(".wall-carousel-wrapper");
+  if (carouselWrapper) {
+    carouselWrapper.style.opacity = "0";
+    carouselWrapper.style.pointerEvents = "none";
+    carouselWrapper.style.transition = "opacity 400ms ease";
+  }
+
+  // Fade/slide in expanded wrapper
+  const readingWrapper = document.querySelector("#reading-card-wrapper");
+  if (readingWrapper) {
+    readingWrapper.style.display = "flex";
+    readingWrapper.offsetHeight; // Force reflow
+    readingWrapper.style.opacity = "1";
+  }
+
+  updateExpandedCard(index, false);
+  
+  // Set accessibility focus
+  setTimeout(() => {
+    document.querySelector("#reading-close-btn")?.focus();
+  }, 100);
+};
+
+const exitReadingMode = () => {
+  isReadingModeActive = false;
+
+  const section = document.querySelector("#heard");
+  section?.classList.remove("reading-mode-active");
+  document.body.classList.remove("reading-mode-on");
+
+  // Restore scroll library
+  if (window.lenis) {
+    window.lenis.start();
+  }
+
+  // Fade back in carousel wrapper
+  const carouselWrapper = document.querySelector(".wall-carousel-wrapper");
+  if (carouselWrapper) {
+    carouselWrapper.style.opacity = "1";
+    carouselWrapper.style.pointerEvents = "auto";
+  }
+
+  // Collapse expanded card wrapper
+  const readingWrapper = document.querySelector("#reading-card-wrapper");
+  if (readingWrapper) {
+    readingWrapper.style.opacity = "0";
+    setTimeout(() => {
+      readingWrapper.style.display = "none";
+    }, 500);
+  }
+
+  // Return focus to previous trigger
+  if (lastClickedReadMoreBtn) {
+    lastClickedReadMoreBtn.focus();
+  }
+
+  // Smooth scroll back to position
+  window.scrollTo({
+    top: previousScrollY,
+    behavior: "smooth"
+  });
+};
+
+// Wire controls
+const wireControls = () => {
+  const closeBtn = document.querySelector("#reading-close-btn");
+  const prevBtn = document.querySelector("#reading-prev-btn");
+  const nextBtn = document.querySelector("#reading-next-btn");
+
+  closeBtn?.addEventListener("click", exitReadingMode);
+
+  prevBtn?.addEventListener("click", () => {
+    if (dynamicTestimonials.length > 0) {
+      currentReadingIndex = (currentReadingIndex - 1 + dynamicTestimonials.length) % dynamicTestimonials.length;
+      updateExpandedCard(currentReadingIndex, true);
+    }
+  });
+
+  nextBtn?.addEventListener("click", () => {
+    if (dynamicTestimonials.length > 0) {
+      currentReadingIndex = (currentReadingIndex + 1) % dynamicTestimonials.length;
+      updateExpandedCard(currentReadingIndex, true);
+    }
+  });
+
+  // Escape key support, Left/Right arrow navigation, and Focus trapping
+  window.addEventListener("keydown", (e) => {
+    if (!isReadingModeActive) return;
+
+    if (e.key === "Escape") {
+      exitReadingMode();
+      return;
+    }
+
+    if (e.key === "ArrowLeft") {
+      prevBtn?.click();
+      return;
+    }
+
+    if (e.key === "ArrowRight") {
+      nextBtn?.click();
+      return;
+    }
+
+    // Intercept scroll-related keys to scroll the testimonial body directly
+    const scrollContainer = document.querySelector(".reading-card-body");
+    if (scrollContainer) {
+      const scrollSpeed = 50; // pixels per Arrow keypress
+      const pageSpeed = scrollContainer.clientHeight - 40; // pixels for PageUp/Down
+      
+      if (e.key === "ArrowUp") {
+        scrollContainer.scrollTop -= scrollSpeed;
+        e.preventDefault();
+        return;
+      }
+      if (e.key === "ArrowDown") {
+        scrollContainer.scrollTop += scrollSpeed;
+        e.preventDefault();
+        return;
+      }
+      if (e.key === "PageUp") {
+        scrollContainer.scrollTop -= pageSpeed;
+        e.preventDefault();
+        return;
+      }
+      if (e.key === "PageDown") {
+        scrollContainer.scrollTop += pageSpeed;
+        e.preventDefault();
+        return;
+      }
+      if (e.key === " " && document.activeElement !== closeBtn && document.activeElement !== prevBtn && document.activeElement !== nextBtn) {
+        if (e.shiftKey) {
+          scrollContainer.scrollTop -= pageSpeed;
+        } else {
+          scrollContainer.scrollTop += pageSpeed;
+        }
+        e.preventDefault();
+        return;
+      }
+    }
+
+    if (e.key === "Tab") {
+      const card = document.querySelector("#reading-card");
+      if (!card) return;
+
+      const focusableSelectors = 'button, [tabindex="0"]';
+      const focusables = Array.from(card.querySelectorAll(focusableSelectors)).filter(
+        el => el.offsetWidth > 0 && el.offsetHeight > 0 && !el.disabled
+      );
+
+      if (focusables.length === 0) return;
+
+      const firstFocusable = focusables[0];
+      const lastFocusable = focusables[focusables.length - 1];
+
+      if (e.shiftKey) { // Shift + Tab
+        if (document.activeElement === firstFocusable) {
+          lastFocusable.focus();
+          e.preventDefault();
+        }
+      } else { // Tab
+        if (document.activeElement === lastFocusable) {
+          firstFocusable.focus();
+          e.preventDefault();
+        }
+      }
+    }
+  });
+};
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", wireControls);
+} else {
+  wireControls();
 }
 

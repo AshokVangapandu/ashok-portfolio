@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { LoginButton } from './LoginButton';
 import { LogoutButton } from './LogoutButton';
+import { Avatar } from '../Avatar';
 
 /**
  * User Profile dropdown component.
@@ -88,30 +89,7 @@ export const UserMenu: React.FC = () => {
           e.currentTarget.style.background = 'rgba(255, 255, 255, 0.03)';
         }}
       >
-        {avatarUrl ? (
-          <img
-            src={avatarUrl}
-            alt={nameVal}
-            style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover' }}
-          />
-        ) : (
-          <div
-            style={{
-              width: '32px',
-              height: '32px',
-              borderRadius: '50%',
-              background: 'linear-gradient(135deg, #8f85ff 0%, #6c5ce7 100%)',
-              color: '#ffffff',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontWeight: 700,
-              fontSize: '13px',
-            }}
-          >
-            {nameVal.charAt(0).toUpperCase()}
-          </div>
-        )}
+        <Avatar imageUrl={avatarUrl} displayName={nameVal} className="navbar-user-avatar" size={32} style={{ objectFit: 'cover' }} />
         <span style={{ fontSize: '13px', fontWeight: 600, maxWidth: '100px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {nameVal}
         </span>
@@ -153,30 +131,7 @@ export const UserMenu: React.FC = () => {
         >
           {/* User Details (Avatar, Name, Email) */}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', borderBottom: '1px solid rgba(255, 255, 255, 0.06)', paddingBottom: '12px', textAlign: 'center' }}>
-            {avatarUrl ? (
-              <img
-                src={avatarUrl}
-                alt={nameVal}
-                style={{ width: '48px', height: '48px', borderRadius: '50%', objectFit: 'cover', border: '1.5px solid rgba(143, 133, 255, 0.3)' }}
-              />
-            ) : (
-              <div
-                style={{
-                  width: '48px',
-                  height: '48px',
-                  borderRadius: '50%',
-                  background: 'linear-gradient(135deg, #8f85ff 0%, #6c5ce7 100%)',
-                  color: '#ffffff',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontWeight: 700,
-                  fontSize: '18px',
-                }}
-              >
-                {nameVal.charAt(0).toUpperCase()}
-              </div>
-            )}
+            <Avatar imageUrl={avatarUrl} displayName={nameVal} className="dropdown-user-header-avatar" size={48} style={{ objectFit: 'cover', border: '1.5px solid rgba(143, 133, 255, 0.3)' }} />
             <div style={{ marginTop: '4px' }}>
               <h4 style={{ margin: '0 0 3px 0', fontSize: '13.5px', fontWeight: 700, color: '#ffffff' }}>
                 {nameVal}

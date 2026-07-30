@@ -1,15 +1,18 @@
--- Standardize existing platform names to lowercase keys
-UPDATE public.social_links SET platform = 'linkedin' WHERE LOWER(platform) = 'linkedin';
-UPDATE public.social_links SET platform = 'github' WHERE LOWER(platform) = 'github';
-UPDATE public.social_links SET platform = 'behance' WHERE LOWER(platform) = 'behance';
-UPDATE public.social_links SET platform = 'instagram' WHERE LOWER(platform) = 'instagram';
-UPDATE public.social_links SET platform = 'whatsapp' WHERE LOWER(platform) = 'whatsapp';
-UPDATE public.social_links SET platform = 'email' WHERE LOWER(platform) = 'email';
+-- 1. Deduplicate by keeping the lowercase row if a capitalized duplicate exists
+DELETE FROM public.social_links a
+WHERE a.platform != LOWER(a.platform)
+  AND EXISTS (
+    SELECT 1 FROM public.social_links b
+    WHERE b.platform = LOWER(a.platform)
+  );
 
--- Delete any unsupported platforms to maintain clean config
+-- 2. Standardize remaining capitalized platform names to lowercase keys
+UPDATE public.social_links SET platform = LOWER(platform) WHERE platform != LOWER(platform);
+
+-- 3. Delete any unsupported platforms to maintain clean config
 DELETE FROM public.social_links WHERE platform NOT IN ('linkedin', 'github', 'behance', 'instagram', 'whatsapp', 'email');
 
--- Insert missing default rows with default URLs
+-- 4. Insert missing default rows with default URLs
 INSERT INTO public.social_links (platform, url, display_order)
 VALUES 
   ('linkedin', 'https://www.linkedin.com/in/ashok-vangapandu', 1),
@@ -19,3 +22,7 @@ VALUES
   ('instagram', 'https://www.instagram.com/ashok_vangapandu?igsh=amM1cTVldDVsZjh3', 5),
   ('email', 'mailto:ashokvangapandu45@gmail.com', 6)
 ON CONFLICT (platform) DO NOTHING;
+
+-- 5. Add check constraint to enforce lowercase platform values
+ALTER TABLE public.social_links DROP CONSTRAINT IF EXISTS check_platform_lowercase;
+ALTER TABLE public.social_links ADD CONSTRAINT check_platform_lowercase CHECK (platform = LOWER(platform));
