@@ -68,13 +68,11 @@
       const res = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: redirectTo
+          redirectTo: redirectTo,
+          skipBrowserRedirect: true
         }
       });
       console.log("AuthService: signInWithOAuth result:", res);
-      if (res.data?.url) {
-        window.location.href = res.data.url;
-      }
       return res;
     },
 
