@@ -56,9 +56,13 @@
    * Handles social authentication flow state operations.
    */
   const AuthService = {
-    get supabase() { return supabase; },
+    get supabase() { 
+      initSupabase();
+      return supabase; 
+    },
     async signInWithGoogle() {
       console.log("AuthService: signInWithGoogle invoked");
+      initSupabase();
       if (!supabase) {
         console.error("AuthService: Supabase client is not initialized.");
         throw new Error("Supabase Client is not initialized.");
@@ -78,6 +82,7 @@
 
     async setSession(hash) {
       console.log("AuthService: setSession invoked");
+      initSupabase();
       if (!supabase) {
         console.error("AuthService: Supabase client is not initialized.");
         throw new Error("Supabase Client is not initialized.");
@@ -97,11 +102,13 @@
     },
 
     async signOut() {
+      initSupabase();
       if (!supabase) throw new Error("Supabase Client is not initialized.");
       return await supabase.auth.signOut();
     },
 
     async getCurrentUser() {
+      initSupabase();
       if (!supabase) return null;
       try {
         const { data: { session } } = await supabase.auth.getSession();
@@ -113,6 +120,7 @@
     },
 
     onAuthStateChange(callback) {
+      initSupabase();
       if (!supabase) return () => {};
       const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
         callback(event, session);
@@ -127,6 +135,7 @@
    */
   const TestimonialService = {
     async submitTestimonial(testimonial) {
+      initSupabase();
       if (!supabase) throw new Error("Supabase Client is not initialized.");
       const dbTestimonial = {
         user_id: testimonial.user_id || null,
@@ -149,6 +158,7 @@
     },
 
     async createTestimonial(testimonial) {
+      initSupabase();
       if (!supabase) throw new Error("Supabase Client is not initialized.");
       const dbTestimonial = {
         user_id: testimonial.user_id || null,
@@ -171,6 +181,7 @@
     },
 
     async hasSubmittedTestimonial(userId) {
+      initSupabase();
       if (!supabase) throw new Error("Supabase Client is not initialized.");
       const { data, error } = await supabase
         .from('testimonials')
@@ -181,6 +192,7 @@
     },
 
     async getApprovedTestimonials() {
+      initSupabase();
       if (!supabase) throw new Error("Supabase Client is not initialized.");
       return await supabase
         .from('testimonials')
@@ -200,6 +212,7 @@
    */
   const AdminService = {
     async getAllTestimonials() {
+      initSupabase();
       if (!supabase) throw new Error("Supabase Client is not initialized.");
       return await supabase
         .from('testimonials')
@@ -208,6 +221,7 @@
     },
 
     async approveTestimonial(id) {
+      initSupabase();
       if (!supabase) throw new Error("Supabase Client is not initialized.");
       return await supabase
         .from('testimonials')
@@ -216,6 +230,7 @@
     },
 
     async rejectTestimonial(id) {
+      initSupabase();
       if (!supabase) throw new Error("Supabase Client is not initialized.");
       return await supabase
         .from('testimonials')
@@ -224,6 +239,7 @@
     },
 
     async deleteTestimonial(id) {
+      initSupabase();
       if (!supabase) throw new Error("Supabase Client is not initialized.");
       return await supabase
         .from('testimonials')
@@ -232,6 +248,7 @@
     },
 
     async updateTestimonial(id, data) {
+      initSupabase();
       if (!supabase) throw new Error("Supabase Client is not initialized.");
       return await supabase
         .from('testimonials')
