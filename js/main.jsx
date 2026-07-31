@@ -1429,8 +1429,6 @@ const loadDynamicTestimonials = async () => {
   }
 };
 
-loadDynamicTestimonials();
-
 // Dynamic certifications load helper
 const loadDynamicCertifications = async () => {
   try {
@@ -1534,8 +1532,6 @@ const loadDynamicCertifications = async () => {
   }
 };
 
-loadDynamicCertifications();
-
 // Dynamic projects highlights load helper
 const loadDynamicProjects = async () => {
   try {
@@ -1584,8 +1580,6 @@ const loadDynamicProjects = async () => {
     }
   }
 };
-
-loadDynamicProjects();
 
 // Geolocation caching for resume downloads
 let cachedGeoData = { ip_address: 'Unknown', country: 'Unknown', city: 'Unknown' };
@@ -2471,6 +2465,11 @@ const wireControls = () => {
       }
     }
   });
+
+  // Load dynamic data after all scripts and services are fully initialized
+  loadDynamicTestimonials();
+  loadDynamicCertifications();
+  loadDynamicProjects();
 };
 
 if (document.readyState === "loading") {
