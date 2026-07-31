@@ -2472,9 +2472,13 @@ const wireControls = () => {
   loadDynamicProjects();
 };
 
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", wireControls);
-} else {
-  wireControls();
-}
+const initApp = () => {
+  if (window.CertificationService && window.supabase && window.APP_CONFIG) {
+    wireControls();
+  } else {
+    setTimeout(initApp, 50);
+  }
+};
+
+initApp();
 
