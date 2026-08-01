@@ -266,6 +266,7 @@
    */
   const CertificationService = {
     async getPublishedCertifications() {
+      initSupabase();
       if (!supabase) throw new Error("Supabase Client is not initialized.");
       return await supabase
         .from('certifications')
@@ -281,6 +282,7 @@
    */
   const ProjectService = {
     async getPublishedProjects() {
+      initSupabase();
       if (!supabase) throw new Error("Supabase Client is not initialized.");
       return await supabase
         .from('projects')
@@ -292,14 +294,19 @@
 
   const ResumeService = {
     async getActiveResume() {
+      initSupabase();
       if (!supabase) throw new Error("Supabase Client is not initialized.");
-      return await supabase
+      const response = await supabase
         .from('resume_settings')
         .select('*')
         .eq('is_active', true)
+        .headers({ 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' })
         .maybeSingle();
+      console.log("Resume Response:", response);
+      return response;
     },
     async logResumeDownload(downloadData) {
+      initSupabase();
       if (!supabase) throw new Error("Supabase Client is not initialized.");
       return await supabase
         .from('resume_downloads')
@@ -308,6 +315,7 @@
         .single();
     },
     async updateDownloadStatus(id, status) {
+      initSupabase();
       if (!supabase) throw new Error("Supabase Client is not initialized.");
       return await supabase
         .from('resume_downloads')
@@ -322,6 +330,7 @@
    */
   const PortfolioSettingsService = {
     async getSiteMode() {
+      initSupabase();
       if (!supabase) return 'public';
       try {
         const { data, error } = await supabase
@@ -340,6 +349,7 @@
       }
     },
     async getSettings() {
+      initSupabase();
       if (!supabase) throw new Error("Supabase Client is not initialized.");
       return await supabase
         .from('portfolio_settings')
@@ -363,6 +373,7 @@
           message: 'Please enter a valid email address.'
         };
       }
+      initSupabase();
       if (!supabase) {
         return {
           success: false,
@@ -434,6 +445,7 @@
 
     async checkSubscriptionStatus(rawEmail) {
       const email = (rawEmail || '').trim().toLowerCase();
+      initSupabase();
       if (!email || !supabase) return { isSubscribed: false };
       try {
         const { data } = await supabase
@@ -476,6 +488,7 @@
       if (!cleanEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
         return { success: false, message: 'Please enter a valid email address.' };
       }
+      initSupabase();
       if (!supabase) {
         return { success: false, message: 'Database service unavailable. Please try again later.' };
       }
@@ -540,6 +553,7 @@
       if (!cleanReason) {
         return { success: false, message: 'Please provide a reason for your access request.' };
       }
+      initSupabase();
       if (!supabase) {
         return { success: false, message: 'Database service unavailable. Please try again later.' };
       }
@@ -593,6 +607,7 @@
    */
   const SocialLinksService = {
     async getLinks() {
+      initSupabase();
       if (!supabase) return [];
       try {
         const { data, error } = await supabase
