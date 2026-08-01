@@ -8,6 +8,7 @@ export interface EmailLayoutOptions {
   ctaText?: string;
   ctaUrl?: string;
   footerNote?: string;
+  portfolioUrl?: string;
 }
 
 /**
@@ -21,8 +22,11 @@ export function renderPortfolioEmail(options: EmailLayoutOptions): string {
     contentHtml,
     ctaText,
     ctaUrl,
-    footerNote = 'Sent automatically from Ashok Vangapandu\'s Portfolio.'
+    footerNote = 'Sent automatically from Ashok Vangapandu\'s Portfolio.',
+    portfolioUrl = 'https://ashokvangapandu.com'
   } = options;
+
+  const displayDomain = portfolioUrl.replace(/^https?:\/\/(www\.)?/, '');
 
   return `
 <!DOCTYPE html>
@@ -143,7 +147,7 @@ export function renderPortfolioEmail(options: EmailLayoutOptions): string {
       <div class="footer">
         <p style="margin: 0 0 6px 0;">${footerNote}</p>
         <p style="margin: 0;">
-          <a href="https://ashokvangapandu.in" target="_blank" rel="noopener noreferrer">ashokvangapandu.in</a>
+          <a href="${portfolioUrl}" target="_blank" rel="noopener noreferrer">${displayDomain}</a>
         </p>
       </div>
     </div>

@@ -7,8 +7,8 @@
   <link rel="stylesheet" href="../css/main.css?v=1.4">
   <script>
     window.APP_CONFIG = {
-      SUPABASE_URL: "%VITE_SUPABASE_URL%",
-      SUPABASE_ANON_KEY: "%VITE_SUPABASE_ANON_KEY%"
+      SUPABASE_URL: "%VITE_SUPABASE_URL%".startsWith('%') ? "https://xpuhbtsgwhgbcvmwzlyd.supabase.co" : "%VITE_SUPABASE_URL%",
+      SUPABASE_ANON_KEY: "%VITE_SUPABASE_ANON_KEY%".startsWith('%') ? "sb_publishable_Rt97581bW4IkOBlUaCNX4Q_Rldchf_z" : "%VITE_SUPABASE_ANON_KEY%"
     };
   </script>
 </head>

@@ -15,8 +15,8 @@ function runTest() {
     process.exit(1);
   }
 
-  // 2. Check main.js payload structure
-  const mainPath = path.join(__dirname, '../js/main.js');
+  // 2. Check main.jsx payload structure
+  const mainPath = path.join(__dirname, '../js/main.jsx');
   const mainContent = fs.readFileSync(mainPath, 'utf-8');
   if (
     mainContent.includes('logResumeDownload(downloadPayload)') &&

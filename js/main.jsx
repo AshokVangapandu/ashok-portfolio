@@ -1694,10 +1694,20 @@ const loadDynamicResume = async () => {
 
         let downloadRecord = null;
         try {
+          // Perform a fresh dynamic query at the moment of the click
+          const { data: latestResume, error: fetchErr } = await window.ResumeService.getActiveResume();
+          if (fetchErr || !latestResume || !latestResume.public_url) {
+            throw new Error(fetchErr ? fetchErr.message : 'No active resume found dynamically');
+          }
+
+          // Dynamically update the View Online href and title in case they changed
+          viewOnlineBtn.setAttribute('href', latestResume.preview_url || latestResume.public_url);
+          viewOnlineBtn.setAttribute('aria-label', "Open Ashok's active resume preview in a new tab");
+
           const device = getDeviceDetails();
           // 1. Create a download record in database
           const downloadPayload = {
-            resume_id: activeResume.id,
+            resume_id: latestResume.id,
             session_id: getSessionId(),
             visitor_id: getVisitorId(),
             page_source: window.location.pathname || '/',
@@ -1717,29 +1727,37 @@ const loadDynamicResume = async () => {
           downloadRecord = data;
 
           // 2. Trigger file download
-          const response = await fetch(activeResume.public_url);
+          const response = await fetch(latestResume.public_url);
           if (!response.ok) throw new Error(`HTTP status: ${response.status}`);
           const blob = await response.blob();
           const blobUrl = window.URL.createObjectURL(blob);
           const link = document.createElement('a');
           link.href = blobUrl;
-          link.download = activeResume.file_name || 'Resume.pdf';
+          link.download = latestResume.file_name || 'Resume.pdf';
           document.body.appendChild(link);
           link.click();
           document.body.removeChild(link);
           window.URL.revokeObjectURL(blobUrl);
         } catch (err) {
           console.error('Download tracking or file retrieval failed:', err);
-          // 3. Update download status to 'failed' if download failed
-          if (downloadRecord && downloadRecord.id) {
-            try {
-              await window.ResumeService.updateDownloadStatus(downloadRecord.id, 'failed');
-            } catch (updateErr) {
-              console.error('Failed to update download status:', updateErr);
+          
+          // Fallback using activeResume (loaded on page load)
+          const fallbackUrl = (activeResume && activeResume.public_url) || '';
+          if (fallbackUrl) {
+            // Update status to failed if record was logged
+            if (downloadRecord && downloadRecord.id) {
+              try {
+                await window.ResumeService.updateDownloadStatus(downloadRecord.id, 'failed');
+              } catch (updateErr) {
+                console.error('Failed to update download status:', updateErr);
+              }
+            }
+            window.open(fallbackUrl, '_blank');
+          } else {
+            if (window.showToast) {
+              window.showToast('error', 'Download Failed', 'Could not retrieve active resume.', 4000);
             }
           }
-          // Fallback trigger link open
-          window.open(activeResume.public_url, '_blank');
         } finally {
           btnSpan.textContent = originalText;
         }

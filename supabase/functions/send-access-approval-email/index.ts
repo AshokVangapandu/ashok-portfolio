@@ -38,7 +38,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    const portfolioUrl = Deno.env.get('PORTFOLIO_URL') || payload.portfolio_url || 'https://ashokvangapandu.in';
+    const portfolioUrl = Deno.env.get('PORTFOLIO_URL') || payload.portfolio_url || 'https://ashokvangapandu.com';
 
     // Render HTML Email via shared portfolio template
     const htmlContent = renderPortfolioEmail({
@@ -54,7 +54,8 @@ Deno.serve(async (req) => {
       `,
       ctaText: 'Open Portfolio',
       ctaUrl: portfolioUrl,
-      footerNote: "If you didn't request access, you can safely ignore this email."
+      footerNote: "If you didn't request access, you can safely ignore this email.",
+      portfolioUrl: portfolioUrl
     });
 
     const plainTextContent = `

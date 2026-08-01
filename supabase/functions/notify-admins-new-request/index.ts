@@ -77,7 +77,7 @@ Deno.serve(async (req) => {
       recipients = [{ email: fallback }];
     }
 
-    const portfolioUrl = Deno.env.get('PORTFOLIO_URL') || 'https://ashokvangapandu.in';
+    const portfolioUrl = Deno.env.get('PORTFOLIO_URL') || 'https://ashokvangapandu.com';
     const base = portfolioUrl.endsWith('/') ? portfolioUrl : `${portfolioUrl}/`;
     const adminUrl = `${base}admin/settings/portfolio?tab=access-requests`;
 
@@ -115,7 +115,8 @@ Deno.serve(async (req) => {
       `,
       ctaText: 'Open Access Requests',
       ctaUrl: adminUrl,
-      footerNote: "You received this email because you are registered as an active administrator for Ashok Vangapandu's Portfolio."
+      footerNote: "You received this email because you are registered as an active administrator for Ashok Vangapandu's Portfolio.",
+      portfolioUrl: portfolioUrl
     });
 
     const plainTextContent = `

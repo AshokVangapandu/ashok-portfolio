@@ -48,6 +48,10 @@ export const ResumePage: React.FC = () => {
   const [selectedResume, setSelectedResume] = useState<ResumeSetting | null>(null);
   const [detailsModalOpen, setDetailsModalOpen] = useState(false);
 
+  // Loading states for individual rows
+  const [processingRowId, setProcessingRowId] = useState<string | null>(null);
+  const [processingAction, setProcessingAction] = useState<'activating' | 'downloading' | 'deleting' | 'replacing' | null>(null);
+
   // Helper toast notifier
   const showToast = (type: 'success' | 'error', title: string, message: string) => {
     if (typeof window !== 'undefined' && (window as any).showToast) {
@@ -84,8 +88,13 @@ export const ResumePage: React.FC = () => {
 
   // Handle uploading or replacing a resume PDF
   const handleSaveResume = async (file: File, resumeName: string, version: string) => {
+    const isReplace = uploadMode === 'replace' && selectedResume;
+    if (isReplace) {
+      setProcessingRowId(selectedResume.id);
+      setProcessingAction('replacing');
+    }
     try {
-      if (uploadMode === 'replace' && selectedResume) {
+      if (isReplace) {
         await resumeService.deleteResume(selectedResume.id);
       }
 
@@ -95,36 +104,90 @@ export const ResumePage: React.FC = () => {
         uploadMode === 'replace' ? 'Resume Replaced' : 'Resume Uploaded',
         'Resume PDF uploaded and set to active.'
       );
-      fetchResumes();
+      await fetchResumes();
     } catch (err: any) {
       console.error('[ResumePage.handleSaveResume] Error:', err);
       showToast('error', 'Upload Failed', err.message || 'Failed to upload resume.');
       throw err;
+    } finally {
+      if (isReplace) {
+        setProcessingRowId(null);
+        setProcessingAction(null);
+      }
     }
   };
 
   // Handle activating a resume
   const handleActivate = async (id: string) => {
+    const resumeToActivate = resumes.find(r => r.id === id);
+    if (resumeToActivate?.isActive) {
+      showToast('error', 'Activation Prevented', 'This resume is already active.');
+      return;
+    }
+
+    setProcessingRowId(id);
+    setProcessingAction('activating');
     try {
       await resumeService.setActiveResume(id);
       showToast('success', 'Resume Activated', 'The selected resume is now active.');
-      fetchResumes();
+      await fetchResumes();
     } catch (err: any) {
       console.error('[ResumePage.handleActivate] Error:', err);
       showToast('error', 'Activation Failed', err.message || 'Failed to activate resume.');
+    } finally {
+      setProcessingRowId(null);
+      setProcessingAction(null);
     }
   };
 
   // Handle deleting a resume
   const handleDelete = async (id: string) => {
+    const resumeToDelete = resumes.find(r => r.id === id);
+    if (resumeToDelete?.isActive) {
+      showToast('error', 'Delete Prevented', 'The active resume cannot be deleted. Please activate another resume first.');
+      return;
+    }
+
     if (!window.confirm('Are you sure you want to delete this resume? This will delete the file from storage and cannot be undone.')) return;
+
+    setProcessingRowId(id);
+    setProcessingAction('deleting');
     try {
       await resumeService.deleteResume(id);
       showToast('success', 'Resume Deleted', 'Resume settings and storage file removed.');
-      fetchResumes();
+      await fetchResumes();
     } catch (err: any) {
       console.error('[ResumePage.handleDelete] Error:', err);
       showToast('error', 'Delete Failed', err.message || 'Failed to delete resume.');
+    } finally {
+      setProcessingRowId(null);
+      setProcessingAction(null);
+    }
+  };
+
+  // Handle downloading a resume PDF
+  const handleDownload = async (resume: ResumeSetting) => {
+    setProcessingRowId(resume.id);
+    setProcessingAction('downloading');
+    try {
+      const response = await fetch(resume.publicUrl);
+      if (!response.ok) throw new Error('Failed to fetch file');
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = resume.fileName || `${resume.resumeName}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+      showToast('success', 'Download Complete', 'The resume PDF has been downloaded.');
+    } catch (err: any) {
+      console.error('[ResumePage.handleDownload] Error:', err);
+      showToast('error', 'Download Failed', err.message || 'Failed to download resume PDF.');
+    } finally {
+      setProcessingRowId(null);
+      setProcessingAction(null);
     }
   };
 
@@ -432,6 +495,9 @@ export const ResumePage: React.FC = () => {
                 setUploadMode('replace');
                 setUploadModalOpen(true);
               }}
+              onDownload={handleDownload}
+              processingRowId={processingRowId}
+              processingAction={processingAction}
             />
 
             <UploadResumeModal
@@ -445,13 +511,15 @@ export const ResumePage: React.FC = () => {
               onSave={handleSaveResume}
             />
 
-            <ResumeDetailsModal
-              resume={selectedResume}
-              onClose={() => {
-                setDetailsModalOpen(false);
-                setSelectedResume(null);
-              }}
-            />
+            {detailsModalOpen && (
+              <ResumeDetailsModal
+                resume={selectedResume}
+                onClose={() => {
+                  setDetailsModalOpen(false);
+                  setSelectedResume(null);
+                }}
+              />
+            )}
           </>
         )
       )}

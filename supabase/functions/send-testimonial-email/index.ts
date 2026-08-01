@@ -58,7 +58,9 @@ Deno.serve(async (req) => {
 
     // Recipient email (ADMIN_NOTIFICATION_EMAIL or default to contact email)
     const toEmail = Deno.env.get('ADMIN_NOTIFICATION_EMAIL') || Deno.env.get('NOTIFICATION_EMAIL_TO') || 'contact@ashokvangapandu.com';
-    const adminUrl = Deno.env.get('ADMIN_PORTAL_URL') || 'https://ashokvangapandu.in/admin';
+    const portfolioUrl = Deno.env.get('PORTFOLIO_URL') || 'https://ashokvangapandu.com';
+    const base = portfolioUrl.endsWith('/') ? portfolioUrl : `${portfolioUrl}/`;
+    const adminUrl = Deno.env.get('ADMIN_PORTAL_URL') || `${base}admin`;
     const submittedTime = created_at ? new Date(created_at).toLocaleString('en-US', { timeZone: 'UTC' }) + ' UTC' : new Date().toLocaleString();
 
     const emailBody = {

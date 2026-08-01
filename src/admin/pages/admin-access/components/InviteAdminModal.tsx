@@ -53,9 +53,13 @@ export const InviteAdminModal: React.FC<InviteAdminModalProps> = ({
 
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('[InviteAdminModal] Invite button clicked. Email:', email, 'Role:', role);
     if (email.trim()) {
+      console.log('[InviteAdminModal] Form validation passed. Invoking onSubmit...');
       onSubmit(email, role);
       setEmail('');
+    } else {
+      console.warn('[InviteAdminModal] Email validation failed: email is empty.');
     }
   };
 

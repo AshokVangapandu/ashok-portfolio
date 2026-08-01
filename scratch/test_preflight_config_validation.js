@@ -75,7 +75,7 @@ edgeFiles.forEach(ef => {
 });
 
 // 3. Frontend Secret Leak Checks
-const frontendFiles = ['src/main.tsx', 'src/App.tsx', 'js/main.js'];
+const frontendFiles = ['src/main.tsx', 'src/App.tsx', 'js/main.jsx'];
 frontendFiles.forEach(ff => {
   const p = path.join(__dirname, '..', ff);
   if (fs.existsSync(p)) {

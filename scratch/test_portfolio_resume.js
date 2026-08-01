@@ -25,8 +25,8 @@ function runTest() {
     process.exit(1);
   }
 
-  // 3. Check main.js loadDynamicResume invocation
-  const mainPath = path.join(__dirname, '../js/main.js');
+  // 3. Check main.jsx loadDynamicResume invocation
+  const mainPath = path.join(__dirname, '../js/main.jsx');
   const mainContent = fs.readFileSync(mainPath, 'utf-8');
   if (mainContent.includes('loadDynamicResume') && mainContent.includes('window.URL.createObjectURL')) {
     console.log('SUCCESS: loadDynamicResume is successfully hooked into main.js boot loader!');

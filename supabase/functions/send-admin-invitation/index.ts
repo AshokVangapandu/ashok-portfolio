@@ -27,7 +27,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    const portfolioUrl = Deno.env.get('PORTFOLIO_URL') || 'https://ashokvangapandu.in';
+    const portfolioUrl = Deno.env.get('PORTFOLIO_URL') || 'https://ashokvangapandu.com';
     const adminUrl = `${portfolioUrl.endsWith('/') ? portfolioUrl : portfolioUrl + '/'}admin`;
 
     // Render HTML Email via shared portfolio template
@@ -43,7 +43,8 @@ Deno.serve(async (req) => {
       `,
       ctaText: 'Access Admin Dashboard',
       ctaUrl: adminUrl,
-      footerNote: "If you weren't expecting this invitation, you can safely ignore this email."
+      footerNote: "If you weren't expecting this invitation, you can safely ignore this email.",
+      portfolioUrl: portfolioUrl
     });
 
     const plainTextContent = `

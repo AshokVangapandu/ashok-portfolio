@@ -117,9 +117,11 @@ export const adminAccessService = {
     return list;
   },
 
-  async inviteAdmin(email: string, role: AdminRole): Promise<boolean> {
+  async inviteAdmin(email: string, role: AdminRole): Promise<{ success: boolean; emailSent: boolean; emailError: string | null; isReinvite?: boolean }> {
     const cleanEmail = (email || '').trim().toLowerCase();
     const dbRole = mapUiRoleToDb(role);
+
+    console.log('[adminAccessService.inviteAdmin] Started. email:', cleanEmail, 'role:', dbRole);
 
     // Dynamic data-driven default permissions
     let defaultPermissions: string[] = [];
@@ -154,40 +156,86 @@ export const adminAccessService = {
       ];
     }
 
-    const payload = {
-      email: cleanEmail,
-      role: dbRole,
-      status: 'Pending',
-      is_active: true,
-      full_name: 'Pending Invite',
-      permissions: defaultPermissions
-    };
-
-    const { error } = await (supabase as any)
+    console.log('[adminAccessService.inviteAdmin] Checking if admin already exists with email:', cleanEmail);
+    const { data: existingAdmin, error: checkError } = await (supabase as any)
       .from('admins')
-      .insert(payload);
+      .select('*')
+      .eq('email', cleanEmail)
+      .maybeSingle();
 
-    if (error) {
-      console.error('[adminAccessService] Error inviting admin:', error);
-      throw error;
+    if (checkError) {
+      console.error('[adminAccessService.inviteAdmin] Database check failed:', checkError);
+      throw checkError;
+    }
+
+    let isReinvite = false;
+
+    if (existingAdmin) {
+      console.log('[adminAccessService.inviteAdmin] Admin record already exists:', existingAdmin);
+      isReinvite = true;
+
+      // Update existing record to reactivate/re-invite
+      const { error: updateError } = await (supabase as any)
+        .from('admins')
+        .update({
+          role: dbRole,
+          status: 'Pending',
+          is_active: true,
+          permissions: defaultPermissions
+        })
+        .eq('id', existingAdmin.id);
+
+      if (updateError) {
+        console.error('[adminAccessService.inviteAdmin] Database update failed:', updateError);
+        throw updateError;
+      }
+      console.log('[adminAccessService.inviteAdmin] Database update succeeded. Now invoking Edge Function...');
+    } else {
+      const payload = {
+        email: cleanEmail,
+        role: dbRole,
+        status: 'Pending',
+        is_active: true,
+        full_name: 'Pending Invite',
+        permissions: defaultPermissions
+      };
+
+      console.log('[adminAccessService.inviteAdmin] Inserting pending admin record in database. Payload:', payload);
+      const { error: insertError } = await (supabase as any)
+        .from('admins')
+        .insert(payload);
+
+      if (insertError) {
+        console.error('[adminAccessService.inviteAdmin] Database insert failed:', insertError);
+        throw insertError;
+      }
+      console.log('[adminAccessService.inviteAdmin] Database insert succeeded. Now invoking Edge Function...');
     }
 
     // Invoke the send-admin-invitation edge function to send welcome email
+    let emailSent = true;
+    let emailError: string | null = null;
     try {
-      const { error: invokeError } = await supabase.functions.invoke('send-admin-invitation', {
+      console.log('[adminAccessService.inviteAdmin] Invoking Edge Function via supabase.functions.invoke("send-admin-invitation")...');
+      const { data: invokeData, error: invokeError } = await supabase.functions.invoke('send-admin-invitation', {
         body: {
           email: cleanEmail,
           role: role
         }
       });
+      console.log('[adminAccessService.inviteAdmin] Edge Function returned. Data:', invokeData, 'Error:', invokeError);
       if (invokeError) {
         console.error('[adminAccessService] send-admin-invitation edge function returned error:', invokeError);
+        emailSent = false;
+        emailError = invokeError.message || 'Failed to trigger invitation email';
       }
-    } catch (invokeErr) {
+    } catch (invokeErr: any) {
       console.error('[adminAccessService] send-admin-invitation edge function exception:', invokeErr);
+      emailSent = false;
+      emailError = invokeErr.message || 'Exception occurred during email invitation dispatch';
     }
 
-    return true;
+    return { success: true, emailSent, emailError, isReinvite };
   },
 
   async deactivateAdmin(id: string): Promise<boolean> {
