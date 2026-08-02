@@ -300,7 +300,6 @@
         .from('resume_settings')
         .select('*')
         .eq('is_active', true)
-        .headers({ 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' })
         .maybeSingle();
       console.log("Resume Response:", response);
       return response;
