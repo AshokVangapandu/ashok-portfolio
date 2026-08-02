@@ -168,9 +168,14 @@ export const ProjectsPage: React.FC = () => {
     }
   };
 
-  const handleSave = (savedData: AdminProject) => {
+  const handleSave = (savedData: AdminProject, shouldClose = true) => {
     fetchData();
-    setIsDrawerOpen(false);
+    if (shouldClose) {
+      setIsDrawerOpen(false);
+    } else {
+      setSelectedProject(savedData);
+      setDrawerMode('edit');
+    }
   };
 
   return (

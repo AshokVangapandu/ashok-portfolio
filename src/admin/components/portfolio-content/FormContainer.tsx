@@ -8,6 +8,8 @@ interface FormContainerProps {
   isSubmitting?: boolean;
   actions: React.ReactNode;
   children: React.ReactNode;
+  width?: string;
+  bodyStyle?: React.CSSProperties;
 }
 
 export const FormContainer: React.FC<FormContainerProps> = ({
@@ -16,7 +18,9 @@ export const FormContainer: React.FC<FormContainerProps> = ({
   onClose,
   isSubmitting = false,
   actions,
-  children
+  children,
+  width,
+  bodyStyle
 }) => {
   return (
     <>
@@ -43,7 +47,7 @@ export const FormContainer: React.FC<FormContainerProps> = ({
           right: 0,
           top: 0,
           bottom: 0,
-          width: '560px',
+          width: width || '560px',
           height: '100vh',
           backgroundColor: '#FFFFFF',
           boxShadow: '-10px 0 30px rgba(15, 23, 42, 0.08)',
@@ -111,7 +115,8 @@ export const FormContainer: React.FC<FormContainerProps> = ({
             display: 'flex',
             flexDirection: 'column',
             gap: '24px',
-            boxSizing: 'border-box'
+            boxSizing: 'border-box',
+            ...bodyStyle
           }}
         >
           {children}

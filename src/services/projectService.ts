@@ -1,6 +1,6 @@
 /* src/services/projectService.ts */
 import { supabase } from './supabase/client';
-import { Project } from '../types/Project';
+import { Project, ProjectFeature, ProjectGallery } from '../types/Project';
 import projectsData from '../data/projects.json';
 
 export const projectService = {
@@ -80,6 +80,8 @@ export const projectService = {
       coverImage: raw.cover_image_url || '',
       images: raw.images || [],
       problemSolved: raw.problem_solved || '',
+      solution: raw.solution || '',
+      fullDescription: raw.full_description || '',
       features: raw.features || [],
       impactMetrics: Array.isArray(raw.impact_metrics) ? raw.impact_metrics : [],
       layoutType: raw.layout_type || 'medium',
@@ -109,6 +111,8 @@ export const projectService = {
       coverImage: admin.coverImageUrl || '',
       images: admin.images || [],
       problemSolved: admin.problemSolved || '',
+      solution: admin.solution || '',
+      fullDescription: admin.fullDescription || '',
       features: admin.features || [],
       impactMetrics: Array.isArray(admin.impactMetrics) ? admin.impactMetrics : [],
       layoutType: admin.layoutType || 'medium',
@@ -138,6 +142,8 @@ export const projectService = {
       coverImage: item.coverImage || '',
       images: item.images || [],
       problemSolved: item.problemSolved || '',
+      solution: item.solution || '',
+      fullDescription: item.fullDescription || '',
       features: item.features || [],
       impactMetrics: Array.isArray(item.impactMetrics) ? item.impactMetrics : [],
       layoutType: item.layoutType || 'medium',
@@ -145,6 +151,70 @@ export const projectService = {
       githubUrl: item.githubUrl,
       docsUrl: item.docsUrl
     };
+  },
+
+  async getProjectFeatures(projectId: string): Promise<ProjectFeature[]> {
+    const { data, error } = await (supabase as any)
+      .from('project_features')
+      .select('*, bullets:feature_bullets(*)')
+      .eq('project_id', projectId)
+      .eq('is_active', true)
+      .order('display_order', { ascending: true });
+
+    if (error) {
+      console.error('[projectService.getProjectFeatures] Error:', error);
+      return [];
+    }
+
+    return (data || []).map((rawFeature: any) => {
+      const bullets = (rawFeature.bullets || []).map((rawBullet: any) => ({
+        id: rawBullet.id,
+        featureId: rawBullet.feature_id,
+        text: rawBullet.text,
+        displayOrder: rawBullet.display_order,
+        createdAt: rawBullet.created_at
+      })).sort((a: any, b: any) => a.displayOrder - b.displayOrder);
+
+      return {
+        id: rawFeature.id,
+        projectId: rawFeature.project_id,
+        title: rawFeature.title,
+        description: rawFeature.description,
+        imageUrl: rawFeature.image_url,
+        imageThumbnailUrl: rawFeature.image_thumbnail_url,
+        imageAlt: rawFeature.image_alt,
+        displayOrder: rawFeature.display_order,
+        isActive: rawFeature.is_active,
+        createdAt: rawFeature.created_at,
+        updatedAt: rawFeature.updated_at,
+        bullets
+      };
+    });
+  },
+
+  async getProjectGallery(projectId: string): Promise<ProjectGallery[]> {
+    const { data, error } = await (supabase as any)
+      .from('project_gallery')
+      .select('*')
+      .eq('project_id', projectId)
+      .order('display_order', { ascending: true });
+
+    if (error) {
+      console.error('[projectService.getProjectGallery] Error:', error);
+      return [];
+    }
+
+    return (data || []).map((raw: any) => ({
+      id: raw.id,
+      projectId: raw.project_id,
+      title: raw.title,
+      imageUrl: raw.image_url,
+      thumbnailUrl: raw.thumbnail_url,
+      caption: raw.caption,
+      deviceType: raw.device_type,
+      displayOrder: raw.display_order,
+      createdAt: raw.created_at
+    }));
   }
 };
 
