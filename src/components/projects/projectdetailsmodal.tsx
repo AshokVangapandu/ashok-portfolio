@@ -547,6 +547,7 @@ export const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
         {/* SECTION 1.5: THE NARRATIVE (PROBLEM, SOLUTION, BUSINESS VALUE) */}
         {((problemSolved && problemSolved.trim() !== '') || (solution && solution.trim() !== '') || (businessValue && businessValue.trim() !== '') || (fullDescription && fullDescription.trim() !== '')) && (
           <div
+            className='case-story-section'
             style={{
               padding: '56px 48px 80px 48px',
               backgroundColor: '#FFFFFF',
@@ -555,8 +556,8 @@ export const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
               justifyContent: 'center'
             }}
           >
-            <div style={{ width: '100%', maxWidth: '1000px', display: 'flex', flexDirection: 'column', gap: '40px' }}>
-              <div style={{ textAlign: 'center', maxWidth: '600px', margin: '0 auto' }}>
+            <div className='case-story-container' style={{ width: '100%', maxWidth: '1000px', display: 'flex', flexDirection: 'column', gap: '40px' }}>
+              <div className='case-story-heading' style={{ textAlign: 'center', maxWidth: '600px', margin: '0 auto' }}>
                 <span style={{ fontSize: '11px', fontWeight: 800, color: '#8B5CF6', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
                   Project Narrative
                 </span>
@@ -565,7 +566,7 @@ export const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
                 </h2>
               </div>
  
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '32px' }}>
+              <div className='case-story-problem-solution' style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '32px' }}>
                 {/* Column 1: The Challenge */}
                 {problemSolved && problemSolved.trim() !== '' && (
                   <div
@@ -622,6 +623,7 @@ export const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
               {/* Detailed Project Overview & Business Outcome Grid */}
               {((fullDescription && fullDescription.trim() !== '') || (businessValue && businessValue.trim() !== '')) && (
                 <div
+                  className='case-story-outcome-grid'
                   style={{
                     display: 'flex',
                     gap: '32px',
@@ -719,16 +721,16 @@ export const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
           
           {/* SKELETON LOADER DURING MOUNT DETAILS FETCH */}
           {loadingDetails ? (
-            <div style={{ padding: '80px 48px', display: 'flex', flexDirection: 'column', gap: '48px' }}>
+            <div style={{ padding: '56px 48px', display: 'flex', flexDirection: 'column', gap: '32px' }}>
               {[1, 2].map((i) => (
-                <div key={i} style={{ height: '320px', borderRadius: '16px', backgroundColor: '#F1F5F9', animation: 'skeletonPulse 1.5s infinite' }} />
+                <div key={i} style={{ height: '260px', borderRadius: '16px', backgroundColor: '#F1F5F9', animation: 'skeletonPulse 1.5s infinite' }} />
               ))}
             </div>
           ) : featuresList.length === 0 ? (
             /* Fallback to cards */
-            <div style={{ padding: '80px 48px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px', backgroundColor: '#F8FAFC' }}>
+            <div style={{ padding: '56px 48px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '18px', backgroundColor: '#F8FAFC' }}>
               {features.map((f: string, i: number) => (
-                <div key={i} style={{ border: '1px solid rgba(0,0,0,0.06)', borderRadius: '12px', padding: '24px', backgroundColor: '#FFFFFF', display: 'flex', gap: '12px' }}>
+                <div key={i} style={{ border: '1px solid rgba(0,0,0,0.06)', borderRadius: '12px', padding: '20px', backgroundColor: '#FFFFFF', display: 'flex', gap: '12px' }}>
                   <span style={{ fontSize: '16px', color: '#8B5CF6', fontWeight: 800 }}>0{i + 1}.</span>
                   <span style={{ fontSize: '14.5px', color: '#0F172A', fontWeight: 650 }}>{f}</span>
                 </div>
@@ -749,7 +751,7 @@ export const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
                       width: '100%',
                       backgroundColor: isEvenBackground ? '#F3F4F6' : '#FFFFFF',
                       color: '#0F172A',
-                      padding: '60px 48px',
+                      padding: '44px 48px',
                       boxSizing: 'border-box',
                       borderBottom: '1px solid rgba(0, 0, 0, 0.02)',
                       display: 'flex',
@@ -760,10 +762,10 @@ export const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
                     <div
                       style={{
                         width: '100%',
-                        maxWidth: '1000px',
+                        maxWidth: '960px',
                         display: 'grid',
                         gridTemplateColumns: isLeftImage ? '1.1fr 0.9fr' : '0.9fr 1.1fr',
-                        gap: '64px',
+                        gap: '40px',
                         alignItems: 'center'
                       }}
                       className="modal-content-grid"
@@ -779,7 +781,7 @@ export const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
                           cursor: 'zoom-in',
                           transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
                           backgroundColor: '#FFFFFF',
-                          padding: '12px',
+                          padding: '10px',
                           boxSizing: 'border-box'
                         }}
                         className="feature-image"
@@ -829,14 +831,14 @@ export const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
                           order: isLeftImage ? 2 : 1,
                           display: 'flex',
                           flexDirection: 'column',
-                          gap: '20px'
+                          gap: '16px'
                         }}
                         className="feature-text-block"
                       >
                         {/* Styled Feature Number Marker */}
                         <div
                           style={{
-                            fontSize: '72px',
+                            fontSize: '56px',
                             fontWeight: 900,
                             color: '#8B5CF6',
                             opacity: 0.08,
@@ -850,7 +852,7 @@ export const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
 
                         <h3
                           style={{
-                            margin: '8px 0 0 0',
+                            margin: '4px 0 0 0',
                             fontSize: '28px',
                             fontWeight: 800,
                             color: '#0F172A',
@@ -878,7 +880,7 @@ export const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
 
                         {/* Bullet items with purple checkmarks and improved whitespace */}
                         {feature.bullets && feature.bullets.length > 0 && (
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '12px' }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '6px' }}>
                             {feature.bullets.map((bullet) => (
                               <div key={bullet.id} style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
                                 <span
@@ -916,14 +918,14 @@ export const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
         {technologies && technologies.length > 0 && (
           <div
             style={{
-              padding: '80px 48px',
+              padding: '56px 48px',
               backgroundColor: '#FFFFFF',
               borderBottom: '1px solid rgba(0, 0, 0, 0.05)',
               display: 'flex',
               justifyContent: 'center'
             }}
           >
-            <div style={{ width: '100%', maxWidth: '1000px', display: 'flex', flexDirection: 'column', gap: '32px' }}>
+            <div style={{ width: '100%', maxWidth: '1000px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
               <div style={{ textAlign: 'center' }}>
                 <span style={{ fontSize: '11px', fontWeight: 800, color: '#8B5CF6', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
                   Technology Integration
@@ -933,7 +935,7 @@ export const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
                 </h2>
               </div>
  
-              <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '16px' }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '10px' }}>
                 {technologies.map((tech) => (
                   <span
                     key={tech}
@@ -944,8 +946,8 @@ export const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
                       backgroundColor: '#FFFFFF',
                       border: '1px solid #E2E8F0',
                       borderRadius: '8px',
-                      padding: '8px 18px',
-                      height: '40px',
+                      padding: '7px 14px',
+                      height: '36px',
                       boxSizing: 'border-box',
                       boxShadow: '0 2px 8px rgba(15, 23, 42, 0.02)',
                       display: 'inline-flex',
@@ -966,7 +968,7 @@ export const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
         {impactMetrics && impactMetrics.length > 0 && (
           <div
             style={{
-              padding: '80px 48px',
+              padding: '56px 48px',
               backgroundColor: '#090D1A', // Dark mode background for high-end metrics contrast
               backgroundImage: 'radial-gradient(circle at 20% 80%, rgba(16, 185, 129, 0.08) 0%, rgba(9, 13, 26, 0) 50%)',
               color: '#FFFFFF',
@@ -975,7 +977,7 @@ export const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
               justifyContent: 'center'
             }}
           >
-            <div style={{ width: '100%', maxWidth: '1000px', display: 'flex', flexDirection: 'column', gap: '48px' }}>
+            <div style={{ width: '100%', maxWidth: '1000px', display: 'flex', flexDirection: 'column', gap: '32px' }}>
               <div style={{ textAlign: 'center', maxWidth: '600px', margin: '0 auto' }}>
                 <span style={{ fontSize: '11px', fontWeight: 800, color: '#10B981', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
                   Performance Metrics
@@ -985,7 +987,7 @@ export const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
                 </h2>
               </div>
  
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '24px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
                 {impactMetrics.map((metric, i) => (
                   <div
                     key={i}
@@ -993,7 +995,7 @@ export const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
                       backgroundColor: 'rgba(255, 255, 255, 0.02)',
                       border: '1px solid rgba(255, 255, 255, 0.08)',
                       borderRadius: '16px',
-                      padding: '36px 28px',
+                      padding: '24px 22px',
                       textAlign: 'center',
                       display: 'flex',
                       flexDirection: 'column',
@@ -1014,7 +1016,7 @@ export const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
                     }}
                   >
                     <span style={{ color: '#10B981', fontSize: '12px', marginBottom: '2px' }}>✦</span>
-                    <span style={{ fontSize: '44px', fontWeight: 900, color: '#10B981', letterSpacing: '-0.03em', lineHeight: 1 }}>
+                    <span style={{ fontSize: '38px', fontWeight: 900, color: '#10B981', letterSpacing: '-0.03em', lineHeight: 1 }}>
                       {metric.kpi}
                     </span>
                     <span style={{ fontSize: '13.5px', color: '#94A3B8', fontWeight: 550, lineHeight: 1.4 }}>
@@ -1029,7 +1031,7 @@ export const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
           {/* FOOTER BAR (Branding + Tech Badges + CTA) */}
         <div
           style={{
-            padding: '80px 48px',
+            padding: '56px 48px',
             backgroundColor: '#FFFFFF',
             borderTop: '1px solid rgba(0, 0, 0, 0.05)',
             display: 'flex',
@@ -1044,12 +1046,12 @@ export const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
               border: '1px solid #E2E8F0',
               borderLeft: '4px solid #8B5CF6',
               borderRadius: '16px',
-              padding: '56px 48px',
+              padding: '34px 36px',
               boxSizing: 'border-box',
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
-              gap: '40px',
+              gap: '28px',
               flexWrap: 'wrap',
               boxShadow: '0 8px 24px rgba(15, 23, 42, 0.03)'
             }}
@@ -1062,8 +1064,8 @@ export const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  width: '44px',
-                  height: '44px',
+                  width: '40px',
+                  height: '40px',
                   borderRadius: '12px',
                   backgroundColor: 'rgba(139, 92, 246, 0.06)',
                   fontSize: '20px'
@@ -1071,25 +1073,25 @@ export const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
               >
                 ⚙
               </span>
-              <p style={{ margin: 0, fontSize: '16.5px', color: '#475569', lineHeight: 1.7, fontWeight: 500 }}>
+              <p style={{ margin: 0, fontSize: '15.5px', color: '#475569', lineHeight: 1.55, fontWeight: 500 }}>
                 {title} delivers a modern, intuitive, and data-driven experience for both patients and providers.
               </p>
             </div>
 
             {/* Technologies used column */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
               <span style={{ fontSize: '9px', fontWeight: 800, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                 TECHNOLOGIES USED
               </span>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
                 {technologies.map((t) => (
                   <span
                     key={t}
                     style={{
-                      fontSize: '12px',
+                      fontSize: '11.5px',
                       color: '#475569',
                       backgroundColor: '#E2E8F0',
-                      padding: '4px 10px',
+                      padding: '3px 8px',
                       borderRadius: '6px',
                       fontWeight: 600
                     }}
@@ -1107,7 +1109,7 @@ export const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{
-                  padding: '14px 32px',
+                  padding: '12px 26px',
                   borderRadius: '8px',
                   backgroundColor: '#8B5CF6',
                   color: '#FFFFFF',
@@ -1329,9 +1331,177 @@ export const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
         .reveal-trigger.narrative-card {
           transition: opacity 350ms cubic-bezier(0.16, 1, 0.3, 1), transform 350ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 250ms cubic-bezier(0.16, 1, 0.3, 1) !important;
         }
+        .case-story-section {
+          padding: 56px 48px 64px !important;
+          background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%) !important;
+          border-bottom: 1px solid rgba(15, 23, 42, 0.08) !important;
+        }
+        .case-story-container {
+          max-width: 1120px !important;
+          gap: 36px !important;
+          counter-reset: caseStory;
+        }
+        .case-story-heading {
+          max-width: none !important;
+          margin: 0 !important;
+          text-align: left !important;
+          display: flex !important;
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 6px;
+          padding-bottom: 16px;
+          border-bottom: 1px solid rgba(15, 23, 42, 0.12);
+        }
+        .case-story-heading::after {
+          content: '';
+          display: none;
+        }
+        .case-story-heading > span {
+          display: block;
+          margin-bottom: 0 !important;
+          color: #4F46E5 !important;
+          letter-spacing: 0.08em !important;
+        }
+        .case-story-heading h2 {
+          margin: 0 !important;
+          font-size: clamp(30px, 3.4vw, 42px) !important;
+          line-height: 1.08 !important;
+          letter-spacing: 0 !important;
+          max-width: none;
+          white-space: nowrap;
+        }
+        .case-story-problem-solution,
+        .case-story-outcome-grid {
+          position: relative;
+          padding-left: 96px;
+        }
+        .case-story-problem-solution {
+          display: flex !important;
+          flex-direction: column;
+          gap: 0 !important;
+        }
+        .case-story-outcome-grid {
+          display: grid !important;
+          grid-template-columns: minmax(0, 1.45fr) minmax(280px, 0.72fr);
+          gap: 36px !important;
+          margin-top: 0 !important;
+          padding-top: 32px;
+          flex-wrap: nowrap !important;
+          border-top: 1px solid rgba(15, 23, 42, 0.1);
+        }
+        .case-story-problem-solution::before,
+        .case-story-outcome-grid::before {
+          content: '';
+          position: absolute;
+          left: 38px;
+          top: 42px;
+          bottom: 0;
+          width: 1px;
+          background: linear-gradient(180deg, rgba(239, 68, 68, 0.7), rgba(79, 70, 229, 0.62), rgba(16, 185, 129, 0.7));
+        }
+        .case-story-outcome-grid::before {
+          top: 32px;
+          background: linear-gradient(180deg, rgba(14, 165, 233, 0.6), rgba(16, 185, 129, 0.64));
+        }
+        .case-story-section .narrative-card {
+          position: relative;
+          min-width: 0 !important;
+          background: transparent !important;
+          background-color: transparent !important;
+          border: 0 !important;
+          border-radius: 0 !important;
+          box-shadow: none !important;
+          padding: 30px 0 !important;
+          gap: 14px !important;
+          overflow: visible;
+          counter-increment: caseStory;
+        }
+        .case-story-problem-solution .narrative-card:first-child {
+          padding-top: 0 !important;
+        }
+        .case-story-problem-solution .narrative-card + .narrative-card {
+          border-top: 1px solid rgba(15, 23, 42, 0.1) !important;
+        }
+        .case-story-outcome-grid .narrative-card {
+          flex: auto !important;
+          padding-top: 0 !important;
+          padding-bottom: 0 !important;
+        }
+        .case-story-outcome-grid .narrative-card:last-child {
+          border-left: 1px solid rgba(15, 23, 42, 0.14) !important;
+          padding-left: 36px !important;
+        }
+        .case-story-section .narrative-card::before {
+          content: '0' counter(caseStory);
+          position: absolute;
+          left: -96px;
+          top: 34px;
+          width: 76px;
+          color: #0F172A;
+          font-size: 12px;
+          line-height: 1;
+          font-weight: 900;
+          letter-spacing: 0.08em;
+        }
+        .case-story-problem-solution .narrative-card:first-child::before {
+          top: 4px;
+          color: #EF4444;
+        }
+        .case-story-problem-solution .narrative-card:nth-child(2)::before {
+          color: #4F46E5;
+        }
+        .case-story-outcome-grid .narrative-card:first-child::before {
+          top: 4px;
+          color: #0EA5E9;
+        }
+        .case-story-outcome-grid .narrative-card:last-child::before {
+          top: 4px;
+          color: #10B981;
+        }
+        .case-story-section .narrative-card > span,
+        .case-story-section .narrative-card > div:first-child > span {
+          display: none !important;
+        }
+        .case-story-section .narrative-card h3 {
+          margin: 0 !important;
+          color: #0F172A !important;
+          font-size: 28px !important;
+          line-height: 1.12 !important;
+          font-weight: 850 !important;
+          letter-spacing: 0 !important;
+        }
+        .case-story-section .narrative-card p {
+          max-width: 780px;
+          color: #475569 !important;
+          font-size: 16px !important;
+          line-height: 1.82 !important;
+          font-weight: 450 !important;
+        }
+        .case-story-outcome-grid .narrative-card:last-child h3 {
+          font-size: 18px !important;
+        }
+        .case-story-outcome-grid .narrative-card:last-child p {
+          color: #334155 !important;
+          font-size: 15px !important;
+          font-weight: 500 !important;
+        }
+        .case-story-outcome-grid .narrative-card:only-child {
+          grid-column: 1 / -1;
+          border-left: 0 !important;
+          padding-left: 0 !important;
+        }
         .feature-section.reveal-trigger {
           opacity: 1 !important;
           transform: none !important;
+        }
+        .feature-section .feature-image {
+          max-width: 440px;
+          justify-self: center;
+          align-self: center;
+        }
+        .feature-section .feature-image img {
+          max-height: 300px;
+          object-fit: contain !important;
         }
         .feature-section .feature-image,
         .feature-section .feature-text-block > * {
@@ -1401,6 +1571,44 @@ export const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
           outline-offset: 4px !important;
         }
         @media (max-width: 900px) {
+          .case-story-section {
+            padding: 48px 32px 56px !important;
+          }
+          .case-story-container {
+            gap: 32px !important;
+          }
+          .case-story-heading {
+            gap: 6px !important;
+            padding-bottom: 14px;
+          }
+          .case-story-problem-solution,
+          .case-story-outcome-grid {
+            padding-left: 68px;
+          }
+          .case-story-problem-solution::before,
+          .case-story-outcome-grid::before {
+            left: 26px;
+          }
+          .case-story-section .narrative-card::before {
+            left: -68px;
+            width: 48px;
+          }
+          .case-story-outcome-grid {
+            grid-template-columns: 1fr !important;
+            gap: 28px !important;
+          }
+          .case-story-outcome-grid .narrative-card:last-child {
+            border-left: 0 !important;
+            border-top: 1px solid rgba(15, 23, 42, 0.1) !important;
+            padding-left: 0 !important;
+            padding-top: 28px !important;
+          }
+          .feature-section .feature-image {
+            max-width: 520px;
+          }
+          .feature-section .feature-image img {
+            max-height: 280px;
+          }
           .modal-content-grid {
             grid-template-columns: 1fr !important;
             gap: 32px !important;
@@ -1417,6 +1625,39 @@ export const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
             flex-direction: column !important;
             align-items: flex-start !important;
             gap: 20px !important;
+          }
+        }
+        @media (max-width: 640px) {
+          .case-story-section {
+            padding: 40px 24px 48px !important;
+          }
+          .case-story-heading h2 {
+            font-size: clamp(24px, 7vw, 30px) !important;
+            line-height: 1 !important;
+          }
+          .case-story-problem-solution,
+          .case-story-outcome-grid {
+            padding-left: 0;
+          }
+          .case-story-problem-solution::before,
+          .case-story-outcome-grid::before {
+            display: none;
+          }
+          .case-story-section .narrative-card::before {
+            position: static;
+            display: block;
+            width: auto;
+            margin-bottom: 12px;
+          }
+          .case-story-section .narrative-card h3 {
+            font-size: 24px !important;
+          }
+          .case-story-section .narrative-card p {
+            font-size: 15px !important;
+            line-height: 1.78 !important;
+          }
+          .feature-section .feature-image img {
+            max-height: 240px;
           }
         }
       `}} />
