@@ -968,58 +968,61 @@ export const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
         {impactMetrics && impactMetrics.length > 0 && (
           <div
             style={{
-              padding: '56px 48px',
-              backgroundColor: '#090D1A', // Dark mode background for high-end metrics contrast
-              backgroundImage: 'radial-gradient(circle at 20% 80%, rgba(16, 185, 129, 0.08) 0%, rgba(9, 13, 26, 0) 50%)',
+              padding: '40px 48px 44px',
+              backgroundColor: '#090D1A',
+              backgroundImage: 'radial-gradient(circle at 18% 78%, rgba(16, 185, 129, 0.06) 0%, rgba(9, 13, 26, 0) 46%)',
               color: '#FFFFFF',
               borderBottom: '1px solid rgba(255, 255, 255, 0.04)',
               display: 'flex',
               justifyContent: 'center'
             }}
+            className="performance-metrics-section"
           >
-            <div style={{ width: '100%', maxWidth: '1000px', display: 'flex', flexDirection: 'column', gap: '32px' }}>
-              <div style={{ textAlign: 'center', maxWidth: '600px', margin: '0 auto' }}>
-                <span style={{ fontSize: '11px', fontWeight: 800, color: '#10B981', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+            <div style={{ width: '100%', maxWidth: '880px', display: 'flex', flexDirection: 'column', gap: '22px' }}>
+              <div style={{ textAlign: 'center', maxWidth: '560px', margin: '0 auto' }}>
+                <span style={{ fontSize: '10.5px', fontWeight: 800, color: '#10B981', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
                   Performance Metrics
                 </span>
-                <h2 style={{ margin: '8px 0 0 0', fontSize: '32px', fontWeight: 900, color: '#FFFFFF', letterSpacing: '-0.02em' }}>
+                <h2 style={{ margin: '6px 0 0 0', fontSize: '28px', fontWeight: 850, color: '#FFFFFF', letterSpacing: '-0.02em', lineHeight: 1.08 }}>
                   Measurable Business Impact
                 </h2>
               </div>
  
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '10px' }}>
                 {impactMetrics.map((metric, i) => (
                   <div
                     key={i}
                     style={{
-                      backgroundColor: 'rgba(255, 255, 255, 0.02)',
-                      border: '1px solid rgba(255, 255, 255, 0.08)',
-                      borderRadius: '16px',
-                      padding: '24px 22px',
-                      textAlign: 'center',
+                      backgroundColor: 'rgba(255, 255, 255, 0.035)',
+                      border: '1px solid rgba(255, 255, 255, 0.09)',
+                      borderRadius: '12px',
+                      padding: '17px 18px 16px',
+                      textAlign: 'left',
                       display: 'flex',
                       flexDirection: 'column',
-                      alignItems: 'center',
+                      alignItems: 'flex-start',
                       justifyContent: 'center',
-                      gap: '8px',
+                      gap: '6px',
                       boxSizing: 'border-box',
+                      minHeight: '112px',
+                      boxShadow: '0 14px 34px rgba(0, 0, 0, 0.12)',
                       transition: 'all 0.25s ease'
                     }}
                     className="metric-card"
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.transform = 'translateY(-4px)';
-                      e.currentTarget.style.borderColor = 'rgba(16, 185, 129, 0.3)';
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                      e.currentTarget.style.borderColor = 'rgba(16, 185, 129, 0.24)';
                     }}
                     onMouseLeave={(e) => {
                       e.currentTarget.style.transform = 'translateY(0)';
-                      e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+                      e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.09)';
                     }}
                   >
-                    <span style={{ color: '#10B981', fontSize: '12px', marginBottom: '2px' }}>✦</span>
-                    <span style={{ fontSize: '38px', fontWeight: 900, color: '#10B981', letterSpacing: '-0.03em', lineHeight: 1 }}>
+                    <span style={{ width: '22px', height: '2px', borderRadius: '999px', backgroundColor: '#10B981', marginBottom: '4px' }} />
+                    <span style={{ fontSize: '30px', fontWeight: 850, color: '#10B981', letterSpacing: '-0.02em', lineHeight: 1 }}>
                       {metric.kpi}
                     </span>
-                    <span style={{ fontSize: '13.5px', color: '#94A3B8', fontWeight: 550, lineHeight: 1.4 }}>
+                    <span style={{ fontSize: '12.75px', color: '#A8B3C7', fontWeight: 550, lineHeight: 1.35 }}>
                       {metric.label}
                     </span>
                   </div>
@@ -1028,112 +1031,6 @@ export const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
           </div>
         </div>
       )}
-          {/* FOOTER BAR (Branding + Tech Badges + CTA) */}
-        <div
-          style={{
-            padding: '56px 48px',
-            backgroundColor: '#FFFFFF',
-            borderTop: '1px solid rgba(0, 0, 0, 0.05)',
-            display: 'flex',
-            justifyContent: 'center'
-          }}
-        >
-          <div
-            style={{
-              width: '100%',
-              maxWidth: '1000px',
-              backgroundColor: '#F8FAFC',
-              border: '1px solid #E2E8F0',
-              borderLeft: '4px solid #8B5CF6',
-              borderRadius: '16px',
-              padding: '34px 36px',
-              boxSizing: 'border-box',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              gap: '28px',
-              flexWrap: 'wrap',
-              boxShadow: '0 8px 24px rgba(15, 23, 42, 0.03)'
-            }}
-            className="footer-cta-container"
-          >
-            {/* Branding phrase & icon */}
-            <div style={{ flex: 1.2, display: 'flex', alignItems: 'center', gap: '16px' }}>
-              <span
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: '40px',
-                  height: '40px',
-                  borderRadius: '12px',
-                  backgroundColor: 'rgba(139, 92, 246, 0.06)',
-                  fontSize: '20px'
-                }}
-              >
-                ⚙
-              </span>
-              <p style={{ margin: 0, fontSize: '15.5px', color: '#475569', lineHeight: 1.55, fontWeight: 500 }}>
-                {title} delivers a modern, intuitive, and data-driven experience for both patients and providers.
-              </p>
-            </div>
-
-            {/* Technologies used column */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-              <span style={{ fontSize: '9px', fontWeight: 800, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                TECHNOLOGIES USED
-              </span>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
-                {technologies.map((t) => (
-                  <span
-                    key={t}
-                    style={{
-                      fontSize: '11.5px',
-                      color: '#475569',
-                      backgroundColor: '#E2E8F0',
-                      padding: '3px 8px',
-                      borderRadius: '6px',
-                      fontWeight: 600
-                    }}
-                  >
-                    {t}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            {/* Launch live button */}
-            {demoUrl && (
-              <a
-                href={demoUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  padding: '12px 26px',
-                  borderRadius: '8px',
-                  backgroundColor: '#8B5CF6',
-                  color: '#FFFFFF',
-                  fontWeight: 750,
-                  fontSize: '14px',
-                  textDecoration: 'none',
-                  textAlign: 'center',
-                  boxShadow: '0 4px 16px rgba(139, 92, 246, 0.25)',
-                  transition: 'all 0.15s ease'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-2px)';
-                  e.currentTarget.style.backgroundColor = '#7C3AED';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.backgroundColor = '#8B5CF6';
-                }}
-              >
-                View Live Demo ↗
-              </a>
-            )}
-          </div>
-        </div>
 
       </div>
     </div>
@@ -1621,11 +1518,6 @@ export const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
           .hero-laptop-column {
             width: 100% !important;
           }
-          .footer-cta-container {
-            flex-direction: column !important;
-            align-items: flex-start !important;
-            gap: 20px !important;
-          }
         }
         @media (max-width: 640px) {
           .case-story-section {
@@ -1666,3 +1558,4 @@ export const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
 };
 
 export default ProjectDetailsModal;
+
