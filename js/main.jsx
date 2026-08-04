@@ -11,6 +11,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import Avatar from '../src/components/Avatar';
 import { createClient } from '@supabase/supabase-js';
+import { resolveTrafficSource } from './utilities/attribution';
 
 window.supabase = { createClient };
 
@@ -265,6 +266,20 @@ contactForm?.addEventListener("submit", async (event) => {
 
     if (error) {
       throw error;
+    }
+
+    // Telemetry: Upsert visitor profile and save contact submit details
+    if (window.AnalyticsService) {
+      try {
+        await window.AnalyticsService.upsertVisitorProfile({
+          visitor_id: getVisitorId(),
+          full_name: nameVal,
+          email: emailVal,
+          updated_at: new Date().toISOString()
+        });
+      } catch (telemetryErr) {
+        console.warn('[Telemetry] Profile upsert failed:', telemetryErr);
+      }
     }
 
     // Success flow
@@ -1582,7 +1597,7 @@ const loadDynamicProjects = async () => {
 };
 
 // Geolocation caching for resume downloads
-let cachedGeoData = { ip_address: 'Unknown', country: 'Unknown', city: 'Unknown' };
+let cachedGeoData = { ip_address: 'Unknown', country: 'Unknown', country_code: 'Unknown', city: 'Unknown' };
 const prefetchGeoData = async () => {
   try {
     const res = await fetch('https://ipapi.co/json/');
@@ -1591,13 +1606,77 @@ const prefetchGeoData = async () => {
       cachedGeoData = {
         ip_address: data.ip || 'Unknown',
         country: data.country_name || 'Unknown',
+        country_code: data.country_code || 'Unknown',
         city: data.city || 'Unknown'
       };
     }
   } catch (err) {
     console.warn('Geolocation prefetch failed:', err);
+  } finally {
+    initTelemetry();
   }
 };
+
+const initTelemetry = async () => {
+  if (!window.AnalyticsService) return;
+
+  const sessionId = getSessionId();
+  const visitorId = getVisitorId();
+  const device = getDeviceDetails();
+
+  const rawReferrer = document.referrer || '';
+  const attribution = resolveTrafficSource(rawReferrer, window.location.search);
+
+  // 1. Log visitor session
+  await window.AnalyticsService.logSession({
+    id: sessionId,
+    visitor_id: visitorId,
+    ip_address: cachedGeoData.ip_address,
+    country: cachedGeoData.country,
+    country_code: cachedGeoData.country_code,
+    city: cachedGeoData.city,
+    user_agent: device.userAgent,
+    browser: device.browser,
+    operating_system: device.os,
+    device_type: device.deviceType,
+    referrer: rawReferrer,
+    traffic_source: attribution.source,
+    traffic_source_display: attribution.sourceDisplay,
+    traffic_medium: attribution.medium,
+    traffic_campaign: attribution.campaign,
+    traffic_content: attribution.content,
+    traffic_term: attribution.term,
+    referrer_url: attribution.referrer,
+    attribution_type: attribution.attributionType
+  });
+
+  // 2. Log Page View (homepage)
+  await window.AnalyticsService.logPageView({
+    session_id: sessionId,
+    page_path: window.location.pathname || '/',
+    page_title: document.title || 'Ashok Vangapandu | Portfolio'
+  });
+
+  // 3. Start heartbeat ping loop
+  const startSeconds = Date.now();
+  setInterval(async () => {
+    const elapsed = Math.floor((Date.now() - startSeconds) / 1000);
+    await window.AnalyticsService.pingSession(sessionId, elapsed);
+  }, 15000);
+
+  // 4. Track social link clicks
+  document.querySelectorAll('[data-social-key]').forEach(link => {
+    link.addEventListener('click', async () => {
+      const platform = link.getAttribute('data-social-key') || 'unknown';
+      await window.AnalyticsService.logCustomEvent({
+        session_id: sessionId,
+        event_type: 'social_click',
+        event_metadata: { platform, url: link.getAttribute('href') || '' }
+      });
+    });
+  });
+};
+
 prefetchGeoData();
 
 // Helper for UUID / random ID generation
