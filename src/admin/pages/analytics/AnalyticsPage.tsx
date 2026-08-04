@@ -42,6 +42,7 @@ export const AnalyticsPage: React.FC = () => {
     operatingSystems,
     visitorComparison,
     peakHours,
+    error,
     refresh
   } = useAnalytics();
 
@@ -101,8 +102,11 @@ export const AnalyticsPage: React.FC = () => {
               visitorComparison={visitorComparison}
               peakHours={peakHours}
               loading={loading}
+              error={error}
+              timeRange={timeRange}
               trendMode={trendMode}
               setTrendMode={setTrendMode}
+              onRetry={refresh}
             />
           )}
         </div>

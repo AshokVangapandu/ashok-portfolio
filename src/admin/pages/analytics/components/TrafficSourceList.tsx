@@ -1,15 +1,18 @@
-/* src/admin/pages/analytics/components/TrafficSourceList.tsx */
 import React from 'react';
 import { AnalyticsSource } from '../../../types/analytics';
 
 interface TrafficSourceListProps {
   sources: AnalyticsSource[];
   loading?: boolean;
+  error?: boolean;
+  onRetry?: () => void;
 }
 
 export const TrafficSourceList: React.FC<TrafficSourceListProps> = ({
   sources,
   loading = false,
+  error = false,
+  onRetry,
 }) => {
   const getIcon = (type: AnalyticsSource['type']) => {
     switch (type) {
@@ -42,15 +45,28 @@ export const TrafficSourceList: React.FC<TrafficSourceListProps> = ({
           </svg>
         );
       default:
+        // Generic external link/referral icon for other sources
         return (
           <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="12" cy="12" r="1" />
-            <circle cx="19" cy="12" r="1" />
-            <circle cx="5" cy="12" r="1" />
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+            <polyline points="15 3 21 3 21 9" />
+            <line x1="10" y1="14" x2="21" y2="3" />
           </svg>
         );
     }
   };
+
+  // Filter out development environment traffic
+  const filteredSources = (sources || [])
+    .filter((src) => {
+      const sourceKey = src.source ? src.source.toLowerCase() : '';
+      return sourceKey !== 'localhost' && sourceKey !== '127.0.0.1';
+    })
+    .slice(0, 5)
+    .map((src, idx) => ({
+      ...src,
+      rank: idx + 1
+    }));
 
   return (
     <div
@@ -72,72 +88,123 @@ export const TrafficSourceList: React.FC<TrafficSourceListProps> = ({
         📈 Traffic Sources
       </h3>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', flex: 1 }}>
-        {loading ? (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', flex: 1, justifyContent: 'center' }}>
+        {error ? (
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '12px', minHeight: '180px' }}>
+            <span style={{ fontSize: '13px', color: '#EF4444', fontWeight: 550 }}>
+              Failed to load traffic sources.
+            </span>
+            {onRetry && (
+              <button
+                onClick={onRetry}
+                style={{
+                  padding: '6px 14px',
+                  borderRadius: '6px',
+                  border: '1px solid #EF4444',
+                  backgroundColor: 'transparent',
+                  color: '#EF4444',
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease'
+                }}
+              >
+                Retry
+              </button>
+            )}
+          </div>
+        ) : loading ? (
           Array.from({ length: 5 }).map((_, idx) => (
             <div key={idx} className="skeleton-cell" style={{ height: '36px', borderRadius: '6px' }} />
           ))
+        ) : filteredSources.length === 0 ? (
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '180px', gap: '8px' }}>
+            <span style={{ fontSize: '13px', color: 'var(--admin-text-secondary)', fontWeight: 550 }}>
+              No traffic sources recorded yet.
+            </span>
+          </div>
         ) : (
-          sources.map((src) => (
+          filteredSources.map((src) => (
             <div
               key={src.source}
               style={{
                 display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
+                flexDirection: 'column',
+                gap: '8px',
                 padding: '10px 14px',
                 backgroundColor: 'rgba(248, 250, 252, 0.7)',
                 borderRadius: '8px',
                 border: '1px solid var(--admin-border)'
               }}
             >
-              {/* Left segment ranking & source label */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                <span
-                  style={{
-                    fontSize: '13px',
-                    fontWeight: 700,
-                    color: 'var(--admin-text-secondary)',
-                    width: '24px'
-                  }}
-                >
-                  #{src.rank}
-                </span>
+              {/* Top row text segments */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                  <span
+                    style={{
+                      fontSize: '13px',
+                      fontWeight: 700,
+                      color: 'var(--admin-text-secondary)',
+                      width: '24px'
+                    }}
+                  >
+                    #{src.rank}
+                  </span>
 
-                <div
-                  style={{
-                    width: '28px',
-                    height: '28px',
-                    borderRadius: '50%',
-                    backgroundColor: 'rgba(124, 58, 237, 0.08)',
-                    color: 'var(--admin-primary)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0
-                  }}
-                >
-                  {getIcon(src.type)}
+                  <div
+                    style={{
+                      width: '28px',
+                      height: '28px',
+                      borderRadius: '50%',
+                      backgroundColor: 'rgba(124, 58, 237, 0.08)',
+                      color: 'var(--admin-primary)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0
+                    }}
+                  >
+                    {getIcon(src.type)}
+                  </div>
+
+                  <span style={{ fontSize: '13.5px', fontWeight: 700, color: 'var(--admin-text)' }}>
+                    {src.source}
+                  </span>
                 </div>
 
-                <span style={{ fontSize: '13.5px', fontWeight: 700, color: 'var(--admin-text)' }}>
-                  {src.source}
+                <span
+                  style={{
+                    fontSize: '12px',
+                    fontWeight: 700,
+                    color: 'var(--admin-primary)',
+                    backgroundColor: 'rgba(124, 58, 237, 0.06)',
+                    padding: '4px 10px',
+                    borderRadius: '12px'
+                  }}
+                >
+                  {src.percentage}%
                 </span>
               </div>
 
-              {/* Right segment percentage pill */}
-              <span
+              {/* Progress bar line */}
+              <div
                 style={{
-                  fontSize: '12px',
-                  fontWeight: 700,
-                  color: 'var(--admin-primary)',
-                  backgroundColor: 'rgba(124, 58, 237, 0.06)',
-                  padding: '4px 10px',
-                  borderRadius: '12px'
+                  height: '6px',
+                  width: '100%',
+                  backgroundColor: '#E2E8F0',
+                  borderRadius: '3px',
+                  overflow: 'hidden'
                 }}
               >
-                {src.percentage}%
-              </span>
+                <div
+                  style={{
+                    height: '100%',
+                    width: `${src.percentage}%`,
+                    backgroundColor: 'var(--admin-primary)',
+                    borderRadius: '3px'
+                  }}
+                />
+              </div>
             </div>
           ))
         )}

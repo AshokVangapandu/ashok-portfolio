@@ -26,6 +26,7 @@ export interface AnalyticsActivity {
   title: string;
   subtitle: string;
   time: string;
+  event_time?: string;
 }
 
 export interface AnalyticsLocation {
@@ -33,6 +34,8 @@ export interface AnalyticsLocation {
   count: number;
   percentage: number;
   code: string;
+  countryCode?: string;
+  cities?: string[];
 }
 
 export interface AnalyticsSource {

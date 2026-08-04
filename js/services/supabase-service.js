@@ -152,6 +152,22 @@
         designation: testimonial.designation || null,
         company: testimonial.company || null
       };
+
+      // Telemetry: Upsert visitor profile if visitor_id is present locally
+      const visitorId = typeof localStorage !== 'undefined' ? localStorage.getItem('visitor_id') : null;
+      if (visitorId) {
+        supabase
+          .from('visitor_profiles')
+          .upsert({
+            visitor_id: visitorId,
+            full_name: dbTestimonial.full_name,
+            email: dbTestimonial.email,
+            avatar_url: dbTestimonial.avatar_url,
+            updated_at: new Date().toISOString()
+          }, { onConflict: 'visitor_id' })
+          .then(() => {});
+      }
+
       return await supabase
         .from('testimonials')
         .insert([dbTestimonial]);
@@ -175,6 +191,22 @@
         designation: testimonial.designation || null,
         company: testimonial.company || null
       };
+
+      // Telemetry: Upsert visitor profile if visitor_id is present locally
+      const visitorId = typeof localStorage !== 'undefined' ? localStorage.getItem('visitor_id') : null;
+      if (visitorId) {
+        supabase
+          .from('visitor_profiles')
+          .upsert({
+            visitor_id: visitorId,
+            full_name: dbTestimonial.full_name,
+            email: dbTestimonial.email,
+            avatar_url: dbTestimonial.avatar_url,
+            updated_at: new Date().toISOString()
+          }, { onConflict: 'visitor_id' })
+          .then(() => {});
+      }
+
       return await supabase
         .from('testimonials')
         .insert([dbTestimonial]);
@@ -622,6 +654,91 @@
     }
   };
 
+  /**
+   * AnalyticsService
+   * Handles public telemetry events tracking.
+   */
+  const AnalyticsService = {
+    async logSession(sessionData) {
+      initSupabase();
+      if (!supabase) return false;
+      try {
+        const { error } = await supabase
+          .from('visitor_sessions')
+          .insert([sessionData]);
+        if (error) throw error;
+        return true;
+      } catch (err) {
+        console.warn('Analytics: Failed to log session:', err);
+        return false;
+      }
+    },
+
+    async pingSession(sessionId, durationSeconds) {
+      initSupabase();
+      if (!supabase) return false;
+      try {
+        const { error } = await supabase
+          .from('visitor_sessions')
+          .update({
+            duration_seconds: durationSeconds,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', sessionId);
+        if (error) throw error;
+        return true;
+      } catch (err) {
+        console.warn('Analytics: Failed to ping session:', err);
+        return false;
+      }
+    },
+
+    async logPageView(viewData) {
+      initSupabase();
+      if (!supabase) return false;
+      try {
+        const { error } = await supabase
+          .from('page_views')
+          .insert([viewData]);
+        if (error) throw error;
+        return true;
+      } catch (err) {
+        console.warn('Analytics: Failed to log page view:', err);
+        return false;
+      }
+    },
+
+    async logCustomEvent(eventData) {
+      initSupabase();
+      if (!supabase) return false;
+      try {
+        const { error } = await supabase
+          .from('analytics_events')
+          .insert([eventData]);
+        if (error) throw error;
+        return true;
+      } catch (err) {
+        console.warn('Analytics: Failed to log custom event:', err);
+        return false;
+      }
+    },
+
+    async upsertVisitorProfile(profileData) {
+      initSupabase();
+      if (!supabase) return false;
+      try {
+        const { error } = await supabase
+          .from('visitor_profiles')
+          .upsert(profileData, { onConflict: 'visitor_id' });
+        if (error) throw error;
+        return true;
+      } catch (err) {
+        console.warn('Analytics: Failed to upsert visitor profile:', err);
+        return false;
+      }
+    }
+  };
+
   // Expose services to window scope
   window.AuthService = AuthService;
   window.TestimonialService = TestimonialService;
@@ -634,5 +751,6 @@
   window.PrivateAccessService = PrivateAccessService;
   window.AccessRequestService = AccessRequestService;
   window.SocialLinksService = SocialLinksService;
+  window.AnalyticsService = AnalyticsService;
   window.supabaseInstance = supabase;
 })();

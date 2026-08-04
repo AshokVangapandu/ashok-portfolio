@@ -44,6 +44,16 @@ export const ProjectsShowcasePage: React.FC = () => {
         const found = projects.find(p => p.id === projId);
         if (found) {
           setSelectedProject(found);
+          if ((window as any).AnalyticsService) {
+            (window as any).AnalyticsService.logCustomEvent({
+              session_id: sessionStorage.getItem('session_id') || 'unknown',
+              event_type: 'project_view',
+              event_metadata: {
+                project_id: found.id,
+                project_title: found.title
+              }
+            });
+          }
         } else {
           setSelectedProject(null);
         }

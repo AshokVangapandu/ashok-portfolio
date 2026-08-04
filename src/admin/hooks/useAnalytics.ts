@@ -17,7 +17,8 @@ import {
 
 export const useAnalytics = () => {
   const [loading, setLoading] = useState<boolean>(false);
-  const [timeRange, setTimeRange] = useState<'today' | '7days' | '30days' | '90days'>('30days');
+  const [error, setError] = useState<boolean>(false);
+  const [timeRange, setTimeRange] = useState<'today' | '7days' | '30days' | '90days'>('7days');
   const [trendMode, setTrendMode] = useState<'daily' | 'weekly' | 'monthly'>('daily');
 
   // Remember view mode during navigation using localStorage
@@ -52,6 +53,7 @@ export const useAnalytics = () => {
 
   const fetchAnalytics = useCallback(async () => {
     setLoading(true);
+    setError(false);
     try {
       const [
         sumData,
@@ -66,17 +68,17 @@ export const useAnalytics = () => {
         peakData,
         visitorData
       ] = await Promise.all([
-        analyticsService.getSummary(),
-        analyticsService.getTrends(trendMode),
-        analyticsService.getActivities(),
-        analyticsService.getLocations(),
-        analyticsService.getSources(),
-        analyticsService.getDevices(),
-        analyticsService.getBrowsers(),
-        analyticsService.getOS(),
-        analyticsService.getVisitorComparison(),
-        analyticsService.getPeakHours(),
-        analyticsService.getVisitors({ search, page, pageSize })
+        analyticsService.getSummary(timeRange),
+        analyticsService.getTrends(timeRange, trendMode),
+        analyticsService.getActivities(timeRange),
+        analyticsService.getLocations(timeRange),
+        analyticsService.getSources(timeRange),
+        analyticsService.getDevices(timeRange),
+        analyticsService.getBrowsers(timeRange),
+        analyticsService.getOS(timeRange),
+        analyticsService.getVisitorComparison(timeRange),
+        analyticsService.getPeakHours(timeRange),
+        analyticsService.getVisitors({ search, page, pageSize, timeRange })
       ]);
 
       setSummary(sumData);
@@ -93,10 +95,11 @@ export const useAnalytics = () => {
       setTotalVisitorsCount(visitorData.totalCount);
     } catch (err) {
       console.error('[useAnalytics] Fetch error:', err);
+      setError(true);
     } finally {
       setLoading(false);
     }
-  }, [trendMode, search, page, pageSize]);
+  }, [timeRange, trendMode, search, page, pageSize]);
 
   useEffect(() => {
     fetchAnalytics();
@@ -132,6 +135,7 @@ export const useAnalytics = () => {
     operatingSystems,
     visitorComparison,
     peakHours,
+    error,
     
     refresh: fetchAnalytics
   };
