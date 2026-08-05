@@ -1,11 +1,36 @@
 /* src/admin/pages/analytics/components/VisitorDetailsModal.tsx */
 import React, { useEffect } from 'react';
-import { AnalyticsVisitor } from '../../../types/analytics';
+import { VisitorSession } from '../../../types/analytics';
 
 interface VisitorDetailsModalProps {
-  visitor: AnalyticsVisitor | null;
+  visitor: VisitorSession | null;
   onClose: () => void;
 }
+
+const formatDuration = (sec: number) => {
+  const durationMin = Math.floor(sec / 60);
+  const durationRemSec = sec % 60;
+  return durationMin > 0 ? `${durationMin}m ${durationRemSec}s` : `${durationRemSec}s`;
+};
+
+const formatTimeAgo = (dateInput: string | Date | null): string => {
+  if (!dateInput) return 'Unknown';
+  const date = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
+  if (isNaN(date.getTime())) return 'Unknown';
+  
+  const now = new Date();
+  const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+  if (seconds < 60) return 'Just now';
+  
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m ago`;
+  
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  
+  const days = Math.floor(hours / 24);
+  return `${days}d ago`;
+};
 
 export const VisitorDetailsModal: React.FC<VisitorDetailsModalProps> = ({
   visitor,
@@ -23,7 +48,7 @@ export const VisitorDetailsModal: React.FC<VisitorDetailsModalProps> = ({
   if (!visitor) return null;
 
   // Formatting date and time
-  const rawDateTime = visitor.dateTime.replace('\n', ' at ');
+  const rawDateTime = visitor.visitedAt.replace('\n', ' at ');
 
   const defaultAvatar = (
     <div
@@ -155,10 +180,10 @@ export const VisitorDetailsModal: React.FC<VisitorDetailsModalProps> = ({
               boxSizing: 'border-box'
             }}
           >
-            {visitor.isKnown && visitor.avatarUrl ? (
+            {visitor.isKnownVisitor && visitor.avatarUrl ? (
               <img
                 src={visitor.avatarUrl}
-                alt={visitor.visitorName}
+                alt={visitor.visitorName || 'Visitor'}
                 style={{
                   width: '64px',
                   height: '64px',
@@ -174,9 +199,9 @@ export const VisitorDetailsModal: React.FC<VisitorDetailsModalProps> = ({
 
             <div style={{ marginLeft: '24px', display: 'flex', flexDirection: 'column', gap: '3px' }}>
               <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: 'var(--admin-text)' }}>
-                {visitor.visitorName}
+                {visitor.visitorName || 'Anonymous Visitor'}
               </h3>
-              {visitor.isKnown && visitor.visitorEmail && (
+              {visitor.isKnownVisitor && visitor.visitorEmail && (
                 <a
                   href={`mailto:${visitor.visitorEmail}`}
                   style={{
@@ -190,7 +215,7 @@ export const VisitorDetailsModal: React.FC<VisitorDetailsModalProps> = ({
                 </a>
               )}
               <span style={{ fontSize: '13px', color: 'var(--admin-text-secondary)', fontWeight: 500 }}>
-                {visitor.country} <span style={{ opacity: 0.5, margin: '0 4px' }}>•</span> {visitor.city}
+                {visitor.country || 'Unknown'} <span style={{ opacity: 0.5, margin: '0 4px' }}>•</span> {visitor.city || 'Unknown'}
               </span>
             </div>
           </div>
@@ -224,7 +249,7 @@ export const VisitorDetailsModal: React.FC<VisitorDetailsModalProps> = ({
                 <div>
                   <span style={{ fontSize: '11px', color: 'var(--admin-text-secondary)', fontWeight: 500 }}>Downloaded From</span>
                   <div style={{ fontSize: '13.5px', fontWeight: 600, color: 'var(--admin-text)', marginTop: '2px' }}>
-                    {visitor.pageViewed}
+                    {visitor.landingPage}
                   </div>
                 </div>
 
@@ -238,7 +263,14 @@ export const VisitorDetailsModal: React.FC<VisitorDetailsModalProps> = ({
                 <div>
                   <span style={{ fontSize: '11px', color: 'var(--admin-text-secondary)', fontWeight: 500 }}>Session Duration</span>
                   <div style={{ fontSize: '13.5px', fontWeight: 600, color: 'var(--admin-text)', marginTop: '2px' }}>
-                    {visitor.duration}
+                    {formatDuration(visitor.sessionDuration)}
+                  </div>
+                </div>
+
+                <div>
+                  <span style={{ fontSize: '11px', color: 'var(--admin-text-secondary)', fontWeight: 500 }}>Last Activity</span>
+                  <div style={{ fontSize: '13.5px', fontWeight: 600, color: 'var(--admin-primary)', marginTop: '2px' }}>
+                    {formatTimeAgo(visitor.lastActivity)}
                   </div>
                 </div>
               </div>
@@ -278,7 +310,7 @@ export const VisitorDetailsModal: React.FC<VisitorDetailsModalProps> = ({
                 <div>
                   <span style={{ fontSize: '11px', color: 'var(--admin-text-secondary)', fontWeight: 500 }}>Operating System</span>
                   <div style={{ fontSize: '13.5px', fontWeight: 600, color: 'var(--admin-text)', marginTop: '2px' }}>
-                    {visitor.os}
+                    {visitor.os || 'Unknown'}
                   </div>
                 </div>
               </div>

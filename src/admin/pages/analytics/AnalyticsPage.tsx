@@ -7,10 +7,10 @@ import { AnalyticsListView } from './components/AnalyticsListView';
 import { AnalyticsGridView } from './components/AnalyticsGridView';
 import { VisitorDetailsModal } from './components/VisitorDetailsModal';
 import { AnalyticsSkeleton } from './components/AnalyticsSkeleton';
-import { AnalyticsVisitor } from '../../types/analytics';
+import { VisitorSession } from '../../types/analytics';
 
 export const AnalyticsPage: React.FC = () => {
-  const [selectedVisitor, setSelectedVisitor] = useState<AnalyticsVisitor | null>(null);
+  const [selectedVisitor, setSelectedVisitor] = useState<VisitorSession | null>(null);
 
   const {
     loading,
@@ -28,7 +28,7 @@ export const AnalyticsPage: React.FC = () => {
     setPage,
     pageSize,
     setPageSize,
-    visitors,
+    visitorSessions,
     totalVisitorsCount,
     
     // Data states
@@ -78,7 +78,7 @@ export const AnalyticsPage: React.FC = () => {
         >
           {viewMode === 'list' ? (
             <AnalyticsListView
-              visitors={visitors}
+              visitorSessions={visitorSessions}
               totalCount={totalVisitorsCount}
               search={search}
               setSearch={setSearch}

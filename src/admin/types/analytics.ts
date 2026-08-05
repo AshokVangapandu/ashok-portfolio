@@ -89,3 +89,21 @@ export interface AnalyticsVisitor {
   os: string;
   status: 'Known Visitor' | 'Anonymous';
 }
+
+export interface VisitorSession {
+  id: string;
+  visitedAt: string; // "Jan 15, 2024\n10:42 AM"
+  visitorName: string | null;
+  visitorEmail: string | null;
+  avatarUrl?: string | null;
+  country: string | null;
+  city: string | null;
+  device: string;
+  browser: string;
+  os?: string; // Add optional fields to map easily if needed
+  source: string;
+  landingPage: string;
+  sessionDuration: number; // Duration in seconds
+  isKnownVisitor: boolean;
+  lastActivity: string; // ISO timestamp string or formatted date
+}

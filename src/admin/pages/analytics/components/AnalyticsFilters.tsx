@@ -108,6 +108,32 @@ export const AnalyticsFilters: React.FC<AnalyticsFiltersProps> = ({
         }}
       >
         <button
+          onClick={() => setViewMode('grid')}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px',
+            padding: '6px 12px',
+            border: 'none',
+            borderRadius: '6px',
+            backgroundColor: viewMode === 'grid' ? 'var(--admin-primary)' : 'transparent',
+            color: viewMode === 'grid' ? '#FFFFFF' : 'var(--admin-text-secondary)',
+            fontSize: '12.5px',
+            fontWeight: 600,
+            cursor: 'pointer',
+            transition: 'all 0.15s ease'
+          }}
+        >
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="3" y="3" width="7" height="7" />
+            <rect x="14" y="3" width="7" height="7" />
+            <rect x="14" y="14" width="7" height="7" />
+            <rect x="3" y="14" width="7" height="7" />
+          </svg>
+          <span>Grid View</span>
+        </button>
+
+        <button
           onClick={() => setViewMode('list')}
           style={{
             display: 'inline-flex',
@@ -133,32 +159,6 @@ export const AnalyticsFilters: React.FC<AnalyticsFiltersProps> = ({
             <line x1="3" y1="18" x2="3.01" y2="18" />
           </svg>
           <span>List View</span>
-        </button>
-
-        <button
-          onClick={() => setViewMode('grid')}
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '6px',
-            padding: '6px 12px',
-            border: 'none',
-            borderRadius: '6px',
-            backgroundColor: viewMode === 'grid' ? 'var(--admin-primary)' : 'transparent',
-            color: viewMode === 'grid' ? '#FFFFFF' : 'var(--admin-text-secondary)',
-            fontSize: '12.5px',
-            fontWeight: 600,
-            cursor: 'pointer',
-            transition: 'all 0.15s ease'
-          }}
-        >
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="3" y="3" width="7" height="7" />
-            <rect x="14" y="3" width="7" height="7" />
-            <rect x="14" y="14" width="7" height="7" />
-            <rect x="3" y="14" width="7" height="7" />
-          </svg>
-          <span>Grid</span>
         </button>
       </div>
     </div>

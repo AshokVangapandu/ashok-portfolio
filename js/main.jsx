@@ -1096,6 +1096,9 @@ const initWallOfLoveCarousel = () => {
   const getPointerX = (event) => event.clientX ?? event.touches?.[0]?.clientX ?? 0;
 
   const startDrag = (event) => {
+    if (event.target.closest("a, button, input, select, textarea")) {
+      return;
+    }
     if (slideTween) {
       slideTween.kill();
       slideTween = null;
@@ -1267,17 +1270,17 @@ const renderTestimonials = (testimonials = []) => {
     `;
   }).join("");
 
-  // Setup click listeners for Read Full Review buttons
+  // Setup click listeners for Read Full Review buttons using event delegation
   const setupReadMoreListeners = () => {
-    const btns = track.querySelectorAll(".read-more-btn");
-    btns.forEach(btn => {
-      btn.addEventListener("click", () => {
+    track.addEventListener("click", (event) => {
+      const btn = event.target.closest(".read-more-btn");
+      if (btn) {
         const id = btn.getAttribute("data-testimonial-id");
         const idx = dynamicTestimonials.findIndex(item => item.id === id);
         if (idx !== -1) {
           enterReadingMode(idx);
         }
-      });
+      }
     });
   };
 

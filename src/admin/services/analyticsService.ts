@@ -15,7 +15,7 @@ import {
   MOCK_PEAK_HOURS,
   MOCK_ANALYTICS_VISITORS
 } from './analytics.mock';
-import { AnalyticsVisitor } from '../types/analytics';
+import { AnalyticsVisitor, VisitorSession } from '../types/analytics';
 
 export interface VisitorQueryOptions {
   search?: string;
@@ -225,29 +225,98 @@ export const analyticsService = {
         totalCount: count || mappedList.length
       };
     } catch (err) {
-      console.warn('[analyticsService.getVisitors] Failed, returning mock data:', err);
-      // Fallback: search and filter mock data
-      let list = [...MOCK_ANALYTICS_VISITORS];
-      if (options.search) {
-        const q = options.search.toLowerCase().trim();
-        list = list.filter(
-          (v) =>
-            v.visitorName.toLowerCase().includes(q) ||
-            (v.visitorEmail && v.visitorEmail.toLowerCase().includes(q)) ||
-            v.country.toLowerCase().includes(q) ||
-            v.city.toLowerCase().includes(q) ||
-            v.source.toLowerCase().includes(q) ||
-            v.pageViewed.toLowerCase().includes(q)
-        );
+      console.warn('[analyticsService.getVisitors] Failed, returning empty dataset:', err);
+      return {
+        data: [],
+        totalCount: 0
+      };
+    }
+  },
+
+  async getVisitorSessions(options: VisitorQueryOptions): Promise<{ data: VisitorSession[]; totalCount: number }> {
+    try {
+      let query = (supabase as any)
+        .from('visitor_sessions')
+        .select('*, visitor_profiles(full_name, email, avatar_url), page_views(page_path, page_title)', { count: 'exact' });
+
+      // Apply range filter bounds
+      if (options.timeRange) {
+        const startBound = getTimerangeStart(options.timeRange);
+        query = query.gte('created_at', startBound.toISOString());
       }
+
+      // Range Pagination limits
       const page = options.page || 1;
       const pageSize = options.pageSize || 10;
-      const startIdx = (page - 1) * pageSize;
-      const sliced = list.slice(startIdx, startIdx + pageSize);
+      const start = (page - 1) * pageSize;
+      const end = start + pageSize - 1;
+
+      query = query.range(start, end).order('created_at', { ascending: false });
+
+      const { data, count, error } = await query;
+      if (error) throw error;
+
+      let mappedList = (data || []).map((v: any): VisitorSession => {
+        const isKnown = !!v.visitor_profiles;
+        const profile = v.visitor_profiles || {};
+        const pViews = v.page_views || [];
+        const lastView = pViews[0] || {};
+
+        // Format dates into target string
+        const d = new Date(v.created_at);
+        const formattedDate = d.toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric'
+        });
+        const formattedTime = d.toLocaleTimeString('en-US', {
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: true
+        });
+
+        return {
+          id: v.id,
+          visitedAt: `${formattedDate}\n${formattedTime}`,
+          visitorName: profile.full_name || `Visitor (${v.visitor_id.substring(0, 6)})`,
+          visitorEmail: profile.email || null,
+          avatarUrl: profile.avatar_url || null,
+          country: v.country || 'Unknown',
+          city: v.city || 'Unknown',
+          device: v.device_type === 'Mobile' || v.device_type === 'Tablet' ? v.device_type : 'Desktop',
+          browser: v.browser || 'Unknown',
+          os: v.operating_system || 'Unknown',
+          source: v.traffic_source || 'Direct',
+          landingPage: lastView.page_title || lastView.page_path || 'Home Page',
+          sessionDuration: Number(v.duration_seconds) || 0,
+          isKnownVisitor: isKnown,
+          lastActivity: v.updated_at
+        };
+      });
+
+      // Filter local search on name, email, country, city, source, landingPage
+      if (options.search) {
+        const q = options.search.toLowerCase().trim();
+        mappedList = mappedList.filter(
+          (v: VisitorSession) =>
+            (v.visitorName && v.visitorName.toLowerCase().includes(q)) ||
+            (v.visitorEmail && v.visitorEmail.toLowerCase().includes(q)) ||
+            (v.country && v.country.toLowerCase().includes(q)) ||
+            (v.city && v.city.toLowerCase().includes(q)) ||
+            v.source.toLowerCase().includes(q) ||
+            v.landingPage.toLowerCase().includes(q)
+        );
+      }
 
       return {
-        data: sliced,
-        totalCount: list.length
+        data: mappedList,
+        totalCount: count || mappedList.length
+      };
+    } catch (err) {
+      console.warn('[analyticsService.getVisitorSessions] Failed, returning empty dataset:', err);
+      return {
+        data: [],
+        totalCount: 0
       };
     }
   }

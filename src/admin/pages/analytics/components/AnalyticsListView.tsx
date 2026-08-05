@@ -1,10 +1,10 @@
 /* src/admin/pages/analytics/components/AnalyticsListView.tsx */
 import React from 'react';
-import { AnalyticsVisitor } from '../../../types/analytics';
+import { VisitorSession } from '../../../types/analytics';
 import { DownloadStatusBadge } from '../../resume/components/DownloadStatusBadge';
 
 interface AnalyticsListViewProps {
-  visitors: AnalyticsVisitor[];
+  visitorSessions: VisitorSession[];
   totalCount: number;
   search: string;
   setSearch: (val: string) => void;
@@ -13,11 +13,72 @@ interface AnalyticsListViewProps {
   pageSize: number;
   setPageSize: (val: number) => void;
   onRefresh?: () => void;
-  onViewDetails?: (v: AnalyticsVisitor) => void;
+  onViewDetails?: (v: VisitorSession) => void;
 }
 
+const formatDuration = (sec: number) => {
+  const durationMin = Math.floor(sec / 60);
+  const durationRemSec = sec % 60;
+  return durationMin > 0 ? `${durationMin}m ${durationRemSec}s` : `${durationRemSec}s`;
+};
+
+const getCountryFlag = (countryNameOrCode: string | null): string => {
+  if (!countryNameOrCode) return '🏳️';
+  const name = countryNameOrCode.toLowerCase().trim();
+  if (name === 'india' || name === 'in') return '🇮🇳';
+  if (name === 'united states' || name === 'us' || name === 'usa') return '🇺🇸';
+  if (name === 'germany' || name === 'de') return '🇩🇪';
+  if (name === 'united kingdom' || name === 'uk' || name === 'gb') return '🇬🇧';
+  if (name === 'canada' || name === 'ca') return '🇨🇦';
+  if (name === 'singapore' || name === 'sg') return '🇸🇬';
+  if (name === 'south korea' || name === 'kr') return '🇰🇷';
+  if (name === 'spain' || name === 'es') return '🇪🇸';
+  if (name === 'denmark' || name === 'dk') return '🇩🇰';
+  if (name === 'australia' || name === 'au') return '🇦🇺';
+  if (name === 'france' || name === 'fr') return '🇫🇷';
+  if (name === 'japan' || name === 'jp') return '🇯🇵';
+  
+  if (countryNameOrCode.length === 2) {
+    const codePoints = countryNameOrCode
+      .toUpperCase()
+      .split('')
+      .map(char => 127397 + char.charCodeAt(0));
+    try {
+      return String.fromCodePoint(...codePoints);
+    } catch (e) {
+      return '🏳️';
+    }
+  }
+  return '🏳️';
+};
+
+const formatCountry = (country: string | null): string => {
+  if (!country || country === 'Unknown') return '🏳️ Unknown';
+  const flag = getCountryFlag(country);
+  return `${flag} ${country}`;
+};
+
+const formatTimeAgo = (dateInput: string | Date | null): string => {
+  if (!dateInput) return 'Unknown';
+  const date = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
+  if (isNaN(date.getTime())) return 'Unknown';
+  
+  const now = new Date();
+  const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+  if (seconds < 60) return 'Just now';
+  
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m ago`;
+  
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  
+  const days = Math.floor(hours / 24);
+  return `${days}d ago`;
+};
+
 export const AnalyticsListView: React.FC<AnalyticsListViewProps> = ({
-  visitors,
+  visitorSessions,
   totalCount,
   search,
   setSearch,
@@ -51,8 +112,8 @@ export const AnalyticsListView: React.FC<AnalyticsListViewProps> = ({
     </div>
   );
 
-  const showingStart = 1;
-  const showingEnd = Math.min(visitors.length, pageSize);
+  const showingStart = visitorSessions.length > 0 ? (page - 1) * pageSize + 1 : 0;
+  const showingEnd = visitorSessions.length > 0 ? (page - 1) * pageSize + visitorSessions.length : 0;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -197,107 +258,163 @@ export const AnalyticsListView: React.FC<AnalyticsListViewProps> = ({
             </tr>
           </thead>
           <tbody>
-            {visitors.map((v) => {
-              const formattedDate = v.dateTime.split('\n');
-              return (
-                <tr
-                  key={v.id}
-                  style={{ borderBottom: '1px solid var(--admin-border)', transition: 'background-color 0.15s ease' }}
-                  onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'rgba(248, 250, 252, 0.6)'}
-                  onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+            {visitorSessions.length === 0 ? (
+              <tr>
+                <td
+                  colSpan={9}
+                  style={{
+                    padding: '48px 24px',
+                    textAlign: 'center',
+                    color: 'var(--admin-text-secondary)',
+                    fontFamily: "'Inter', sans-serif"
+                  }}
                 >
-                  {/* Date & Time */}
-                  <td style={{ padding: '16px var(--admin-space-4)' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column' }}>
-                      <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--admin-text)' }}>{formattedDate[0]}</span>
-                      <span style={{ fontSize: '11px', color: 'var(--admin-text-secondary)', fontWeight: 500 }}>{formattedDate[1]}</span>
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '12px'
+                    }}
+                  >
+                    <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--admin-text-secondary)', opacity: 0.5 }}>
+                      <circle cx="12" cy="12" r="10" />
+                      <line x1="12" y1="8" x2="12" y2="12" />
+                      <line x1="12" y1="16" x2="12.01" y2="16" />
+                    </svg>
+                    <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--admin-text)' }}>
+                      No visitor sessions available.
                     </div>
-                  </td>
-
-                  {/* Visitor */}
-                  <td style={{ padding: '16px var(--admin-space-4)' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                      {v.isKnown && v.avatarUrl ? (
-                        <img src={v.avatarUrl} alt={v.visitorName} style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover', border: '1px solid var(--admin-border)', flexShrink: 0 }} />
-                      ) : (
-                        defaultAvatar
-                      )}
-                      <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        <span style={{ fontWeight: 700, fontSize: '13.5px', color: v.isKnown ? 'var(--admin-text)' : 'var(--admin-text-secondary)', whiteSpace: 'nowrap' }}>
-                          {v.visitorName}
+                    <div style={{ fontSize: '12.5px', opacity: 0.7, maxWidth: '380px', lineHeight: '1.5' }}>
+                      Live analytics data will appear here once the table is connected to the analytics service.
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            ) : (
+              visitorSessions.map((v) => {
+                const formattedDate = v.visitedAt.split('\n');
+                return (
+                  <tr
+                    key={v.id}
+                    style={{ borderBottom: '1px solid var(--admin-border)', transition: 'background-color 0.15s ease' }}
+                    onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'rgba(248, 250, 252, 0.6)'}
+                    onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                  >
+                    {/* Date & Time / Last Activity */}
+                    <td style={{ padding: '16px var(--admin-space-4)', whiteSpace: 'nowrap' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                        <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--admin-text)' }}>{formattedDate[0]}</span>
+                        <span style={{ fontSize: '11px', color: 'var(--admin-text-secondary)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <span>{formattedDate[1]}</span>
+                          <span style={{ opacity: 0.4 }}>•</span>
+                          <span style={{ fontWeight: 500, color: 'var(--admin-primary)' }}>{formatTimeAgo(v.lastActivity)}</span>
                         </span>
-                        {v.isKnown && v.visitorEmail && (
-                          <span style={{ fontSize: '11px', color: 'var(--admin-text-secondary)', fontWeight: 500, whiteSpace: 'nowrap' }}>
-                            {v.visitorEmail}
-                          </span>
-                        )}
                       </div>
-                    </div>
-                  </td>
+                    </td>
 
-                  {/* Country */}
-                  <td style={{ padding: '16px var(--admin-space-4)' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column' }}>
-                      <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--admin-text)' }}>{v.country}</span>
-                      <span style={{ fontSize: '11px', color: 'var(--admin-text-secondary)', fontWeight: 500 }}>{v.city}</span>
-                    </div>
-                  </td>
+                    {/* Visitor */}
+                    <td style={{ padding: '16px var(--admin-space-4)' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        {v.avatarUrl ? (
+                          <img
+                            src={v.avatarUrl}
+                            alt={v.visitorName || 'Visitor'}
+                            style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover' }}
+                          />
+                        ) : (
+                          <div style={{
+                            width: '28px',
+                            height: '28px',
+                            borderRadius: '50%',
+                            backgroundColor: 'var(--admin-surface)',
+                            color: 'var(--admin-primary)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '11px',
+                            fontWeight: 700
+                          }}>
+                            {(v.visitorName || 'Anonymous Visitor').substring(0, 2).toUpperCase()}
+                          </div>
+                        )}
+                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                          <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--admin-text)', whiteSpace: 'nowrap' }}>{v.visitorName || 'Anonymous Visitor'}</span>
+                          {v.visitorEmail && <span style={{ fontSize: '11.5px', color: 'var(--admin-text-secondary)', whiteSpace: 'nowrap' }}>{v.visitorEmail}</span>}
+                        </div>
+                      </div>
+                    </td>
 
-                  {/* Device */}
-                  <td style={{ padding: '16px var(--admin-space-4)', color: 'var(--admin-text-secondary)', fontSize: '13px', fontWeight: 500 }}>
-                    {v.device}
-                  </td>
+                    {/* Country & City */}
+                    <td style={{ padding: '16px var(--admin-space-4)', whiteSpace: 'nowrap' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                        <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--admin-text)' }}>{formatCountry(v.country)}</span>
+                        {v.city && v.city !== 'Unknown' && <span style={{ fontSize: '11px', color: 'var(--admin-text-secondary)', marginLeft: '24px' }}>{v.city}</span>}
+                      </div>
+                    </td>
 
-                  {/* Source */}
-                  <td style={{ padding: '16px var(--admin-space-4)', color: 'var(--admin-text-secondary)', fontSize: '13px', fontWeight: 500 }}>
-                    {v.source}
-                  </td>
+                    {/* Device / Browser & OS */}
+                    <td style={{ padding: '16px var(--admin-space-4)', whiteSpace: 'nowrap' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                        <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--admin-text)' }}>{v.device || 'Unknown Device'}</span>
+                        <span style={{ fontSize: '11px', color: 'var(--admin-text-secondary)' }}>
+                          {v.browser || 'Unknown Browser'}{v.os && v.os !== 'Unknown' ? ` on ${v.os}` : ''}
+                        </span>
+                      </div>
+                    </td>
 
-                  {/* Page Viewed */}
-                  <td style={{ padding: '16px var(--admin-space-4)', color: 'var(--admin-text-secondary)', fontSize: '13px', fontWeight: 500 }}>
-                    {v.pageViewed}
-                  </td>
+                    {/* Traffic Source */}
+                    <td style={{ padding: '16px var(--admin-space-4)', color: 'var(--admin-text-secondary)', fontSize: '13px', fontWeight: 500 }}>
+                      {v.source || 'Direct Traffic'}
+                    </td>
 
-                  {/* Duration */}
-                  <td style={{ padding: '16px var(--admin-space-4)', color: 'var(--admin-text-secondary)', fontSize: '13px', fontWeight: 500 }}>
-                    {v.duration}
-                  </td>
+                    {/* Landing Page */}
+                    <td style={{ padding: '16px var(--admin-space-4)', color: 'var(--admin-text-secondary)', fontSize: '13px', fontWeight: 500 }}>
+                      {v.landingPage || 'Home Page'}
+                    </td>
 
-                  {/* Status */}
-                  <td style={{ padding: '16px var(--admin-space-4)' }}>
-                    <DownloadStatusBadge isKnown={v.isKnown} />
-                  </td>
+                    {/* Duration */}
+                    <td style={{ padding: '16px var(--admin-space-4)', color: 'var(--admin-text-secondary)', fontSize: '13px', fontWeight: 500 }}>
+                      {formatDuration(v.sessionDuration)}
+                    </td>
 
-                  {/* Actions */}
-                  <td style={{ padding: '16px var(--admin-space-4)' }}>
-                    <button
-                      onClick={() => onViewDetails?.(v)}
-                      className="hover-scale active-press"
-                      style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        padding: '6px 12px',
-                        border: '1px solid #E2E8F0',
-                        borderRadius: '20px',
-                        backgroundColor: '#FFFFFF',
-                        color: '#0F172A',
-                        fontSize: '12px',
-                        fontWeight: 600,
-                        cursor: 'pointer',
-                        transition: 'all 0.15s ease'
-                      }}
-                    >
-                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                        <circle cx="12" cy="12" r="3" />
-                      </svg>
-                      <span>View</span>
-                    </button>
-                  </td>
-                </tr>
-              );
-            })}
+                    {/* Status */}
+                    <td style={{ padding: '16px var(--admin-space-4)' }}>
+                      <DownloadStatusBadge isKnown={v.isKnownVisitor} />
+                    </td>
+
+                    {/* Actions */}
+                    <td style={{ padding: '16px var(--admin-space-4)' }}>
+                      <button
+                        onClick={() => onViewDetails?.(v)}
+                        className="hover-scale active-press"
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          padding: '6px 12px',
+                          border: '1px solid #E2E8F0',
+                          borderRadius: '20px',
+                          backgroundColor: '#FFFFFF',
+                          color: '#0F172A',
+                          fontSize: '12px',
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                          transition: 'all 0.15s ease'
+                        }}
+                      >
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                          <circle cx="12" cy="12" r="3" />
+                        </svg>
+                        <span>View</span>
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })
+            )}
           </tbody>
         </table>
       </div>

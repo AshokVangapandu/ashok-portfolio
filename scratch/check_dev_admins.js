@@ -15,9 +15,11 @@ async function main() {
 
   try {
     await client.connect();
-    console.log('Successfully connected to DEV database!');
+    console.log('Connected to DEV database.');
+    const res = await client.query('SELECT * FROM public.admins');
+    console.log('Admins in DEV:', res.rows);
   } catch (err) {
-    console.error('Failed to connect to DEV database:', err.message);
+    console.error(err);
   } finally {
     await client.end();
   }

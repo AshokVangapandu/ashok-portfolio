@@ -12,7 +12,8 @@ import {
   AnalyticsOperatingSystem,
   VisitorComparison,
   PeakHours,
-  AnalyticsVisitor
+  AnalyticsVisitor,
+  VisitorSession
 } from '../types/analytics';
 
 export const useAnalytics = () => {
@@ -36,8 +37,8 @@ export const useAnalytics = () => {
   const [search, setSearch] = useState<string>('');
   const [page, setPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(10);
-  const [visitors, setVisitors] = useState<AnalyticsVisitor[]>([]);
-  const [totalVisitorsCount, setTotalVisitorsCount] = useState<number>(386);
+  const [visitorSessions, setVisitorSessions] = useState<VisitorSession[]>([]);
+  const [totalVisitorsCount, setTotalVisitorsCount] = useState<number>(0);
 
   // Stats Data
   const [summary, setSummary] = useState<AnalyticsSummary | null>(null);
@@ -66,7 +67,7 @@ export const useAnalytics = () => {
         osData,
         compData,
         peakData,
-        visitorData
+        visitorSessionsData
       ] = await Promise.all([
         analyticsService.getSummary(timeRange),
         analyticsService.getTrends(timeRange, trendMode),
@@ -78,7 +79,7 @@ export const useAnalytics = () => {
         analyticsService.getOS(timeRange),
         analyticsService.getVisitorComparison(timeRange),
         analyticsService.getPeakHours(timeRange),
-        analyticsService.getVisitors({ search, page, pageSize, timeRange })
+        analyticsService.getVisitorSessions({ search, page, pageSize, timeRange })
       ]);
 
       setSummary(sumData);
@@ -91,8 +92,8 @@ export const useAnalytics = () => {
       setOperatingSystems(osData);
       setVisitorComparison(compData);
       setPeakHours(peakData);
-      setVisitors(visitorData.data);
-      setTotalVisitorsCount(visitorData.totalCount);
+      setVisitorSessions(visitorSessionsData.data);
+      setTotalVisitorsCount(visitorSessionsData.totalCount);
     } catch (err) {
       console.error('[useAnalytics] Fetch error:', err);
       setError(true);
@@ -121,7 +122,7 @@ export const useAnalytics = () => {
     setPage,
     pageSize,
     setPageSize,
-    visitors,
+    visitorSessions,
     totalVisitorsCount,
     
     // Data states
