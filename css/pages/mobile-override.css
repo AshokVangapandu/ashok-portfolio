@@ -2,6 +2,7 @@
 
 /* Hide mobile-specific layout components on desktop sizes */
 @media (min-width: 769px) {
+
   .brand-mobile-title,
   .mobile-hero-wrapper,
   .mobile-projects-wrapper,
@@ -13,6 +14,7 @@
 }
 
 @media (max-width: 768px) {
+
   /* 1. Global Reset & Theme overrides */
   :root {
     --header-height: 68px;
@@ -21,11 +23,12 @@
   body {
     background-color: #0A061E !important;
     color: #FFFFFF !important;
-    padding-bottom: 90px; /* Safe space for bottom floating navigation */
+    padding-bottom: 90px;
+    /* Safe space for bottom floating navigation */
   }
 
   .site-bg {
-    background: 
+    background:
       radial-gradient(circle at 50% -10%, rgba(108, 60, 255, 0.15), transparent 450px),
       radial-gradient(circle at 10% 35%, rgba(143, 114, 255, 0.06), transparent 320px),
       radial-gradient(circle at 90% 75%, rgba(108, 60, 255, 0.05), transparent 350px),
@@ -37,7 +40,8 @@
   .site-bg .energy-field,
   .site-bg .orb-field,
   .site-bg .particle-field {
-    display: none !important; /* Hide heavy dynamic background ribbons on mobile to save performance */
+    display: none !important;
+    /* Hide heavy dynamic background ribbons on mobile to save performance */
   }
 
   /* 2. Header and Brand styling */
@@ -126,7 +130,8 @@
 
   .hero-container,
   .hero-copy::before {
-    display: none !important; /* Hide desktop hero */
+    display: none !important;
+    /* Hide desktop hero */
   }
 
   .mobile-hero-wrapper {
@@ -211,10 +216,25 @@
     border-radius: 50%;
   }
 
-  .chip-dot.pink { background: #FF578C; box-shadow: 0 0 8px #FF578C; }
-  .chip-dot.purple { background: #8F72FF; box-shadow: 0 0 8px #8F72FF; }
-  .chip-dot.teal { background: #00D6C6; box-shadow: 0 0 8px #00D6C6; }
-  .chip-dot.blue { background: #409CFF; box-shadow: 0 0 8px #409CFF; }
+  .chip-dot.pink {
+    background: #FF578C;
+    box-shadow: 0 0 8px #FF578C;
+  }
+
+  .chip-dot.purple {
+    background: #8F72FF;
+    box-shadow: 0 0 8px #8F72FF;
+  }
+
+  .chip-dot.teal {
+    background: #00D6C6;
+    box-shadow: 0 0 8px #00D6C6;
+  }
+
+  .chip-dot.blue {
+    background: #409CFF;
+    box-shadow: 0 0 8px #409CFF;
+  }
 
   /* 4. Statistics Card styling */
   .mobile-stats-card {
@@ -317,6 +337,7 @@
   }
 
   @media (max-width: 350px) {
+
     .mobile-btn-primary,
     .mobile-btn-secondary {
       font-size: 11px;
@@ -390,21 +411,70 @@
   .expertise-grid {
     display: flex !important;
     flex-direction: column !important;
-    gap: 10px !important;
+    gap: 12px !important;
+  }
+
+  /* Dynamic Accent Colors for each card based on category title */
+  [aria-label="Mendix expertise"] {
+    --skill-color: #4EA8FF !important;
+  }
+
+  [aria-label="Figma expertise"] {
+    --skill-color: #A855F7 !important;
+  }
+
+  [aria-label="Design System expertise"] {
+    --skill-color: #22C55E !important;
+  }
+
+  [aria-label="Widgets expertise"] {
+    --skill-color: #F59E0B !important;
+  }
+
+  [aria-label="Frontend Dev expertise"] {
+    --skill-color: #6366F1 !important;
+  }
+
+  [aria-label="JavaScript expertise"] {
+    --skill-color: #6366F1 !important;
+  }
+
+  [aria-label="SCSS expertise"] {
+    --skill-color: #F43F5E !important;
+  }
+
+  [aria-label="AI Product Building expertise"] {
+    --skill-color: #22D3EE !important;
   }
 
   .expertise-card {
     display: grid !important;
-    grid-template-columns: auto 1fr auto !important;
+    grid-template-columns: 44px 1fr auto !important;
     grid-template-rows: auto auto auto auto !important;
-    gap: 12px 10px !important;
-    padding: 20px !important;
-    background: #140E2D !important;
-    border: 1px solid rgba(108, 60, 255, 0.14) !important;
+    column-gap: 12px !important;
+    row-gap: 8px !important;
+    padding: 16px !important;
+    background: linear-gradient(145deg, #0e111f, #070913) !important;
+    background-image:
+      radial-gradient(circle at 20% 20%, color-mix(in srgb, var(--skill-color) 6%, transparent), transparent 60%),
+      linear-gradient(145deg, #0e111f, #070913) !important;
+    border: 1px solid color-mix(in srgb, var(--skill-color) 8%, rgba(255, 255, 255, 0.04)) !important;
     border-radius: 16px !important;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.16) !important;
+    box-shadow:
+      0 8px 24px -8px rgba(0, 0, 0, 0.6),
+      inset 0 1px 1px rgba(255, 255, 255, 0.02) !important;
     transform: none !important;
     min-height: auto !important;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease !important;
+  }
+
+  .expertise-card:hover,
+  .expertise-card:active {
+    border-color: color-mix(in srgb, var(--skill-color) 25%, transparent) !important;
+    box-shadow:
+      0 10px 28px rgba(0, 0, 0, 0.5),
+      0 0 12px color-mix(in srgb, var(--skill-color) 6%, transparent),
+      inset 0 1px 1px rgba(255, 255, 255, 0.04) !important;
   }
 
   .expertise-card-top,
@@ -416,22 +486,26 @@
 
   .expertise-icon {
     grid-column: 1 !important;
-    grid-row: 1 !important;
-    width: 36px !important;
-    height: 36px !important;
-    border-radius: 8px !important;
-    background: rgba(108, 60, 255, 0.1) !important;
-    border: 1px solid rgba(108, 60, 255, 0.22) !important;
+    grid-row: 1 / span 2 !important;
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 14px !important;
+    background: linear-gradient(135deg, color-mix(in srgb, var(--skill-color) 15%, transparent), color-mix(in srgb, var(--skill-color) 5%, transparent)) !important;
+    border: 1px solid color-mix(in srgb, var(--skill-color) 20%, transparent) !important;
+    box-shadow: 0 4px 10px color-mix(in srgb, var(--skill-color) 6%, transparent) !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     flex-shrink: 0 !important;
+    color: color-mix(in srgb, var(--skill-color) 85%, #fff) !important;
+    align-self: start !important;
   }
 
   .expertise-icon svg,
   .expertise-icon img {
-    width: 18px !important;
-    height: 18px !important;
+    width: 20px !important;
+    height: 20px !important;
+    object-fit: contain !important;
   }
 
   .expertise-card h3 {
@@ -441,80 +515,303 @@
     font-size: 16px !important;
     font-weight: 700 !important;
     color: #FFFFFF !important;
-    margin: 0 0 0 4px !important;
+    margin: 0 !important;
     text-align: left !important;
+    line-height: 1.2 !important;
+    letter-spacing: -0.01em !important;
   }
 
-  .expertise-score {
+  /* Badge styling using .expertise-signal and replacing its content */
+  .expertise-signal {
     grid-column: 3 !important;
     grid-row: 1 !important;
+    display: inline-flex !important;
     align-self: center !important;
     justify-self: end !important;
-    padding: 5px 9px !important;
-    border: 1px solid rgba(108, 60, 255, 0.2) !important;
-    border-radius: 99px !important;
-    color: #8F72FF !important;
-    background: rgba(108, 60, 255, 0.1) !important;
-    font-size: 11px !important;
-    font-weight: 700 !important;
-    letter-spacing: 0 !important;
+    font-size: 0 !important;
     text-transform: none !important;
+    letter-spacing: 0 !important;
   }
 
-  .expertise-card p {
-    grid-column: 1 / -1 !important;
-    grid-row: 2 !important;
-    font-size: 12.5px !important;
-    line-height: 1.5 !important;
-    color: rgba(255, 255, 255, 0.6) !important;
-    margin: 4px 0 0 0 !important;
-    text-align: left !important;
-    max-width: 100% !important;
+  .expertise-signal::after {
+    font-size: 8.5px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    padding: 2.5px 8px !important;
+    border-radius: 99px !important;
+    color: color-mix(in srgb, var(--skill-color) 90%, #fff) !important;
+    background: transparent !important;
+    border: 1px solid color-mix(in srgb, var(--skill-color) 35%, transparent) !important;
+    white-space: nowrap !important;
   }
 
+  [aria-label="Mendix expertise"] .expertise-signal::after {
+    content: "Expert" !important;
+  }
+
+  [aria-label="Figma expertise"] .expertise-signal::after {
+    content: "Specialist" !important;
+  }
+
+  [aria-label="Design System expertise"] .expertise-signal::after {
+    content: "Advanced" !important;
+  }
+
+  [aria-label="Widgets expertise"] .expertise-signal::after {
+    content: "Expert" !important;
+  }
+
+  [aria-label="Frontend Dev expertise"] .expertise-signal::after {
+    content: "Advanced" !important;
+  }
+
+  [aria-label="JavaScript expertise"] .expertise-signal::after {
+    content: "Advanced" !important;
+  }
+
+  [aria-label="SCSS expertise"] .expertise-signal::after {
+    content: "Advanced" !important;
+  }
+
+  [aria-label="AI Product Building expertise"] .expertise-signal::after {
+    content: "Explorer" !important;
+  }
+
+  /* Hide the percentage text since it's not in the reference design */
+  .expertise-score {
+    display: none !important;
+  }
+
+  /* Progress indicator styled as 5 circular dots */
   .expertise-meter {
-    grid-column: 1 / -1 !important;
-    grid-row: 3 !important;
-    width: 100% !important;
-    height: 3px !important;
-    background: rgba(255, 255, 255, 0.08) !important;
-    border-radius: 999px !important;
-    margin: 6px 0 !important;
+    grid-column: 2 / span 2 !important;
+    grid-row: 2 !important;
+    width: 46px !important;
+    height: 6px !important;
+    background: rgba(255, 255, 255, 0.12) !important;
+    border-radius: 0 !important;
+    margin: 1px 0 3px 0 !important;
     position: relative !important;
     overflow: hidden !important;
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='46' height='6'%3E%3Crect width='6' height='6' rx='3' fill='black'/%3E%3Crect x='10' width='6' height='6' rx='3' fill='black'/%3E%3Crect x='20' width='6' height='6' rx='3' fill='black'/%3E%3Crect x='30' width='6' height='6' rx='3' fill='black'/%3E%3Crect x='40' width='6' height='6' rx='3' fill='black'/%3E%3C/svg%3E") !important;
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='46' height='6'%3E%3Crect width='6' height='6' rx='3' fill='black'/%3E%3Crect x='10' width='6' height='6' rx='3' fill='black'/%3E%3Crect x='20' width='6' height='6' rx='3' fill='black'/%3E%3Crect x='30' width='6' height='6' rx='3' fill='black'/%3E%3Crect x='40' width='6' height='6' rx='3' fill='black'/%3E%3C/svg%3E") !important;
+    mask-size: contain !important;
+    mask-repeat: no-repeat !important;
   }
 
   .expertise-meter span {
     display: block !important;
     width: var(--skill-score) !important;
     height: 100% !important;
-    background: linear-gradient(90deg, #8F72FF, #6C3CFF) !important;
-    box-shadow: 0 0 8px rgba(108, 60, 255, 0.5) !important;
+    background: var(--skill-color) !important;
+    box-shadow: 0 0 6px color-mix(in srgb, var(--skill-color) 40%, transparent) !important;
+    border-radius: 0 !important;
+  }
+
+  /* Description flows under the icon for shorter compact height */
+  .expertise-card p {
+    grid-column: 1 / -1 !important;
+    grid-row: 3 !important;
+    font-size: 13px !important;
+    line-height: 1.45 !important;
+    color: #94a3b8 !important;
+    margin: 2px 0 !important;
+    text-align: left !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
   }
 
   .expertise-tags {
-    grid-column: 1 / -1 !important;
+    grid-column: 1 / span 2 !important;
     grid-row: 4 !important;
     display: flex !important;
     flex-wrap: wrap !important;
     gap: 6px !important;
     margin-top: 4px !important;
+    align-self: center !important;
   }
 
   .expertise-tags span {
-    padding: 5px 10px !important;
-    background: rgba(255, 255, 255, 0.05) !important;
+    padding: 3px 8px !important;
+    background: rgba(255, 255, 255, 0.04) !important;
     border: 1px solid rgba(255, 255, 255, 0.08) !important;
-    border-radius: 6px !important;
-    color: rgba(255, 255, 255, 0.6) !important;
+    border-radius: 99px !important;
+    color: #cbd5e1 !important;
     font-size: 10px !important;
-    font-weight: 600 !important;
+    font-weight: 500 !important;
     text-transform: none !important;
     letter-spacing: 0 !important;
   }
 
-  .expertise-signal {
+  /* Right arrow in category accent color (no background box) */
+  .expertise-card::after {
+    content: "→" !important;
+    grid-column: 3 !important;
+    grid-row: 4 !important;
+    align-self: center !important;
+    justify-self: end !important;
+    color: var(--skill-color) !important;
+    font-size: 18px !important;
+    font-weight: 400 !important;
+    opacity: 0.8 !important;
+    position: static !important;
+    inset: auto !important;
+    height: auto !important;
+    border-radius: 0 !important;
+    filter: none !important;
+    transition: transform 0.2s ease, opacity 0.2s ease !important;
+    pointer-events: none !important;
+  }
+
+  .expertise-card:hover::after,
+  .expertise-card:active::after {
+    transform: translateX(3px) !important;
+    opacity: 1 !important;
+  }
+
+  /* Custom Tooling Mobile Optimization (Widget Lab) */
+  .widget-showcase-panel {
+    gap: 16px !important;
+    /* Reduced vertical grid gap */
+  }
+
+  .tech-marquee-title {
+    margin: 12px 0 6px !important;
+    /* Reduced top/bottom margins */
+  }
+
+  .widget-showcase-ticker {
+    margin: 0 auto 6px !important;
+    /* Reduced bottom margin */
+    padding: 8px 0 !important;
+  }
+
+  .widget-showcase-stats {
+    display: grid !important;
+    grid-template-columns: 0.9fr 1.2fr 0.9fr !important;
+    /* Proportional widths: middle column gets more space */
+    gap: 10px !important;
+    width: 100% !important;
+    padding: 0 16px !important;
+    box-sizing: border-box !important;
+    margin: 12px auto 0 !important;
+  }
+
+  .widget-showcase-stats .capability-card {
+    min-height: auto !important;
+    padding: 12px 4px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    border-radius: 14px !important;
+    grid-column: span 1 !important;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01)) !important;
+    border: 1px solid rgba(143, 133, 255, 0.15) !important;
+    box-shadow:
+      0 8px 24px rgba(0, 0, 0, 0.5),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      0 0 12px rgba(143, 133, 255, 0.05) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease !important;
+  }
+
+  /* Visual ordering to place the third card ("Production-Ready") in the center column */
+  .widget-showcase-stats .capability-card:nth-child(1) {
+    order: 1 !important;
+  }
+
+  .widget-showcase-stats .capability-card:nth-child(2) {
+    order: 3 !important;
+    /* Reusable moves to the right */
+  }
+
+  .widget-showcase-stats .capability-card:nth-child(3) {
+    order: 2 !important;
+    /* Production-Ready moves to the center */
+  }
+
+  .widget-showcase-stats .capability-card:hover,
+  .widget-showcase-stats .capability-card:active {
+    transform: translateY(-2px) !important;
+    border-color: rgba(143, 133, 255, 0.35) !important;
+    box-shadow:
+      0 12px 30px rgba(0, 0, 0, 0.6),
+      inset 0 1px 0 rgba(255, 255, 255, 0.12),
+      0 0 20px rgba(143, 133, 255, 0.15) !important;
+  }
+
+  .widget-showcase-stats .capability-icon {
+    width: 34px !important;
+    height: 34px !important;
+    padding: 7px !important;
+    box-sizing: border-box !important;
+    border-radius: 50% !important;
+    background: linear-gradient(135deg, rgba(143, 133, 255, 0.14), rgba(143, 133, 255, 0.04)) !important;
+    border: 1px solid rgba(143, 133, 255, 0.22) !important;
+    color: #b4a8ff !important;
+    fill: none !important;
+    stroke: currentColor !important;
+    stroke-width: 2 !important;
+    stroke-linecap: round !important;
+    stroke-linejoin: round !important;
+    filter: drop-shadow(0 0 10px rgba(143, 133, 255, 0.35)) !important;
+    margin-bottom: 4px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .widget-showcase-stats .capability-card strong {
+    font-size: clamp(9px, 2.3vw, 10.5px) !important;
+    line-height: 1.2 !important;
+    font-weight: 700 !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+    color: #ffffff !important;
+  }
+
+  .widget-showcase-stats .capability-card span {
     display: none !important;
+  }
+
+  .widget-showcase-actions {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    gap: 4% !important;
+    width: 100% !important;
+    margin-top: 14px !important;
+    padding: 0 16px !important;
+    /* Horizontal page padding insets */
+    box-sizing: border-box !important;
+  }
+
+  .widget-showcase-actions .profile-action {
+    flex: 1 1 48% !important;
+    width: 48% !important;
+    min-width: 0 !important;
+    min-height: 44px !important;
+    height: 44px !important;
+    padding: 0 8px !important;
+    border-radius: 10px !important;
+    font-size: clamp(10px, 2.6vw, 12px) !important;
+    white-space: nowrap !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+  }
+
+  .widget-showcase-actions .profile-action svg {
+    width: 14px !important;
+    height: 14px !important;
+    flex-shrink: 0 !important;
   }
 
   /* Mobile Capability Grid (Hero Cards) */
@@ -636,10 +933,21 @@
     overflow: hidden;
   }
 
-  .mobile-project-thumbnail.swatch-violet { background: linear-gradient(135deg, #1A103C, #4F1D7C); }
-  .mobile-project-thumbnail.swatch-blue { background: linear-gradient(135deg, #0A1B3A, #1A4F9C); }
-  .mobile-project-thumbnail.swatch-mint { background: linear-gradient(135deg, #0A2620, #1A6C58); }
-  .mobile-project-thumbnail.swatch-ink { background: linear-gradient(135deg, #0B0E14, #2A2E3D); }
+  .mobile-project-thumbnail.swatch-violet {
+    background: linear-gradient(135deg, #1A103C, #4F1D7C);
+  }
+
+  .mobile-project-thumbnail.swatch-blue {
+    background: linear-gradient(135deg, #0A1B3A, #1A4F9C);
+  }
+
+  .mobile-project-thumbnail.swatch-mint {
+    background: linear-gradient(135deg, #0A2620, #1A6C58);
+  }
+
+  .mobile-project-thumbnail.swatch-ink {
+    background: linear-gradient(135deg, #0B0E14, #2A2E3D);
+  }
 
   .proj-badge {
     position: absolute;
@@ -807,7 +1115,8 @@
   }
 
   .build-visual {
-    display: none !important; /* Hide central decorative visual orb on mobile */
+    display: none !important;
+    /* Hide central decorative visual orb on mobile */
   }
 
   .build-flow {
@@ -864,7 +1173,8 @@
   }
 
   .build-icon {
-    display: none !important; /* Hide large icon box on mobile layout */
+    display: none !important;
+    /* Hide large icon box on mobile layout */
   }
 
   .build-card-copy h3 {
@@ -913,7 +1223,8 @@
   }
 
   .wall-control-float {
-    display: none !important; /* Hide arrows on touch screens */
+    display: none !important;
+    /* Hide arrows on touch screens */
   }
 
   .wall-carousel-wrapper {
@@ -930,7 +1241,8 @@
   .wall-marquee {
     display: flex !important;
     width: max-content !important;
-    animation: none !important; /* Disable autoplay animation to allow native swiping */
+    animation: none !important;
+    /* Disable autoplay animation to allow native swiping */
     gap: 12px !important;
   }
 
@@ -1017,7 +1329,8 @@
   }
 
   .contact-stats-banner {
-    display: grid !important; /* Stacked layout banner in card */
+    display: grid !important;
+    /* Stacked layout banner in card */
     grid-template-columns: repeat(3, 1fr) !important;
     padding: 12px 8px !important;
     margin-top: 16px !important;
