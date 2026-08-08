@@ -1533,15 +1533,36 @@ const loadDynamicCertifications = async () => {
             </svg>`;
           };
 
-          gridEl.innerHTML = maxProviders.map(provider => `
-            <div class="provider-logo-card">
-              <div class="provider-logo-container">
-                ${getProviderLogo(provider.name, provider.iconUrl)}
+          let cardsHtml = maxProviders.map((provider, index) => {
+            const isDesktopOnly = index >= 3;
+            const desktopClass = isDesktopOnly ? 'desktop-only-card' : '';
+            return `
+              <div class="provider-logo-card ${desktopClass}">
+                <div class="provider-logo-container">
+                  ${getProviderLogo(provider.name, provider.iconUrl)}
+                </div>
+                <span class="provider-name">${provider.name}</span>
+                <div class="provider-glow-dot"></div>
               </div>
-              <span class="provider-name">${provider.name}</span>
-              <div class="provider-glow-dot"></div>
-            </div>
-          `).join('');
+            `;
+          }).join('');
+
+          const totalProvidersCount = uniqueProviders.length;
+          if (totalProvidersCount > 3) {
+            const remainingCount = totalProvidersCount - 3;
+            const label = remainingCount === 1 ? 'Other →' : 'Others →';
+            cardsHtml += `
+              <a href="certifications/index.html" class="provider-logo-card mobile-only-card others-card">
+                <div class="provider-logo-container">
+                  <span class="others-count">+${remainingCount}</span>
+                </div>
+                <span class="provider-name">${label}</span>
+                <div class="provider-glow-dot"></div>
+              </a>
+            `;
+          }
+
+          gridEl.innerHTML = cardsHtml;
         }
       }
     }

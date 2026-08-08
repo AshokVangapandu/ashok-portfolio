@@ -1083,35 +1083,94 @@
 
   /* 9. Timeline (Behind the Build) section */
   .behind-build {
-    padding: 40px 16px 0 !important;
+    padding: 60px 16px 40px !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
   }
 
   .behind-build-shell {
     width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
   }
 
   .build-heading {
     display: flex !important;
     flex-direction: column !important;
+    align-items: flex-start !important;
     gap: 12px !important;
     margin-bottom: 32px !important;
+    text-align: left !important;
+  }
+
+  .build-heading .section-kicker {
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.12em !important;
+    color: #00D6C6 !important;
+    /* Accent teal kicker */
+    margin: 0 !important;
+  }
+
+  .build-heading h2 {
+    font-size: 32px !important;
+    font-weight: 700 !important;
+    color: #FFFFFF !important;
+    line-height: 1.1 !important;
+    letter-spacing: -0.02em !important;
+    margin: 0 !important;
   }
 
   .build-heading-side {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 16px !important;
+    width: 100% !important;
     text-align: left !important;
-    justify-items: start !important;
-    gap: 12px !important;
   }
 
   .build-heading-side .section-subtitle {
-    text-align: left !important;
+    font-size: 13.5px !important;
+    line-height: 1.5 !important;
+    color: #94A3B8 !important;
     margin: 0 !important;
+    max-width: 100% !important;
+  }
+
+  .build-phase-pill {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    background: rgba(255, 255, 255, 0.03) !important;
+    border: 1px solid rgba(255, 255, 255, 0.06) !important;
+    border-radius: 20px !important;
+    padding: 6px 14px !important;
+    color: #CBD5E1 !important;
+    font-size: 9.5px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.08em !important;
+    width: auto !important;
+  }
+
+  .build-phase-pill i {
+    width: 6px !important;
+    height: 6px !important;
+    border-radius: 50% !important;
+    background-color: #00D6C6 !important;
+    box-shadow: 0 0 6px #00D6C6 !important;
+    display: inline-block !important;
   }
 
   .build-stage {
     display: flex !important;
     flex-direction: column !important;
     gap: 20px !important;
+    box-sizing: border-box !important;
   }
 
   .build-visual {
@@ -1122,85 +1181,196 @@
   .build-flow {
     display: flex !important;
     flex-direction: column !important;
-    gap: 12px !important;
+    gap: 16px !important;
+    /* Compact gap between separate cards */
+    position: relative !important;
+    padding-left: 24px !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    background: transparent !important;
+    /* Make parent container background transparent */
+    border: none !important;
+    /* Remove parent border */
+    box-shadow: none !important;
+    /* Remove parent shadow */
+  }
+
+  /* Glowing gradient timeline connector line */
+  .build-flow::before {
+    content: "" !important;
+    position: absolute !important;
+    left: 8px !important;
+    top: 36px !important;
+    bottom: 36px !important;
+    width: 2px !important;
+    background: linear-gradient(to bottom, #00d6c6, #8f72ff, #409cff, #ffd84d, #dc66f0) !important;
+    /* Beautiful gradient flow matching the phase colors */
+    z-index: 1 !important;
+    opacity: 0.65 !important;
   }
 
   .build-node {
-    border-left: 2px solid rgba(108, 60, 255, 0.22) !important;
-    border-bottom: none !important;
-    padding: 12px 12px 12px 24px !important;
-    margin-left: 10px !important;
     position: relative !important;
-    border-radius: 0 !important;
-    background: transparent !important;
-    box-shadow: none !important;
-    border: none !important;
+    margin: 0 !important;
+    border-radius: 16px !important;
+    background: linear-gradient(135deg, rgba(13, 22, 43, 0.5), rgba(7, 17, 33, 0.5)) !important;
+    /* Premium glass backing for each card */
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    border-color: color-mix(in srgb, var(--build-color) 20%, rgba(255, 255, 255, 0.04)) !important;
+    /* Colored accent card border */
+    padding: 12px 14px !important;
+    /* Compact padding */
+    display: grid !important;
+    grid-template-columns: 56px 1fr !important;
+    /* Two columns: Left (Index + Icon), Right (Content) */
+    grid-template-rows: auto auto !important;
+    /* Row 1: Index, Row 2: Icon */
+    align-items: center !important;
+    gap: 8px 16px !important;
+    /* Row gap: 8px, Column gap: 16px */
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.24),
+      0 0 20px color-mix(in srgb, var(--build-color) 8%, transparent),
+      inset 0 1px 0 rgba(255, 255, 255, 0.02) !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    overflow: visible !important;
+    /* Allow timeline dot to be visible outside card container */
   }
 
-  /* Vertical timeline line effect */
+  /* Timeline Dot (Node) */
   .build-node::before {
     content: "" !important;
     position: absolute !important;
-    left: 0 !important;
-    top: 0 !important;
-    bottom: -12px !important;
-    width: 2px !important;
-    background: rgba(108, 60, 255, 0.25) !important;
-    z-index: 1 !important;
-  }
-
-  .build-node:last-child::before {
-    bottom: auto !important;
-    height: 32px !important;
-  }
-
-  .build-step-index {
-    position: absolute !important;
-    left: -14px !important;
-    top: 10px !important;
-    width: 28px !important;
-    height: 28px !important;
-    font-size: 11px !important;
-    font-weight: 750 !important;
-    background: #140E2D !important;
-    border: 1.5px solid var(--build-color) !important;
+    left: -16px !important;
+    /* Align centered with connector line */
+    top: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: 6px !important;
+    height: 6px !important;
     border-radius: 50% !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    color: #FFFFFF !important;
+    background-color: var(--build-color) !important;
+    box-shadow: 0 0 10px var(--build-color) !important;
+    border: 3px solid #071121 !important;
+    /* Double-ring masking effect */
+    outline: 1.5px solid var(--build-color) !important;
     z-index: 2 !important;
   }
 
+  /* Clean dashed separator between columns */
+  .build-node::after {
+    content: "" !important;
+    position: absolute !important;
+    left: 64px !important;
+    /* Centers exactly in the 16px gap (56px column + 8px half-gap) */
+    top: 8px !important;
+    bottom: 8px !important;
+    width: 1px !important;
+    border-right: 1px dashed rgba(255, 255, 255, 0.12) !important;
+    z-index: 1 !important;
+  }
+
+  /* Step index number (Top of Column 1) */
+  .build-step-index {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    align-self: center !important;
+    justify-self: center !important;
+    color: var(--build-color) !important;
+    font-size: 26px !important;
+    font-weight: 700 !important;
+    z-index: 2 !important;
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: auto !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Phase Icon (Bottom of Column 1, below the number) */
   .build-icon {
-    display: none !important;
-    /* Hide large icon box on mobile layout */
+    grid-column: 1 !important;
+    grid-row: 2 !important;
+    align-self: center !important;
+    justify-self: center !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 34px !important;
+    /* Slightly smaller to fit below the number beautifully */
+    height: 34px !important;
+    border-radius: 50% !important;
+    background: rgba(255, 255, 255, 0.02) !important;
+    border: 1px solid color-mix(in srgb, var(--build-color) 30%, rgba(255, 255, 255, 0.05)) !important;
+    color: var(--build-color) !important;
+    box-shadow: 0 0 10px color-mix(in srgb, var(--build-color) 8%, transparent) !important;
+    position: static !important;
+    flex-shrink: 0 !important;
+    margin-top: 4px !important;
+    box-sizing: border-box !important;
+  }
+
+  .build-icon svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  /* Content Column (Spans both rows of Column 2) */
+  .build-card-copy {
+    grid-column: 2 !important;
+    grid-row: 1 / span 2 !important;
+    /* Spans top and bottom rows next to index and icon */
+    align-self: center !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    text-align: left !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    gap: 0 !important;
+    /* Reset flex gap */
   }
 
   .build-card-copy h3 {
-    font-size: 15px !important;
+    font-size: 16px !important;
     font-weight: 700 !important;
     color: #FFFFFF !important;
-    margin: 0 0 4px !important;
+    margin: 0 0 8px 0 !important;
+    /* Spacing between title underline and description */
+    position: relative !important;
+    padding-bottom: 4px !important;
+    line-height: 1.2 !important;
+  }
+
+  /* Title underline gradient */
+  .build-card-copy h3::after {
+    content: "" !important;
+    position: absolute !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    width: 24px !important;
+    height: 2px !important;
+    background: linear-gradient(90deg, var(--build-color), transparent) !important;
+    border-radius: 1px !important;
+    margin: 0 !important;
+    /* Reset margin */
   }
 
   .build-card-copy p {
-    font-size: 12.5px !important;
-    line-height: 1.5 !important;
-    color: #A1A1AA !important;
-    margin: 0 0 8px !important;
+    font-size: 13px !important;
+    line-height: 1.45 !important;
+    color: #CBD5E1 !important;
+    margin: 0 !important;
+    /* Reset margins entirely to avoid layout gaps */
+    padding: 0 !important;
   }
 
   .build-tags {
-    gap: 6px !important;
-  }
-
-  .build-tags li {
-    font-size: 9.5px !important;
-    padding: 3px 8px !important;
-    border-radius: 4px !important;
-    background: rgba(255, 255, 255, 0.04) !important;
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    display: none !important;
   }
 
   /* 10. Wall of love/Testimonials carousel overrides */
@@ -1408,5 +1578,293 @@
 
   .mobile-nav-item.is-active svg {
     transform: scale(1.08);
+  }
+
+  /* 14. Mobile Certifications Redesign overrides */
+  .certifications-heading-wrapper {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+    margin-bottom: 24px !important;
+  }
+
+  .certifications-subtitle {
+    font-size: 13.5px !important;
+    line-height: 1.5 !important;
+    color: #94A3B8 !important;
+    margin-top: 12px !important;
+    text-align: left !important;
+  }
+
+  .heading-cta-wrapper {
+    justify-content: center !important;
+    width: 100% !important;
+    margin-top: 12px !important;
+    margin-bottom: 32px !important;
+    /* Reduced margin bottom */
+    padding: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  .heading-cta-wrapper .primary-action {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    background: linear-gradient(135deg, #6C3CFF, #8F72FF) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 14px !important;
+    /* Matches provider cards */
+    padding: 0 20px !important;
+    height: 50px !important;
+    /* Scaled down height */
+    color: #FFFFFF !important;
+    font-size: 13.5px !important;
+    /* Scaled down font size */
+    font-weight: 600 !important;
+    text-decoration: none !important;
+    box-shadow: 0 4px 16px rgba(108, 60, 255, 0.25) !important;
+    transition: all 0.2s ease !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .heading-cta-wrapper .primary-action:active {
+    transform: scale(0.98) !important;
+    box-shadow: 0 2px 10px rgba(108, 60, 255, 0.2) !important;
+  }
+
+  .heading-cta-wrapper .primary-action svg {
+    margin: 0 !important;
+    transition: transform 0.2s ease !important;
+  }
+
+  .heading-cta-wrapper .primary-action:active svg {
+    transform: translateX(4px) !important;
+  }
+
+  .partners-subheader {
+    margin-top: 0 !important;
+    margin-bottom: 24px !important;
+    /* Partners heading -> 24-28px -> Provider cards */
+    gap: 12px !important;
+  }
+
+  .subheader-text {
+    font-size: 10px !important;
+    letter-spacing: 0.12em !important;
+  }
+
+  .certifications-grid-v2 {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    gap: 8px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    margin-bottom: 36px !important;
+    /* Provider cards -> 36-44px -> Stats container */
+  }
+
+  .provider-logo-card {
+    flex: 1 1 0px !important;
+    min-width: 0 !important;
+    padding: 12px 6px !important;
+    gap: 8px !important;
+    border-radius: 12px !important;
+    height: 105px !important;
+    justify-content: center !important;
+    align-items: center !important;
+    box-sizing: border-box !important;
+  }
+
+  .provider-logo-container {
+    height: 32px !important;
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .provider-logo-container img {
+    height: 24px !important;
+    width: auto !important;
+    max-width: 90% !important;
+  }
+
+  .provider-logo-container svg {
+    width: 24px !important;
+    height: 24px !important;
+  }
+
+  .provider-name {
+    font-size: 10px !important;
+    line-height: 1.2 !important;
+    white-space: normal !important;
+    word-break: break-word !important;
+    overflow: hidden !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    text-align: center !important;
+  }
+
+  .provider-glow-dot {
+    display: none !important;
+  }
+
+  .others-count {
+    font-size: 18px !important;
+    font-weight: 800 !important;
+  }
+
+  .desktop-only-card {
+    display: none !important;
+  }
+
+  .mobile-only-card {
+    display: flex !important;
+  }
+
+  /* 15. Mobile stats override */
+  .certifications-trust-panel-v2 {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    align-items: start !important;
+    padding: 20px 16px !important;
+    /* 18-22px vertical, 16-20px horizontal */
+    gap: 8px !important;
+    background: rgba(10, 15, 30, 0.4) !important;
+    border: 1px solid rgba(255, 255, 255, 0.04) !important;
+    border-radius: 16px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    margin-bottom: 28px !important;
+    /* Stats container -> 28-36px -> Verification banner */
+  }
+
+  .trust-metric-item {
+    flex: 1 1 0px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    /* Stack vertically: ICON, VALUE, LABEL */
+    align-items: center !important;
+    text-align: center !important;
+    gap: 0 !important;
+    min-width: 0 !important;
+    padding: 0 4px !important;
+    box-sizing: border-box !important;
+  }
+
+  .trust-metric-item:nth-of-type(1),
+  .trust-metric-item:nth-of-type(2) {
+    border-right: 1px solid rgba(255, 255, 255, 0.05) !important;
+  }
+
+  .trust-icon-box {
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 50% !important;
+    flex-shrink: 0 !important;
+    background: rgba(255, 255, 255, 0.02) !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin-bottom: 14px !important;
+    /* 12-16px gap between icon and value */
+  }
+
+  .trust-icon-box svg {
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  .trust-text-stack {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 4px !important;
+    /* 4-6px gap between value and label */
+    align-items: center !important;
+    width: 100% !important;
+  }
+
+  .trust-stat-title {
+    font-size: 14px !important;
+    /* Strong white typography */
+    font-weight: 700 !important;
+    color: #FFFFFF !important;
+    line-height: 1.2 !important;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.1) !important;
+  }
+
+  .trust-stat-description {
+    font-size: 10px !important;
+    /* Smaller muted lavender typography */
+    color: #A5B4FC !important;
+    line-height: 1.2 !important;
+    font-weight: 500 !important;
+  }
+
+  @media (max-width: 360px) {
+    .trust-stat-title {
+      font-size: 12px !important;
+    }
+
+    .trust-stat-description {
+      font-size: 9px !important;
+    }
+
+    .trust-icon-box {
+      width: 36px !important;
+      height: 36px !important;
+      margin-bottom: 10px !important;
+    }
+  }
+
+  .trust-panel-separator {
+    display: none !important;
+    /* Ignore default HTML divider divs */
+  }
+
+  .hide-mobile {
+    display: none !important;
+  }
+
+  .show-mobile-inline {
+    display: inline !important;
+  }
+
+  /* 16. Verification Message Banner */
+  .certifications-verification-footer {
+    margin-top: 0 !important;
+    /* Margin-bottom of stats handles the rhythm */
+    background: rgba(16, 185, 129, 0.03) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border: 1px solid rgba(16, 185, 129, 0.1) !important;
+    border-radius: 12px !important;
+    padding: 12px 16px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    text-align: left !important;
+    gap: 12px !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+  }
+
+  .certifications-verification-footer svg {
+    color: #34D399 !important;
+    width: 20px !important;
+    height: 20px !important;
+    flex-shrink: 0 !important;
+    filter: drop-shadow(0 0 4px rgba(52, 211, 153, 0.3)) !important;
+  }
+
+  .certifications-verification-footer span {
+    font-size: 12px !important;
+    line-height: 1.4 !important;
+    color: #A5B4FC !important;
+    /* Muted lavender */
   }
 }
