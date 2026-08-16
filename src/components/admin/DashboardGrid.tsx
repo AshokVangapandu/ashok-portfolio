@@ -2,7 +2,7 @@
 import React, { useEffect } from 'react';
 import { DashboardBanner } from './DashboardBanner';
 import { KpiCard } from './KpiCard';
-import { AnalyticsCard } from './AnalyticsCard';
+import { ContentPublishingCard } from './ContentPublishingCard';
 import { ActivityCard } from './ActivityCard';
 import { EdithInsights } from './EdithInsights';
 import { SystemMonitor } from './SystemMonitor';
@@ -96,9 +96,9 @@ export const DashboardGrid: React.FC = () => {
         />
       </div>
 
-      {/* 3. Analytics Card & Recent Activity row */}
+      {/* 3. Content & Publishing Card & Recent Activity row */}
       <div className="dashboard-grid-row two-cols">
-        <AnalyticsCard />
+        <ContentPublishingCard />
         <ActivityCard />
       </div>
 

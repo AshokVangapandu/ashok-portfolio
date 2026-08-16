@@ -7,7 +7,7 @@ export default defineConfig({
     {
       name: 'admin-fallback-middleware',
       configureServer(server) {
-        server.middlewares.use((req, res, next) => {
+        server.middlewares.use((req: any, _res: any, next: any) => {
           if (req.url) {
             const urlObj = new URL(req.url, 'http://localhost');
             const pathname = urlObj.pathname;

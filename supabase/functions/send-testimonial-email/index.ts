@@ -549,7 +549,7 @@ Deno.serve(async (req) => {
       });
     }
 
-  } catch (error) {
+  } catch (error: any) {
     console.error("❌ Email failed:", error.message);
     return new Response(JSON.stringify({ 
       success: false, 
