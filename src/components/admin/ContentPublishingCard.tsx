@@ -1,7 +1,120 @@
 /* src/components/admin/ContentPublishingCard.tsx */
-import React from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
+import { projectService } from '../../admin/services/projectService';
+import { certificationService } from '../../admin/services/certificationService';
+import { testimonialService } from '../../admin/services/testimonialService';
+import { resumeService } from '../../admin/services/resumeService';
+import { AdminProject } from '../../admin/types/project';
+import { Certification } from '../../admin/types/certification';
+import { ResumeSetting } from '../../admin/types/resume';
 
 export const ContentPublishingCard: React.FC = () => {
+  const [loading, setLoading] = useState<boolean>(true);
+
+  // Top Metric Counts
+  const [publishedCount, setPublishedCount] = useState<number>(0);
+  const [draftsCount, setDraftsCount] = useState<number>(0);
+  const [needsReviewCount, setNeedsReviewCount] = useState<number>(0);
+
+  // Category Subtext Counts
+  const [publishedProjects, setPublishedProjects] = useState<number>(0);
+  const [publishedCertifications, setPublishedCertifications] = useState<number>(0);
+  const [approvedTestimonials, setApprovedTestimonials] = useState<number>(0);
+  const [resumeSubtext, setResumeSubtext] = useState<string>('Up to date');
+
+  // Attention Banner Content
+  const [bannerTitle, setBannerTitle] = useState<string>('All items up to date');
+  const [bannerSubtitle, setBannerSubtitle] = useState<string>('All portfolio content is organized and publication ready.');
+
+  const loadContentData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const [projectsRes, certsRes, testimonialSummary, activeResume] = await Promise.all([
+        projectService.getProjects().catch(() => [] as AdminProject[]),
+        certificationService.getCertifications().catch(() => [] as Certification[]),
+        testimonialService.getSummary().catch(() => ({ total: 0, approved: 0, pending: 0, rejected: 0 })),
+        resumeService.getActiveResume().catch(() => null as ResumeSetting | null)
+      ]);
+
+      // 1. Projects Breakdown
+      const pubProjects = projectsRes.filter(p => p.status === 'published').length;
+      const draftProjs = projectsRes.filter(p => p.status === 'draft').length;
+      const missingThumbProjs = projectsRes.filter(p => !p.coverImageUrl || p.coverImageUrl.trim() === '').length;
+
+      // 2. Certifications Breakdown
+      const pubCerts = certsRes.filter(c => c.status === 'published').length;
+      const draftCerts = certsRes.filter(c => c.status === 'draft').length;
+      const pendingCerts = certsRes.filter(c => (c.status as string) === 'pending').length;
+
+      // 3. Testimonials Breakdown
+      const appTestimonials = testimonialSummary.approved || 0;
+      const pendingTestimonials = testimonialSummary.pending || 0;
+
+      // 4. Resume Subtext
+      let rSub = 'Up to date';
+      if (!activeResume) {
+        rSub = 'No active resume';
+      } else if (activeResume.updatedAt || activeResume.uploadedAt) {
+        const dateStr = activeResume.updatedAt || activeResume.uploadedAt;
+        const d = new Date(dateStr);
+        if (!isNaN(d.getTime())) {
+          const diffMs = Date.now() - d.getTime();
+          const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+          if (days <= 0) {
+            rSub = 'Updated today';
+          } else if (days === 1) {
+            rSub = 'Updated 1 day ago';
+          } else {
+            rSub = `Updated ${days} days ago`;
+          }
+        }
+      }
+
+      // 5. Aggregate Summaries
+      const pubTotal = pubProjects + pubCerts + appTestimonials;
+      const draftTotal = draftProjs + draftCerts + pendingTestimonials;
+
+      // 6. Actionable Attention Items
+      const attentionItems: string[] = [];
+      if (pendingTestimonials > 0) {
+        attentionItems.push(`${pendingTestimonials} ${pendingTestimonials === 1 ? 'Testimonial' : 'Testimonials'} pending approval`);
+      }
+      if (pendingCerts > 0) {
+        attentionItems.push(`${pendingCerts} ${pendingCerts === 1 ? 'Certification' : 'Certifications'} pending review`);
+      }
+      if (missingThumbProjs > 0) {
+        attentionItems.push(`${missingThumbProjs} ${missingThumbProjs === 1 ? 'Project' : 'Projects'} missing thumbnail`);
+      }
+
+      const reviewTotal = pendingTestimonials + pendingCerts + missingThumbProjs;
+
+      setPublishedCount(pubTotal);
+      setDraftsCount(draftTotal);
+      setNeedsReviewCount(reviewTotal);
+
+      setPublishedProjects(pubProjects);
+      setPublishedCertifications(pubCerts);
+      setApprovedTestimonials(appTestimonials);
+      setResumeSubtext(rSub);
+
+      if (reviewTotal > 0) {
+        setBannerTitle(`${reviewTotal} ${reviewTotal === 1 ? 'item needs' : 'items need'} attention`);
+        setBannerSubtitle(attentionItems.join('  •  '));
+      } else {
+        setBannerTitle('All items up to date');
+        setBannerSubtitle('All portfolio content is organized and publication ready.');
+      }
+    } catch (err) {
+      console.warn('[ContentPublishingCard] Error loading content data:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadContentData();
+  }, [loadContentData]);
+
   return (
     <div className="content-publishing-card">
       {/* 1. Header Section */}
@@ -18,14 +131,6 @@ export const ContentPublishingCard: React.FC = () => {
             <p className="card-subtitle-text">Keep your portfolio content organized and publication-ready.</p>
           </div>
         </div>
-
-        <button className="quick-edit-btn" type="button">
-          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M12 20h9" />
-            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
-          </svg>
-          <span>Quick Edit</span>
-        </button>
       </div>
 
       {/* 2. Top Summary Metric Cards (3 Columns) */}
@@ -35,7 +140,7 @@ export const ContentPublishingCard: React.FC = () => {
             <span className="dot green"></span>
             <span className="metric-label green-label">PUBLISHED</span>
           </div>
-          <span className="metric-count">37</span>
+          <span className="metric-count">{loading ? '...' : publishedCount.toLocaleString()}</span>
         </div>
 
         <div className="metric-card drafts">
@@ -43,7 +148,7 @@ export const ContentPublishingCard: React.FC = () => {
             <span className="dot purple"></span>
             <span className="metric-label purple-label">DRAFTS</span>
           </div>
-          <span className="metric-count">3</span>
+          <span className="metric-count">{loading ? '...' : draftsCount.toLocaleString()}</span>
         </div>
 
         <div className="metric-card review">
@@ -51,7 +156,7 @@ export const ContentPublishingCard: React.FC = () => {
             <span className="dot orange"></span>
             <span className="metric-label orange-label">NEEDS REVIEW</span>
           </div>
-          <span className="metric-count">2</span>
+          <span className="metric-count">{loading ? '...' : needsReviewCount.toLocaleString()}</span>
         </div>
       </div>
 
@@ -66,7 +171,7 @@ export const ContentPublishingCard: React.FC = () => {
           </div>
           <div className="cat-details">
             <span className="cat-title">Projects</span>
-            <span className="cat-sub">18 Published</span>
+            <span className="cat-sub">{loading ? '...' : `${publishedProjects} Published`}</span>
           </div>
         </div>
 
@@ -79,7 +184,7 @@ export const ContentPublishingCard: React.FC = () => {
           </div>
           <div className="cat-details">
             <span className="cat-title">Certifications</span>
-            <span className="cat-sub">12 Published</span>
+            <span className="cat-sub">{loading ? '...' : `${publishedCertifications} Published`}</span>
           </div>
         </div>
 
@@ -91,7 +196,7 @@ export const ContentPublishingCard: React.FC = () => {
           </div>
           <div className="cat-details">
             <span className="cat-title">Testimonials</span>
-            <span className="cat-sub">92 Approved</span>
+            <span className="cat-sub">{loading ? '...' : `${approvedTestimonials} Approved`}</span>
           </div>
         </div>
 
@@ -104,7 +209,7 @@ export const ContentPublishingCard: React.FC = () => {
           </div>
           <div className="cat-details">
             <span className="cat-title">Resume</span>
-            <span className="cat-sub">Up to date</span>
+            <span className="cat-sub">{loading ? '...' : resumeSubtext}</span>
           </div>
         </div>
       </div>
@@ -131,18 +236,25 @@ export const ContentPublishingCard: React.FC = () => {
       </div>
 
       {/* 5. Bottom Attention & Action Banner */}
-      <div className="attention-cta-banner">
+      <div className={`attention-cta-banner ${needsReviewCount === 0 ? 'banner-all-clear' : ''}`}>
         <div className="banner-left">
-          <div className="warning-icon-wrapper">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
-              <line x1="12" y1="9" x2="12" y2="13" />
-              <line x1="12" y1="17" x2="12.01" y2="17" />
-            </svg>
+          <div className={`warning-icon-wrapper ${needsReviewCount === 0 ? 'icon-success' : ''}`}>
+            {needsReviewCount > 0 ? (
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                <line x1="12" y1="9" x2="12" y2="13" />
+                <line x1="12" y1="17" x2="12.01" y2="17" />
+              </svg>
+            ) : (
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                <polyline points="22 4 12 14.01 9 11.01" />
+              </svg>
+            )}
           </div>
           <div className="banner-text">
-            <h5 className="banner-title">2 items need attention</h5>
-            <p className="banner-sub">1 Certification pending review &nbsp;•&nbsp; 1 Project missing thumbnail</p>
+            <h5 className="banner-title">{loading ? 'Loading content status...' : bannerTitle}</h5>
+            <p className="banner-sub">{loading ? 'Checking publication status...' : bannerSubtitle}</p>
           </div>
         </div>
 
@@ -416,6 +528,11 @@ export const ContentPublishingCard: React.FC = () => {
           gap: 16px;
         }
 
+        .content-publishing-card .attention-cta-banner.banner-all-clear {
+          background: #F0FDF4;
+          border-color: #BBF7D0;
+        }
+
         .content-publishing-card .banner-left {
           display: flex;
           align-items: center;
@@ -434,6 +551,10 @@ export const ContentPublishingCard: React.FC = () => {
           flex-shrink: 0;
         }
 
+        .content-publishing-card .warning-icon-wrapper.icon-success {
+          background: #16A34A;
+        }
+
         .content-publishing-card .banner-text {
           display: flex;
           flex-direction: column;
@@ -447,11 +568,19 @@ export const ContentPublishingCard: React.FC = () => {
           margin: 0;
         }
 
+        .content-publishing-card .banner-all-clear .banner-title {
+          color: #15803D;
+        }
+
         .content-publishing-card .banner-sub {
           font-size: 12.5px;
           color: #92400E;
           margin: 0;
           font-weight: 500;
+        }
+
+        .content-publishing-card .banner-all-clear .banner-sub {
+          color: #166534;
         }
 
         .content-publishing-card .view-content-btn {

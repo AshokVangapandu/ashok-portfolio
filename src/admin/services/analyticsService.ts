@@ -49,6 +49,22 @@ export const analyticsService = {
     }
   },
 
+  async getLiveVisitorsCount(): Promise<number> {
+    try {
+      const fiveMinsAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+      const { count, error } = await (supabase as any)
+        .from('visitor_sessions')
+        .select('*', { count: 'exact', head: true })
+        .gte('updated_at', fiveMinsAgo);
+
+      if (error) throw error;
+      return count || 0;
+    } catch (err) {
+      console.warn('[analyticsService.getLiveVisitorsCount] Error fetching live count:', err);
+      return 0;
+    }
+  },
+
   async getTrends(timeRange: string = '30days', mode: 'daily' | 'weekly' | 'monthly' = 'daily') {
     const { data, error } = await (supabase as any).rpc('get_analytics_trends', { range_filter: timeRange, trend_mode: mode });
     if (error) throw error;

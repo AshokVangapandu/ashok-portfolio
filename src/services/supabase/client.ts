@@ -1,8 +1,23 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { Database } from '../../../lib/supabase/types';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || (typeof window !== 'undefined' && (window as any).APP_CONFIG?.SUPABASE_URL) || '';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || (typeof window !== 'undefined' && (window as any).APP_CONFIG?.SUPABASE_ANON_KEY) || '';
+const getEnvVar = (key: string): string => {
+  try {
+    if (typeof import.meta !== 'undefined' && (import.meta as any).env && (import.meta as any).env[key]) {
+      return (import.meta as any).env[key];
+    }
+  } catch (_) {}
+  if (typeof window !== 'undefined' && (window as any).APP_CONFIG && (window as any).APP_CONFIG[key.replace('VITE_SUPABASE_', 'SUPABASE_')]) {
+    return (window as any).APP_CONFIG[key.replace('VITE_SUPABASE_', 'SUPABASE_')];
+  }
+  if (typeof (globalThis as any).process !== 'undefined' && (globalThis as any).process?.env && (globalThis as any).process.env[key]) {
+    return (globalThis as any).process.env[key];
+  }
+  return '';
+};
+
+const supabaseUrl = getEnvVar('VITE_SUPABASE_URL');
+const supabaseAnonKey = getEnvVar('VITE_SUPABASE_ANON_KEY');
 
 const isValidSupabaseConfig = (url: string, key: string): boolean => {
   if (!url || !key) return false;
