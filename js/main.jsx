@@ -1644,6 +1644,14 @@ const prefetchGeoData = async () => {
 const initTelemetry = async () => {
   if (!window.AnalyticsService) return;
 
+  const isTelemetryDebugEnabled = () => {
+    try {
+      return window.location.search.includes('telemetryDebug=true') || window.localStorage?.getItem('telemetry_debug') === 'true';
+    } catch (_) {
+      return false;
+    }
+  };
+
   const sessionId = getSessionId();
   const visitorId = getVisitorId();
   const device = getDeviceDetails();
@@ -1652,7 +1660,7 @@ const initTelemetry = async () => {
   const attribution = resolveTrafficSource(rawReferrer, window.location.search);
 
   // 1. Log visitor session
-  await window.AnalyticsService.logSession({
+  const sessionLogged = await window.AnalyticsService.logSession({
     id: sessionId,
     visitor_id: visitorId,
     ip_address: cachedGeoData.ip_address,
@@ -1673,6 +1681,10 @@ const initTelemetry = async () => {
     referrer_url: attribution.referrer,
     attribution_type: attribution.attributionType
   });
+
+  if (!sessionLogged && isTelemetryDebugEnabled()) {
+    console.warn('[Telemetry] Visitor session was not recorded; continuing without blocking the portfolio.');
+  }
 
   // 2. Log Page View (homepage)
   await window.AnalyticsService.logPageView({

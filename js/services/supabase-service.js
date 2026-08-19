@@ -362,7 +362,7 @@
   const PortfolioSettingsService = {
     async getSiteMode() {
       initSupabase();
-      if (!supabase) return 'public';
+      if (!supabase) throw new Error('Supabase client is not initialized.');
       try {
         const { data, error } = await supabase
           .from('portfolio_settings')
@@ -371,12 +371,15 @@
           .maybeSingle();
         if (error) {
           console.error("Error fetching site_mode from Supabase:", error);
-          return 'public';
+          throw error;
         }
-        return data?.visibility || 'public';
+        if (!data?.visibility) {
+          throw new Error('Portfolio visibility setting is unavailable.');
+        }
+        return data.visibility;
       } catch (err) {
         console.error("Failed to load site mode:", err);
-        return 'public';
+        throw err;
       }
     },
     async getSettings() {
@@ -413,9 +416,30 @@
         };
       }
       try {
+        const { data: subscriptionStatus, error: subscriptionError } = await supabase
+          .rpc('subscribe_maintenance_notification', { p_email: email });
+
+        if (!subscriptionError) {
+          if (subscriptionStatus === 'duplicate') {
+            return {
+              success: true,
+              isDuplicate: true,
+              message: "You're already subscribed. We'll notify you when the portfolio is live again."
+            };
+          }
+
+          return {
+            success: true,
+            isDuplicate: false,
+            message: "Thank you! We'll notify you as soon as the portfolio is live."
+          };
+        }
+
+        console.warn("MaintenanceService RPC unavailable, falling back to legacy insert flow:", subscriptionError);
+
         const { data: existing } = await supabase
           .from('maintenance_subscribers')
-          .select('id')
+          .select('id, status')
           .eq('email', email)
           .maybeSingle();
 
@@ -479,6 +503,20 @@
       initSupabase();
       if (!email || !supabase) return { isSubscribed: false };
       try {
+        const { data: isSubscribed, error: subscriptionError } = await supabase
+          .rpc('check_maintenance_subscription', { p_email: email });
+
+        if (!subscriptionError) {
+          return isSubscribed === true
+            ? {
+                isSubscribed: true,
+                message: "You're already subscribed! We'll notify you as soon as the portfolio is live again."
+              }
+            : { isSubscribed: false };
+        }
+
+        console.warn("MaintenanceService RPC status unavailable, falling back to legacy lookup:", subscriptionError);
+
         const { data } = await supabase
           .from('maintenance_subscribers')
           .select('id, status')
@@ -524,22 +562,12 @@
         return { success: false, message: 'Database service unavailable. Please try again later.' };
       }
       try {
-        const { data, error } = await supabase
-          .from('authorized_users')
-          .select('id, email, access_status')
-          .ilike('email', cleanEmail)
-          .eq('access_status', 'enabled')
-          .maybeSingle();
+        const { data: hasAccess, error } = await supabase
+          .rpc('verify_private_access', { p_email: cleanEmail });
 
         if (error) throw error;
 
-        if (data && data.access_status === 'enabled') {
-          supabase
-            .from('authorized_users')
-            .update({ last_access: new Date().toISOString() })
-            .eq('id', data.id)
-            .then(() => {});
-
+        if (hasAccess === true) {
           const session = {
             email: cleanEmail,
             token: btoa(cleanEmail + ':' + Date.now()),
@@ -616,7 +644,15 @@
             request_status: 'pending'
           });
 
-        if (insertError) throw insertError;
+        if (insertError) {
+          if (insertError.code === '23505') {
+            return {
+              success: false,
+              message: "An access request for this email address is already pending review. You'll be notified once it's reviewed."
+            };
+          }
+          throw insertError;
+        }
 
         return {
           success: true,
@@ -658,18 +694,69 @@
    * AnalyticsService
    * Handles public telemetry events tracking.
    */
+  const isTelemetryDebugEnabled = () => {
+    try {
+      return window.location.search.includes('telemetryDebug=true') || window.localStorage?.getItem('telemetry_debug') === 'true';
+    } catch (_) {
+      return false;
+    }
+  };
+
+  const logTelemetryWarning = (message, err) => {
+    if (isTelemetryDebugEnabled()) {
+      console.warn(message, err);
+    }
+  };
+
+  const ensureVisitorProfile = async (visitorId) => {
+    if (!visitorId) return false;
+
+    const { error } = await supabase
+      .from('visitor_profiles')
+      .insert([{
+        visitor_id: visitorId,
+        updated_at: new Date().toISOString()
+      }]);
+
+    if (error && error.code === '23505') return true;
+    if (error) throw error;
+    return true;
+  };
+
+  const saveVisitorProfile = async (profileData) => {
+    if (!profileData?.visitor_id) return false;
+
+    const { error: insertError } = await supabase
+      .from('visitor_profiles')
+      .insert([profileData]);
+
+    if (!insertError) return true;
+    if (insertError.code !== '23505') throw insertError;
+
+    const { visitor_id, ...profileUpdates } = profileData;
+    const { error: updateError } = await supabase
+      .from('visitor_profiles')
+      .update(profileUpdates)
+      .eq('visitor_id', visitor_id);
+
+    if (updateError) throw updateError;
+    return true;
+  };
+
   const AnalyticsService = {
     async logSession(sessionData) {
       initSupabase();
       if (!supabase) return false;
       try {
+        await ensureVisitorProfile(sessionData?.visitor_id);
+
         const { error } = await supabase
           .from('visitor_sessions')
           .insert([sessionData]);
         if (error) throw error;
         return true;
       } catch (err) {
-        console.warn('Analytics: Failed to log session:', err);
+        logTelemetryWarning('Analytics: Failed to log session:', err);
         return false;
       }
     },
@@ -688,7 +775,7 @@
         if (error) throw error;
         return true;
       } catch (err) {
-        console.warn('Analytics: Failed to ping session:', err);
+        logTelemetryWarning('Analytics: Failed to ping session:', err);
         return false;
       }
     },
@@ -703,7 +790,7 @@
         if (error) throw error;
         return true;
       } catch (err) {
-        console.warn('Analytics: Failed to log page view:', err);
+        logTelemetryWarning('Analytics: Failed to log page view:', err);
         return false;
       }
     },
@@ -718,7 +805,7 @@
         if (error) throw error;
         return true;
       } catch (err) {
-        console.warn('Analytics: Failed to log custom event:', err);
+        logTelemetryWarning('Analytics: Failed to log custom event:', err);
         return false;
       }
     },
@@ -727,13 +814,9 @@
       initSupabase();
       if (!supabase) return false;
       try {
-        const { error } = await supabase
-          .from('visitor_profiles')
-          .upsert(profileData, { onConflict: 'visitor_id' });
-        if (error) throw error;
-        return true;
+        return await saveVisitorProfile(profileData);
       } catch (err) {
-        console.warn('Analytics: Failed to upsert visitor profile:', err);
+        logTelemetryWarning('Analytics: Failed to upsert visitor profile:', err);
         return false;
       }
     }
