@@ -169,17 +169,73 @@
     }
   }
 
+  function renderVisibilityUnavailable() {
+    overlayNode.innerHTML = `
+      <div class="vis-card err">
+        <div class="vis-badge" style="color:#F87171;">Portfolio Unavailable</div>
+        <h1 class="vis-title">Unable to verify portfolio access</h1>
+        <p class="vis-desc">The portfolio visibility setting could not be loaded. For safety, public access is temporarily paused.</p>
+        <button type="button" class="vis-btn" onclick="window.location.reload()">Retry</button>
+      </div>
+    `;
+    injectOverlay();
+  }
+
+  const VISIBILITY_READY_TIMEOUT_MS = 4000;
+  const VISIBILITY_READY_POLL_MS = 50;
+  const SITE_MODE_REQUEST_TIMEOUT_MS = 2500;
+
+  const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+  function isSupabaseClientReady() {
+    return Boolean(
+      window.supabaseInstance ||
+      (window.supabase && typeof window.supabase.createClient === 'function')
+    );
+  }
+
+  function getPortfolioSettingsServiceIfReady() {
+    const service = window.PortfolioSettingsService;
+    if (!service || typeof service.getSiteMode !== 'function') {
+      return null;
+    }
+    return isSupabaseClientReady() ? service : null;
+  }
+
+  async function waitForPortfolioSettingsService() {
+    const deadline = Date.now() + VISIBILITY_READY_TIMEOUT_MS;
+    let service = getPortfolioSettingsServiceIfReady();
+
+    while (!service && Date.now() < deadline) {
+      await wait(VISIBILITY_READY_POLL_MS);
+      service = getPortfolioSettingsServiceIfReady();
+    }
+
+    if (!service) {
+      if (!window.PortfolioSettingsService || typeof window.PortfolioSettingsService.getSiteMode !== 'function') {
+        throw new Error('Portfolio settings service is unavailable.');
+      }
+      throw new Error('Supabase client was not ready before the visibility check timed out.');
+    }
+
+    return service;
+  }
+
+  async function loadSiteMode(service) {
+    return Promise.race([
+      service.getSiteMode(),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('Portfolio settings request timed out.')), SITE_MODE_REQUEST_TIMEOUT_MS))
+    ]);
+  }
+
   async function checkVisibility() {
     try {
+      const service = await waitForPortfolioSettingsService();
       const isAdmin = await checkAdminBypass();
       if (isAdmin) {
         console.log('[visibility-guard] Authenticated administrator detected. Granting full portfolio bypass.');
         removeOverlay();
-        const service = window.PortfolioSettingsService;
-        let mode = 'public';
-        if (service && typeof service.getSiteMode === 'function') {
-          mode = await service.getSiteMode();
-        }
+        const mode = await loadSiteMode(service);
         renderAdminModeBanner(mode);
         return;
       }
@@ -187,18 +243,7 @@
       const existingBanner = document.getElementById('admin-bypass-banner');
       if (existingBanner) existingBanner.remove();
 
-      if (!window.PortfolioSettingsService) {
-        await new Promise((resolve) => setTimeout(resolve, 200));
-      }
-
-      const service = window.PortfolioSettingsService;
-      let mode = 'public';
-      if (service && typeof service.getSiteMode === 'function') {
-        mode = await Promise.race([
-          service.getSiteMode(),
-          new Promise((res) => setTimeout(() => res('public'), 2500))
-        ]);
-      }
+      const mode = await loadSiteMode(service);
 
       if (mode === 'maintenance') {
         const client = (window.AuthService && window.AuthService.supabase) ||
@@ -402,8 +447,8 @@
         removeOverlay();
       }
     } catch (err) {
-      console.warn('[visibility-guard] Fetch error, defaulting to public mode:', err);
-      removeOverlay();
+      console.warn('[visibility-guard] Visibility check failed closed:', err);
+      renderVisibilityUnavailable();
     }
   }
 

@@ -76,6 +76,14 @@ const MainLayout: React.FC = () => {
     const initTelemetry = async () => {
       if (!(window as any).AnalyticsService) return;
 
+      const isTelemetryDebugEnabled = () => {
+        try {
+          return window.location.search.includes('telemetryDebug=true') || window.localStorage?.getItem('telemetry_debug') === 'true';
+        } catch (_) {
+          return false;
+        }
+      };
+
       const sessionId = getSessionId();
       const visitorId = getVisitorId();
       const device = getDeviceDetails();
@@ -97,7 +105,7 @@ const MainLayout: React.FC = () => {
         }
       } catch (e) {}
 
-      await (window as any).AnalyticsService.logSession({
+      const sessionLogged = await (window as any).AnalyticsService.logSession({
         id: sessionId,
         visitor_id: visitorId,
         ip_address: cachedGeo.ip_address,
@@ -118,6 +126,10 @@ const MainLayout: React.FC = () => {
         referrer_url: attribution.referrer,
         attribution_type: attribution.attributionType
       });
+
+      if (!sessionLogged && isTelemetryDebugEnabled()) {
+        console.warn('[Telemetry] Visitor session was not recorded; continuing without blocking the portfolio.');
+      }
 
       await (window as any).AnalyticsService.logPageView({
         session_id: sessionId,

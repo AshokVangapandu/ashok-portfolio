@@ -72,6 +72,7 @@ export class BrevoEmailProvider implements IEmailProvider {
   private apiKey: string;
   private defaultSender: EmailSender;
   private endpoint = 'https://api.brevo.com/v3/smtp/email';
+  private timeoutMs = 15000;
 
   constructor() {
     // Read Brevo config from Deno/environment variables with sensible defaults/fallbacks
@@ -157,18 +158,33 @@ export class BrevoEmailProvider implements IEmailProvider {
 
     try {
       console.log(`[emailProvider:${this.name}] Dispatching POST ${this.endpoint} to ${to.map(t => t.email).join(', ')}...`);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), this.timeoutMs);
 
-      const res = await fetch(this.endpoint, {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          'api-key': this.apiKey
-        },
-        body: JSON.stringify(payload)
-      });
+      let res: Response;
+      try {
+        res = await fetch(this.endpoint, {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'api-key': this.apiKey
+          },
+          body: JSON.stringify(payload),
+          signal: controller.signal
+        });
+      } finally {
+        clearTimeout(timeoutId);
+      }
 
-      const responseBody = await res.json().catch(() => ({}));
+      const rawText = await res.text().catch(() => '');
+      const responseBody = rawText ? (() => {
+        try {
+          return JSON.parse(rawText);
+        } catch (_) {
+          return { raw: rawText };
+        }
+      })() : {};
 
       if (!res.ok) {
         const errorDetail = responseBody?.message || responseBody?.code || `HTTP Status ${res.status}`;
@@ -181,11 +197,16 @@ export class BrevoEmailProvider implements IEmailProvider {
         };
       }
 
-      console.log(`[emailProvider:${this.name}] Email dispatched successfully! Message ID:`, responseBody?.messageId || responseBody?.id);
+      const messageId = responseBody?.messageId || responseBody?.id;
+      if (!messageId) {
+        console.warn(`[emailProvider:${this.name}] Provider returned success without a message ID.`, responseBody);
+      } else {
+        console.log(`[emailProvider:${this.name}] Email accepted by provider. Message ID:`, messageId);
+      }
 
       return {
         success: true,
-        messageId: responseBody?.messageId || responseBody?.id,
+        messageId,
         statusCode: res.status,
         rawResponse: responseBody
       };
@@ -193,7 +214,9 @@ export class BrevoEmailProvider implements IEmailProvider {
       console.error(`[emailProvider:${this.name}] Unexpected fetch error:`, err);
       return {
         success: false,
-        error: err?.message || 'Unexpected network error during email dispatch.'
+        error: err?.name === 'AbortError'
+          ? `Email provider request timed out after ${this.timeoutMs}ms.`
+          : err?.message || 'Unexpected network error during email dispatch.'
       };
     }
   }

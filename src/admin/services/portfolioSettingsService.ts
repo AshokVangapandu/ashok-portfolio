@@ -21,7 +21,11 @@ export const portfolioSettingsService = {
       throw error;
     }
 
-    return (data?.visibility as SiteMode) || 'public';
+    if (!data?.visibility) {
+      throw new Error('Portfolio visibility setting is unavailable.');
+    }
+
+    return data.visibility as SiteMode;
   },
 
   async getSettings(): Promise<PortfolioSettings> {

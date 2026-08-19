@@ -52,10 +52,56 @@ export const resumeService = {
 
     if (dbError) {
       console.error('[resumeService.uploadResume] Database insert error:', dbError);
+      try {
+        const { error: cleanupError } = await supabase.storage
+          .from('resume-files')
+          .remove([storagePath]);
+        if (cleanupError) {
+          console.warn('[resumeService.uploadResume] Uploaded file cleanup failed after DB insert error:', cleanupError);
+        }
+      } catch (cleanupErr) {
+        console.warn('[resumeService.uploadResume] Uploaded file cleanup threw after DB insert error:', cleanupErr);
+      }
       throw dbError;
     }
 
     return mapSupabaseToResumeSetting(data as SupabaseResumeSetting);
+  },
+
+  /**
+   * Replaces an active resume without deleting the known-good resume first.
+   */
+  async replaceResume(
+    oldResumeId: string,
+    file: File,
+    resumeName: string,
+    version: string
+  ): Promise<{ resume: ResumeSetting; cleanupWarning?: string }> {
+    const uploaded = await this.uploadResume(file, resumeName, version, false);
+    const activated = await this.setActiveResume(uploaded.id).catch(async (activationErr) => {
+      try {
+        await this.deleteResume(uploaded.id);
+      } catch (cleanupErr) {
+        console.warn('[resumeService.replaceResume] Failed to clean up inactive replacement after activation error:', cleanupErr);
+      }
+      throw activationErr;
+    });
+
+    const active = await this.getActiveResume();
+
+    if (!active || active.id !== activated.id) {
+      throw new Error('Replacement uploaded, but the new resume could not be verified as active.');
+    }
+
+    let cleanupWarning: string | undefined;
+    try {
+      await this.deleteResume(oldResumeId);
+    } catch (cleanupErr: any) {
+      console.warn('[resumeService.replaceResume] New resume is active, but old resume cleanup failed:', cleanupErr);
+      cleanupWarning = cleanupErr?.message || 'Old resume cleanup failed after replacement.';
+    }
+
+    return { resume: activated, cleanupWarning };
   },
 
   /**

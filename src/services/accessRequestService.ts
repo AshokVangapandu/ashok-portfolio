@@ -53,6 +53,12 @@ export const accessRequestService = {
         });
 
       if (insertError) {
+        if (insertError.code === '23505') {
+          return {
+            success: false,
+            message: "An access request for this email address is already pending review. You'll be notified once it's reviewed."
+          };
+        }
         console.error('[accessRequestService] Submit error:', insertError);
         throw insertError;
       }

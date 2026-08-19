@@ -515,6 +515,8 @@ export const AnalyticsGridView: React.FC<AnalyticsGridViewProps> = ({
         <PeakHoursHeatmap
           peakHours={peakHours}
           loading={loading}
+          error={error}
+          onRetry={onRetry}
         />
       </div>
     </div>

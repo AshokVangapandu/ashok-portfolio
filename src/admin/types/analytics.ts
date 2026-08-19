@@ -70,6 +70,9 @@ export interface VisitorComparison {
 export interface PeakHours {
   hour: string;
   value: number; // 0 to 10 scale representing low to high
+  count?: number; // actual visitor sessions in this hour, when returned by the analytics RPC
+  label?: string; // display-ready local time label, e.g. 6 AM
+  timezone?: string;
 }
 
 export interface AnalyticsVisitor {

@@ -16,6 +16,7 @@ import {
   MOCK_ANALYTICS_VISITORS
 } from './analytics.mock';
 import { AnalyticsVisitor, VisitorSession } from '../types/analytics';
+import { PeakHours } from '../types/analytics';
 
 export interface VisitorQueryOptions {
   search?: string;
@@ -35,6 +36,16 @@ const getTimerangeStart = (range: string): Date => {
   } else { // 30days
     return new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
   }
+};
+
+const normalizePeakHours = (rows: PeakHours[] = []): PeakHours[] => {
+  return rows.map((row) => ({
+    ...row,
+    value: Number(row.value) || 0,
+    count: typeof row.count === 'number' ? row.count : undefined,
+    label: row.label || row.hour,
+    timezone: row.timezone
+  }));
 };
 
 export const analyticsService = {
@@ -142,10 +153,10 @@ export const analyticsService = {
     try {
       const { data, error } = await (supabase as any).rpc('get_analytics_peak_hours', { range_filter: timeRange });
       if (error) throw error;
-      return data || MOCK_PEAK_HOURS;
+      return normalizePeakHours(data || MOCK_PEAK_HOURS);
     } catch (err) {
       console.warn('[analyticsService.getPeakHours] Failed, returning mock data:', err);
-      return MOCK_PEAK_HOURS;
+      return normalizePeakHours(MOCK_PEAK_HOURS);
     }
   },
 

@@ -29,7 +29,7 @@ Deno.serve(async (req) => {
     const payload = await req.json();
     console.log("Received webhook payload:", JSON.stringify(payload));
 
-    const record = payload.record;
+    const record = payload.record || payload;
     if (!record) {
       throw new Error("No record found in payload");
     }

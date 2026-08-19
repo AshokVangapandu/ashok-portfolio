@@ -2,6 +2,7 @@ import "@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@^2";
 import { renderPortfolioEmail } from "../_shared/emailTemplate.ts";
 import { sendEmail } from "../_shared/emailProvider.ts";
+import { corsHeaders, jsonResponse, requireWebhookSecret } from "../_shared/functionAuth.ts";
 
 console.log("notify-admins-new-request function initialized");
 
@@ -9,27 +10,16 @@ Deno.serve(async (req) => {
   // Handle CORS Preflight
   if (req.method === 'OPTIONS') {
     return new Response('ok', {
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-webhook-secret',
-      }
+      headers: corsHeaders
     });
   }
 
   try {
-    // Verify Webhook Secret
-    const webhookSecret = req.headers.get('x-webhook-secret');
-    const expectedSecret = Deno.env.get('WEBHOOK_SECRET');
-    if (expectedSecret && webhookSecret && webhookSecret !== expectedSecret) {
-      console.warn("[notify-admins-new-request] Webhook secret mismatch.");
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
-      });
-    }
+    const unauthorized = requireWebhookSecret(req);
+    if (unauthorized) return unauthorized;
 
     const payload = await req.json().catch(() => ({}));
-    const record = payload.record;
+    const record = payload.record || payload;
     if (!record) {
       throw new Error("No record found in payload");
     }
@@ -41,10 +31,7 @@ Deno.serve(async (req) => {
     const reason = record.reason || 'No reason provided';
 
     if (!visitorEmail) {
-      return new Response(JSON.stringify({ error: "Missing visitor email." }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
-      });
+      return jsonResponse({ error: "Missing visitor email." }, 400);
     }
 
     // Initialize Supabase client using Service Role key to query active admins
@@ -152,22 +139,10 @@ You received this email because you are registered as an active administrator fo
     }
 
     console.log("[notify-admins-new-request] Email dispatched successfully. Message ID:", result.messageId);
-    return new Response(JSON.stringify({ success: true, id: result.messageId }), {
-      status: 200,
-      headers: { 
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      }
-    });
+    return jsonResponse({ success: true, id: result.messageId });
 
   } catch (error: any) {
     console.error("[notify-admins-new-request] Error sending notification:", error.message);
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 400,
-      headers: { 
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      }
-    });
+    return jsonResponse({ error: error.message }, 400);
   }
 });

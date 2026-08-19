@@ -1,6 +1,7 @@
 import "@supabase/functions-js/edge-runtime.d.ts";
 import { renderPortfolioEmail } from "../_shared/emailTemplate.ts";
 import { sendEmail } from "../_shared/emailProvider.ts";
+import { corsHeaders, jsonResponse, requireAdmin } from "../_shared/functionAuth.ts";
 
 console.log("send-access-approval-email function initialized");
 
@@ -8,34 +9,20 @@ Deno.serve(async (req) => {
   // Handle CORS Preflight
   if (req.method === 'OPTIONS') {
     return new Response('ok', {
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-webhook-secret',
-      }
+      headers: corsHeaders
     });
   }
 
   try {
-    // Optional Webhook Secret Verification if supplied
-    const webhookSecret = req.headers.get('x-webhook-secret');
-    const expectedSecret = Deno.env.get('WEBHOOK_SECRET');
-    if (expectedSecret && webhookSecret && webhookSecret !== expectedSecret) {
-      console.warn("[send-access-approval-email] Webhook secret mismatch.");
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
-      });
-    }
+    const auth = await requireAdmin(req);
+    if (!auth.ok) return auth.response;
 
     const payload = await req.json().catch(() => ({}));
     const email = payload.email || payload.record?.email;
     const name = payload.name || payload.record?.full_name || 'there';
 
     if (!email) {
-      return new Response(JSON.stringify({ error: "Missing recipient email address." }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
-      });
+      return jsonResponse({ error: "Missing recipient email address." }, 400);
     }
 
     const portfolioUrl = Deno.env.get('PORTFOLIO_URL') || payload.portfolio_url || 'https://ashokvangapandu.com';
@@ -88,22 +75,10 @@ If you didn't request access, you can safely ignore this email.
     }
 
     console.log("[send-access-approval-email] Email sent successfully. Message ID:", result.messageId);
-    return new Response(JSON.stringify({ success: true, id: result.messageId }), {
-      status: 200,
-      headers: { 
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      }
-    });
+    return jsonResponse({ success: true, id: result.messageId });
 
   } catch (error: any) {
     console.error("[send-access-approval-email] Error sending notification:", error.message);
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 400,
-      headers: { 
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      }
-    });
+    return jsonResponse({ error: error.message }, 400);
   }
 });

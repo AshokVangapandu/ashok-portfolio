@@ -1,6 +1,7 @@
 import "@supabase/functions-js/edge-runtime.d.ts";
 import { renderPortfolioEmail } from "../_shared/emailTemplate.ts";
 import { sendEmail } from "../_shared/emailProvider.ts";
+import { corsHeaders, jsonResponse, requireAdmin } from "../_shared/functionAuth.ts";
 
 console.log("send-admin-invitation function initialized");
 
@@ -8,23 +9,20 @@ Deno.serve(async (req) => {
   // Handle CORS Preflight
   if (req.method === 'OPTIONS') {
     return new Response('ok', {
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-      }
+      headers: corsHeaders
     });
   }
 
   try {
+    const auth = await requireAdmin(req, { superAdmin: true });
+    if (!auth.ok) return auth.response;
+
     const payload = await req.json().catch(() => ({}));
     const email = payload.email;
     const role = payload.role || 'administrator';
 
     if (!email) {
-      return new Response(JSON.stringify({ error: "Missing recipient email address." }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
-      });
+      return jsonResponse({ error: "Missing recipient email address." }, 400);
     }
 
     const portfolioUrl = Deno.env.get('PORTFOLIO_URL') || 'https://ashokvangapandu.com';
@@ -75,22 +73,10 @@ If you weren't expecting this invitation, you can safely ignore this email.
     }
 
     console.log("[send-admin-invitation] Email sent successfully. Message ID:", result.messageId);
-    return new Response(JSON.stringify({ success: true, id: result.messageId }), {
-      status: 200,
-      headers: { 
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      }
-    });
+    return jsonResponse({ success: true, id: result.messageId });
 
   } catch (error: any) {
     console.error("[send-admin-invitation] Error sending notification:", error.message);
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 400,
-      headers: { 
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      }
-    });
+    return jsonResponse({ error: error.message }, 400);
   }
 });

@@ -53,13 +53,8 @@ export const privateAccessService = {
     }
 
     try {
-      // Lookup enabled authorized user (case-insensitive email match)
-      const { data, error } = await supabase
-        .from('authorized_users')
-        .select('id, email, access_status')
-        .ilike('email', cleanEmail)
-        .eq('access_status', 'enabled')
-        .maybeSingle();
+      const { data: hasAccess, error } = await (supabase as any)
+        .rpc('verify_private_access', { p_email: cleanEmail });
 
       if (error) {
         console.error('[privateAccessService] Database lookup error:', error);
@@ -69,16 +64,7 @@ export const privateAccessService = {
         };
       }
 
-      if (data && data.access_status === 'enabled') {
-        // Record last access timestamp
-        supabase
-          .from('authorized_users')
-          .update({ last_access: new Date().toISOString() })
-          .eq('id', data.id)
-          .then(({ error: updateErr }) => {
-            if (updateErr) console.warn('[privateAccessService] Failed to update last_access:', updateErr);
-          });
-
+      if (hasAccess === true) {
         // Store session in sessionStorage
         const session: PrivateSession = {
           email: cleanEmail,

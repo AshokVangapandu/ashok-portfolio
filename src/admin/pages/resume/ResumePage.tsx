@@ -95,15 +95,20 @@ export const ResumePage: React.FC = () => {
     }
     try {
       if (isReplace) {
-        await resumeService.deleteResume(selectedResume.id);
+        const result = await resumeService.replaceResume(selectedResume.id, file, resumeName, version);
+        showToast(
+          result.cleanupWarning ? 'error' : 'success',
+          result.cleanupWarning ? 'Resume Replaced, Cleanup Failed' : 'Resume Replaced',
+          result.cleanupWarning || 'Resume PDF uploaded and set to active.'
+        );
+      } else {
+        await resumeService.uploadResume(file, resumeName, version, true);
+        showToast(
+          'success',
+          'Resume Uploaded',
+          'Resume PDF uploaded and set to active.'
+        );
       }
-
-      await resumeService.uploadResume(file, resumeName, version, true);
-      showToast(
-        'success',
-        uploadMode === 'replace' ? 'Resume Replaced' : 'Resume Uploaded',
-        'Resume PDF uploaded and set to active.'
-      );
       await fetchResumes();
     } catch (err: any) {
       console.error('[ResumePage.handleSaveResume] Error:', err);

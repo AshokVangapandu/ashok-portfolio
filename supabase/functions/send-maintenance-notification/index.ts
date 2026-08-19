@@ -1,6 +1,7 @@
 import "@supabase/functions-js/edge-runtime.d.ts";
 import { renderPortfolioEmail } from "../_shared/emailTemplate.ts";
 import { sendEmail } from "../_shared/emailProvider.ts";
+import { corsHeaders, jsonResponse, requireAdmin } from "../_shared/functionAuth.ts";
 
 console.log("send-maintenance-notification function initialized");
 
@@ -8,34 +9,20 @@ Deno.serve(async (req) => {
   // Handle CORS Preflight
   if (req.method === 'OPTIONS') {
     return new Response('ok', {
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-webhook-secret',
-      }
+      headers: corsHeaders
     });
   }
 
   try {
-    // Optional Webhook Secret Verification if supplied
-    const webhookSecret = req.headers.get('x-webhook-secret');
-    const expectedSecret = Deno.env.get('WEBHOOK_SECRET');
-    if (expectedSecret && webhookSecret && webhookSecret !== expectedSecret) {
-      console.warn("[send-maintenance-notification] Webhook secret mismatch.");
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
-      });
-    }
+    const auth = await requireAdmin(req);
+    if (!auth.ok) return auth.response;
 
     const payload = await req.json().catch(() => ({}));
     const email = payload.email || payload.record?.email;
     const subscriberId = payload.subscriber_id || payload.record?.id;
 
     if (!email) {
-      return new Response(JSON.stringify({ error: "Missing recipient email address." }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
-      });
+      return jsonResponse({ error: "Missing recipient email address." }, 400);
     }
 
     const portfolioUrl = Deno.env.get('PORTFOLIO_URL') || payload.portfolio_url || 'https://ashokvangapandu.com';
@@ -88,30 +75,18 @@ Ashok Vangapandu
 
     console.log(`[send-maintenance-notification] Successfully sent to ${email}. Message ID: ${result.messageId}`);
 
-    return new Response(JSON.stringify({
+    return jsonResponse({
       success: true,
       id: result.messageId,
       email,
       subscriber_id: subscriberId
-    }), {
-      status: 200,
-      headers: { 
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      }
     });
 
   } catch (error: any) {
     console.error("[send-maintenance-notification] Error dispatching email:", error.message || error);
-    return new Response(JSON.stringify({
+    return jsonResponse({
       success: false,
       error: error.message || 'Unknown error occurred while sending email.'
-    }), {
-      status: 500,
-      headers: { 
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      }
-    });
+    }, 500);
   }
 });

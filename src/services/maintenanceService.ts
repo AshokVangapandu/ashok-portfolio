@@ -20,6 +20,27 @@ export const maintenanceService = {
     }
 
     try {
+      const { data: subscriptionStatus, error: subscriptionError } = await (supabase as any)
+        .rpc('subscribe_maintenance_notification', { p_email: email });
+
+      if (!subscriptionError) {
+        if (subscriptionStatus === 'duplicate') {
+          return {
+            success: true,
+            isDuplicate: true,
+            message: "You're already subscribed. We'll notify you when the portfolio is live again."
+          };
+        }
+
+        return {
+          success: true,
+          isDuplicate: false,
+          message: "Thank you! We'll notify you as soon as the portfolio is live."
+        };
+      }
+
+      console.warn('[maintenanceService] RPC subscription unavailable, falling back to legacy insert flow:', subscriptionError);
+
       // 1. Check for existing subscription
       const { data: existing, error: checkError } = await supabase
         .from('maintenance_subscribers')
@@ -94,6 +115,20 @@ export const maintenanceService = {
     const email = (rawEmail || '').trim().toLowerCase();
     if (!email) return { isSubscribed: false };
     try {
+      const { data: isSubscribed, error: subscriptionError } = await (supabase as any)
+        .rpc('check_maintenance_subscription', { p_email: email });
+
+      if (!subscriptionError) {
+        return isSubscribed === true
+          ? {
+              isSubscribed: true,
+              message: "You're already subscribed! We'll notify you as soon as the portfolio is live again."
+            }
+          : { isSubscribed: false };
+      }
+
+      console.warn('[maintenanceService] RPC subscription status unavailable, falling back to legacy lookup:', subscriptionError);
+
       const { data, error } = await supabase
         .from('maintenance_subscribers')
         .select('id, status')

@@ -4,6 +4,7 @@ import { ToolsProduct, SupabaseToolsProduct, mapSupabaseToToolsProduct, ProductC
 import productsData from '../../data/products.json';
 
 const CACHE_KEY = 'admin_tools_products_cache';
+const canUseLocalFallback = () => import.meta.env.DEV && typeof localStorage !== 'undefined';
 
 export const toolsProductsService = {
   /**
@@ -17,8 +18,11 @@ export const toolsProductsService = {
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.warn('[toolsProductsService] Supabase query failed, using local cache:', error.message);
-        return this.getLocalCache();
+        if (canUseLocalFallback()) {
+          console.warn('[toolsProductsService] Supabase query failed, using local dev cache:', error.message);
+          return this.getLocalCache();
+        }
+        throw error;
       }
 
       const mapped = ((data as any) as SupabaseToolsProduct[] || []).map(mapSupabaseToToolsProduct);
@@ -27,8 +31,11 @@ export const toolsProductsService = {
       }
       return mapped;
     } catch (err: any) {
-      console.warn('[toolsProductsService] Query caught error, using local cache:', err);
-      return this.getLocalCache();
+      if (canUseLocalFallback()) {
+        console.warn('[toolsProductsService] Query caught error, using local dev cache:', err);
+        return this.getLocalCache();
+      }
+      throw err;
     }
   },
 
@@ -36,6 +43,7 @@ export const toolsProductsService = {
    * Creates a new tools product with relational capabilities & technologies.
    */
   async createToolsProduct(product: ToolsProduct): Promise<ToolsProduct> {
+    let createdProductId: string | null = null;
     try {
       // 1. Insert product details
       const { data, error } = await (supabase as any)
@@ -67,13 +75,15 @@ export const toolsProductsService = {
 
       if (error) throw error;
       const insertedProduct = mapSupabaseToToolsProduct(data);
+      createdProductId = insertedProduct.id;
 
       // If this product is featured, unset any other featured products
       if (product.isFeatured) {
-        await (supabase as any)
+        const { error: featuredError } = await (supabase as any)
           .from('tools_products')
           .update({ is_featured: false })
           .neq('id', insertedProduct.id);
+        if (featuredError) throw featuredError;
       }
 
       // 2. Insert capabilities
@@ -85,7 +95,8 @@ export const toolsProductsService = {
           icon: c.icon,
           display_order: idx
         }));
-        await (supabase as any).from('product_capabilities').insert(caps);
+        const { error: capsError } = await (supabase as any).from('product_capabilities').insert(caps);
+        if (capsError) throw capsError;
       }
 
       // 3. Insert technologies
@@ -95,23 +106,34 @@ export const toolsProductsService = {
           name: t,
           display_order: idx
         }));
-        await (supabase as any).from('product_technologies').insert(techs);
+        const { error: techsError } = await (supabase as any).from('product_technologies').insert(techs);
+        if (techsError) throw techsError;
       }
 
       // Retrieve full record with joins
-      const { data: finalRecord } = await (supabase as any)
+      const { data: finalRecord, error: finalError } = await (supabase as any)
         .from('tools_products')
         .select('*, product_capabilities(*), product_technologies(*)')
         .eq('id', insertedProduct.id)
         .single();
 
+      if (finalError || !finalRecord) throw finalError || new Error('Product was created but could not be verified.');
+
       const mapped = mapSupabaseToToolsProduct(finalRecord);
       this.addToLocalCache(mapped);
       return mapped;
     } catch (err: any) {
-      console.warn('[toolsProductsService] Supabase create failed, saving to local cache:', err.message);
-      this.addToLocalCache(product);
-      return product;
+      console.error('[toolsProductsService] Supabase create failed:', err);
+      if (createdProductId) {
+        const { error: cleanupError } = await (supabase as any)
+          .from('tools_products')
+          .delete()
+          .eq('id', createdProductId);
+        if (cleanupError) {
+          console.warn('[toolsProductsService] Failed to clean up partially-created product:', cleanupError);
+        }
+      }
+      throw err;
     }
   },
 
@@ -119,7 +141,19 @@ export const toolsProductsService = {
    * Updates an existing tools product and its repeater rows.
    */
   async updateToolsProduct(id: string, updates: ToolsProduct): Promise<ToolsProduct> {
+    let snapshot: any = null;
     try {
+      const { data: existingRecord, error: snapshotError } = await (supabase as any)
+        .from('tools_products')
+        .select('*, product_capabilities(*), product_technologies(*)')
+        .eq('id', id)
+        .single();
+
+      if (snapshotError || !existingRecord) {
+        throw snapshotError || new Error('Existing product could not be loaded before update.');
+      }
+      snapshot = existingRecord;
+
       // 1. Update product info
       const { error } = await (supabase as any)
         .from('tools_products')
@@ -150,15 +184,19 @@ export const toolsProductsService = {
 
       // If this product is featured, unset any other featured products
       if (updates.isFeatured) {
-        await (supabase as any)
+        const { error: featuredError } = await (supabase as any)
           .from('tools_products')
           .update({ is_featured: false })
           .neq('id', id);
+        if (featuredError) throw featuredError;
       }
 
       // 2. Cascade delete existing caps and techs
-      await (supabase as any).from('product_capabilities').delete().eq('product_id', id);
-      await (supabase as any).from('product_technologies').delete().eq('product_id', id);
+      const { error: deleteCapsError } = await (supabase as any).from('product_capabilities').delete().eq('product_id', id);
+      if (deleteCapsError) throw deleteCapsError;
+
+      const { error: deleteTechsError } = await (supabase as any).from('product_technologies').delete().eq('product_id', id);
+      if (deleteTechsError) throw deleteTechsError;
 
       // 3. Re-insert new caps
       if (updates.capabilities.length > 0) {
@@ -169,7 +207,8 @@ export const toolsProductsService = {
           icon: c.icon,
           display_order: idx
         }));
-        await (supabase as any).from('product_capabilities').insert(caps);
+        const { error: capsError } = await (supabase as any).from('product_capabilities').insert(caps);
+        if (capsError) throw capsError;
       }
 
       // 4. Re-insert new techs
@@ -179,23 +218,93 @@ export const toolsProductsService = {
           name: t,
           display_order: idx
         }));
-        await (supabase as any).from('product_technologies').insert(techs);
+        const { error: techsError } = await (supabase as any).from('product_technologies').insert(techs);
+        if (techsError) throw techsError;
       }
 
       // Retrieve full updated record
-      const { data: finalRecord } = await (supabase as any)
+      const { data: finalRecord, error: finalError } = await (supabase as any)
         .from('tools_products')
         .select('*, product_capabilities(*), product_technologies(*)')
         .eq('id', id)
         .single();
 
+      if (finalError || !finalRecord) throw finalError || new Error('Product was updated but could not be verified.');
+
       const mapped = mapSupabaseToToolsProduct(finalRecord);
       this.updateLocalCache(id, mapped);
       return mapped;
     } catch (err: any) {
-      console.warn('[toolsProductsService] Supabase update failed, saving to local cache:', err.message);
-      this.updateLocalCache(id, updates);
-      return updates;
+      console.error('[toolsProductsService] Supabase update failed:', err);
+      if (snapshot) {
+        try {
+          const { error: rollbackProductError } = await (supabase as any)
+            .from('tools_products')
+            .update({
+              title: snapshot.title,
+              description: snapshot.description,
+              type: snapshot.type,
+              version: snapshot.version,
+              category: snapshot.category,
+              cover_image_url: snapshot.cover_image_url,
+              preview_image_url: snapshot.preview_image_url,
+              rating: snapshot.rating,
+              downloads: snapshot.downloads,
+              views: snapshot.views,
+              marketplace_url: snapshot.marketplace_url,
+              github_url: snapshot.github_url,
+              docs_url: snapshot.docs_url,
+              demo_url: snapshot.demo_url,
+              is_featured: snapshot.is_featured,
+              is_coming_soon: snapshot.is_coming_soon,
+              problem_solved: snapshot.problem_solved,
+              status: snapshot.status
+            })
+            .eq('id', id);
+          if (rollbackProductError) throw rollbackProductError;
+
+          const { error: rollbackCapsDeleteError } = await (supabase as any)
+            .from('product_capabilities')
+            .delete()
+            .eq('product_id', id);
+          if (rollbackCapsDeleteError) throw rollbackCapsDeleteError;
+
+          const { error: rollbackTechsDeleteError } = await (supabase as any)
+            .from('product_technologies')
+            .delete()
+            .eq('product_id', id);
+          if (rollbackTechsDeleteError) throw rollbackTechsDeleteError;
+
+          const previousCaps = (snapshot.product_capabilities || []).map((cap: any) => ({
+            product_id: id,
+            title: cap.title,
+            description: cap.description,
+            icon: cap.icon,
+            display_order: cap.display_order
+          }));
+          if (previousCaps.length > 0) {
+            const { error: rollbackCapsInsertError } = await (supabase as any)
+              .from('product_capabilities')
+              .insert(previousCaps);
+            if (rollbackCapsInsertError) throw rollbackCapsInsertError;
+          }
+
+          const previousTechs = (snapshot.product_technologies || []).map((tech: any) => ({
+            product_id: id,
+            name: tech.name,
+            display_order: tech.display_order
+          }));
+          if (previousTechs.length > 0) {
+            const { error: rollbackTechsInsertError } = await (supabase as any)
+              .from('product_technologies')
+              .insert(previousTechs);
+            if (rollbackTechsInsertError) throw rollbackTechsInsertError;
+          }
+        } catch (rollbackErr) {
+          console.warn('[toolsProductsService] Failed to restore previous product state after update error:', rollbackErr);
+        }
+      }
+      throw err;
     }
   },
 
@@ -205,11 +314,13 @@ export const toolsProductsService = {
   async deleteToolsProduct(id: string): Promise<boolean> {
     try {
       // Find asset paths for storage cleanup
-      const { data: prod } = await (supabase as any)
+      const { data: prod, error: fetchError } = await (supabase as any)
         .from('tools_products')
         .select('cover_image_url, preview_image_url')
         .eq('id', id)
         .single();
+
+      if (fetchError) throw fetchError;
 
       const coverPath = prod?.cover_image_url ? prod.cover_image_url.split('/storage/v1/object/public/tools-products/')[1] : null;
       const previewPath = prod?.preview_image_url ? prod.preview_image_url.split('/storage/v1/object/public/tools-products/')[1] : null;
@@ -224,15 +335,17 @@ export const toolsProductsService = {
       // Delete storage files
       const pathsToDelete = [coverPath, previewPath].filter(Boolean) as string[];
       if (pathsToDelete.length > 0) {
-        await supabase.storage.from('tools-products').remove(pathsToDelete);
+        const { error: storageError } = await supabase.storage.from('tools-products').remove(pathsToDelete);
+        if (storageError) {
+          console.warn('[toolsProductsService] Product deleted, but asset cleanup failed:', storageError);
+        }
       }
 
       this.removeFromLocalCache(id);
       return true;
     } catch (err: any) {
-      console.warn('[toolsProductsService] Supabase delete failed, removing from cache:', err.message);
-      this.removeFromLocalCache(id);
-      return true;
+      console.error('[toolsProductsService] Supabase delete failed:', err);
+      throw err;
     }
   },
 

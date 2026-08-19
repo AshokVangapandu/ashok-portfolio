@@ -28,8 +28,9 @@ export const PortfolioSettingsProvider: React.FC<PortfolioSettingsProviderProps>
       const mode = await portfolioSettingsService.getSiteMode();
       setSiteMode(mode);
     } catch (err: any) {
-      console.warn('[PortfolioSettingsProvider] Error fetching site_mode, defaulting to public:', err);
-      setSiteMode('public');
+      console.warn('[PortfolioSettingsProvider] Error fetching site_mode; failing closed:', err);
+      setSiteMode('maintenance');
+      setError(err?.message || 'Unable to verify portfolio visibility. Please try again.');
     } finally {
       setIsLoading(false);
     }

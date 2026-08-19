@@ -18,13 +18,13 @@ entrypoint = "./functions/send-testimonial-email/index.ts"
 
 [functions.send-maintenance-notification]
 enabled = true
-verify_jwt = false
+verify_jwt = true
 import_map = "./functions/send-maintenance-notification/deno.json"
 entrypoint = "./functions/send-maintenance-notification/index.ts"
 
 [functions.send-access-approval-email]
 enabled = true
-verify_jwt = false
+verify_jwt = true
 import_map = "./functions/send-access-approval-email/deno.json"
 entrypoint = "./functions/send-access-approval-email/index.ts"
 
@@ -36,7 +36,7 @@ entrypoint = "./functions/notify-admins-new-request/index.ts"
 
 [functions.send-admin-invitation]
 enabled = true
-verify_jwt = false
+verify_jwt = true
 import_map = "./functions/send-admin-invitation/deno.json"
 entrypoint = "./functions/send-admin-invitation/index.ts"
 
