@@ -45,7 +45,7 @@ export const IndustryGrid: React.FC = () => {
         </h3>
       </div>
 
-      {/* Marquee Track viewport wrapper */}
+      {/* Marquee Track viewport wrapper with transparent edge fade mask */}
       <div
         style={{
           width: '100%',
@@ -53,34 +53,11 @@ export const IndustryGrid: React.FC = () => {
           position: 'relative',
           padding: '12px 0',
           display: 'flex',
-          alignItems: 'center'
+          alignItems: 'center',
+          WebkitMaskImage: 'linear-gradient(to right, transparent 0%, #000 8%, #000 92%, transparent 100%)',
+          maskImage: 'linear-gradient(to right, transparent 0%, #000 8%, #000 92%, transparent 100%)'
         }}
       >
-        {/* Soft edge blur masks to fade in/out on sides */}
-        <div
-          style={{
-            position: 'absolute',
-            left: 0,
-            top: 0,
-            bottom: 0,
-            width: '120px',
-            background: 'linear-gradient(90deg, #080c25 0%, transparent 100%)',
-            zIndex: 3,
-            pointerEvents: 'none'
-          }}
-        />
-        <div
-          style={{
-            position: 'absolute',
-            right: 0,
-            top: 0,
-            bottom: 0,
-            width: '120px',
-            background: 'linear-gradient(270deg, #080c25 0%, transparent 100%)',
-            zIndex: 3,
-            pointerEvents: 'none'
-          }}
-        />
 
         {/* Rolling track container (scrolls in reverse direction) */}
         <div

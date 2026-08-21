@@ -7,6 +7,7 @@ import { AchievementsPanel } from '../components/tools/achievementspanel';
 import { TechnologyGrid } from '../components/tools/technologygrid';
 import { CTASection } from '../components/tools/ctasection';
 import { ProductDetailsModal } from '../components/tools/productdetailsmodal';
+import { BackButton } from '../components/BackButton';
 
 interface ComingSoonData {
   progress: number;
@@ -17,7 +18,7 @@ interface ComingSoonData {
 const getComingSoonDetails = (title: string): ComingSoonData => {
   const seed = title.length;
   const progress = 60 + (seed % 5) * 8; // returns 60%, 68%, 76%, 84%, 92%
-  
+
   const statusList: ComingSoonData['status'] = [
     { label: 'Architecture & Design', state: 'done' },
     { label: 'UI Layout Complete', state: progress >= 68 ? 'done' : 'wip' },
@@ -42,6 +43,10 @@ export const ToolsProductsPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [activeProduct, setActiveProduct] = useState<Product | null>(null);
+
+  const baseUrl = typeof window !== 'undefined' && window.location.pathname.startsWith('/ashok-portfolio')
+    ? '/ashok-portfolio/'
+    : '/';
 
   useEffect(() => {
     const loadData = async () => {
@@ -114,7 +119,7 @@ export const ToolsProductsPage: React.FC = () => {
 
   const handleCloseDetails = () => {
     if (window.location.hash) {
-      window.history.pushState(null, '', window.location.pathname + window.location.search);
+      window.history.replaceState(null, '', window.location.pathname + window.location.search);
     }
     setSelectedProduct(null);
   };
@@ -124,16 +129,20 @@ export const ToolsProductsPage: React.FC = () => {
       style={{
         display: 'flex',
         flexDirection: 'column',
-        gap: '64px',
+        gap: '40px',
         width: '100%',
         maxWidth: '1200px',
         margin: '0 auto',
-        padding: '110px 24px 80px 24px',
+        padding: '36px 24px 80px 24px',
         boxSizing: 'border-box',
         color: '#FFFFFF',
         fontFamily: "'Inter', sans-serif"
       }}
     >
+      {/* Top minimal back control */}
+      <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-start' }}>
+        <BackButton label="Back to Portfolio" fallbackUrl={`${baseUrl}#widget-lab`} />
+      </div>
       <style>{`
         @keyframes pulse-glow-orange {
           0% { transform: scale(1); opacity: 0.6; }
@@ -327,7 +336,7 @@ export const ToolsProductsPage: React.FC = () => {
                   gap: '10px',
                   maxHeight: '560px',
                   overflowY: 'auto',
-                  paddingRight: '6px'
+                  padding: '6px'
                 }}
                 className="custom-scrollbar"
               >
@@ -342,11 +351,11 @@ export const ToolsProductsPage: React.FC = () => {
                       style={{
                         padding: '16px',
                         borderRadius: '16px',
-                        backgroundColor: isActive 
-                          ? (isFeatured ? 'rgba(212, 163, 89, 0.05)' : 'rgba(124, 58, 237, 0.06)') 
+                        backgroundColor: isActive
+                          ? (isFeatured ? 'rgba(212, 163, 89, 0.05)' : 'rgba(124, 58, 237, 0.06)')
                           : (isFeatured ? 'rgba(212, 163, 89, 0.02)' : (isComingSoon ? 'rgba(255, 255, 255, 0.005)' : 'rgba(255, 255, 255, 0.015)')),
-                        border: isActive 
-                          ? (isFeatured ? '1px solid rgba(212, 163, 89, 0.45)' : '1px solid rgba(139, 92, 246, 0.4)') 
+                        border: isActive
+                          ? (isFeatured ? '1px solid rgba(212, 163, 89, 0.45)' : '1px solid rgba(139, 92, 246, 0.4)')
                           : (isFeatured ? '1px solid rgba(212, 163, 89, 0.15)' : (isComingSoon ? '1px solid rgba(255, 255, 255, 0.02)' : '1px solid rgba(255, 255, 255, 0.05)')),
                         cursor: 'pointer',
                         transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -356,23 +365,23 @@ export const ToolsProductsPage: React.FC = () => {
                         alignItems: 'center',
                         textAlign: 'left',
                         transform: isActive ? 'scale(1.02) translateY(-2px)' : 'scale(1)',
-                        boxShadow: isActive 
-                          ? (isFeatured ? '0 8px 32px rgba(212, 163, 89, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.05)' : '0 8px 32px rgba(139, 92, 246, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.05)') 
+                        boxShadow: isActive
+                          ? (isFeatured ? '0 8px 32px rgba(212, 163, 89, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.05)' : '0 8px 32px rgba(139, 92, 246, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.05)')
                           : (isFeatured ? '0 4px 12px rgba(212, 163, 89, 0.03)' : 'none'),
                         opacity: isComingSoon && !isActive ? 0.75 : 1
                       }}
                       className={isActive ? "tool-mini-card" : (isFeatured ? "tool-mini-card tool-mini-card-inactive-featured" : "tool-mini-card tool-mini-card-inactive")}
                     >
                       {/* Image Icon Thumbnail */}
-                      <div 
-                        style={{ 
-                          width: '48px', 
-                          height: '48px', 
-                          borderRadius: '10px', 
-                          overflow: 'hidden', 
-                          backgroundColor: '#090D1A', 
-                          border: isActive 
-                            ? (isFeatured ? '1.5px solid #D4A359' : '1.5px solid #A78BFA') 
+                      <div
+                        style={{
+                          width: '48px',
+                          height: '48px',
+                          borderRadius: '10px',
+                          overflow: 'hidden',
+                          backgroundColor: '#090D1A',
+                          border: isActive
+                            ? (isFeatured ? '1.5px solid #D4A359' : '1.5px solid #A78BFA')
                             : '1px solid rgba(255, 255, 255, 0.06)',
                           padding: '6px',
                           boxSizing: 'border-box',
@@ -390,19 +399,19 @@ export const ToolsProductsPage: React.FC = () => {
                             <polyline points="14 2 14 8 20 8" />
                           </svg>
                         ) : (
-                          <img 
-                            src={prod.coverImage || `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23090D1A"/><circle cx="50" cy="50" r="15" fill="%231E293B" opacity="0.6"/><path d="M42 45 L50 37 L58 45" stroke="%237C5CFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`} 
-                            alt="" 
+                          <img
+                            src={prod.coverImage || `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23090D1A"/><circle cx="50" cy="50" r="15" fill="%231E293B" opacity="0.6"/><path d="M42 45 L50 37 L58 45" stroke="%237C5CFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`}
+                            alt=""
                             onError={(e) => {
                               e.currentTarget.src = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23090D1A"/><circle cx="50" cy="50" r="15" fill="%231E293B" opacity="0.6"/><path d="M42 45 L50 37 L58 45" stroke="%237C5CFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`;
                             }}
-                            style={{ 
-                              width: '100%', 
-                              height: '100%', 
+                            style={{
+                              width: '100%',
+                              height: '100%',
                               objectFit: 'contain',
                               transform: isActive ? 'scale(1.05)' : 'scale(1)',
                               transition: 'transform 0.25s ease'
-                            }} 
+                            }}
                           />
                         )}
                       </div>
@@ -440,15 +449,15 @@ export const ToolsProductsPage: React.FC = () => {
                             </span>
                           ) : (
                             <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', color: '#F59E0B', fontWeight: 600 }}>
-                              <span 
+                              <span
                                 className="pulse-glow-orange"
-                                style={{ 
-                                  width: '6px', 
-                                  height: '6px', 
-                                  borderRadius: '50%', 
+                                style={{
+                                  width: '6px',
+                                  height: '6px',
+                                  borderRadius: '50%',
                                   backgroundColor: '#F59E0B',
                                   display: 'inline-block'
-                                }} 
+                                }}
                               />
                               In Development
                             </span>
@@ -733,7 +742,7 @@ export const ToolsProductsPage: React.FC = () => {
                     >
                       View Details
                     </button>
-                    
+
                     {activeProduct.comingSoon ? (
                       <button
                         type="button"

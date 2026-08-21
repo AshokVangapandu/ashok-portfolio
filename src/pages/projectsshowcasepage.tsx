@@ -9,12 +9,17 @@ import { IndustryGrid } from '../components/projects/industrygrid';
 import { TechStackGrid } from '../components/projects/techstackgrid';
 import { CTASection } from '../components/projects/ctasection';
 import { ProjectDetailsModal } from '../components/projects/projectdetailsmodal';
+import { BackButton } from '../components/BackButton';
 
 export const ProjectsShowcasePage: React.FC = () => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [featuredProject, setFeaturedProject] = useState<Project | null>(null);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+
+  const baseUrl = typeof window !== 'undefined' && window.location.pathname.startsWith('/ashok-portfolio')
+    ? '/ashok-portfolio/'
+    : '/';
 
   useEffect(() => {
     const loadData = async () => {
@@ -76,7 +81,7 @@ export const ProjectsShowcasePage: React.FC = () => {
 
   const handleCloseDetails = () => {
     if (window.location.hash) {
-      window.history.pushState(null, '', window.location.pathname + window.location.search);
+      window.history.replaceState(null, '', window.location.pathname + window.location.search);
     }
     setSelectedProject(null);
   };
@@ -86,16 +91,20 @@ export const ProjectsShowcasePage: React.FC = () => {
       style={{
         display: 'flex',
         flexDirection: 'column',
-        gap: '64px',
+        gap: '40px',
         width: '100%',
         maxWidth: '1200px',
         margin: '0 auto',
-        padding: '110px 24px 80px 24px',
+        padding: '36px 24px 80px 24px',
         boxSizing: 'border-box',
         color: '#FFFFFF',
         fontFamily: "'Inter', sans-serif"
       }}
     >
+      {/* Top minimal back control */}
+      <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-start' }}>
+        <BackButton label="Back to Portfolio" fallbackUrl={`${baseUrl}#work`} />
+      </div>
 
 
 

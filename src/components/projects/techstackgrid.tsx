@@ -582,7 +582,7 @@ export const TechStackGrid: React.FC = () => {
           letterSpacing: '0.04em'
         }}
       >
-        Auto-scrolling • Center item is highlighted
+        Technologies behind the products I build
       </span>
 
       <style dangerouslySetInnerHTML={{__html: `

@@ -10,7 +10,7 @@ interface ProjectDetailsModalProps {
 
 const getMockFeaturesForProject = (project: Project): ProjectFeature[] => {
   const defaultFeatures = project.features || [];
-  
+
   const sampleImages = [
     'https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?auto=format&fit=crop&w=1200&q=80',
     'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1200&q=80',
@@ -388,7 +388,7 @@ export const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
           >
             &times;
           </button>
- 
+
           {/* Header Left-Aligned Text Column */}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', textAlign: 'left', gap: '16px', width: '100%', maxWidth: '1000px', zIndex: 2 }}>
             {/* Back Navigation Button */}
@@ -400,7 +400,7 @@ export const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
                 border: 'none',
                 color: '#C4B5FD',
                 fontSize: '13px',
-                fontWeight: 700,
+                fontWeight: 600,
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
@@ -420,7 +420,7 @@ export const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
             <span
               style={{
                 fontSize: '11px',
-                fontWeight: 800,
+                fontWeight: 600,
                 color: '#A78BFA',
                 backgroundColor: 'rgba(139, 92, 246, 0.12)',
                 border: '1px solid rgba(139, 92, 246, 0.2)',
@@ -441,7 +441,7 @@ export const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
               style={{
                 margin: 0,
                 fontSize: '44px',
-                fontWeight: 900,
+                fontWeight: 700,
                 color: '#FFFFFF',
                 letterSpacing: '-0.03em',
                 lineHeight: '1.15',
@@ -489,10 +489,10 @@ export const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
                 { label: 'Platform', val: platform || 'Web Application', icon: '💻' }
               ].map((meta, i) => (
                 <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '3px' }}>
-                  <span style={{ fontSize: '9px', color: '#64748B', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <span style={{ fontSize: '9px', color: '#64748B', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', display: 'flex', alignItems: 'center', gap: '4px' }}>
                     <span>{meta.icon}</span> {meta.label}
                   </span>
-                  <span style={{ fontSize: '13px', fontWeight: 650, color: '#E2E8F0' }}>
+                  <span style={{ fontSize: '13px', fontWeight: 500, color: '#E2E8F0' }}>
                     {meta.val}
                   </span>
                 </div>
@@ -558,14 +558,14 @@ export const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
           >
             <div className='case-story-container' style={{ width: '100%', maxWidth: '1000px', display: 'flex', flexDirection: 'column', gap: '40px' }}>
               <div className='case-story-heading' style={{ textAlign: 'center', maxWidth: '600px', margin: '0 auto' }}>
-                <span style={{ fontSize: '11px', fontWeight: 800, color: '#8B5CF6', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                <span style={{ fontSize: '11px', fontWeight: 600, color: '#8B5CF6', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
                   Project Narrative
                 </span>
-                <h2 style={{ margin: '8px 0 0 0', fontSize: '32px', fontWeight: 900, color: '#0F172A', letterSpacing: '-0.02em' }}>
+                <h2 style={{ margin: '8px 0 0 0', fontSize: '32px', fontWeight: 650, color: '#0F172A', letterSpacing: '-0.02em' }}>
                   The Journey & Outcome
                 </h2>
               </div>
- 
+
               <div className='case-story-problem-solution' style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '32px' }}>
                 {/* Column 1: The Challenge */}
                 {problemSolved && problemSolved.trim() !== '' && (
@@ -586,7 +586,7 @@ export const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
                     className="reveal-trigger narrative-card"
                   >
                     <span style={{ fontSize: '32px', color: '#EF4444' }}>⚠️</span>
-                    <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 800, color: '#0F172A', letterSpacing: '-0.02em' }}>The Challenge</h3>
+                    <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 600, color: '#0F172A', letterSpacing: '-0.02em' }}>The Challenge</h3>
                     <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.75', color: '#475569', fontWeight: 450 }}>
                       {problemSolved}
                     </p>
@@ -612,7 +612,7 @@ export const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
                     className="reveal-trigger narrative-card"
                   >
                     <span style={{ fontSize: '32px', color: '#8B5CF6' }}>💡</span>
-                    <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 800, color: '#0F172A', letterSpacing: '-0.02em' }}>The Solution</h3>
+                    <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 600, color: '#0F172A', letterSpacing: '-0.02em' }}>The Solution</h3>
                     <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.75', color: '#475569', fontWeight: 450 }}>
                       {solution}
                     </p>
@@ -653,7 +653,7 @@ export const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
                     >
                       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                         <span style={{ fontSize: '28px', color: '#3B82F6' }}>📄</span>
-                        <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 800, color: '#0F172A', letterSpacing: '-0.02em' }}>
+                        <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 600, color: '#0F172A', letterSpacing: '-0.02em' }}>
                           Detailed Project Overview
                         </h3>
                       </div>
@@ -693,7 +693,7 @@ export const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
                     >
                       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                         <span style={{ fontSize: '28px', color: '#10B981' }}>📈</span>
-                        <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 800, color: '#0F172A', letterSpacing: '-0.02em' }}>
+                        <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 600, color: '#0F172A', letterSpacing: '-0.02em' }}>
                           Business Outcome
                         </h3>
                       </div>
@@ -715,10 +715,10 @@ export const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
             </div>
           </div>
         )}
- 
+
         {/* SECTION 2: THE MAIN VISUAL CASE STUDY BODY */}
         <div style={{ display: 'flex', flexDirection: 'column', boxSizing: 'border-box' }}>
-          
+
           {/* SKELETON LOADER DURING MOUNT DETAILS FETCH */}
           {loadingDetails ? (
             <div style={{ padding: '56px 48px', display: 'flex', flexDirection: 'column', gap: '32px' }}>
@@ -731,8 +731,8 @@ export const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
             <div style={{ padding: '56px 48px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '18px', backgroundColor: '#F8FAFC' }}>
               {features.map((f: string, i: number) => (
                 <div key={i} style={{ border: '1px solid rgba(0,0,0,0.06)', borderRadius: '12px', padding: '20px', backgroundColor: '#FFFFFF', display: 'flex', gap: '12px' }}>
-                  <span style={{ fontSize: '16px', color: '#8B5CF6', fontWeight: 800 }}>0{i + 1}.</span>
-                  <span style={{ fontSize: '14.5px', color: '#0F172A', fontWeight: 650 }}>{f}</span>
+                  <span style={{ fontSize: '16px', color: '#8B5CF6', fontWeight: 600 }}>0{i + 1}.</span>
+                  <span style={{ fontSize: '14.5px', color: '#0F172A', fontWeight: 600 }}>{f}</span>
                 </div>
               ))}
             </div>
@@ -839,9 +839,9 @@ export const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
                         <div
                           style={{
                             fontSize: '56px',
-                            fontWeight: 900,
+                            fontWeight: 700,
                             color: '#8B5CF6',
-                            opacity: 0.08,
+                            opacity: 0.1,
                             lineHeight: 1,
                             letterSpacing: '-0.03em',
                             fontFamily: 'system-ui, -apple-system, sans-serif'
@@ -853,8 +853,8 @@ export const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
                         <h3
                           style={{
                             margin: '4px 0 0 0',
-                            fontSize: '28px',
-                            fontWeight: 800,
+                            fontSize: '18px',
+                            fontWeight: 600,
                             color: '#0F172A',
                             letterSpacing: '-0.02em',
                             lineHeight: 1.3
@@ -886,7 +886,7 @@ export const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
                                 <span
                                   style={{
                                     color: '#8B5CF6',
-                                    fontWeight: 900,
+                                    fontWeight: 700,
                                     fontSize: '13px',
                                     display: 'inline-flex',
                                     alignItems: 'center',
@@ -914,126 +914,126 @@ export const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
               })}
             </div>
           )}
-        {/* SECTION 2.3: TECHNOLOGY STACK */}
-        {technologies && technologies.length > 0 && (
-          <div
-            style={{
-              padding: '56px 48px',
-              backgroundColor: '#FFFFFF',
-              borderBottom: '1px solid rgba(0, 0, 0, 0.05)',
-              display: 'flex',
-              justifyContent: 'center'
-            }}
-          >
-            <div style={{ width: '100%', maxWidth: '1000px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
-              <div style={{ textAlign: 'center' }}>
-                <span style={{ fontSize: '11px', fontWeight: 800, color: '#8B5CF6', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-                  Technology Integration
-                </span>
-                <h2 style={{ margin: '8px 0 0 0', fontSize: '32px', fontWeight: 900, color: '#0F172A', letterSpacing: '-0.02em' }}>
-                  Engineered Stack & Tools
-                </h2>
-              </div>
- 
-              <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '10px' }}>
-                {technologies.map((tech) => (
-                  <span
-                    key={tech}
-                    style={{
-                      fontSize: '13px',
-                      fontWeight: 600,
-                      color: '#475569',
-                      backgroundColor: '#FFFFFF',
-                      border: '1px solid #E2E8F0',
-                      borderRadius: '8px',
-                      padding: '7px 14px',
-                      height: '36px',
-                      boxSizing: 'border-box',
-                      boxShadow: '0 2px 8px rgba(15, 23, 42, 0.02)',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '8px',
-                      cursor: 'default'
-                    }}
-                    className="tech-chip"
-                  >
-                    <span style={{ color: '#8B5CF6', fontSize: '10px' }}>✦</span> {tech}
+          {/* SECTION 2.3: TECHNOLOGY STACK */}
+          {technologies && technologies.length > 0 && (
+            <div
+              style={{
+                padding: '56px 48px',
+                backgroundColor: '#FFFFFF',
+                borderBottom: '1px solid rgba(0, 0, 0, 0.05)',
+                display: 'flex',
+                justifyContent: 'center'
+              }}
+            >
+              <div style={{ width: '100%', maxWidth: '1000px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                <div style={{ textAlign: 'center' }}>
+                  <span style={{ fontSize: '11px', fontWeight: 600, color: '#8B5CF6', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                    Technology Integration
                   </span>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-        {/* SECTION 2.5: PERFORMANCE IMPACT (KPI METRICS) */}
-        {impactMetrics && impactMetrics.length > 0 && (
-          <div
-            style={{
-              padding: '40px 48px 44px',
-              backgroundColor: '#090D1A',
-              backgroundImage: 'radial-gradient(circle at 18% 78%, rgba(16, 185, 129, 0.06) 0%, rgba(9, 13, 26, 0) 46%)',
-              color: '#FFFFFF',
-              borderBottom: '1px solid rgba(255, 255, 255, 0.04)',
-              display: 'flex',
-              justifyContent: 'center'
-            }}
-            className="performance-metrics-section"
-          >
-            <div style={{ width: '100%', maxWidth: '880px', display: 'flex', flexDirection: 'column', gap: '22px' }}>
-              <div style={{ textAlign: 'center', maxWidth: '560px', margin: '0 auto' }}>
-                <span style={{ fontSize: '10.5px', fontWeight: 800, color: '#10B981', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-                  Performance Metrics
-                </span>
-                <h2 style={{ margin: '6px 0 0 0', fontSize: '28px', fontWeight: 850, color: '#FFFFFF', letterSpacing: '-0.02em', lineHeight: 1.08 }}>
-                  Measurable Business Impact
-                </h2>
-              </div>
- 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '10px' }}>
-                {impactMetrics.map((metric, i) => (
-                  <div
-                    key={i}
-                    style={{
-                      backgroundColor: 'rgba(255, 255, 255, 0.035)',
-                      border: '1px solid rgba(255, 255, 255, 0.09)',
-                      borderRadius: '12px',
-                      padding: '17px 18px 16px',
-                      textAlign: 'left',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'flex-start',
-                      justifyContent: 'center',
-                      gap: '6px',
-                      boxSizing: 'border-box',
-                      minHeight: '112px',
-                      boxShadow: '0 14px 34px rgba(0, 0, 0, 0.12)',
-                      transition: 'all 0.25s ease'
-                    }}
-                    className="metric-card"
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.transform = 'translateY(-2px)';
-                      e.currentTarget.style.borderColor = 'rgba(16, 185, 129, 0.24)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.transform = 'translateY(0)';
-                      e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.09)';
-                    }}
-                  >
-                    <span style={{ width: '22px', height: '2px', borderRadius: '999px', backgroundColor: '#10B981', marginBottom: '4px' }} />
-                    <span style={{ fontSize: '30px', fontWeight: 850, color: '#10B981', letterSpacing: '-0.02em', lineHeight: 1 }}>
-                      {metric.kpi}
-                    </span>
-                    <span style={{ fontSize: '12.75px', color: '#A8B3C7', fontWeight: 550, lineHeight: 1.35 }}>
-                      {metric.label}
-                    </span>
-                  </div>
-                ))}
-            </div>
-          </div>
-        </div>
-      )}
+                  <h2 style={{ margin: '8px 0 0 0', fontSize: '32px', fontWeight: 650, color: '#0F172A', letterSpacing: '-0.02em' }}>
+                    Engineered Stack & Tools
+                  </h2>
+                </div>
 
+                <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '10px' }}>
+                  {technologies.map((tech) => (
+                    <span
+                      key={tech}
+                      style={{
+                        fontSize: '13px',
+                        fontWeight: 500,
+                        color: '#475569',
+                        backgroundColor: '#FFFFFF',
+                        border: '1px solid #E2E8F0',
+                        borderRadius: '8px',
+                        padding: '7px 14px',
+                        height: '36px',
+                        boxSizing: 'border-box',
+                        boxShadow: '0 2px 8px rgba(15, 23, 42, 0.02)',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        cursor: 'default'
+                      }}
+                      className="tech-chip"
+                    >
+                      <span style={{ color: '#8B5CF6', fontSize: '10px' }}>✦</span> {tech}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+          {/* SECTION 2.5: PERFORMANCE IMPACT (KPI METRICS) */}
+          {impactMetrics && impactMetrics.length > 0 && (
+            <div
+              style={{
+                padding: '40px 48px 44px',
+                backgroundColor: '#090D1A',
+                backgroundImage: 'radial-gradient(circle at 18% 78%, rgba(16, 185, 129, 0.06) 0%, rgba(9, 13, 26, 0) 46%)',
+                color: '#FFFFFF',
+                borderBottom: '1px solid rgba(255, 255, 255, 0.04)',
+                display: 'flex',
+                justifyContent: 'center'
+              }}
+              className="performance-metrics-section"
+            >
+              <div style={{ width: '100%', maxWidth: '880px', display: 'flex', flexDirection: 'column', gap: '22px' }}>
+                <div style={{ textAlign: 'center', maxWidth: '560px', margin: '0 auto' }}>
+                  <span style={{ fontSize: '10.5px', fontWeight: 600, color: '#10B981', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                    Performance Metrics
+                  </span>
+                  <h2 style={{ margin: '6px 0 0 0', fontSize: '28px', fontWeight: 650, color: '#FFFFFF', letterSpacing: '-0.02em', lineHeight: 1.08 }}>
+                    Measurable Business Impact
+                  </h2>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '10px' }}>
+                  {impactMetrics.map((metric, i) => (
+                    <div
+                      key={i}
+                      style={{
+                        backgroundColor: 'rgba(255, 255, 255, 0.035)',
+                        border: '1px solid rgba(255, 255, 255, 0.09)',
+                        borderRadius: '12px',
+                        padding: '17px 18px 16px',
+                        textAlign: 'left',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'flex-start',
+                        justifyContent: 'center',
+                        gap: '6px',
+                        boxSizing: 'border-box',
+                        minHeight: '112px',
+                        boxShadow: '0 14px 34px rgba(0, 0, 0, 0.12)',
+                        transition: 'all 0.25s ease'
+                      }}
+                      className="metric-card"
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = 'translateY(-2px)';
+                        e.currentTarget.style.borderColor = 'rgba(16, 185, 129, 0.24)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = 'translateY(0)';
+                        e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.09)';
+                      }}
+                    >
+                      <span style={{ width: '22px', height: '2px', borderRadius: '999px', backgroundColor: '#10B981', marginBottom: '4px' }} />
+                      <span style={{ fontSize: '30px', fontWeight: 700, color: '#10B981', letterSpacing: '-0.02em', lineHeight: 1 }}>
+                        {metric.kpi}
+                      </span>
+                      <span style={{ fontSize: '12.75px', color: '#A8B3C7', fontWeight: 500, lineHeight: 1.35 }}>
+                        {metric.label}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+        </div>
       </div>
-    </div>
 
       {/* FULL SCREEN LIGHTBOX INTERACTIVE OVERLAY */}
       {activeLightboxImg && (
@@ -1068,7 +1068,7 @@ export const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            <h4 style={{ margin: 0, fontSize: '15px', fontWeight: 800 }}>{activeLightboxImg.title}</h4>
+            <h4 style={{ margin: 0, fontSize: '15px', fontWeight: 600 }}>{activeLightboxImg.title}</h4>
             <button
               type="button"
               onClick={() => setActiveLightboxImg(null)}
@@ -1191,7 +1191,8 @@ export const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
       )}
 
       {/* Embedding Custom CSS Styles */}
-      <style dangerouslySetInnerHTML={{__html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
         @keyframes slideUpModal {
           from { transform: translateY(30px); opacity: 0; }
           to { transform: translateY(0); opacity: 1; }
@@ -1362,7 +1363,7 @@ export const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
         .case-story-section .narrative-card h3 {
           margin: 0 !important;
           color: #0F172A !important;
-          font-size: 28px !important;
+          font-size: 28px ;
           line-height: 1.12 !important;
           font-weight: 850 !important;
           letter-spacing: 0 !important;

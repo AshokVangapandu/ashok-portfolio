@@ -1016,7 +1016,8 @@
 }
 
 .widget-showcase-actions .profile-action {
-  min-width: 184px;
+  min-width: 220px;
+  padding: 0 28px;
   min-height: 50px;
   border-radius: 12px;
   font-size: 13px;

@@ -782,9 +782,7 @@
 
   .widget-showcase-actions {
     display: flex !important;
-    flex-direction: row !important;
-    justify-content: space-between !important;
-    gap: 4% !important;
+    justify-content: center !important;
     width: 100% !important;
     margin-top: 14px !important;
     padding: 0 16px !important;
@@ -793,19 +791,20 @@
   }
 
   .widget-showcase-actions .profile-action {
-    flex: 1 1 48% !important;
-    width: 48% !important;
-    min-width: 0 !important;
+    flex: 0 1 auto !important;
+    width: auto !important;
+    min-width: 200px !important;
+    max-width: 280px !important;
     min-height: 44px !important;
     height: 44px !important;
-    padding: 0 8px !important;
+    padding: 0 24px !important;
     border-radius: 10px !important;
-    font-size: clamp(10px, 2.6vw, 12px) !important;
+    font-size: clamp(11.5px, 3vw, 13px) !important;
     white-space: nowrap !important;
-    display: flex !important;
+    display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 6px !important;
+    gap: 8px !important;
   }
 
   .widget-showcase-actions .profile-action svg {

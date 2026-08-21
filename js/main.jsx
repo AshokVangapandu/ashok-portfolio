@@ -724,6 +724,13 @@ const setActiveNavLink = () => {
       link.setAttribute("aria-current", "page");
     });
   }
+
+  if (window.location.pathname.includes('/certifications')) {
+    document.querySelectorAll('.nav-links a[href*="certifications"]').forEach((link) => {
+      link.classList.add("is-active");
+      link.setAttribute("aria-current", "page");
+    });
+  }
 };
 
 let scrollTicking = false;
@@ -788,8 +795,8 @@ anchorLinks.forEach((link) => {
       });
     }
 
-    if (window.history.pushState) {
-      window.history.pushState(null, "", targetId);
+    if (window.history.replaceState) {
+      window.history.replaceState(null, "", targetId);
     }
   });
 });
@@ -2150,15 +2157,13 @@ const setupNavbarAuth = async () => {
 
   const renderLoginButton = (isLoading = false) => {
     container.innerHTML = `
-      <button type="button" class="profile-action profile-action-primary" id="fallback-login-btn" ${isLoading ? "disabled" : ""}>
+      <button type="button" class="profile-action profile-action-primary" id="fallback-login-btn" ${isLoading ? "disabled" : ""} aria-label="Sign in with Google" title="Sign in with Google">
         ${isLoading ? `
-          <span class="auth-spinner" style="width: 14px; height: 14px; border: 2px solid rgba(255, 255, 255, 0.2); border-top-color: #ffffff; border-radius: 50%; display: inline-block; animation: spin 1s linear infinite; margin-right: 6px;"></span>
-          <span>Connecting...</span>
+          <span class="auth-spinner" style="width: 14px; height: 14px; border: 2px solid rgba(255, 255, 255, 0.2); border-top-color: #ffffff; border-radius: 50%; display: inline-block; animation: spin 1s linear infinite;"></span>
         ` : `
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="margin-right: 6px;">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
             <path d="M12.24 10.285V13.4h6.887C18.2 15.614 15.645 18 12.24 18c-3.86 0-7-3.14-7-7s3.14-7 7-7c1.7 0 3.3.6 4.5 1.7l2.4-2.4C17.3 1.5 14.9 0 12.24 0c-6.08 0-11 4.92-11 11s4.92 11 11 11c5.73 0 10.2-4.1 10.2-11 0-.74-.08-1.46-.2-2.115H12.24z" />
           </svg>
-          <span>Sign in with Google</span>
         `}
       </button>
       <style>

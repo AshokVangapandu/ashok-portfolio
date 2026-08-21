@@ -1,6 +1,6 @@
-/* src/pages/CertificationsShowcasePage.tsx */
 import React, { useState, useEffect, useMemo } from 'react';
 import { supabase } from '../services/supabase/client';
+import { BackButton } from '../components/BackButton';
 
 interface CertificationCard {
   id: string;
@@ -26,36 +26,36 @@ const getProviderLogo = (issuer: string, certificateImageUrl?: string | null) =>
   if (name.includes('google')) {
     return (
       <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" style={{ color: '#60A5FA' }}>
-        <path d="M12.24 10.285V13.4h6.887c-.275 1.565-1.88 4.604-6.887 4.604-4.33 0-7.866-3.577-7.866-8s3.536-8 7.866-8c2.46 0 4.105 1.025 5.047 1.926l2.427-2.334C17.955 2.192 15.34 1 12.24 1 7.14 1 3 5.14 3 10.25s4.14 9.25 9.24 9.25c5.32 0 8.86-3.72 8.86-9.01 0-.61-.06-1.08-.14-1.54H12.24z"/>
+        <path d="M12.24 10.285V13.4h6.887c-.275 1.565-1.88 4.604-6.887 4.604-4.33 0-7.866-3.577-7.866-8s3.536-8 7.866-8c2.46 0 4.105 1.025 5.047 1.926l2.427-2.334C17.955 2.192 15.34 1 12.24 1 7.14 1 3 5.14 3 10.25s4.14 9.25 9.24 9.25c5.32 0 8.86-3.72 8.86-9.01 0-.61-.06-1.08-.14-1.54H12.24z" />
       </svg>
     );
   }
   if (name.includes('aws') || name.includes('amazon')) {
     return (
       <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" style={{ color: '#F59E0B' }}>
-        <path d="M11.625 15.783c-1.189 0-2.18-.152-2.973-.456-.793-.304-1.229-.685-1.31-1.144-.066-.379.083-.75.446-1.112.363-.362.908-.667 1.636-.916.727-.248 1.656-.424 2.787-.528l2.673-.243v1.39c0 .736-.188 1.282-.564 1.637-.376.356-.99.534-1.84.534m3.048-6.147v1.73l-2.423.23c-1.393.13-2.483.364-3.272.705-.789.34-1.34.786-1.655 1.336-.314.55-.471 1.157-.471 1.823 0 .973.307 1.737.92 2.293.614.555 1.492.833 2.634.833 1.082 0 1.986-.226 2.711-.678a4.877 4.877 0 0 0 1.684-1.874h.084c.121.666.333 1.168.636 1.505.303.337.755.505 1.356.505.47 0 .973-.105 1.511-.314a13.38 13.38 0 0 0 1.51-.714V14.86c0-.987-.042-1.921-.125-2.802-.083-.88-.242-1.66-.477-2.339a5.147 5.147 0 0 0-1.042-1.874c-.496-.549-1.194-.973-2.096-1.272-.9-.3-2.023-.45-3.37-.45-1.42 0-2.585.185-3.493.555a6.666 6.666 0 0 0-2.33 1.585l1.323 1.306c.49-.496.99-.861 1.5-1.096.51-.235 1.176-.353 2.0-.353.94 0 1.636.19 2.09.569.453.38.68.959.68 1.738"/>
-        <path d="M12.046 22.094c3.488 0 6.634-1.22 8.784-3.213.303-.28.1-.733-.303-.64-2.883.666-6.425.992-9.743.992-3.473 0-7.253-.36-10.158-1.092-.394-.1-.594.364-.285.64 2.224 1.993 5.485 3.313 9.705 3.313m8.948-4.053c-.328-.426-1.503-.186-2.073-.092-.188.03-.236-.18-.073-.314.509-.42 1.485-.363 1.867.042.382.404-.036 1.442-.442 1.916-.134.155-.31.066-.273-.146.115-.658.322-.98.994-1.406"/>
+        <path d="M11.625 15.783c-1.189 0-2.18-.152-2.973-.456-.793-.304-1.229-.685-1.31-1.144-.066-.379.083-.75.446-1.112.363-.362.908-.667 1.636-.916.727-.248 1.656-.424 2.787-.528l2.673-.243v1.39c0 .736-.188 1.282-.564 1.637-.376.356-.99.534-1.84.534m3.048-6.147v1.73l-2.423.23c-1.393.13-2.483.364-3.272.705-.789.34-1.34.786-1.655 1.336-.314.55-.471 1.157-.471 1.823 0 .973.307 1.737.92 2.293.614.555 1.492.833 2.634.833 1.082 0 1.986-.226 2.711-.678a4.877 4.877 0 0 0 1.684-1.874h.084c.121.666.333 1.168.636 1.505.303.337.755.505 1.356.505.47 0 .973-.105 1.511-.314a13.38 13.38 0 0 0 1.51-.714V14.86c0-.987-.042-1.921-.125-2.802-.083-.88-.242-1.66-.477-2.339a5.147 5.147 0 0 0-1.042-1.874c-.496-.549-1.194-.973-2.096-1.272-.9-.3-2.023-.45-3.37-.45-1.42 0-2.585.185-3.493.555a6.666 6.666 0 0 0-2.33 1.585l1.323 1.306c.49-.496.99-.861 1.5-1.096.51-.235 1.176-.353 2.0-.353.94 0 1.636.19 2.09.569.453.38.68.959.68 1.738" />
+        <path d="M12.046 22.094c3.488 0 6.634-1.22 8.784-3.213.303-.28.1-.733-.303-.64-2.883.666-6.425.992-9.743.992-3.473 0-7.253-.36-10.158-1.092-.394-.1-.594.364-.285.64 2.224 1.993 5.485 3.313 9.705 3.313m8.948-4.053c-.328-.426-1.503-.186-2.073-.092-.188.03-.236-.18-.073-.314.509-.42 1.485-.363 1.867.042.382.404-.036 1.442-.442 1.916-.134.155-.31.066-.273-.146.115-.658.322-.98.994-1.406" />
       </svg>
     );
   }
   if (name.includes('microsoft')) {
     return (
       <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-        <path d="M2 2h9.5v9.5H2V2zm10.5 0H22v9.5h-9.5V2zM2 12.5h9.5V22H2v-9.5zm10.5 0H22V22h-9.5v-9.5z" fill="#F25022"/>
+        <path d="M2 2h9.5v9.5H2V2zm10.5 0H22v9.5h-9.5V2zM2 12.5h9.5V22H2v-9.5zm10.5 0H22V22h-9.5v-9.5z" fill="#F25022" />
       </svg>
     );
   }
   if (name.includes('meta')) {
     return (
       <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" style={{ color: '#0668E1' }}>
-        <path d="M22.5 12c0-3.32-2.7-6-6-6-2.22 0-4.14 1.2-5.16 3-1.02-1.8-2.94-3-5.16-3-3.3 0-6 2.68-6 6 0 3.31 2.7 6 6 6 2.22 0 4.14-1.2 5.16-3 1.02 1.8 2.94 3 5.16 3 3.3 0 6-2.69 6-6zm-17.34 4c-2.2 0-4-1.8-4-4s1.8-4 4-4 4 1.8 4 4-1.8 4-4 4zm11.68 0c-2.2 0-4-1.8-4-4s1.8-4 4-4 4 1.8 4 4-1.8 4-4 4z"/>
+        <path d="M22.5 12c0-3.32-2.7-6-6-6-2.22 0-4.14 1.2-5.16 3-1.02-1.8-2.94-3-5.16-3-3.3 0-6 2.68-6 6 0 3.31 2.7 6 6 6 2.22 0 4.14-1.2 5.16-3 1.02 1.8 2.94 3 5.16 3 3.3 0 6-2.69 6-6zm-17.34 4c-2.2 0-4-1.8-4-4s1.8-4 4-4 4 1.8 4 4-1.8 4-4 4zm11.68 0c-2.2 0-4-1.8-4-4s1.8-4 4-4 4 1.8 4 4-1.8 4-4 4z" />
       </svg>
     );
   }
   if (name.includes('linux')) {
     return (
       <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" style={{ color: '#64748B' }}>
-        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" />
       </svg>
     );
   }
@@ -73,6 +73,10 @@ export const CertificationsShowcasePage: React.FC = () => {
   const [selectedCard, setSelectedCard] = useState<CertificationCard | null>(null);
   const [displayCard, setDisplayCard] = useState<CertificationCard | null>(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
+
+  const baseUrl = typeof window !== 'undefined' && window.location.pathname.startsWith('/ashok-portfolio')
+    ? '/ashok-portfolio/'
+    : '/';
 
   const [certifications, setCertifications] = useState<CertificationCard[]>([]);
   const [loading, setLoading] = useState(true);
@@ -236,12 +240,16 @@ export const CertificationsShowcasePage: React.FC = () => {
         width: '100%',
         maxWidth: '1280px',
         margin: '0 auto',
-        padding: 'calc(var(--header-height) + 44px) 24px 60px 24px',
+        padding: '36px 24px 60px 24px',
         boxSizing: 'border-box',
         color: '#FFFFFF',
         fontFamily: "'Inter', sans-serif"
       }}
     >
+      {/* Top minimal back control */}
+      <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-start' }}>
+        <BackButton label="Back to Portfolio" fallbackUrl={`${baseUrl}#certifications`} />
+      </div>
       {/* 1. Top Section (Hero Split Layout) */}
       <section
         style={{
@@ -256,7 +264,7 @@ export const CertificationsShowcasePage: React.FC = () => {
         <div style={{ flex: 1, display: 'flex', alignItems: 'flex-start', gap: '20px' }}>
           {/* Medal Icon on the left */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '4px', flexShrink: 0 }}>
-            <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: '#a855f7', filter: 'drop-shadow(0 0 12px rgba(168, 85, 247, 0.4))' }}>
+            <svg viewBox="0 0 24 24" width="40" height="46" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: '#a855f7', filter: 'drop-shadow(0 0 12px rgba(168, 85, 247, 0.4))' }}>
               <path d="M12 2L3 7v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5z" />
               <polygon points="12 8 13.5 11 16.5 11 14 13 15 16 12 14 9 16 10 13 7.5 11 10.5 11" fill="rgba(168, 85, 247, 0.2)" stroke="#a855f7" strokeWidth="1.5" />
             </svg>
@@ -449,10 +457,10 @@ export const CertificationsShowcasePage: React.FC = () => {
                         onClick={() => handleCardSelect(card)}
                         style={{
                           background: isActive ? 'rgba(34, 43, 73, 0.85)' : (isHovered ? 'rgba(28, 35, 60, 0.7)' : 'rgba(23, 29, 49, 0.54)'),
-                          border: isActive 
-                            ? '1px solid #7C5CFF' 
-                            : (isHovered 
-                              ? (card.isFeatured ? '1px solid rgba(251, 191, 36, 0.55)' : '1px solid rgba(124, 92, 255, 0.45)') 
+                          border: isActive
+                            ? '1px solid #7C5CFF'
+                            : (isHovered
+                              ? (card.isFeatured ? '1px solid rgba(251, 191, 36, 0.55)' : '1px solid rgba(124, 92, 255, 0.45)')
                               : (card.isFeatured ? '1px solid rgba(251, 191, 36, 0.22)' : '1px solid rgba(255, 255, 255, 0.09)')),
                           borderRadius: '16px',
                           padding: '24px',
@@ -461,8 +469,8 @@ export const CertificationsShowcasePage: React.FC = () => {
                           justifyContent: 'space-between',
                           boxShadow: isActive
                             ? (card.isFeatured ? '0 14px 40px rgba(0, 0, 0, 0.35), 0 0 25px rgba(251, 191, 36, 0.22)' : '0 14px 40px rgba(0, 0, 0, 0.35), 0 0 25px rgba(124, 92, 255, 0.25)')
-                            : (isHovered 
-                              ? (card.isFeatured ? '0 24px 48px rgba(0, 0, 0, 0.35), 0 0 30px rgba(251, 191, 36, 0.14)' : '0 24px 48px rgba(0, 0, 0, 0.35), 0 0 30px rgba(124, 92, 255, 0.16)') 
+                            : (isHovered
+                              ? (card.isFeatured ? '0 24px 48px rgba(0, 0, 0, 0.35), 0 0 30px rgba(251, 191, 36, 0.14)' : '0 24px 48px rgba(0, 0, 0, 0.35), 0 0 30px rgba(124, 92, 255, 0.16)')
                               : '0 14px 40px rgba(0, 0, 0, 0.28)'),
                           transform: isHovered ? 'translateY(-6px) scale(1.01)' : (isActive ? 'translateY(-2px)' : 'translateY(0)'),
                           transition: 'all 250ms cubic-bezier(0.16, 1, 0.3, 1)',
