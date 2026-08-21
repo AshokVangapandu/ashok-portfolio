@@ -64,7 +64,7 @@
   overlayNode.innerHTML = `
     <div style="display:flex; flex-direction:column; align-items:center; gap:20px;">
       <div style="width:48px; height:48px; border-radius:12px; background:linear-gradient(135deg, #7C3AED, #3B82F6); display:flex; align-items:center; justify-content:center; color:#FFF; font-weight:800; font-size:18px; box-shadow:0 0 30px rgba(124, 58, 237, 0.4); animation: visPulse 1.5s infinite ease-in-out;">
-        AV
+        <img src="assets/images/AV%20White%20Icon.svg" alt="AV Logo" style="width:22px; height:22px; object-fit:contain; display:block;" />
       </div>
       <span style="font-size:14px; color:#94A3B8; font-weight:500;">Loading portfolio...</span>
     </div>
