@@ -37,7 +37,7 @@ export const GlobalLoadingScreen: React.FC = () => {
             animation: 'pulse 1.5s infinite ease-in-out'
           }}
         >
-          AV
+          <img src="assets/images/AV%20White%20Icon.svg" alt="AV Logo" style={{ width: '22px', height: '22px', objectFit: 'contain', display: 'block' }} />
         </div>
         <span style={{ fontSize: '14px', color: '#94A3B8', fontWeight: 500, letterSpacing: '0.02em' }}>
           Loading application...

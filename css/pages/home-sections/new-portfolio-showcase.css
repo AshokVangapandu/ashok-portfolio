@@ -164,6 +164,10 @@
   width: 100%;
 }
 
+.mobile-showcase-mockup {
+  display: none;
+}
+
 .mockup-glow {
   position: absolute;
   width: 80%;

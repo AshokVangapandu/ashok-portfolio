@@ -31,7 +31,9 @@ export const Navbar: React.FC = () => {
     <header className={`site-header ${isScrolled ? 'is-scrolled' : ''}`} data-header>
       <nav className="navbar" aria-label="Primary navigation">
         <a className="brand" href="#hero" aria-label="Ashok Vangapandu home" onClick={closeMenu}>
-          <span className="brand-mark">AV</span>
+          <span className="brand-mark">
+            <img src="assets/images/AV%20White%20Icon.svg" alt="AV Logo" className="brand-mark-img" />
+          </span>
           <span className="brand-copy">
             <span className="brand-name">Ashok Vangapandu</span>
           </span>

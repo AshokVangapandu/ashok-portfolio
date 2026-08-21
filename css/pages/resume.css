@@ -166,6 +166,16 @@
   box-shadow: 0 24px 62px rgba(77, 118, 255, 0.22);
   font-size: 22px;
   font-weight: 880;
+  overflow: hidden;
+  padding: 18px;
+  box-sizing: border-box;
+}
+
+.resume-avatar .resume-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
 }
 
 .resume-status {

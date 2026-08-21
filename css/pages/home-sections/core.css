@@ -501,6 +501,23 @@ body.has-pointer .cursor-light {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
   color: #ffffff;
   font-size: 12px;
+  overflow: hidden;
+  padding: 5px;
+  box-sizing: border-box;
+}
+
+.brand-mark-img {
+  width: 100%;
+  height: 100%;
+  max-width: 20px;
+  max-height: 20px;
+  object-fit: contain;
+  display: block;
+  transition: transform 240ms ease;
+}
+
+.brand:hover .brand-mark-img {
+  transform: scale(1.08);
 }
 
 .nav-links {

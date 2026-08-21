@@ -75,6 +75,51 @@
   align-items: center;
 }
 
+.desktop-cert-cta {
+  display: flex;
+}
+
+.mobile-cert-cta,
+.certifications-cta-wrapper {
+  display: none;
+}
+
+.cert-footer-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-width: 220px;
+  max-width: 280px;
+  height: 48px;
+  padding: 0 24px;
+  background: linear-gradient(135deg, #6C3CFF, #8F72FF);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  color: #FFFFFF;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: 0 4px 20px rgba(108, 60, 255, 0.25);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
+}
+
+.cert-footer-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(108, 60, 255, 0.38);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #FFFFFF;
+}
+
+.cert-footer-cta svg {
+  transition: transform 0.25s ease;
+}
+
+.cert-footer-cta:hover svg {
+  transform: translateX(4px);
+}
+
 /* Provider Cards Grid: 6 columns */
 .certifications-grid-v2 {
   display: grid;

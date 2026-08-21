@@ -84,7 +84,7 @@
   letter-spacing: 0.08em;
   color: #1E2045;
   /* Adjusted dark slate-purple for actual visibility */
-  opacity: 0.20;
+  opacity: 0.45;
   /* 15% opacity */
   pointer-events: none;
   z-index: 0;
@@ -110,6 +110,16 @@
   /* Text Primary */
   margin: 0 0 16px;
   letter-spacing: 0;
+}
+
+.contact-title-purple {
+  color: #fff !important;
+  display: inline-block;
+}
+
+.contact-title-blue {
+  color: #fff !important;
+  display: inline-block;
 }
 
 .contact-header p {
@@ -182,6 +192,16 @@
   color: #FFFFFF;
   box-shadow: 0 8px 24px rgba(108, 60, 255, 0.35);
   border: 1px solid rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.contact-avatar-badge .avatar-badge-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
 }
 
 .contact-identity-copy h3 {
@@ -857,6 +877,7 @@
     border: 1px solid rgba(10, 102, 194, 0.15);
     color: #0A66C2;
   }
+
   .social-item-mobile[href*="linkedin.com"]:hover .social-icon-box {
     background: #0A66C2;
     border-color: #0A66C2;
@@ -869,6 +890,7 @@
     border: 1px solid rgba(255, 255, 255, 0.1);
     color: #E6EDF0;
   }
+
   .social-item-mobile[href*="github.com"]:hover .social-icon-box {
     background: #FFFFFF;
     border-color: #FFFFFF;
@@ -881,9 +903,11 @@
     border: 1px solid rgba(37, 211, 102, 0.15);
     color: #25D366;
   }
+
   .social-item-mobile[href*="wa.me"] .social-icon-box svg {
     transform: translate(-1.2px, 1.2px) scale(1.12);
   }
+
   .social-item-mobile[href*="wa.me"]:hover .social-icon-box {
     background: #25D366;
     border-color: #25D366;
@@ -896,6 +920,7 @@
     border: 1px solid rgba(225, 48, 108, 0.15);
     color: #E1306C;
   }
+
   .social-item-mobile[href*="instagram.com"]:hover .social-icon-box {
     background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
     border-color: transparent;
@@ -946,6 +971,7 @@
     opacity: 0;
     transform: translateY(-4px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -973,6 +999,7 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
