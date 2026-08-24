@@ -16,7 +16,10 @@
       left: 0;
       width: 100vw;
       height: 100vh;
-      background-color: #0A0D14;
+      background-color: #080A0F;
+      background-image: linear-gradient(to right, rgba(255, 255, 255, 0.025) 1px, transparent 1px), linear-gradient(to bottom, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+      background-size: 36px 36px;
+      background-position: center center;
       color: #FFFFFF;
       display: flex;
       flex-direction: column;
@@ -25,32 +28,189 @@
       z-index: 99999;
       font-family: 'Inter', system-ui, -apple-system, sans-serif;
       box-sizing: border-box;
-      padding: 24px;
+      padding: 24px 16px;
       opacity: 1;
       transition: opacity 0.15s ease-out;
+      overflow-x: hidden;
     }
     .vis-card {
       max-width: 480px;
       width: 100%;
-      background-color: #121824;
-      border-radius: 20px;
+      background-color: rgba(13, 16, 23, 0.85);
+      border-radius: 28px;
       padding: 40px 32px;
       text-align: center;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.65), 0 0 40px rgba(124, 58, 237, 0.06);
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 20px;
+      gap: 22px;
       box-sizing: border-box;
     }
-    .vis-card.maint { border: 1px solid rgba(245, 158, 11, 0.3); }
-    .vis-card.priv { border: 1px solid rgba(100, 116, 139, 0.3); }
+    .vis-card.maint { border: 1px solid rgba(255, 255, 255, 0.08); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+    .vis-card.priv { border: 1px solid rgba(124, 58, 237, 0.3); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
     .vis-card.err { border: 1px solid rgba(239, 68, 68, 0.3); }
-    .vis-badge { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; }
-    .vis-title { margin: 0; font-size: 24px; font-weight: 700; color: #F8FAFC; }
+    .vis-badge { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; }
+    .vis-title { margin: 0; font-size: 26px; font-weight: 700; color: #F8FAFC; }
     .vis-desc { margin: 0; font-size: 14px; color: #94A3B8; line-height: 1.6; }
     .vis-sub { font-size: 12px; color: #64748B; background: rgba(255,255,255,0.04); padding: 6px 12px; border-radius: 6px; }
     .vis-btn { padding: 10px 24px; border-radius: 8px; background: #7C3AED; color: #FFF; border: none; font-weight: 600; cursor: pointer; }
+    #maint-btn-google {
+      transition: all 0.2s ease;
+    }
+    #maint-btn-google:hover {
+      background-color: rgba(255, 255, 255, 0.1) !important;
+      border-color: rgba(255, 255, 255, 0.25) !important;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    }
+    .maint-vis-social-btn {
+      background-color: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #94A3B8;
+      border-radius: 10px;
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 500;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+    .maint-vis-social-btn:hover {
+      background-color: rgba(255, 255, 255, 0.07);
+      border-color: rgba(255, 255, 255, 0.18);
+      color: #FFFFFF;
+      transform: translateY(-1px);
+    }
+
+    /* Animations */
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 0.4; transform: translate(-50%, -50%) scale(1); }
+      50% { opacity: 0.75; transform: translate(-50%, -50%) scale(1.1); }
+    }
+    @keyframes ringPulse {
+      0%, 100% { transform: scale(1); opacity: 0.3; }
+      50% { transform: scale(1.15); opacity: 0.75; }
+    }
+
+    /* Option 3: Full-Screen Hero Layout with Fixed Bottom Dock (< 640px) */
+    @media (max-width: 640px) {
+      .vis-overlay {
+        background-color: #06080F !important;
+        background-image:
+          radial-gradient(circle at 50% 20%, rgba(124, 58, 237, 0.28) 0%, rgba(99, 102, 241, 0.1) 45%, transparent 75%),
+          linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+          linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px) !important;
+        background-size: 100% 100%, 32px 32px, 32px 32px !important;
+        padding: 24px 16px 20px 16px !important;
+        min-height: 100vh !important;
+        justify-content: space-between !important;
+      }
+      .maint-bg-glow {
+        display: none !important;
+      }
+      .vis-card.maint {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        padding: 0 !important;
+        max-width: 360px !important;
+        width: 100% !important;
+        gap: 22px !important;
+        margin: auto 0 !important;
+      }
+      .maint-hero-ring {
+        width: 76px !important;
+        height: 76px !important;
+        border: 1px solid rgba(139, 92, 246, 0.3) !important;
+        animation: ringPulse 3s ease-in-out infinite !important;
+      }
+      .maint-hero-box {
+        width: 58px !important;
+        height: 58px !important;
+        border-radius: 17px !important;
+        background: rgba(35, 22, 60, 0.75) !important;
+        border: 1px solid rgba(139, 92, 246, 0.4) !important;
+        box-shadow: 0 0 24px rgba(124, 58, 237, 0.3) !important;
+      }
+      .maint-hero-img {
+        width: 28px !important;
+        height: 28px !important;
+      }
+      .maint-title {
+        font-size: 25px !important;
+        line-height: 1.25 !important;
+        color: #FFFFFF !important;
+        background: none !important;
+        -webkit-text-fill-color: initial !important;
+        font-weight: 800 !important;
+        letter-spacing: -0.02em !important;
+      }
+      .maint-desc {
+        font-size: 13.5px !important;
+        line-height: 1.55 !important;
+        color: #94A3B8 !important;
+        max-width: 320px !important;
+      }
+      .maint-status-pill {
+        padding: 8px 18px !important;
+        font-size: 12.5px !important;
+        background: rgba(255, 255, 255, 0.04) !important;
+        border: 1px solid rgba(255, 255, 255, 0.09) !important;
+        color: #CBD5E1 !important;
+        border-radius: 9999px !important;
+      }
+      .maint-notify-box {
+        padding: 20px 18px !important;
+        border-radius: 20px !important;
+        gap: 14px !important;
+        background: rgba(15, 20, 32, 0.8) !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        backdrop-filter: blur(20px) !important;
+        -webkit-backdrop-filter: blur(20px) !important;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4) !important;
+        width: 100% !important;
+      }
+      #maint-btn-google {
+        padding: 12px 18px !important;
+        font-size: 14px !important;
+        border-radius: 12px !important;
+        background: rgba(255, 255, 255, 0.06) !important;
+        border: 1px solid rgba(255, 255, 255, 0.14) !important;
+        color: #FFFFFF !important;
+        font-weight: 600 !important;
+      }
+      #maint-btn-google:active {
+        transform: scale(0.98) !important;
+        background: rgba(255, 255, 255, 0.12) !important;
+      }
+      .maint-vis-social-container {
+        width: 100% !important;
+        max-width: 360px !important;
+        gap: 8px !important;
+        margin-top: 12px !important;
+      }
+      .maint-vis-social-btn {
+        padding: 10px 14px !important;
+        font-size: 12.5px !important;
+        border-radius: 12px !important;
+        background: rgba(255, 255, 255, 0.04) !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        color: #94A3B8 !important;
+        flex: 1 1 calc(33.33% - 6px) !important;
+        justify-content: center !important;
+        font-weight: 500 !important;
+      }
+      .maint-vis-social-btn:active {
+        transform: scale(0.96) !important;
+        color: #FFFFFF !important;
+        background: rgba(255, 255, 255, 0.09) !important;
+      }
+    }
     @keyframes visPulse {
       0%, 100% { transform: scale(1); opacity: 1; }
       50% { transform: scale(0.95); opacity: 0.7; }
@@ -263,72 +423,75 @@
         }
 
         const userContent = currentUser ? `
-          <div style="display:flex; flex-direction:column; align-items:center; gap:14px; width:100%; background:rgba(15, 23, 42, 0.6); border:1px solid rgba(255, 255, 255, 0.1); border-radius:16px; padding:20px; box-sizing:border-box;">
+          <div style="display:flex; flex-direction:column; align-items:center; gap:14px; width:100%; box-sizing:border-box;">
             <div style="display:flex; align-items:center; gap:12px; width:100%;">
-              ${currentUser.user_metadata?.avatar_url || currentUser.user_metadata?.picture ? `<img src="${currentUser.user_metadata.avatar_url || currentUser.user_metadata.picture}" style="width:42px; height:42px; border-radius:50%; border:2px solid #7C3AED;" />` : `<div style="width:42px; height:42px; border-radius:50%; background:#7C3AED; color:#FFF; display:flex; align-items:center; justify-content:center; font-weight:700;">${(currentUser.user_metadata?.full_name || currentUser.email || 'U').charAt(0).toUpperCase()}</div>`}
-              <div style="display:flex; flex-direction:column; text-align:left;">
-                <span style="font-size:14.5px; font-weight:700; color:#F8FAFC;">👤 ${currentUser.user_metadata?.full_name || currentUser.user_metadata?.name || 'Google User'}</span>
-                <span style="font-size:13px; color:#94A3B8;">${currentUser.email}</span>
+              ${currentUser.user_metadata?.avatar_url || currentUser.user_metadata?.picture ? `<img src="${currentUser.user_metadata.avatar_url || currentUser.user_metadata.picture}" style="width:38px; height:38px; border-radius:50%; border:2px solid #7C3AED; flex-shrink:0;" />` : `<div style="width:38px; height:38px; border-radius:50%; background:#7C3AED; color:#FFF; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:15px; flex-shrink:0;">${(currentUser.user_metadata?.full_name || currentUser.email || 'U').charAt(0).toUpperCase()}</div>`}
+              <div style="display:flex; flex-direction:column; text-align:left; overflow:hidden;">
+                <span style="font-size:14px; font-weight:600; color:#F8FAFC; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${currentUser.user_metadata?.full_name || currentUser.user_metadata?.name || 'Google User'}</span>
+                <span style="font-size:12.5px; color:#94A3B8; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${currentUser.email}</span>
               </div>
-              <span style="margin-left:auto; font-size:11px; font-weight:700; color:#10B981; background:rgba(16, 185, 129, 0.15); border:1px solid rgba(16, 185, 129, 0.3); padding:3px 8px; border-radius:12px; white-space:nowrap;">✓ Signed in</span>
+              <span style="margin-left:auto; font-size:11px; font-weight:700; color:#10B981; background:rgba(16, 185, 129, 0.15); border:1px solid rgba(16, 185, 129, 0.3); padding:3px 8px; border-radius:12px; white-space:nowrap; flex-shrink:0;">✓ Signed in</span>
             </div>
             ${isAlreadySubscribed ? `
-              <div style="width:100%; background:rgba(245, 158, 11, 0.1); border:1px solid rgba(245, 158, 11, 0.3); border-radius:10px; padding:12px; color:#F59E0B; font-size:13px; font-weight:600; line-height:1.5; text-align:center;">ℹ ${subscribedMsg}</div>
+              <div style="width:100%; background:rgba(245, 158, 11, 0.1); border:1px solid rgba(245, 158, 11, 0.3); border-radius:10px; padding:10px 14px; color:#F59E0B; font-size:13px; font-weight:600; line-height:1.4; text-align:center;">ℹ ${subscribedMsg}</div>
             ` : `
-              <button id="maint-btn-submit" type="button" data-user-email="${currentUser.email}" onclick="window.handleMaintenanceNotifySubmit(event)" style="width:100%; padding:12px; border-radius:10px; background:linear-gradient(135deg, #7C3AED, #6D28D9); color:#FFF; border:none; font-weight:600; font-size:14px; cursor:pointer; box-shadow:0 4px 14px rgba(124, 58, 237, 0.3);">Notify Me</button>
-              <div id="maint-error-feedback" style="display:none; font-size:12px; color:#EF4444; text-align:left; width:100%;"></div>
+              <button id="maint-btn-submit" type="button" data-user-email="${currentUser.email}" onclick="window.handleMaintenanceNotifySubmit(event)" style="width:100%; padding:11px 16px; border-radius:10px; background:linear-gradient(135deg, #7C3AED, #6D28D9); color:#FFF; border:none; font-weight:600; font-size:13.5px; cursor:pointer; box-shadow:0 4px 14px rgba(124, 58, 237, 0.3);">Notify Me When Back Online</button>
+              <div id="maint-error-feedback" style="display:none; font-size:12px; color:#EF4444; text-align:center; width:100%;"></div>
             `}
             <button type="button" onclick="window.AuthService && window.AuthService.signOut()" style="background:none; border:none; color:#94A3B8; font-size:12px; cursor:pointer; text-decoration:underline;">Not your account? Sign Out</button>
           </div>
         ` : `
           <div style="display:flex; flex-direction:column; align-items:center; gap:12px; width:100%;">
-            <span style="font-size:14.5px; font-weight:600; color:#E2E8F0; letter-spacing:-0.01em;">
+            <span style="font-size:13.5px; font-weight:600; color:#E2E8F0; letter-spacing:-0.01em; text-align:center;">
               Want to get notified when we're back online?
             </span>
-            <button id="maint-btn-google" type="button" onclick="window.AuthService && window.AuthService.signInWithGoogle()" style="display:inline-flex; align-items:center; justify-content:center; gap:10px; padding:12px 24px; border-radius:12px; background:#FFFFFF; color:#0F172A; border:none; font-weight:600; font-size:14px; cursor:pointer; width:100%; box-shadow:0 4px 14px rgba(0,0,0,0.2);">
-              <svg viewBox="0 0 24 24" width="18" height="18"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+            <button id="maint-btn-google" type="button" onclick="window.AuthService && window.AuthService.signInWithGoogle()" style="display:inline-flex; align-items:center; justify-content:center; gap:10px; padding:12px 20px; border-radius:12px; background:rgba(255, 255, 255, 0.05); border:1px solid rgba(255, 255, 255, 0.12); color:#FFFFFF; font-weight:600; font-size:14px; cursor:pointer; width:100%; transition:all 0.2s ease; box-sizing:border-box;">
+              <svg viewBox="0 0 24 24" width="18" height="18" style="flex-shrink:0;"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
               Continue with Google
             </button>
           </div>
         `;
 
         overlayNode.innerHTML = `
-          <div class="vis-card maint" style="max-width:520px; padding:44px 36px; gap:24px; border:1px solid rgba(255,255,255,0.08); background:rgba(18,24,36,0.85); backdrop-filter:blur(16px); box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);">
-            <div style="display:flex; flex-direction:column; align-items:center; gap:16px;">
-              <div style="width:64px; height:64px; border-radius:20px; background:linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(217, 119, 6, 0.08)); border:1px solid rgba(245, 158, 11, 0.3); color:#F59E0B; display:flex; align-items:center; justify-content:center; box-shadow:0 0 20px rgba(245, 158, 11, 0.15);">
-                <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
-                </svg>
-              </div>
-              <div style="display:flex; align-items:center; gap:8px; background:rgba(245, 158, 11, 0.1); padding:6px 14px; border-radius:20px; border:1px solid rgba(245, 158, 11, 0.2);">
-                <span style="width:8px; height:8px; border-radius:50%; background-color:#F59E0B; box-shadow:0 0 8px #F59E0B;"></span>
-                <span style="font-size:12px; font-weight:700; color:#F59E0B; letter-spacing:0.04em; text-transform:uppercase;">Maintenance Mode</span>
+          <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:650px; height:650px; background:radial-gradient(circle at center, rgba(124, 58, 237, 0.14) 0%, rgba(99, 102, 241, 0.04) 50%, transparent 70%); pointer-events:none; filter:blur(50px); z-index:1;"></div>
+          <div class="vis-card maint" style="position:relative; z-index:2; max-width:480px; width:100%; background:rgba(13,16,23,0.85); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border:1px solid rgba(255,255,255,0.08); border-radius:28px; padding:40px 32px; text-align:center; box-shadow:0 30px 60px -15px rgba(0,0,0,0.65), 0 0 40px rgba(124,58,237,0.06); display:flex; flex-direction:column; align-items:center; gap:22px; box-sizing:border-box;">
+            <div style="position:relative; display:flex; align-items:center; justify-content:center; margin:4px 0 2px 0;">
+              <div class="maint-hero-ring" style="position:absolute; width:84px; height:84px; border-radius:50%; border:1px solid rgba(139, 92, 246, 0.18); pointer-events:none;"></div>
+              <div class="maint-hero-box" style="position:relative; width:64px; height:64px; border-radius:18px; background:rgba(35, 22, 60, 0.65); border:1px solid rgba(139, 92, 246, 0.35); display:flex; align-items:center; justify-content:center; box-shadow:0 0 24px rgba(124, 58, 237, 0.22), inset 0 0 16px rgba(139, 92, 246, 0.15);">
+                <div style="position:absolute; top:-3px; right:-3px; width:5px; height:5px; border-radius:50%; background:#38BDF8; box-shadow:0 0 8px #38BDF8;"></div>
+                <div style="position:absolute; bottom:-2px; left:-2px; width:4px; height:4px; border-radius:50%; background:#C084FC; box-shadow:0 0 6px #C084FC;"></div>
+                <img src="assets/images/AV%20White%20Icon.svg" alt="AV Brand Logo" class="maint-hero-img" style="width:32px; height:32px; object-fit:contain; display:block;" />
               </div>
             </div>
-            <div style="display:flex; flex-direction:column; gap:10px;">
-              <h1 style="margin:0; font-size:26px; font-weight:800; color:#F8FAFC; letter-spacing:-0.02em;">Portfolio Under Maintenance</h1>
-              <p style="margin:0; font-size:14.5px; color:#94A3B8; line-height:1.6;">I'm currently working on exciting improvements, new projects, and a better experience. Thank you for your patience.</p>
+            <div style="display:inline-flex; align-items:center; gap:8px; background:rgba(245, 158, 11, 0.08); border:1px solid rgba(245, 158, 11, 0.3); border-radius:9999px; padding:5px 14px; font-size:11px; font-weight:700; color:#F59E0B; letter-spacing:0.08em; text-transform:uppercase;">
+              <span style="width:6px; height:6px; border-radius:50%; background-color:#F59E0B; box-shadow:0 0 6px #F59E0B;"></span>
+              <span>Maintenance Mode</span>
             </div>
-            <div style="display:inline-flex; align-items:center; gap:8px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); padding:8px 16px; border-radius:12px; font-size:13px; color:#CBD5E1;">
+            <div style="display:flex; flex-direction:column; gap:10px; align-items:center;">
+              <h1 class="maint-title" style="margin:0; font-size:clamp(26px, 5vw, 32px); font-weight:700; color:#FFFFFF; letter-spacing:-0.02em; line-height:1.25; max-width:380px;">Portfolio Under<br />Maintenance</h1>
+              <p class="maint-desc" style="margin:0; font-size:14px; color:#94A3B8; line-height:1.6; max-width:400px;">I'm currently working on exciting improvements, new projects, and a better experience. Thank you for your patience.</p>
+            </div>
+            <div class="maint-status-pill" style="display:inline-flex; align-items:center; gap:8px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); padding:8px 18px; border-radius:9999px; font-size:13px; color:#94A3B8; font-weight:500;">
+              <span style="font-size:13px;">⏳</span>
               <span>Expected to be back soon</span>
             </div>
-            <div id="maint-notify-wrapper" style="width:100%; display:flex; flex-direction:column; gap:12px; margin-top:4px;">
+            <div id="maint-notify-wrapper" class="maint-notify-box" style="width:100%; background:rgba(10, 13, 20, 0.65); border:1px solid rgba(255, 255, 255, 0.06); border-radius:16px; padding:20px 22px; box-sizing:border-box; display:flex; flex-direction:column; align-items:center; gap:14px; margin-top:2px;">
               ${userContent}
             </div>
-            <div style="width:100%; height:1px; background:rgba(255, 255, 255, 0.08); margin:4px 0;"></div>
-            <div style="display:flex; align-items:center; justify-content:center; gap:20px;">
-              <a href="#" data-social-key="linkedin" target="_blank" rel="noopener noreferrer" style="color:#94A3B8; font-size:13px; font-weight:500; text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" /><rect x="2" y="9" width="4" height="12" /><circle cx="4" cy="4" r="2" /></svg> LinkedIn
+            <div class="maint-vis-social-container" style="display:flex; align-items:center; justify-content:center; gap:10px; flex-wrap:wrap; width:100%; margin-top:4px;">
+              <a href="#" data-social-key="linkedin" target="_blank" rel="noopener noreferrer" class="maint-vis-social-btn">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" /><rect x="2" y="9" width="4" height="12" /><circle cx="4" cy="4" r="2" /></svg> LinkedIn
               </a>
-              <a href="#" data-social-key="github" target="_blank" rel="noopener noreferrer" style="color:#94A3B8; font-size:13px; font-weight:500; text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" /></svg> GitHub
+              <a href="#" data-social-key="github" target="_blank" rel="noopener noreferrer" class="maint-vis-social-btn">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" /></svg> GitHub
               </a>
-              <a href="#" data-social-key="email" style="color:#94A3B8; font-size:13px; font-weight:500; text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" /></svg> Email
+              <a href="#" data-social-key="email" class="maint-vis-social-btn">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" /></svg> Email
               </a>
             </div>
           </div>
         `;
+
       } else if (mode === 'private') {
         const client = (window.AuthService && window.AuthService.supabase) ||
                        (window.supabase && window.APP_CONFIG?.SUPABASE_URL && window.APP_CONFIG?.SUPABASE_ANON_KEY ? window.supabase.createClient(window.APP_CONFIG.SUPABASE_URL, window.APP_CONFIG.SUPABASE_ANON_KEY) : null);
