@@ -1,5 +1,5 @@
 /* js/components/visibility-guard.js */
-(function() {
+(function () {
   // Do not run route protection on admin dashboard routes
   const path = window.location.pathname.toLowerCase();
   if (path.includes('/admin') || path.includes('admin/index.html')) {
@@ -16,10 +16,8 @@
       left: 0;
       width: 100vw;
       height: 100vh;
-      background-color: #080A0F;
-      background-image: linear-gradient(to right, rgba(255, 255, 255, 0.025) 1px, transparent 1px), linear-gradient(to bottom, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
-      background-size: 36px 36px;
-      background-position: center center;
+      max-height: 100vh;
+      background-color: #06080F;
       color: #FFFFFF;
       display: flex;
       flex-direction: column;
@@ -28,10 +26,10 @@
       z-index: 99999;
       font-family: 'Inter', system-ui, -apple-system, sans-serif;
       box-sizing: border-box;
-      padding: 24px 16px;
+      padding: 0;
       opacity: 1;
       transition: opacity 0.15s ease-out;
-      overflow-x: hidden;
+      overflow: hidden !important;
     }
     .vis-card {
       max-width: 480px;
@@ -55,22 +53,24 @@
     .vis-desc { margin: 0; font-size: 14px; color: #94A3B8; line-height: 1.6; }
     .vis-sub { font-size: 12px; color: #64748B; background: rgba(255,255,255,0.04); padding: 6px 12px; border-radius: 6px; }
     .vis-btn { padding: 10px 24px; border-radius: 8px; background: #7C3AED; color: #FFF; border: none; font-weight: 600; cursor: pointer; }
-    #maint-btn-google {
+    #maint-btn-google, .maint-btn-google-primary {
       transition: all 0.2s ease;
+      background-color: #FFFFFF !important;
+      color: #0F172A !important;
     }
-    #maint-btn-google:hover {
-      background-color: rgba(255, 255, 255, 0.1) !important;
-      border-color: rgba(255, 255, 255, 0.25) !important;
-      transform: translateY(-1px);
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    #maint-btn-google:hover:not(:disabled), .maint-btn-google-primary:hover:not(:disabled) {
+      background-color: #F8FAFC !important;
+      color: #0F172A !important;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(255, 255, 255, 0.4), 0 0 20px rgba(124, 58, 237, 0.3) !important;
     }
     .maint-vis-social-btn {
       background-color: rgba(255, 255, 255, 0.03);
       border: 1px solid rgba(255, 255, 255, 0.08);
       color: #94A3B8;
       border-radius: 10px;
-      padding: 8px 16px;
-      font-size: 13px;
+      padding: 7px 14px;
+      font-size: 12px;
       font-weight: 500;
       text-decoration: none;
       display: inline-flex;
@@ -85,130 +85,177 @@
       transform: translateY(-1px);
     }
 
-    /* Animations */
-    @keyframes pulseGlow {
-      0%, 100% { opacity: 0.4; transform: translate(-50%, -50%) scale(1); }
-      50% { opacity: 0.75; transform: translate(-50%, -50%) scale(1.1); }
-    }
-    @keyframes ringPulse {
-      0%, 100% { transform: scale(1); opacity: 0.3; }
-      50% { transform: scale(1.15); opacity: 0.75; }
+    /* 100% Full-Screen 60/40 Split Desktop Presentation (>= 992px) */
+    .maint-split-container {
+      display: grid;
+      grid-template-columns: 60% 40%;
+      width: 100%;
+      height: 100vh;
+      max-height: 100vh;
+      overflow: hidden;
+      box-sizing: border-box;
     }
 
-    /* Option 3: Full-Screen Hero Layout with Fixed Bottom Dock (< 640px) */
-    @media (max-width: 640px) {
+    /* Responsive Tablet / Mobile Stacking (< 992px) - Isolated from Desktop */
+    @media (max-width: 991px) {
       .vis-overlay {
-        background-color: #06080F !important;
-        background-image:
-          radial-gradient(circle at 50% 20%, rgba(124, 58, 237, 0.28) 0%, rgba(99, 102, 241, 0.1) 45%, transparent 75%),
-          linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-          linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px) !important;
-        background-size: 100% 100%, 32px 32px, 32px 32px !important;
-        padding: 24px 16px 20px 16px !important;
+        height: auto !important;
         min-height: 100vh !important;
-        justify-content: space-between !important;
+        max-height: none !important;
+        overflow-y: auto !important;
+        padding: 0 0 36px 0 !important;
       }
-      .maint-bg-glow {
+      .maint-split-container {
+        display: flex !important;
+        flex-direction: column !important;
+        grid-template-columns: 1fr !important;
+        width: 100% !important;
+        height: auto !important;
+        min-height: 100vh !important;
+        max-height: none !important;
+        padding: 0 0 36px 0 !important;
+        box-sizing: border-box !important;
+        overflow: visible !important;
+      }
+      .maint-left-col {
+        position: relative !important;
+        height: auto !important;
+        min-height: auto !important;
+        width: 100% !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        text-align: center !important;
+        padding: 0 0 12px 0 !important;
+        overflow: visible !important;
+      }
+      .maint-hero-cover-img {
+        position: relative !important;
+        top: auto !important;
+        left: auto !important;
+        width: 100% !important;
+        height: clamp(240px, 35vh, 320px) !important;
+        object-fit: cover !important;
+        object-position: center top !important;
+        display: block !important;
+        border-radius: 0 !important;
+        margin-bottom: 0 !important;
+      }
+      .maint-hero-gradient {
+        display: block !important;
+        position: absolute !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        height: 90px !important;
+        background: linear-gradient(to top, #06080F 25%, rgba(6, 8, 15, 0.7) 65%, transparent 100%) !important;
+        pointer-events: none !important;
+        z-index: 2 !important;
+      }
+      .maint-left-content {
+        position: relative !important;
+        z-index: 3 !important;
+        width: 100% !important;
+        padding: 0 20px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        text-align: center !important;
+        gap: 14px !important;
+        box-sizing: border-box !important;
+        margin-top: -20px !important;
+      }
+      .maint-title-br {
         display: none !important;
       }
-      .vis-card.maint {
-        background: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
-        backdrop-filter: none !important;
-        -webkit-backdrop-filter: none !important;
-        padding: 0 !important;
-        max-width: 360px !important;
+      .maint-title {
+        font-size: 18px !important;
+        font-weight: 700 !important;
+        line-height: 1.3 !important;
+        text-align: center !important;
         width: 100% !important;
-        gap: 22px !important;
-        margin: auto 0 !important;
+        margin: 0 !important;
+        white-space: nowrap !important;
       }
-      .maint-hero-ring {
-        width: 76px !important;
-        height: 76px !important;
-        border: 1px solid rgba(139, 92, 246, 0.3) !important;
-        animation: ringPulse 3s ease-in-out infinite !important;
+      .maint-badge {
+        display: inline-flex !important;
+        margin: 0 auto !important;
+        font-size: 9.5px !important;
+        font-weight: 700 !important;
+        letter-spacing: 0.08em !important;
+        padding: 4px 10px !important;
+        gap: 5px !important;
       }
-      .maint-hero-box {
+      /* Hide Desktop-Only Content on Mobile */
+      .maint-desc,
+      .maint-status-pill,
+      .maint-benefits-grid {
+        display: none !important;
+      }
+      .maint-right-col-wrapper {
+        width: 100% !important;
+        height: auto !important;
+        padding: 0 0 12px 0  !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        box-sizing: border-box !important;
+      }
+      .maint-right-col {
+        width: 100% !important;
+        max-width: 100% !important;
+        border-radius: 0px !important;
+        padding: 20px 16px 16px 16px !important;
+        gap: 12px !important;
+        box-sizing: border-box !important;
+      }
+      .maint-card-icon-outer {
         width: 58px !important;
         height: 58px !important;
-        border-radius: 17px !important;
-        background: rgba(35, 22, 60, 0.75) !important;
-        border: 1px solid rgba(139, 92, 246, 0.4) !important;
-        box-shadow: 0 0 24px rgba(124, 58, 237, 0.3) !important;
       }
-      .maint-hero-img {
-        width: 28px !important;
-        height: 28px !important;
+      .maint-card-icon-inner {
+        width: 44px !important;
+        height: 44px !important;
       }
-      .maint-title {
-        font-size: 25px !important;
+      .maint-card-heading {
+        font-size: 16.5px !important;
         line-height: 1.25 !important;
-        color: #FFFFFF !important;
-        background: none !important;
-        -webkit-text-fill-color: initial !important;
-        font-weight: 800 !important;
-        letter-spacing: -0.02em !important;
       }
-      .maint-desc {
-        font-size: 13.5px !important;
-        line-height: 1.55 !important;
-        color: #94A3B8 !important;
-        max-width: 320px !important;
+      .maint-card-subtext {
+        font-size: 11.5px !important;
+        line-height: 1.35 !important;
+        max-width: 270px !important;
       }
-      .maint-status-pill {
-        padding: 8px 18px !important;
-        font-size: 12.5px !important;
-        background: rgba(255, 255, 255, 0.04) !important;
-        border: 1px solid rgba(255, 255, 255, 0.09) !important;
-        color: #CBD5E1 !important;
-        border-radius: 9999px !important;
-      }
-      .maint-notify-box {
-        padding: 20px 18px !important;
-        border-radius: 20px !important;
-        gap: 14px !important;
-        background: rgba(15, 20, 32, 0.8) !important;
-        border: 1px solid rgba(255, 255, 255, 0.08) !important;
-        backdrop-filter: blur(20px) !important;
-        -webkit-backdrop-filter: blur(20px) !important;
-        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4) !important;
-        width: 100% !important;
-      }
+      .maint-btn-google-primary,
       #maint-btn-google {
-        padding: 12px 18px !important;
-        font-size: 14px !important;
-        border-radius: 12px !important;
-        background: rgba(255, 255, 255, 0.06) !important;
-        border: 1px solid rgba(255, 255, 255, 0.14) !important;
-        color: #FFFFFF !important;
+        height: 40px !important;
+        padding: 0 16px !important;
+        font-size: 13px !important;
         font-weight: 600 !important;
-      }
-      #maint-btn-google:active {
-        transform: scale(0.98) !important;
-        background: rgba(255, 255, 255, 0.12) !important;
+        border-radius: 10px !important;
       }
       .maint-vis-social-container {
+        display: grid !important;
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 6px !important;
         width: 100% !important;
-        max-width: 360px !important;
-        gap: 8px !important;
-        margin-top: 12px !important;
       }
       .maint-vis-social-btn {
-        padding: 10px 14px !important;
-        font-size: 12.5px !important;
-        border-radius: 12px !important;
-        background: rgba(255, 255, 255, 0.04) !important;
-        border: 1px solid rgba(255, 255, 255, 0.08) !important;
-        color: #94A3B8 !important;
-        flex: 1 1 calc(33.33% - 6px) !important;
+        width: 100% !important;
+        height: 36px !important;
         justify-content: center !important;
-        font-weight: 500 !important;
+        padding: 0 2px !important;
+        font-size: 11.5px !important;
+        font-weight: 600 !important;
+        border-radius: 8px !important;
+        box-sizing: border-box !important;
       }
-      .maint-vis-social-btn:active {
-        transform: scale(0.96) !important;
-        color: #FFFFFF !important;
-        background: rgba(255, 255, 255, 0.09) !important;
+        justify-content: center !important;
+        padding: 0 4px !important;
+        font-size: 12px !important;
+        font-weight: 600 !important;
+        box-sizing: border-box !important;
       }
     }
     @keyframes visPulse {
@@ -234,12 +281,18 @@
     const overlay = document.getElementById('visibility-overlay');
     if (overlay) {
       overlay.style.opacity = '0';
-      setTimeout(() => overlay.remove(), 150);
+      setTimeout(() => {
+        overlay.remove();
+        document.body.style.overflow = '';
+        document.documentElement.style.overflow = '';
+      }, 150);
     }
   };
 
   const injectOverlay = () => {
     if (!document.getElementById('visibility-overlay')) {
+      document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
       document.body.appendChild(overlayNode);
     }
   };
@@ -253,7 +306,7 @@
   async function checkAdminBypass() {
     try {
       const client = (window.AuthService && window.AuthService.supabase) ||
-                     (window.supabase && window.APP_CONFIG?.SUPABASE_URL && window.APP_CONFIG?.SUPABASE_ANON_KEY ? window.supabase.createClient(window.APP_CONFIG.SUPABASE_URL, window.APP_CONFIG.SUPABASE_ANON_KEY) : null);
+        (window.supabase && window.APP_CONFIG?.SUPABASE_URL && window.APP_CONFIG?.SUPABASE_ANON_KEY ? window.supabase.createClient(window.APP_CONFIG.SUPABASE_URL, window.APP_CONFIG.SUPABASE_ANON_KEY) : null);
       if (!client) return false;
 
       const { data: sessionData } = await client.auth.getSession();
@@ -407,7 +460,7 @@
 
       if (mode === 'maintenance') {
         const client = (window.AuthService && window.AuthService.supabase) ||
-                       (window.supabase && window.APP_CONFIG?.SUPABASE_URL && window.APP_CONFIG?.SUPABASE_ANON_KEY ? window.supabase.createClient(window.APP_CONFIG.SUPABASE_URL, window.APP_CONFIG.SUPABASE_ANON_KEY) : null);
+          (window.supabase && window.APP_CONFIG?.SUPABASE_URL && window.APP_CONFIG?.SUPABASE_ANON_KEY ? window.supabase.createClient(window.APP_CONFIG.SUPABASE_URL, window.APP_CONFIG.SUPABASE_ANON_KEY) : null);
         let currentUser = null;
         if (client) {
           const { data: s } = await client.auth.getSession();
@@ -442,10 +495,7 @@
           </div>
         ` : `
           <div style="display:flex; flex-direction:column; align-items:center; gap:12px; width:100%;">
-            <span style="font-size:13.5px; font-weight:600; color:#E2E8F0; letter-spacing:-0.01em; text-align:center;">
-              Want to get notified when we're back online?
-            </span>
-            <button id="maint-btn-google" type="button" onclick="window.AuthService && window.AuthService.signInWithGoogle()" style="display:inline-flex; align-items:center; justify-content:center; gap:10px; padding:12px 20px; border-radius:12px; background:rgba(255, 255, 255, 0.05); border:1px solid rgba(255, 255, 255, 0.12); color:#FFFFFF; font-weight:600; font-size:14px; cursor:pointer; width:100%; transition:all 0.2s ease; box-sizing:border-box;">
+            <button id="maint-btn-google" type="button" class="maint-btn-google-primary" onclick="window.AuthService && window.AuthService.signInWithGoogle()" style="display:inline-flex; align-items:center; justify-content:center; gap:10px; padding:13px 20px; border-radius:12px; background:#FFFFFF; color:#0F172A; font-weight:700; font-size:14.5px; cursor:pointer; width:100%; border:none; boxShadow:0 4px 16px rgba(255, 255, 255, 0.15); transition:all 0.2s ease; box-sizing:border-box;">
               <svg viewBox="0 0 24 24" width="18" height="18" style="flex-shrink:0;"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
               Continue with Google
             </button>
@@ -453,48 +503,91 @@
         `;
 
         overlayNode.innerHTML = `
-          <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:650px; height:650px; background:radial-gradient(circle at center, rgba(124, 58, 237, 0.14) 0%, rgba(99, 102, 241, 0.04) 50%, transparent 70%); pointer-events:none; filter:blur(50px); z-index:1;"></div>
-          <div class="vis-card maint" style="position:relative; z-index:2; max-width:480px; width:100%; background:rgba(13,16,23,0.85); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border:1px solid rgba(255,255,255,0.08); border-radius:28px; padding:40px 32px; text-align:center; box-shadow:0 30px 60px -15px rgba(0,0,0,0.65), 0 0 40px rgba(124,58,237,0.06); display:flex; flex-direction:column; align-items:center; gap:22px; box-sizing:border-box;">
-            <div style="position:relative; display:flex; align-items:center; justify-content:center; margin:4px 0 2px 0;">
-              <div class="maint-hero-ring" style="position:absolute; width:84px; height:84px; border-radius:50%; border:1px solid rgba(139, 92, 246, 0.18); pointer-events:none;"></div>
-              <div class="maint-hero-box" style="position:relative; width:64px; height:64px; border-radius:18px; background:rgba(35, 22, 60, 0.65); border:1px solid rgba(139, 92, 246, 0.35); display:flex; align-items:center; justify-content:center; box-shadow:0 0 24px rgba(124, 58, 237, 0.22), inset 0 0 16px rgba(139, 92, 246, 0.15);">
-                <div style="position:absolute; top:-3px; right:-3px; width:5px; height:5px; border-radius:50%; background:#38BDF8; box-shadow:0 0 8px #38BDF8;"></div>
-                <div style="position:absolute; bottom:-2px; left:-2px; width:4px; height:4px; border-radius:50%; background:#C084FC; box-shadow:0 0 6px #C084FC;"></div>
-                <img src="assets/images/AV%20White%20Icon.svg" alt="AV Brand Logo" class="maint-hero-img" style="width:32px; height:32px; object-fit:contain; display:block;" />
+          <div class="maint-bg-glow" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:750px; height:750px; background:radial-gradient(circle at center, rgba(124, 58, 237, 0.16) 0%, rgba(99, 102, 241, 0.05) 50%, transparent 70%); pointer-events:none; filter:blur(60px); z-index:1;"></div>
+          <div class="maint-split-container" style="position:relative; z-index:2; box-sizing:border-box;">
+            
+            <!-- LEFT SECTION (60%) -->
+            <div class="maint-left-col" style="position:relative; width:100%; height:100vh; min-height:100vh; display:flex; flex-direction:column; justify-content:flex-end; align-items:flex-start; text-align:left; padding:0; box-sizing:border-box; overflow:hidden;">
+              <img class="maint-hero-cover-img" src="assets/images/Maintanance_Cover.png" alt="Portfolio Maintenance Illustration" style="position:absolute; top:0; left:0; width:100%; height:72%; object-fit:cover; object-position:center top; display:block; z-index:1; pointer-events:none;" />
+              <div class="maint-hero-gradient" style="position:absolute; bottom:0; left:0; width:100%; height:55%; background:linear-gradient(to top, #06080F 25%, rgba(6, 8, 15, 0.85) 60%, transparent 100%); z-index:2; pointer-events:none;"></div>
+              
+              <div class="maint-left-content" style="position:relative; z-index:3; width:100%; padding:0 48px 44px 48px; display:flex; flex-direction:column; gap:16px; align-items:flex-start; box-sizing:border-box;">
+                <div class="maint-badge" style="display:inline-flex; align-items:center; gap:8px; background:rgba(245, 158, 11, 0.08); border:1px solid rgba(245, 158, 11, 0.3); border-radius:9999px; padding:6px 16px; font-size:11px; font-weight:700; color:#F59E0B; letter-spacing:0.08em; text-transform:uppercase;">
+                  <span style="width:6px; height:6px; border-radius:50%; background-color:#F59E0B; box-shadow:0 0 6px #F59E0B;"></span>
+                  <span>Maintenance Mode</span>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:10px; width:100%;">
+                  <h1 class="maint-title" style="margin:0; font-size:clamp(30px, 3.5vw, 42px); font-weight:800; color:#FFFFFF; letter-spacing:-0.02em; line-height:1.15;">Portfolio Under <br class="maint-title-br" /><span style="color:#C084FC;">Maintenance</span></h1>
+                  <p class="maint-desc" style="margin:0; font-size:14.5px; color:#94A3B8; line-height:1.55; max-width:500px;">I'm currently working on exciting improvements, new projects, and a better experience. Thank you for your patience.</p>
+                </div>
+                <div class="maint-status-pill" style="display:inline-flex; align-items:center; gap:8px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); padding:8px 18px; border-radius:9999px; font-size:13px; color:#94A3B8; font-weight:500;">
+                  <span style="font-size:13px;">⏳</span>
+                  <span>Expected to be back soon</span>
+                </div>
               </div>
             </div>
-            <div style="display:inline-flex; align-items:center; gap:8px; background:rgba(245, 158, 11, 0.08); border:1px solid rgba(245, 158, 11, 0.3); border-radius:9999px; padding:5px 14px; font-size:11px; font-weight:700; color:#F59E0B; letter-spacing:0.08em; text-transform:uppercase;">
-              <span style="width:6px; height:6px; border-radius:50%; background-color:#F59E0B; box-shadow:0 0 6px #F59E0B;"></span>
-              <span>Maintenance Mode</span>
+
+            <!-- RIGHT SECTION (40%) -->
+            <div class="maint-right-col-wrapper" style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; padding:40px 36px; box-sizing:border-box;">
+              <div class="maint-right-col" style="background:rgba(12, 15, 26, 0.88); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px); border:1px solid rgba(139, 92, 246, 0.28); border-radius:28px; padding:40px 32px; text-align:center; box-shadow:0 25px 60px -10px rgba(0,0,0,0.75), 0 0 50px rgba(124,58,237,0.14), inset 0 0 20px rgba(124,58,237,0.04); display:flex; flex-direction:column; align-items:center; gap:20px; max-width:460px; width:100%; box-sizing:border-box;">
+                <div style="position:relative; display:flex; align-items:center; justify-content:center;">
+                  <div class="maint-card-icon-outer" style="position:absolute; width:76px; height:76px; border-radius:50%; border:1px solid rgba(139, 92, 246, 0.25); pointer-events:none;"></div>
+                  <div class="maint-card-icon-inner" style="position:relative; width:56px; height:56px; border-radius:50%; background:rgba(35, 22, 60, 0.75); border:1px solid rgba(139, 92, 246, 0.4); display:flex; align-items:center; justify-content:center; box-shadow:0 0 24px rgba(124, 58, 237, 0.3);">
+                    <div style="position:absolute; top:1px; right:1px; width:5px; height:5px; border-radius:50%; background:#38BDF8; box-shadow:0 0 8px #38BDF8;"></div>
+                    <div style="position:absolute; bottom:1px; left:1px; width:4px; height:4px; border-radius:50%; background:#C084FC; box-shadow:0 0 6px #C084FC;"></div>
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#C084FC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.73 21a2 2 0 0 1-3.46 0" /></svg>
+                  </div>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:6px; align-items:center;">
+                  <h2 class="maint-card-heading" style="margin:0; font-size:clamp(20px, 2.2vw, 24px); font-weight:700; color:#FFFFFF; letter-spacing:-0.02em; line-height:1.25;">Get notified<br /><span style="color:#C084FC;">when I'm back online</span></h2>
+                  <p class="maint-card-subtext" style="margin:0; font-size:13px; color:#94A3B8; line-height:1.5; max-width:320px;">Sign in with your account and I'll let you know as soon as the portfolio is live again.</p>
+                </div>
+                <div id="maint-notify-wrapper" style="width:100%;">
+                  ${userContent}
+                </div>
+                <div class="maint-benefits-grid" style="width:100%; display:grid; grid-template-columns:repeat(2, 1fr); gap:14px; background:rgba(10, 13, 22, 0.65); border:1px solid rgba(255, 255, 255, 0.06); border-radius:16px; padding:14px 16px; box-sizing:border-box;">
+                  <div style="display:flex; align-items:center; gap:10px; text-align:left;">
+                    <div style="width:36px; height:36px; border-radius:10px; background:rgba(124, 58, 237, 0.15); border:1px solid rgba(124, 58, 237, 0.3); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#C084FC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:2px;">
+                      <span style="color:#FFFFFF; font-size:13px; font-weight:600; line-height:1.2;">No Spam</span>
+                      <span style="color:#64748B; font-size:11px; line-height:1.3;">Only important updates</span>
+                    </div>
+                  </div>
+                  <div style="display:flex; align-items:center; gap:10px; text-align:left;">
+                    <div style="width:36px; height:36px; border-radius:10px; background:rgba(124, 58, 237, 0.15); border:1px solid rgba(124, 58, 237, 0.3); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#C084FC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" /></svg>
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:2px;">
+                      <span style="color:#FFFFFF; font-size:13px; font-weight:600; line-height:1.2;">Instant Update</span>
+                      <span style="color:#64748B; font-size:11px; line-height:1.3;">Get notified first</span>
+                    </div>
+                  </div>
+                </div>
+                <div style="display:flex; align-items:center; width:100%; gap:10px; color:#64748B; font-size:11.5px; font-weight:500; margin:2px 0;">
+                  <div style="flex:1; height:1px; background:rgba(255,255,255,0.08);"></div>
+                  <span>Or connect with me</span>
+                  <div style="flex:1; height:1px; background:rgba(255,255,255,0.08);"></div>
+                </div>
+                <div class="maint-vis-social-container" style="display:flex; align-items:center; justify-content:center; gap:10px; flex-wrap:wrap; width:100%;">
+                  <a href="#" data-social-key="linkedin" target="_blank" rel="noopener noreferrer" class="maint-vis-social-btn">
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" /><rect x="2" y="9" width="4" height="12" /><circle cx="4" cy="4" r="2" /></svg> LinkedIn
+                  </a>
+                  <a href="#" data-social-key="github" target="_blank" rel="noopener noreferrer" class="maint-vis-social-btn">
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" /></svg> GitHub
+                  </a>
+                  <a href="#" data-social-key="email" class="maint-vis-social-btn">
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" /></svg> Email
+                  </a>
+                </div>
+              </div>
             </div>
-            <div style="display:flex; flex-direction:column; gap:10px; align-items:center;">
-              <h1 class="maint-title" style="margin:0; font-size:clamp(26px, 5vw, 32px); font-weight:700; color:#FFFFFF; letter-spacing:-0.02em; line-height:1.25; max-width:380px;">Portfolio Under<br />Maintenance</h1>
-              <p class="maint-desc" style="margin:0; font-size:14px; color:#94A3B8; line-height:1.6; max-width:400px;">I'm currently working on exciting improvements, new projects, and a better experience. Thank you for your patience.</p>
-            </div>
-            <div class="maint-status-pill" style="display:inline-flex; align-items:center; gap:8px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); padding:8px 18px; border-radius:9999px; font-size:13px; color:#94A3B8; font-weight:500;">
-              <span style="font-size:13px;">⏳</span>
-              <span>Expected to be back soon</span>
-            </div>
-            <div id="maint-notify-wrapper" class="maint-notify-box" style="width:100%; background:rgba(10, 13, 20, 0.65); border:1px solid rgba(255, 255, 255, 0.06); border-radius:16px; padding:20px 22px; box-sizing:border-box; display:flex; flex-direction:column; align-items:center; gap:14px; margin-top:2px;">
-              ${userContent}
-            </div>
-            <div class="maint-vis-social-container" style="display:flex; align-items:center; justify-content:center; gap:10px; flex-wrap:wrap; width:100%; margin-top:4px;">
-              <a href="#" data-social-key="linkedin" target="_blank" rel="noopener noreferrer" class="maint-vis-social-btn">
-                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" /><rect x="2" y="9" width="4" height="12" /><circle cx="4" cy="4" r="2" /></svg> LinkedIn
-              </a>
-              <a href="#" data-social-key="github" target="_blank" rel="noopener noreferrer" class="maint-vis-social-btn">
-                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" /></svg> GitHub
-              </a>
-              <a href="#" data-social-key="email" class="maint-vis-social-btn">
-                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" /></svg> Email
-              </a>
-            </div>
-          </div>
         `;
 
       } else if (mode === 'private') {
         const client = (window.AuthService && window.AuthService.supabase) ||
-                       (window.supabase && window.APP_CONFIG?.SUPABASE_URL && window.APP_CONFIG?.SUPABASE_ANON_KEY ? window.supabase.createClient(window.APP_CONFIG.SUPABASE_URL, window.APP_CONFIG.SUPABASE_ANON_KEY) : null);
+          (window.supabase && window.APP_CONFIG?.SUPABASE_URL && window.APP_CONFIG?.SUPABASE_ANON_KEY ? window.supabase.createClient(window.APP_CONFIG.SUPABASE_URL, window.APP_CONFIG.SUPABASE_ANON_KEY) : null);
         let currentUser = null;
         if (client) {
           const { data: s } = await client.auth.getSession();
@@ -615,7 +708,7 @@
     }
   }
 
-  window.handleMaintenanceNotifySubmit = async function(e) {
+  window.handleMaintenanceNotifySubmit = async function (e) {
     if (e) e.preventDefault();
     const btn = document.getElementById('maint-btn-submit');
     const wrapper = document.getElementById('maint-notify-wrapper');
@@ -676,7 +769,7 @@
     }
   };
 
-  window.handlePrivateContinueSubmit = async function(e) {
+  window.handlePrivateContinueSubmit = async function (e) {
     if (e) e.preventDefault();
     const input = document.getElementById('priv-email-input');
     const errBox = document.getElementById('priv-error-feedback');
@@ -742,12 +835,12 @@
     }
   };
 
-  window.handlePrivateRequestAccessClick = function(e) {
+  window.handlePrivateRequestAccessClick = function (e) {
     if (e) e.preventDefault();
     window.handlePrivateRequestAccess();
   };
 
-  window.handlePrivateSignOut = async function(e) {
+  window.handlePrivateSignOut = async function (e) {
     if (e) e.preventDefault();
     try {
       if (typeof window !== 'undefined' && window.sessionStorage) {
@@ -766,12 +859,12 @@
     }
   };
 
-  window.handlePrivateRequestAccess = async function() {
+  window.handlePrivateRequestAccess = async function () {
     const existing = document.getElementById('priv-req-modal');
     if (existing) existing.remove();
 
     const client = (window.AuthService && window.AuthService.supabase) ||
-                   (window.supabase && window.APP_CONFIG?.SUPABASE_URL && window.APP_CONFIG?.SUPABASE_ANON_KEY ? window.supabase.createClient(window.APP_CONFIG.SUPABASE_URL, window.APP_CONFIG.SUPABASE_ANON_KEY) : null);
+      (window.supabase && window.APP_CONFIG?.SUPABASE_URL && window.APP_CONFIG?.SUPABASE_ANON_KEY ? window.supabase.createClient(window.APP_CONFIG.SUPABASE_URL, window.APP_CONFIG.SUPABASE_ANON_KEY) : null);
     let currentUser = null;
     if (client) {
       const { data: s } = await client.auth.getSession();
@@ -833,7 +926,7 @@
     document.body.appendChild(modal);
   };
 
-  window.handleAccessRequestSubmit = async function(e) {
+  window.handleAccessRequestSubmit = async function (e) {
     if (e) e.preventDefault();
     const nameInput = document.getElementById('req-modal-name');
     const emailInput = document.getElementById('req-modal-email');
@@ -926,7 +1019,7 @@
   // Subscribe to auth state changes to re-evaluate visibility immediately on SIGNED_IN / SIGNED_OUT
   try {
     const client = (window.AuthService && window.AuthService.supabase) ||
-                   (window.supabase && window.APP_CONFIG?.SUPABASE_URL && window.APP_CONFIG?.SUPABASE_ANON_KEY ? window.supabase.createClient(window.APP_CONFIG.SUPABASE_URL, window.APP_CONFIG.SUPABASE_ANON_KEY) : null);
+      (window.supabase && window.APP_CONFIG?.SUPABASE_URL && window.APP_CONFIG?.SUPABASE_ANON_KEY ? window.supabase.createClient(window.APP_CONFIG.SUPABASE_URL, window.APP_CONFIG.SUPABASE_ANON_KEY) : null);
     if (client && client.auth) {
       client.auth.onAuthStateChange((event) => {
         if (event === 'SIGNED_OUT') {
