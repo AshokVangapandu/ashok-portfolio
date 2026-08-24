@@ -334,6 +334,77 @@ export const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
           />
         </div>
 
+        {/* STICKY MODAL TOP BAR NAV */}
+        <div
+          className="modal-sticky-top-bar"
+          style={{
+            position: 'sticky',
+            top: 0,
+            left: 0,
+            right: 0,
+            zIndex: 150,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '12px 24px',
+            backgroundColor: 'rgba(9, 13, 26, 0.95)',
+            backdropFilter: 'blur(16px)',
+            borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+            boxSizing: 'border-box'
+          }}
+        >
+          {/* Back Action Button */}
+          <button
+            type="button"
+            onClick={onClose}
+            style={{
+              backgroundColor: 'transparent',
+              border: 'none',
+              color: '#A78BFA',
+              fontSize: '13.5px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '4px 8px',
+              borderRadius: '8px',
+              outline: 'none',
+              transition: 'all 150ms ease'
+            }}
+          >
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="19" y1="12" x2="5" y2="12" />
+              <polyline points="12 19 5 12 12 5" />
+            </svg>
+            <span>Back to Showcase</span>
+          </button>
+
+          {/* Close Action Button */}
+          <button
+            type="button"
+            onClick={onClose}
+            style={{
+              width: '34px',
+              height: '34px',
+              borderRadius: '50%',
+              backgroundColor: 'rgba(255, 255, 255, 0.06)',
+              border: '1px solid rgba(255, 255, 255, 0.12)',
+              color: '#FFFFFF',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '20px',
+              outline: 'none',
+              transition: 'all 150ms ease'
+            }}
+            aria-label="Close Case Study"
+          >
+            &times;
+          </button>
+        </div>
+
         {/* SECTION 1: IMMERSIVE CENTURED DARK HERO SECTION */}
         <div
           style={{
@@ -341,7 +412,7 @@ export const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
             width: '100%',
             backgroundColor: '#090D1A', // Dark Hero
             backgroundImage: 'radial-gradient(circle at 50% 30%, rgba(139, 92, 246, 0.15) 0%, rgba(9, 13, 26, 0) 70%)',
-            padding: '80px 48px 32px 48px',
+            padding: '36px 48px 32px 48px',
             boxSizing: 'border-box',
             flexShrink: 0,
             display: 'flex',
@@ -353,70 +424,8 @@ export const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
           }}
           className="hero-section-grid"
         >
-          {/* Close button at top right */}
-          <button
-            type="button"
-            onClick={onClose}
-            style={{
-              position: 'absolute',
-              top: '24px',
-              right: '24px',
-              width: '40px',
-              height: '40px',
-              borderRadius: '50%',
-              backgroundColor: 'rgba(255, 255, 255, 0.05)',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-              color: '#FFFFFF',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              backdropFilter: 'blur(10px)',
-              transition: 'all 150ms cubic-bezier(0.16, 1, 0.3, 1)',
-              outline: 'none',
-              zIndex: 10
-            }}
-            aria-label="Close Case Study"
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.2)';
-              e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.4)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
-              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
-            }}
-          >
-            &times;
-          </button>
-
           {/* Header Left-Aligned Text Column */}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', textAlign: 'left', gap: '16px', width: '100%', maxWidth: '1000px', zIndex: 2 }}>
-            {/* Back Navigation Button */}
-            <button
-              type="button"
-              onClick={onClose}
-              style={{
-                backgroundColor: 'transparent',
-                border: 'none',
-                color: '#C4B5FD',
-                fontSize: '13px',
-                fontWeight: 600,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: 0,
-                width: 'fit-content',
-                outline: 'none',
-                marginBottom: '4px',
-                transition: 'color 150ms cubic-bezier(0.16, 1, 0.3, 1)'
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.color = '#FFFFFF'}
-              onMouseLeave={(e) => e.currentTarget.style.color = '#C4B5FD'}
-            >
-              ← Back to Showcase
-            </button>
-
             <span
               style={{
                 fontSize: '11px',
@@ -433,7 +442,7 @@ export const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
               }}
               className="animate-fade-in-up"
             >
-              {category ? `${category.replace(/case study/gi, '').trim()} Case Study` : 'Project Case Study'}
+              {category ? category.replace(/case study/gi, '').trim() : 'Featured Project'}
             </span>
 
             <h1
@@ -917,6 +926,7 @@ export const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
           {/* SECTION 2.3: TECHNOLOGY STACK */}
           {technologies && technologies.length > 0 && (
             <div
+              className="modal-tech-section"
               style={{
                 padding: '56px 48px',
                 backgroundColor: '#FFFFFF',

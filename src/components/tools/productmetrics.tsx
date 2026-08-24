@@ -48,6 +48,47 @@ export const ProductMetrics: React.FC = () => {
         </h3>
       </div>
 
+      {/* Mobile Performance Highlights Layout (<= 768px) */}
+      <div className="tools-mobile-metrics-container">
+        <div className="tools-mobile-metric-card">
+          <div className="tools-mobile-metric-top">
+            <div className="tools-mobile-metric-icon-box purple">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#A78BFA" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+            </div>
+            <span className="tools-mobile-metric-badge green">
+              ↑ 24%
+            </span>
+          </div>
+          <div className="tools-mobile-metric-val">
+            {totalDownloadsStr}
+          </div>
+          <div className="tools-mobile-metric-label">TOTAL ACTIVE INSTALLS</div>
+          <div className="tools-mobile-metric-sub">Across all environments</div>
+        </div>
+
+        <div className="tools-mobile-metric-card">
+          <div className="tools-mobile-metric-top">
+            <div className="tools-mobile-metric-icon-box pink">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#FB7185" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+              </svg>
+            </div>
+            <span className="tools-mobile-metric-badge gray">
+              Excellent
+            </span>
+          </div>
+          <div className="tools-mobile-metric-val">
+            {averageRatingStr} <span className="tools-mobile-metric-max">/ 5.0</span>
+          </div>
+          <div className="tools-mobile-metric-label">USER SATISFACTION</div>
+          <div className="tools-mobile-metric-sub">Based on {totalReviews || 18} reviews</div>
+        </div>
+      </div>
+
       <div
         style={{
           display: 'grid',

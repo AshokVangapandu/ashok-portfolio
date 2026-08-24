@@ -95,6 +95,7 @@ export const TechnologyGrid: React.FC = () => {
   const [scrollProgress, setScrollProgress] = useState(0.5);
   
   const containerRef = useRef<HTMLDivElement>(null);
+  const mobileRailRef = useRef<HTMLDivElement>(null);
   const animationFrameRef = useRef<number>();
   const glideFrameRef = useRef<number>();
   const isPausedRef = useRef(false);
@@ -102,6 +103,22 @@ export const TechnologyGrid: React.FC = () => {
   
   const targetSpeed = 0.88;
   const acceleration = 0.016;
+
+  const handleMobilePrev = () => {
+    if (mobileRailRef.current) {
+      isPausedRef.current = true;
+      mobileRailRef.current.scrollBy({ left: -140, behavior: 'smooth' });
+      setTimeout(() => { isPausedRef.current = false; }, 1500);
+    }
+  };
+
+  const handleMobileNext = () => {
+    if (mobileRailRef.current) {
+      isPausedRef.current = true;
+      mobileRailRef.current.scrollBy({ left: 140, behavior: 'smooth' });
+      setTimeout(() => { isPausedRef.current = false; }, 1500);
+    }
+  };
 
   // Real-time style interpolation based on card centering
   const updateCardStyles = () => {
@@ -149,7 +166,6 @@ export const TechnologyGrid: React.FC = () => {
       card.style.filter = `blur(${blurVal}px) saturate(${saturateVal}%)`;
       
       // Refined Active Card Border & Glass styling:
-      // High transparency, soft glow, slightly brighter border (167, 139, 250)
       const glowOpacity = pct * 0.6;
       const borderOpacity = 0.04 + pct * 0.38;
       card.style.borderColor = `rgba(167, 139, 250, ${borderOpacity})`;
@@ -176,27 +192,26 @@ export const TechnologyGrid: React.FC = () => {
     });
   };
 
-  // Continuous linear animation loop
+  // Continuous linear animation loop for both Desktop and Mobile
   useEffect(() => {
     const loop = () => {
-      if (containerRef.current) {
-        const container = containerRef.current;
-        
-        // PAUSE & RESUME physics
-        if (isPausedRef.current) {
-          if (speedRef.current > 0) {
-            speedRef.current = Math.max(0, speedRef.current - 0.04);
-          }
-        } else {
-          if (speedRef.current < targetSpeed) {
-            speedRef.current = Math.min(targetSpeed, speedRef.current + acceleration);
-          }
-        }
-        
+      // PAUSE & RESUME physics
+      if (isPausedRef.current) {
         if (speedRef.current > 0) {
+          speedRef.current = Math.max(0, speedRef.current - 0.04);
+        }
+      } else {
+        if (speedRef.current < targetSpeed) {
+          speedRef.current = Math.min(targetSpeed, speedRef.current + acceleration);
+        }
+      }
+
+      if (speedRef.current > 0) {
+        // Desktop Container Auto-scroll
+        if (containerRef.current && containerRef.current.offsetParent !== null) {
+          const container = containerRef.current;
           let newScrollLeft = container.scrollLeft + speedRef.current;
           const oneThird = container.scrollWidth / 3;
-          
           if (oneThird > 0) {
             if (newScrollLeft >= oneThird * 2) {
               newScrollLeft -= oneThird;
@@ -204,6 +219,21 @@ export const TechnologyGrid: React.FC = () => {
               newScrollLeft += oneThird;
             }
             container.scrollLeft = newScrollLeft;
+          }
+        }
+
+        // Mobile Rail Auto-scroll
+        if (mobileRailRef.current && mobileRailRef.current.offsetParent !== null) {
+          const mRail = mobileRailRef.current;
+          let newScrollLeft = mRail.scrollLeft + speedRef.current;
+          const oneThird = mRail.scrollWidth / 3;
+          if (oneThird > 0) {
+            if (newScrollLeft >= oneThird * 2) {
+              newScrollLeft -= oneThird;
+            } else if (newScrollLeft <= oneThird) {
+              newScrollLeft += oneThird;
+            }
+            mRail.scrollLeft = newScrollLeft;
           }
         }
       }
@@ -221,14 +251,20 @@ export const TechnologyGrid: React.FC = () => {
   // Center alignment on mount
   useEffect(() => {
     const initScroll = () => {
-      if (!containerRef.current) return;
-      const container = containerRef.current;
-      const oneThird = container.scrollWidth / 3;
-      if (oneThird > 0) {
-        container.scrollLeft = oneThird;
-        updateCardStyles();
-      } else {
-        requestAnimationFrame(initScroll);
+      if (containerRef.current && containerRef.current.offsetParent !== null) {
+        const container = containerRef.current;
+        const oneThird = container.scrollWidth / 3;
+        if (oneThird > 0) {
+          container.scrollLeft = oneThird;
+          updateCardStyles();
+        }
+      }
+      if (mobileRailRef.current && mobileRailRef.current.offsetParent !== null) {
+        const mRail = mobileRailRef.current;
+        const oneThird = mRail.scrollWidth / 3;
+        if (oneThird > 0) {
+          mRail.scrollLeft = oneThird;
+        }
       }
     };
     initScroll();
@@ -342,13 +378,75 @@ export const TechnologyGrid: React.FC = () => {
         position: 'relative'
       }}
     >
-      {/* Header Info */}
-      <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-start', alignItems: 'center', gap: '8px' }}>
-        <span style={{ width: '4px', height: '16px', backgroundColor: 'var(--admin-primary)', borderRadius: '2px' }} />
-        <h3 style={{ fontSize: '18px', fontWeight: 600, margin: 0, color: '#FFFFFF', letterSpacing: '-0.02em' }}>
-          Technology Stack
-        </h3>
+      {/* Mobile Technology Stack Layout (<= 768px) */}
+      <div className="tools-mobile-techstack-wrapper">
+        <div className="tools-mobile-techstack-header">
+          <div className="tools-mobile-techstack-title-group">
+            <span className="tools-mobile-techstack-bar" />
+            <h3 className="tools-mobile-techstack-title">Technology Stack</h3>
+          </div>
+        </div>
+
+        <div className="tools-mobile-techstack-rail-container">
+          <button
+            type="button"
+            className="tools-mobile-techstack-arrow left"
+            onClick={handleMobilePrev}
+            aria-label="Previous Technology"
+          >
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <polyline points="15 18 9 12 15 6" />
+            </svg>
+          </button>
+
+          <div
+            className="tools-mobile-techstack-rail custom-scrollbar"
+            ref={mobileRailRef}
+            onTouchStart={() => { isPausedRef.current = true; }}
+            onTouchEnd={() => {
+              setTimeout(() => { isPausedRef.current = false; }, 1200);
+            }}
+            onMouseEnter={() => { isPausedRef.current = true; }}
+            onMouseLeave={() => { isPausedRef.current = false; }}
+          >
+            {tripledTechs.map((tech, idx) => (
+              <div key={idx} className="tools-mobile-techstack-card">
+                <div className="tools-mobile-techstack-icon">
+                  {tech.icon}
+                </div>
+                <span className="tools-mobile-techstack-name">{tech.name}</span>
+              </div>
+            ))}
+          </div>
+
+          <button
+            type="button"
+            className="tools-mobile-techstack-arrow right"
+            onClick={handleMobileNext}
+            aria-label="Next Technology"
+          >
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
+          </button>
+        </div>
+
+        <div className="tools-mobile-techstack-dots">
+          {techs.slice(0, 5).map((_, i) => (
+            <span key={i} className={`tools-mobile-dot ${i === 1 ? 'active' : ''}`} />
+          ))}
+        </div>
       </div>
+
+      {/* Desktop Technology Stack Layout (> 768px) */}
+      <div className="tools-desktop-techstack-container" style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '32px', alignItems: 'center' }}>
+        {/* Header Info */}
+        <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-start', alignItems: 'center', gap: '8px' }}>
+          <span style={{ width: '4px', height: '16px', backgroundColor: 'var(--admin-primary)', borderRadius: '2px' }} />
+          <h3 style={{ fontSize: '18px', fontWeight: 600, margin: 0, color: '#FFFFFF', letterSpacing: '-0.02em' }}>
+            Technology Stack
+          </h3>
+        </div>
 
       {/* Slider Viewport Area */}
       <div
@@ -564,6 +662,7 @@ export const TechnologyGrid: React.FC = () => {
       >
         Carefully selected technologies powering every product I build.
       </span>
+      </div>
 
       <style dangerouslySetInnerHTML={{__html: `
         .horizontal-scroll-carousel::-webkit-scrollbar {

@@ -328,262 +328,290 @@ export const TechStackGrid: React.FC = () => {
   };
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: '40px',
-        width: '100%',
-        boxSizing: 'border-box',
-        padding: '60px 0 20px 0',
-        borderTop: '1px solid rgba(255, 255, 255, 0.05)',
-        position: 'relative'
-      }}
-    >
-      {/* 1. Header Text */}
-      <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+    <div style={{ width: '100%' }}>
+      {/* 1. DESKTOP SLIDER CONTAINER (Shown on Desktop ONLY > 768px) */}
+      <div
+        className="tech-desktop-grid-container"
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '40px',
+          width: '100%',
+          boxSizing: 'border-box',
+          padding: '60px 0 20px 0',
+          borderTop: '1px solid rgba(255, 255, 255, 0.05)',
+          position: 'relative'
+        }}
+      >
+        {/* 1. Header Text */}
+        <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <span
+            style={{
+              fontSize: '11px',
+              fontWeight: 850,
+              color: '#A78BFA',
+              letterSpacing: '0.2em',
+              textTransform: 'uppercase'
+            }}
+          >
+            TECH & TOOLS I WORK WITH
+          </span>
+          <h2
+            style={{
+              margin: 0,
+              fontSize: 'clamp(28px, 4vw, 42px)',
+              fontWeight: 800,
+              color: '#FFFFFF',
+              letterSpacing: '-0.02em',
+              lineHeight: 1.2
+            }}
+          >
+            Modern technologies powering <br />
+            <span style={{ background: 'linear-gradient(135deg, #7C3AED, #A78BFA)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+              enterprise
+            </span> solutions
+          </h2>
+        </div>
+
+        {/* 2. Slider Viewport Container Wrapper */}
+        <div
+          style={{
+            width: '100%',
+            position: 'relative',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '0 24px',
+            boxSizing: 'border-box'
+          }}
+          onMouseEnter={() => { isPausedRef.current = true; }}
+          onMouseLeave={() => { isPausedRef.current = false; }}
+        >
+          {/* Left Arrow Button */}
+          <button
+            onClick={handlePrev}
+            type="button"
+            style={{
+              width: '40px',
+              height: '40px',
+              borderRadius: '50%',
+              backgroundColor: 'rgba(255, 255, 255, 0.02)',
+              border: '1px solid rgba(255, 255, 255, 0.06)',
+              color: '#C4B5FD',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              zIndex: 10,
+              position: 'absolute',
+              left: '24px',
+              transition: 'all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1)'
+            }}
+            className="slider-arrow"
+          >
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="19" y1="12" x2="5" y2="12" />
+              <polyline points="12 19 5 12 12 5" />
+            </svg>
+          </button>
+
+          {/* Viewport container */}
+          <div
+            ref={containerRef}
+            onScroll={updateCardStyles}
+            style={{
+              width: 'calc(100% - 100px)',
+              overflowX: 'auto',
+              display: 'flex',
+              alignItems: 'center',
+              padding: '28px 0',
+              scrollBehavior: 'auto',
+              position: 'relative',
+              maskImage: 'linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%)',
+              WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%)'
+            }}
+            className="horizontal-scroll-carousel"
+          >
+            {tripledTechs.map((tech, idx) => {
+              return (
+                <React.Fragment key={idx}>
+                  <div
+                    data-type="card"
+                    onClick={() => smoothScrollToChild(idx * 2)}
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px',
+                      cursor: 'pointer',
+                      flexShrink: 0,
+                      width: '120px',
+                      height: '120px',
+                      borderRadius: '16px',
+                      border: '1px solid rgba(255, 255, 255, 0.05)',
+                      padding: '16px 8px',
+                      boxSizing: 'border-box',
+                      transition: 'transform 0.15s ease-out, opacity 0.15s ease-out, border-color 0.15s ease-out, background-color 0.15s ease-out, box-shadow 0.15s ease-out, filter 0.15s ease-out',
+                      willChange: 'transform, opacity, filter',
+                      position: 'relative'
+                    }}
+                  >
+                    <div
+                      className="tech-icon-wrapper"
+                      style={{
+                        transition: 'transform 0.2s ease, filter 0.2s ease',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
+                    >
+                      {tech.icon}
+                    </div>
+                    
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1px', alignItems: 'center' }}>
+                      <span
+                        style={{
+                          fontSize: '12.5px',
+                          fontWeight: 600,
+                          color: '#FFFFFF',
+                          textAlign: 'center',
+                          whiteSpace: 'nowrap'
+                        }}
+                      >
+                        {tech.name}
+                      </span>
+                      <span
+                        className="tech-label"
+                        style={{
+                          fontSize: '9px',
+                          color: '#A78BFA',
+                          fontWeight: 500,
+                          textAlign: 'center',
+                          whiteSpace: 'nowrap',
+                          opacity: 0,
+                          height: 0,
+                          overflow: 'hidden',
+                          transition: 'opacity 0.2s ease, height 0.2s ease'
+                        }}
+                      >
+                        {tech.label}
+                      </span>
+                    </div>
+                  </div>
+
+                  <span
+                    style={{
+                      color: 'rgba(139, 92, 246, 0.25)',
+                      fontSize: '12px',
+                      margin: '0 24px',
+                      flexShrink: 0,
+                      userSelect: 'none'
+                    }}
+                  >
+                    ♦
+                  </span>
+                </React.Fragment>
+              );
+            })}
+          </div>
+
+          {/* Right Arrow Button */}
+          <button
+            onClick={handleNext}
+            type="button"
+            style={{
+              width: '40px',
+              height: '40px',
+              borderRadius: '50%',
+              backgroundColor: 'rgba(255, 255, 255, 0.02)',
+              border: '1px solid rgba(255, 255, 255, 0.06)',
+              color: '#C4B5FD',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              zIndex: 10,
+              position: 'absolute',
+              right: '24px',
+              transition: 'all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1)'
+            }}
+            className="slider-arrow"
+          >
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12" />
+              <polyline points="12 5 19 12 12 19" />
+            </svg>
+          </button>
+        </div>
+
+        {/* Fluid animated scroll progress bar indicator */}
+        <div
+          style={{
+            width: '100px',
+            height: '2px',
+            backgroundColor: 'rgba(255, 255, 255, 0.08)',
+            borderRadius: '999px',
+            position: 'relative',
+            overflow: 'hidden',
+            marginTop: '-12px'
+          }}
+        >
+          <div
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: `${scrollProgress * 70}%`,
+              width: '30%',
+              height: '100%',
+              backgroundColor: '#8B5CF6',
+              borderRadius: '999px',
+              boxShadow: '0 0 6px rgba(139, 92, 246, 0.6)',
+              transition: 'left 0.15s cubic-bezier(0.25, 0.8, 0.25, 1)'
+            }}
+          />
+        </div>
+
         <span
           style={{
             fontSize: '11px',
-            fontWeight: 850,
-            color: '#A78BFA',
-            letterSpacing: '0.2em',
-            textTransform: 'uppercase'
+            color: '#475569',
+            fontWeight: 600,
+            textTransform: 'uppercase',
+            letterSpacing: '0.04em'
           }}
         >
-          TECH & TOOLS I WORK WITH
+          Technologies behind the products I build
         </span>
-        <h2
-          style={{
-            margin: 0,
-            fontSize: 'clamp(28px, 4vw, 42px)',
-            fontWeight: 800,
-            color: '#FFFFFF',
-            letterSpacing: '-0.02em',
-            lineHeight: 1.2
-          }}
-        >
-          Modern technologies powering <br />
-          <span style={{ background: 'linear-gradient(135deg, #7C3AED, #A78BFA)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-            enterprise
-          </span> solutions
-        </h2>
       </div>
 
-      {/* 2. Slider Viewport Container Wrapper */}
-      <div
-        style={{
-          width: '100%',
-          position: 'relative',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '0 24px',
-          boxSizing: 'border-box'
-        }}
-        onMouseEnter={() => { isPausedRef.current = true; }}
-        onMouseLeave={() => { isPausedRef.current = false; }}
-      >
-        {/* Left Arrow Button */}
-        <button
-          onClick={handlePrev}
-          type="button"
-          style={{
-            width: '40px',
-            height: '40px',
-            borderRadius: '50%',
-            backgroundColor: 'rgba(255, 255, 255, 0.02)',
-            border: '1px solid rgba(255, 255, 255, 0.06)',
-            color: '#C4B5FD',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            zIndex: 10,
-            position: 'absolute',
-            left: '24px',
-            transition: 'all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1)'
-          }}
-          className="slider-arrow"
-        >
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="19" y1="12" x2="5" y2="12" />
-            <polyline points="12 19 5 12 12 5" />
-          </svg>
-        </button>
+      {/* 2. MOBILE TECH CONTAINER (Shown on Mobile ONLY <= 768px) */}
+      <div className="tech-mobile-grid-container">
+        <div className="tech-mobile-header">
+          <div className="projects-mobile-badge-pill">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="#A78BFA" strokeWidth="2">
+              <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
+            </svg>
+            <span>TECH & TOOLS I WORK WITH</span>
+          </div>
 
-        {/* Viewport container with mask and position relative for precise child offset calculations */}
-        <div
-          ref={containerRef}
-          onScroll={updateCardStyles}
-          style={{
-            width: 'calc(100% - 100px)',
-            overflowX: 'auto',
-            display: 'flex',
-            alignItems: 'center',
-            padding: '28px 0',
-            scrollBehavior: 'auto',
-            position: 'relative',
-            maskImage: 'linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%)',
-            WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%)'
-          }}
-          className="horizontal-scroll-carousel"
-        >
-          {tripledTechs.map((tech, idx) => {
-            return (
-              <React.Fragment key={idx}>
-                {/* Custom Tech Card */}
-                <div
-                  data-type="card"
-                  onClick={() => smoothScrollToChild(idx * 2)}
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '8px',
-                    cursor: 'pointer',
-                    flexShrink: 0,
-                    width: '120px',
-                    height: '120px',
-                    borderRadius: '16px',
-                    border: '1px solid rgba(255, 255, 255, 0.05)',
-                    padding: '16px 8px',
-                    boxSizing: 'border-box',
-                    transition: 'transform 0.15s ease-out, opacity 0.15s ease-out, border-color 0.15s ease-out, background-color 0.15s ease-out, box-shadow 0.15s ease-out, filter 0.15s ease-out',
-                    willChange: 'transform, opacity, filter',
-                    position: 'relative'
-                  }}
-                >
-                  <div
-                    className="tech-icon-wrapper"
-                    style={{
-                      transition: 'transform 0.2s ease, filter 0.2s ease',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center'
-                    }}
-                  >
-                    {tech.icon}
-                  </div>
-                  
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1px', alignItems: 'center' }}>
-                    <span
-                      style={{
-                        fontSize: '12.5px',
-                        fontWeight: 600,
-                        color: '#FFFFFF',
-                        textAlign: 'center',
-                        whiteSpace: 'nowrap'
-                      }}
-                    >
-                      {tech.name}
-                    </span>
-                    <span
-                      className="tech-label"
-                      style={{
-                        fontSize: '9px',
-                        color: '#A78BFA',
-                        fontWeight: 500,
-                        textAlign: 'center',
-                        whiteSpace: 'nowrap',
-                        opacity: 0,
-                        height: 0,
-                        overflow: 'hidden',
-                        transition: 'opacity 0.2s ease, height 0.2s ease'
-                      }}
-                    >
-                      {tech.label}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Diamond Separator */}
-                <span
-                  style={{
-                    color: 'rgba(139, 92, 246, 0.25)',
-                    fontSize: '12px',
-                    margin: '0 24px',
-                    flexShrink: 0,
-                    userSelect: 'none'
-                  }}
-                >
-                  ♦
-                </span>
-              </React.Fragment>
-            );
-          })}
+          <h2 className="tech-mobile-title">
+            Modern technologies powering <span className="purple-gradient-text">enterprise</span> solutions
+          </h2>
         </div>
 
-        {/* Right Arrow Button */}
-        <button
-          onClick={handleNext}
-          type="button"
-          style={{
-            width: '40px',
-            height: '40px',
-            borderRadius: '50%',
-            backgroundColor: 'rgba(255, 255, 255, 0.02)',
-            border: '1px solid rgba(255, 255, 255, 0.06)',
-            color: '#C4B5FD',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            zIndex: 10,
-            position: 'absolute',
-            right: '24px',
-            transition: 'all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1)'
-          }}
-          className="slider-arrow"
-        >
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="5" y1="12" x2="19" y2="12" />
-            <polyline points="12 5 19 12 12 19" />
-          </svg>
-        </button>
+        {/* Mobile Icon-Only Auto-Scrolling Ticker */}
+        <div className="tech-mobile-ticker-wrapper">
+          <div className="tech-mobile-ticker-track">
+            {tripledTechs.map((tech, idx) => (
+              <div key={idx} className="tech-mobile-icon-card" title={tech.name}>
+                {tech.icon}
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
-
-      {/* Fluid animated scroll progress bar indicator */}
-      <div
-        style={{
-          width: '100px',
-          height: '2px',
-          backgroundColor: 'rgba(255, 255, 255, 0.08)',
-          borderRadius: '999px',
-          position: 'relative',
-          overflow: 'hidden',
-          marginTop: '-12px'
-        }}
-      >
-        <div
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: `${scrollProgress * 70}%`, // thumb is 30% wide
-            width: '30%',
-            height: '100%',
-            backgroundColor: '#8B5CF6',
-            borderRadius: '999px',
-            boxShadow: '0 0 6px rgba(139, 92, 246, 0.6)',
-            transition: 'left 0.15s cubic-bezier(0.25, 0.8, 0.25, 1)'
-          }}
-        />
-      </div>
-
-      {/* 3. Bottom Auto-scroll subtext */}
-      <span
-        style={{
-          fontSize: '11px',
-          color: '#475569',
-          fontWeight: 600,
-          textTransform: 'uppercase',
-          letterSpacing: '0.04em'
-        }}
-      >
-        Technologies behind the products I build
-      </span>
 
       <style dangerouslySetInnerHTML={{__html: `
         .horizontal-scroll-carousel::-webkit-scrollbar {

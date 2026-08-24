@@ -100,6 +100,7 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({
 
   return (
     <div
+      className="product-details-modal-overlay"
       style={{
         position: 'fixed',
         inset: 0,
@@ -117,6 +118,7 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({
     >
       {/* Container Card */}
       <div
+        className="product-details-modal-card"
         style={{
           width: '100%',
           maxWidth: '1000px',
@@ -133,7 +135,7 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header Hero Banner / Preview */}
-        <div style={{ position: 'relative', width: '100%', height: '320px', overflow: 'hidden', backgroundColor: '#090D1A' }}>
+        <div className="product-details-modal-banner" style={{ position: 'relative', width: '100%', height: '320px', overflow: 'hidden', backgroundColor: '#090D1A' }}>
           {coverImage && coverImage.toLowerCase().split('?')[0].endsWith('.pdf') ? (
             <div
               style={{
@@ -226,7 +228,7 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="hover-scale active-press"
+            className="product-details-modal-close-btn hover-scale active-press"
             style={{
               position: 'absolute',
               top: '20px',
@@ -259,7 +261,7 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="hover-scale"
+            className="product-details-modal-back-btn hover-scale"
             style={{
               position: 'absolute',
               top: '20px',
@@ -288,6 +290,7 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({
 
         {/* Content Section */}
         <div
+          className="product-details-modal-content-grid"
           style={{
             padding: '0 40px 40px 40px',
             display: 'grid',
@@ -297,7 +300,7 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({
           }}
         >
           {/* Left Column: Core Info & Features */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
+          <div className="product-details-modal-left-col" style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {/* Badge row */}
               <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
@@ -397,7 +400,8 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({
           </div>
 
           {/* Right Column: Statistics & Action Links */}
-          <div 
+          <div
+            className="product-details-modal-right-col"
             style={{ 
               display: 'flex', 
               flexDirection: 'column', 
@@ -493,6 +497,7 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({
             ) : (
               <>
                 <div
+                  className="product-details-modal-stats-box"
                   style={{
                     backgroundColor: 'rgba(255, 255, 255, 0.01)',
                     border: '1px solid rgba(255, 255, 255, 0.04)',
@@ -531,7 +536,7 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({
                 </div>
 
                 {/* Action buttons list */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <div className="product-details-modal-actions" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   {marketplaceUrl && (
                     <a
                       href={marketplaceUrl}

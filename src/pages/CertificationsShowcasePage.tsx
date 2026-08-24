@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { supabase } from '../services/supabase/client';
 import { BackButton } from '../components/BackButton';
 
@@ -83,6 +83,23 @@ export const CertificationsShowcasePage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [visibleCount, setVisibleCount] = useState(6);
+
+  const [activeRailIndex, setActiveRailIndex] = useState(0);
+  const railRef = useRef<HTMLDivElement>(null);
+
+  const handleRailScroll = () => {
+    if (railRef.current && filteredCertifications.length > 0) {
+      const scrollLeft = railRef.current.scrollLeft;
+      const cardWidth = 172; // 160px width + 12px gap
+      const index = Math.round(scrollLeft / cardWidth);
+      const safeIndex = Math.min(Math.max(0, index), filteredCertifications.length - 1);
+      setActiveRailIndex(safeIndex);
+      const targetCard = filteredCertifications[safeIndex];
+      if (targetCard && targetCard.id !== selectedCard?.id) {
+        handleCardSelect(targetCard);
+      }
+    }
+  };
 
   const handleCardSelect = (card: CertificationCard) => {
     if (card.id === selectedCard?.id) return;
@@ -246,12 +263,443 @@ export const CertificationsShowcasePage: React.FC = () => {
         fontFamily: "'Inter', sans-serif"
       }}
     >
-      {/* Top minimal back control */}
-      <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-start' }}>
+      {/* 1. Mobile Page Header (Shown on Mobile ONLY <= 768px) */}
+      <div className="cert-mobile-header-bar">
+        <button
+          type="button"
+          className="projects-mobile-back-btn"
+          onClick={() => {
+            const baseUrl = typeof window !== 'undefined' && window.location.pathname.startsWith('/ashok-portfolio')
+              ? '/ashok-portfolio/'
+              : '/';
+            window.location.href = `${baseUrl}#certifications`;
+          }}
+          aria-label="Go Back"
+        >
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <line x1="19" y1="12" x2="5" y2="12" />
+            <polyline points="12 19 5 12 12 5" />
+          </svg>
+          <span>Back to Portfolio</span>
+        </button>
+        <button
+          type="button"
+          className="projects-mobile-share-btn"
+          onClick={() => {
+            if (navigator.share) {
+              navigator.share({
+                title: 'Professional Certifications | Ashok Vangapandu',
+                url: window.location.href
+              }).catch(() => {});
+            } else if (navigator.clipboard) {
+              navigator.clipboard.writeText(window.location.href);
+              if (typeof window !== 'undefined' && (window as any).showToast) {
+                (window as any).showToast('success', 'Link Copied', 'Certifications page link copied to clipboard!', 3000);
+              }
+            }
+          }}
+          aria-label="Share page"
+        >
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="18" cy="5" r="3" />
+            <circle cx="6" cy="12" r="3" />
+            <circle cx="18" cy="19" r="3" />
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+          </svg>
+        </button>
+      </div>
+
+      {/* 2. Mobile Certifications Hero & Stats (Shown on Mobile ONLY <= 768px) */}
+      <div className="cert-mobile-hero-wrapper">
+        {/* Hero split layout: Left info, Right 3D Shield */}
+        <div className="cert-mobile-hero-top">
+          <div className="cert-mobile-hero-text">
+            <h1 className="cert-mobile-hero-title">
+              Professional <br />
+              <span className="purple-gradient-text">Certifications</span>
+            </h1>
+            <p className="cert-mobile-hero-desc">
+              Trusted credentials from globally recognized organizations that validate my skills and expertise.
+            </p>
+          </div>
+
+          {/* 3D Premium Purple Shield & Diploma Illustration */}
+          <div className="cert-mobile-hero-visual">
+            <svg viewBox="0 0 200 200" width="120" height="120" fill="none" style={{ filter: 'drop-shadow(0 12px 28px rgba(124, 58, 237, 0.5))' }}>
+              <defs>
+                <linearGradient id="certShieldGrad3D" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#C4B5FD" />
+                  <stop offset="35%" stopColor="#8B5CF6" />
+                  <stop offset="70%" stopColor="#6D28D9" />
+                  <stop offset="100%" stopColor="#3B0764" />
+                </linearGradient>
+                <linearGradient id="certShieldInnerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="rgba(255, 255, 255, 0.25)" />
+                  <stop offset="100%" stopColor="rgba(139, 92, 246, 0.05)" />
+                </linearGradient>
+                <linearGradient id="certPlatformGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#3B0764" />
+                  <stop offset="50%" stopColor="#1E1B4B" />
+                  <stop offset="100%" stopColor="#090518" />
+                </linearGradient>
+                <linearGradient id="certStar3D" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#FFFFFF" />
+                  <stop offset="60%" stopColor="#F5F3FF" />
+                  <stop offset="100%" stopColor="#DDD6FE" />
+                </linearGradient>
+                <linearGradient id="certScrollGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#EDE9FE" />
+                  <stop offset="50%" stopColor="#DDD6FE" />
+                  <stop offset="100%" stopColor="#C4B5FD" />
+                </linearGradient>
+                <filter id="glow3D" x="-20%" y="-20%" width="140%" height="140%">
+                  <feGaussianBlur stdDeviation="6" result="blur" />
+                  <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                </filter>
+              </defs>
+
+              {/* 3D Perspective Platform Base */}
+              <g transform="translate(0, 20)">
+                <ellipse cx="100" cy="140" rx="72" ry="24" fill="url(#certPlatformGrad)" stroke="rgba(139, 92, 247, 0.4)" strokeWidth="1.5" />
+                <ellipse cx="100" cy="136" rx="60" ry="18" fill="rgba(124, 58, 237, 0.18)" />
+              </g>
+
+              {/* Glowing Background Particles */}
+              <circle cx="45" cy="45" r="2.5" fill="#A78BFA" opacity="0.6" filter="url(#glow3D)" />
+              <circle cx="160" cy="55" r="2" fill="#C4B5FD" opacity="0.7" filter="url(#glow3D)" />
+              <circle cx="150" cy="120" r="3" fill="#8B5CF6" opacity="0.5" filter="url(#glow3D)" />
+
+              {/* Main 3D Metallic Shield */}
+              <g transform="translate(0, -5)">
+                {/* Outer Drop Shadow Path */}
+                <path
+                  d="M100 22 C138 22, 158 38, 158 84 C158 132, 100 158, 100 158 C100 158, 42 132, 42 84 C42 38, 62 22, 100 22 Z"
+                  fill="url(#certShieldGrad3D)"
+                  stroke="rgba(255, 255, 255, 0.45)"
+                  strokeWidth="2"
+                  filter="drop-shadow(0 8px 16px rgba(0,0,0,0.5))"
+                />
+                {/* Inner Bevel Shield */}
+                <path
+                  d="M100 32 C130 32, 147 45, 147 84 C147 122, 100 144, 100 144 C100 144, 53 122, 53 84 C53 45, 70 32, 100 32 Z"
+                  fill="url(#certShieldInnerGrad)"
+                  stroke="rgba(255, 255, 255, 0.2)"
+                  strokeWidth="1.2"
+                />
+
+                {/* 3D Glossy Star on Shield */}
+                <polygon
+                  points="100,52 108,74 131,74 112,88 119,110 100,96 81,110 88,88 69,74 92,74"
+                  fill="url(#certStar3D)"
+                  filter="drop-shadow(0 4px 10px rgba(0,0,0,0.4))"
+                />
+
+                {/* Star Center Highlight */}
+                <polygon points="100,56 106,73 123,73 109,84 114,101 100,90" fill="rgba(255,255,255,0.6)" />
+              </g>
+
+              {/* 3D Diploma Scroll Ribbon */}
+              <g transform="translate(118, 112) rotate(-22)" filter="drop-shadow(0 6px 12px rgba(0,0,0,0.4))">
+                <rect x="0" y="0" width="52" height="18" rx="9" fill="url(#certScrollGrad)" stroke="#7C3AED" strokeWidth="1.8" />
+                <circle cx="52" cy="9" r="9" fill="#A78BFA" stroke="#6D28D9" strokeWidth="1.5" />
+                <circle cx="52" cy="9" r="4.5" fill="#5B21B6" />
+                {/* Ribbon Tie */}
+                <rect x="22" y="-1" width="7" height="20" fill="#F59E0B" rx="1.5" />
+              </g>
+            </svg>
+          </div>
+        </div>
+
+        {/* Compact Unified Statistics Panel (3 Columns with vertical dividers) */}
+        <div className="cert-mobile-stats-panel">
+          <div className="cert-mobile-stat-col">
+            <div className="cert-mobile-stat-icon purple">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="8" r="6" />
+                <path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11" />
+              </svg>
+            </div>
+            <span className="cert-mobile-stat-value">{certifications.length > 0 ? `${certifications.length}+` : '0'}</span>
+            <span className="cert-mobile-stat-label">Certifications</span>
+            <span className="cert-mobile-stat-sublabel">Industry Recognized</span>
+          </div>
+
+          <div className="cert-mobile-stat-divider" />
+
+          <div className="cert-mobile-stat-col">
+            <div className="cert-mobile-stat-icon blue">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="2" y1="12" x2="22" y2="12" />
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10z" />
+              </svg>
+            </div>
+            <span className="cert-mobile-stat-value">{uniquePlatformsCount}</span>
+            <span className="cert-mobile-stat-label">Platforms</span>
+            <span className="cert-mobile-stat-sublabel">Global Brands</span>
+          </div>
+
+          <div className="cert-mobile-stat-divider" />
+
+          <div className="cert-mobile-stat-col">
+            <div className="cert-mobile-stat-icon green">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                <polyline points="9 12 11 14 15 10" />
+              </svg>
+            </div>
+            <span className="cert-mobile-stat-value">100%</span>
+            <span className="cert-mobile-stat-label">Verified</span>
+            <span className="cert-mobile-stat-sublabel">Authentic Credentials</span>
+          </div>
+        </div>
+      </div>
+
+      {/* 3. Mobile Certification Collection Rail (Shown on Mobile ONLY <= 768px) */}
+      <div className="cert-mobile-collection-wrapper">
+        <div className="cert-mobile-collection-header">
+          <span className="cert-mobile-collection-title">My Certifications</span>
+          
+          {/* Compact Mobile Search Bar replacing View All */}
+          <div className="cert-mobile-header-search">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#94A3B8" strokeWidth="2.5" style={{ flexShrink: 0 }}>
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <input
+              type="text"
+              placeholder="Search..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="cert-mobile-header-search-input"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery('')}
+                className="cert-mobile-search-clear"
+                aria-label="Clear search"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Horizontal Rail */}
+        <div className="cert-mobile-rail" ref={railRef} onScroll={handleRailScroll}>
+          {filteredCertifications.length === 0 ? (
+            <div className="cert-mobile-empty-state">
+              No certifications found matching your search.
+            </div>
+          ) : (
+            filteredCertifications.map((card) => {
+              const isActive = selectedCard?.id === card.id;
+              return (
+                <div
+                  key={card.id}
+                  className={`cert-mobile-card ${isActive ? 'active' : ''}`}
+                  onClick={() => handleCardSelect(card)}
+                >
+                  <div className="cert-mobile-card-top">
+                    <div className="cert-mobile-card-logo">{card.logo}</div>
+                    {card.isFeatured && (
+                      <span className="cert-mobile-card-featured">
+                        <span>⭐</span> Featured
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="cert-mobile-card-body">
+                    <h3 className="cert-mobile-card-title">{card.title}</h3>
+                    <p className="cert-mobile-card-issuer">{card.issuer}</p>
+                    <span className="cert-mobile-card-verified">
+                      <svg viewBox="0 0 24 24" width="8" height="8" fill="none" stroke="currentColor" strokeWidth="4">
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                      Verified
+                    </span>
+                  </div>
+
+                  <div className="cert-mobile-card-footer">
+                    <span className="cert-mobile-card-date">📅 {card.issueDate}</span>
+                    <a
+                      href={card.verificationUrl || '#'}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="cert-mobile-card-link"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      View Credential ↗
+                    </a>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+
+        {/* Rail Dots Pagination */}
+        {filteredCertifications.length > 0 && (
+          <div className="cert-mobile-dots">
+            {filteredCertifications.map((card, idx) => (
+              <span
+                key={idx}
+                className={`cert-mobile-dot ${activeRailIndex === idx ? 'active' : ''}`}
+                onClick={() => {
+                  setActiveRailIndex(idx);
+                  handleCardSelect(card);
+                  if (railRef.current) {
+                    railRef.current.scrollTo({ left: idx * 172, behavior: 'smooth' });
+                  }
+                }}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* 4. Mobile Certificate Preview (Shown on Mobile ONLY <= 768px) */}
+      <div className="cert-mobile-preview-wrapper">
+        <div className="cert-mobile-preview-header">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#A78BFA" strokeWidth="2">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+          </svg>
+          <span>Certificate Preview</span>
+        </div>
+
+        {displayCard && (
+          <div className="cert-mobile-preview-card">
+            {/* Certificate Image Box */}
+            <div className="cert-mobile-preview-img-box">
+              {displayCard.pdfUrl ? (
+                displayCard.pdfUrl.toLowerCase().split('?')[0].endsWith('.pdf') ? (
+                  <iframe
+                    src={`${displayCard.pdfUrl}#toolbar=0&navpanes=0&scrollbar=0&view=Fit`}
+                    title={displayCard.title}
+                    scrolling="no"
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      border: 'none',
+                      borderRadius: '12px',
+                      backgroundColor: '#FFFFFF',
+                      overflow: 'hidden',
+                      pointerEvents: 'auto'
+                    }}
+                  />
+                ) : (
+                  <img
+                    src={displayCard.pdfUrl}
+                    alt={displayCard.title}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'contain',
+                      borderRadius: '12px',
+                      backgroundColor: '#FFFFFF',
+                      display: 'block'
+                    }}
+                  />
+                )
+              ) : (
+                <div className="cert-mobile-preview-fallback">
+                  <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#64748B" strokeWidth="1.5">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                    <circle cx="8.5" cy="8.5" r="1.5" />
+                    <polyline points="21 15 16 10 5 21" />
+                  </svg>
+                  <span>No Certificate Image Available</span>
+                </div>
+              )}
+            </div>
+
+            {/* Verified Badge Pill */}
+            <div style={{ display: 'flex', marginTop: '12px' }}>
+              <span className="cert-mobile-preview-badge">
+                <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" strokeWidth="4">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+                VERIFIED CREDENTIAL
+              </span>
+            </div>
+
+            {/* Title & Issuer */}
+            <h3 className="cert-mobile-preview-title">{displayCard.title}</h3>
+            <p className="cert-mobile-preview-issuer">{displayCard.issuer}</p>
+
+            {/* Stacked Details Grid */}
+            <div className="cert-mobile-preview-meta-grid">
+              <div className="cert-mobile-preview-meta-item">
+                <span className="meta-icon">📅</span>
+                <div className="meta-text">
+                  <span className="meta-label">Issued</span>
+                  <span className="meta-val">{displayCard.issueDate || '—'}</span>
+                </div>
+              </div>
+
+              <div className="cert-mobile-preview-meta-item">
+                <span className="meta-icon">🔒</span>
+                <div className="meta-text">
+                  <span className="meta-label">Credential ID</span>
+                  <span className="meta-val">{displayCard.credentialId || '—'}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Skills Validated List */}
+            <div className="cert-mobile-skills-box">
+              <span className="cert-mobile-skills-title">Skills Validated</span>
+              <div className="cert-mobile-skills-list">
+                {displayCard.skills && displayCard.skills.length > 0 ? (
+                  displayCard.skills.map((skill, idx) => (
+                    <div key={idx} className="cert-mobile-skill-item">
+                      <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="#A78BFA" strokeWidth="4">
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                      <span>{skill}</span>
+                    </div>
+                  ))
+                ) : (
+                  <span style={{ fontSize: '12px', color: '#64748B' }}>—</span>
+                )}
+              </div>
+            </div>
+
+            {/* Download PDF Action Button */}
+            <button
+              type="button"
+              disabled={!displayCard.pdfUrl}
+              onClick={() => displayCard.pdfUrl && window.open(displayCard.pdfUrl, '_blank')}
+              className="cert-mobile-download-btn"
+            >
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              Download PDF
+            </button>
+
+            {/* Verification Note */}
+            <div className="cert-mobile-verify-note">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+              </svg>
+              <span>All credentials are verified and sourced from official providers.</span>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Top minimal back control (Desktop ONLY > 768px) */}
+      <div className="cert-desktop-back-wrapper" style={{ width: '100%', display: 'flex', justifyContent: 'flex-start' }}>
         <BackButton label="Back to Portfolio" fallbackUrl={`${baseUrl}#certifications`} />
       </div>
-      {/* 1. Top Section (Hero Split Layout) */}
+      {/* 1. Top Section (Hero Split Layout) (Desktop ONLY > 768px) */}
       <section
+        className="cert-desktop-hero-section"
         style={{
           display: 'flex',
           justifyContent: 'space-between',
@@ -344,6 +792,7 @@ export const CertificationsShowcasePage: React.FC = () => {
 
       {/* 2. Main Content (Two-Column Layout) */}
       <section
+        className="cert-desktop-main-grid"
         style={{
           display: 'grid',
           gridTemplateColumns: '1fr 410px',

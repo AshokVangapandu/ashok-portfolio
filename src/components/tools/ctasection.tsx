@@ -3,25 +3,62 @@ import React from 'react';
 
 export const CTASection: React.FC = () => {
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        textAlign: 'center',
-        padding: '56px 40px',
-        background: 'radial-gradient(circle at center, rgba(124, 58, 237, 0.08) 0%, transparent 70%)',
-        border: '1px solid rgba(255, 255, 255, 0.04)',
-        borderRadius: '24px',
-        width: '100%',
-        boxSizing: 'border-box',
-        gap: '24px',
-        fontFamily: "'Inter', sans-serif",
-        position: 'relative',
-        overflow: 'hidden'
-      }}
-    >
+    <>
+      {/* Mobile Custom Tooling CTA (<= 768px) */}
+      <div className="tools-mobile-cta-wrapper">
+        <div className="tools-mobile-cta-icon-box">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#C4B5FD" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 20h9" />
+            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+          </svg>
+        </div>
+        <div className="tools-mobile-cta-content">
+          <h3 className="tools-mobile-cta-title">Interested in custom tooling?</h3>
+          <p className="tools-mobile-cta-desc">
+            Let's build something together. From Mendix plugins to custom Figma plugins and integrations — I can help you create tools that scale.
+          </p>
+        </div>
+        <div className="tools-mobile-cta-actions">
+          <a href="/#contact" className="tools-mobile-cta-btn primary">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+              <polyline points="22,6 12,13 2,6" />
+            </svg>
+            Get in Touch
+          </a>
+          <a href="/" className="tools-mobile-cta-btn secondary">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="3" width="7" height="7" />
+              <rect x="14" y="3" width="7" height="7" />
+              <rect x="14" y="14" width="7" height="7" />
+              <rect x="3" y="14" width="7" height="7" />
+            </svg>
+            View Portfolio
+          </a>
+        </div>
+      </div>
+
+      {/* Desktop CTA Container (> 768px) */}
+      <div
+        className="tools-desktop-cta-container"
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          textAlign: 'center',
+          padding: '56px 40px',
+          background: 'radial-gradient(circle at center, rgba(124, 58, 237, 0.08) 0%, transparent 70%)',
+          border: '1px solid rgba(255, 255, 255, 0.04)',
+          borderRadius: '24px',
+          width: '100%',
+          boxSizing: 'border-box',
+          gap: '24px',
+          fontFamily: "'Inter', sans-serif",
+          position: 'relative',
+          overflow: 'hidden'
+        }}
+      >
       {/* Icon Circle */}
       <div
         style={{
@@ -113,6 +150,7 @@ export const CTASection: React.FC = () => {
         </a>
       </div>
     </div>
+    </>
   );
 };
 

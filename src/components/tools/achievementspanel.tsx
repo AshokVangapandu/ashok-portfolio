@@ -92,7 +92,92 @@ export const AchievementsPanel: React.FC = () => {
         boxSizing: 'border-box'
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', paddingBottom: '4px' }}>
+      {/* Mobile Discovery Excellence Layout (<= 768px) */}
+      <div className="tools-mobile-discovery-wrapper">
+        <div className="tools-mobile-discovery-header">
+          <div className="tools-mobile-discovery-title-group">
+            <span className="tools-mobile-discovery-bar" />
+            <h3 className="tools-mobile-discovery-title">Discovery Excellence</h3>
+          </div>
+          <a href="#discovery-excellence" className="tools-mobile-view-all" onClick={(e) => e.preventDefault()}>
+            View All &rarr;
+          </a>
+        </div>
+
+        <div className="tools-mobile-discovery-grid">
+          {[
+            {
+              title: 'Enterprise Ready',
+              desc: 'Secure, scalable, and built for production environments.',
+              icon: (
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#60A5FA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                </svg>
+              )
+            },
+            {
+              title: 'Highly Reliable',
+              desc: 'Consistent performance with rigorous testing.',
+              icon: (
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#A78BFA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M6 3h12l4 6-10 12L2 9z" />
+                </svg>
+              )
+            },
+            {
+              title: 'Performance Optimized',
+              desc: 'Efficient code and optimized assets for smooth UX.',
+              icon: (
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#F59E0B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                </svg>
+              )
+            },
+            {
+              title: 'Accessibility First',
+              desc: 'WCAG-compliant with full keyboard & screen support.',
+              icon: (
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#10B981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="4" r="2" />
+                  <path d="M18 9l-6 1-6-1M12 10v10M9 20l3-5 3 5" />
+                </svg>
+              )
+            },
+            {
+              title: 'Cross Platform',
+              desc: 'Works across devices, browsers & environments.',
+              icon: (
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#60A5FA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="2" y="3" width="20" height="14" rx="2" />
+                  <line x1="8" y1="21" x2="16" y2="21" />
+                  <line x1="12" y1="17" x2="12" y2="21" />
+                </svg>
+              )
+            },
+            {
+              title: 'AI Friendly',
+              desc: 'Designed with AI-first principles for automation.',
+              icon: (
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#A78BFA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="4" y="4" width="16" height="16" rx="2" />
+                  <rect x="9" y="9" width="6" height="6" />
+                  <path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 15h3M1 9h3M1 15h3" />
+                </svg>
+              )
+            }
+          ].map((item, idx) => (
+            <div key={idx} className="tools-mobile-discovery-card">
+              <div className="tools-mobile-discovery-icon">
+                {item.icon}
+              </div>
+              <h4 className="tools-mobile-discovery-card-title">{item.title}</h4>
+              <p className="tools-mobile-discovery-card-desc">{item.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="tools-desktop-discovery-header" style={{ display: 'flex', alignItems: 'center', gap: '10px', paddingBottom: '4px' }}>
         <span style={{ width: '4px', height: '16px', backgroundColor: '#60A5FA', borderRadius: '2px' }} />
         <h3 style={{ fontSize: '18px', fontWeight: 600, margin: 0, color: '#FFFFFF', letterSpacing: '-0.02em' }}>
           Engineering Excellence

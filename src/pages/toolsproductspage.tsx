@@ -124,8 +124,18 @@ export const ToolsProductsPage: React.FC = () => {
     setSelectedProduct(null);
   };
 
+  const getCategoryColor = (type: string) => {
+    const t = type.toLowerCase();
+    if (t.includes('developer')) return '#A78BFA';
+    if (t.includes('3d') || t.includes('visualization')) return '#F59E0B';
+    if (t.includes('mendix') || t.includes('widget')) return '#F59E0B';
+    if (t.includes('figma') || t.includes('plugin')) return '#10B981';
+    return '#94A3B8';
+  };
+
   return (
     <div
+      className="tools-page-container"
       style={{
         display: 'flex',
         flexDirection: 'column',
@@ -139,8 +149,52 @@ export const ToolsProductsPage: React.FC = () => {
         fontFamily: "'Inter', sans-serif"
       }}
     >
-      {/* Top minimal back control */}
-      <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-start' }}>
+      {/* 1. Mobile Page Header (Shown on Mobile ONLY <= 768px) */}
+      <div className="tools-mobile-header-bar">
+        <button
+          type="button"
+          className="projects-mobile-back-btn"
+          onClick={() => {
+            const baseUrl = typeof window !== 'undefined' && window.location.pathname.startsWith('/ashok-portfolio')
+              ? '/ashok-portfolio/'
+              : '/';
+            window.location.href = `${baseUrl}#widget-lab`;
+          }}
+          aria-label="Back"
+        >
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <line x1="19" y1="12" x2="5" y2="12" />
+            <polyline points="12 19 5 12 12 5" />
+          </svg>
+          <span>Back to Portfolio</span>
+        </button>
+        <button
+          type="button"
+          className="projects-mobile-share-btn"
+          onClick={() => {
+            if (navigator.share) {
+              navigator.share({
+                title: 'Tools & Products Showcase',
+                url: window.location.href
+              }).catch(() => {});
+            } else if (navigator.clipboard) {
+              navigator.clipboard.writeText(window.location.href);
+            }
+          }}
+          aria-label="Share"
+        >
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="18" cy="5" r="3" />
+            <circle cx="6" cy="12" r="3" />
+            <circle cx="18" cy="19" r="3" />
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+          </svg>
+        </button>
+      </div>
+
+      {/* Desktop Top minimal back control */}
+      <div className="tools-desktop-back-wrapper" style={{ width: '100%', display: 'flex', justifyContent: 'flex-start' }}>
         <BackButton label="Back to Portfolio" fallbackUrl={`${baseUrl}#widget-lab`} />
       </div>
       <style>{`
@@ -165,8 +219,10 @@ export const ToolsProductsPage: React.FC = () => {
           box-shadow: 0 4px 20px rgba(212, 163, 89, 0.06) !important;
         }
       `}</style>
-      {/* 1. Hero Section (Polished Editorial Layout) */}
+
+      {/* 2. Hero Section - Desktop Version */}
       <section
+        className="tools-desktop-hero"
         style={{
           display: 'flex',
           flexDirection: 'column',
@@ -246,9 +302,23 @@ export const ToolsProductsPage: React.FC = () => {
         </div>
       </section>
 
-      {/* 4. Complete Collection - Master Detail Layout */}
+      {/* Hero Section - Mobile Version (<= 768px) */}
+      <section className="tools-mobile-hero">
+        <span className="tools-mobile-badge">
+          <span className="purple-dot" /> PRODUCT SHOWCASE
+        </span>
+        <h1 className="tools-mobile-hero-title">
+          Tools <span className="tools-mobile-amp">&</span> Products
+        </h1>
+        <p className="tools-mobile-hero-desc">
+          Plug-and-play tools, developer plugins, and productivity solutions crafted to streamline workflows.
+        </p>
+      </section>
+
+      {/* 3. Complete Collection Section */}
       <section style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '24px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', borderBottom: '1px solid rgba(255, 255, 255, 0.05)', paddingBottom: '16px' }}>
+        {/* Desktop Header */}
+        <div className="tools-desktop-collection-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', borderBottom: '1px solid rgba(255, 255, 255, 0.05)', paddingBottom: '16px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <span style={{ width: '4px', height: '16px', backgroundColor: 'var(--admin-primary)', borderRadius: '2px' }} />
             <h2 style={{ fontSize: '20px', fontWeight: 600, margin: 0, color: '#FFFFFF', letterSpacing: '-0.02em' }}>
@@ -258,6 +328,223 @@ export const ToolsProductsPage: React.FC = () => {
               ({filteredProducts.length} Items Available)
             </span>
           </div>
+        </div>
+
+        {/* Mobile Header & Horizontal Card Rail (<= 768px) */}
+        <div className="tools-mobile-collection-wrapper">
+          <div className="tools-mobile-collection-header">
+            <div className="tools-mobile-collection-title-group">
+              <h2 className="tools-mobile-collection-title">Complete Collection</h2>
+              <span className="tools-mobile-collection-count">
+                {filteredProducts.length} tools available
+              </span>
+            </div>
+            {/* Mobile Search Field */}
+            <div className="tools-mobile-search-box">
+              <svg
+                viewBox="0 0 24 24"
+                width="13"
+                height="13"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                style={{ color: '#64748B', flexShrink: 0 }}
+              >
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+              <input
+                type="text"
+                placeholder="Search tools & plugins..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="tools-mobile-search-input"
+              />
+            </div>
+          </div>
+
+          <div className="tools-mobile-rail custom-scrollbar">
+            {filteredProducts.map((prod) => {
+              const isActive = activeProduct?.id === prod.id;
+              const categoryColor = getCategoryColor(prod.type);
+              return (
+                <div
+                  key={prod.id}
+                  className={`tools-mobile-card ${isActive ? 'active' : ''}`}
+                  onClick={() => setActiveProduct(prod)}
+                >
+                  <div className="tools-mobile-card-thumb">
+                    {prod.coverImage && prod.coverImage.toLowerCase().split('?')[0].endsWith('.pdf') ? (
+                      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#EF4444" strokeWidth="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                        <polyline points="14 2 14 8 20 8" />
+                      </svg>
+                    ) : (
+                      <img
+                        src={prod.coverImage || `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23090D1A"/><circle cx="50" cy="50" r="15" fill="%231E293B" opacity="0.6"/><path d="M42 45 L50 37 L58 45" stroke="%237C5CFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`}
+                        alt={prod.title}
+                        onError={(e) => {
+                          e.currentTarget.src = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23090D1A"/><circle cx="50" cy="50" r="15" fill="%231E293B" opacity="0.6"/><path d="M42 45 L50 37 L58 45" stroke="%237C5CFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`;
+                        }}
+                      />
+                    )}
+                  </div>
+                  <div className="tools-mobile-card-body">
+                    <div className="tools-mobile-card-title-row">
+                      <h4 className="tools-mobile-card-title">{prod.title}</h4>
+                      <span className="tools-mobile-card-version">v{prod.version}</span>
+                    </div>
+                    <span className="tools-mobile-card-type" style={{ color: categoryColor }}>
+                      {prod.type}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Mobile Featured Product Card (Phase 2 - <= 768px) */}
+          {activeProduct && (
+            <div className="tools-mobile-featured-card">
+              {/* Header badges */}
+              <div className="tools-mobile-featured-header-badges">
+                <span className="tools-mobile-featured-badge">
+                  ⭐ FEATURED PRODUCT
+                </span>
+                <span className="tools-mobile-featured-version">
+                  v{activeProduct.version}
+                </span>
+              </div>
+
+              {/* Product image */}
+              <div className="tools-mobile-featured-img-box">
+                {activeProduct.coverImage && activeProduct.coverImage.toLowerCase().split('?')[0].endsWith('.pdf') ? (
+                  <div className="tools-mobile-pdf-placeholder">
+                    <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="#EF4444" strokeWidth="2">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                      <polyline points="14 2 14 8 20 8" />
+                    </svg>
+                  </div>
+                ) : (
+                  <img
+                    src={activeProduct.coverImage || `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23090D1A"/><circle cx="50" cy="50" r="15" fill="%231E293B" opacity="0.6"/><path d="M42 45 L50 37 L58 45" stroke="%237C5CFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`}
+                    alt={activeProduct.title}
+                    onError={(e) => {
+                      e.currentTarget.src = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23090D1A"/><circle cx="50" cy="50" r="15" fill="%231E293B" opacity="0.6"/><path d="M42 45 L50 37 L58 45" stroke="%237C5CFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`;
+                    }}
+                  />
+                )}
+              </div>
+
+              {/* Title & Metadata */}
+              <div className="tools-mobile-featured-info">
+                <h3 className="tools-mobile-featured-title">{activeProduct.title}</h3>
+                <div className="tools-mobile-featured-submeta">
+                  <span className="tools-mobile-featured-type">{activeProduct.type}</span>
+                  <span className="tools-mobile-dot-sep">•</span>
+                  <span className="tools-mobile-featured-rating">
+                    ★ {activeProduct.rating || 4.9} <span className="tools-mobile-reviews-count">(18 reviews)</span>
+                  </span>
+                </div>
+                <p className="tools-mobile-featured-desc">
+                  {activeProduct.description}
+                </p>
+                {activeProduct.description && activeProduct.description.length > 100 && (
+                  <span
+                    className="tools-mobile-read-more"
+                    onClick={() => handleOpenDetails(activeProduct)}
+                  >
+                    Read more...
+                  </span>
+                )}
+              </div>
+
+              <hr className="tools-mobile-featured-divider" />
+
+              {/* Key Capabilities */}
+              <div className="tools-mobile-capabilities-section">
+                <h4 className="tools-mobile-section-label">KEY CAPABILITIES</h4>
+                <ul className="tools-mobile-capabilities-list">
+                  {(activeProduct.features && activeProduct.features.length > 0 ? activeProduct.features.slice(0, 4) : [
+                    'Intuitive star/emoji rating interface',
+                    'Real-time analytics & distribution',
+                    'Optimized for all devices',
+                    'Seamless Mendix integration'
+                  ]).map((cap, idx) => (
+                    <li key={idx} className="tools-mobile-capability-item">
+                      <span className="tools-mobile-check-icon">✓</span>
+                      <span>{cap}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Technologies Used */}
+              <div className="tools-mobile-tech-section">
+                <h4 className="tools-mobile-section-label">TECHNOLOGIES USED</h4>
+                <div className="tools-mobile-tech-pills">
+                  {activeProduct.technologies.slice(0, 3).map((tech) => (
+                    <span key={tech} className="tools-mobile-tech-pill">
+                      {tech}
+                    </span>
+                  ))}
+                  {activeProduct.technologies.length > 3 && (
+                    <span className="tools-mobile-tech-pill extra">
+                      +{activeProduct.technologies.length - 3}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="tools-mobile-featured-actions">
+                <button
+                  type="button"
+                  className="tools-mobile-btn-primary"
+                  onClick={() => handleOpenDetails(activeProduct)}
+                >
+                  <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2.2">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                    <polyline points="15 3 21 3 21 9" />
+                    <line x1="10" y1="14" x2="21" y2="3" />
+                  </svg>
+                  View Details
+                </button>
+
+                {activeProduct.marketplaceUrl && (
+                  <a
+                    href={activeProduct.marketplaceUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="tools-mobile-btn-secondary"
+                  >
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2">
+                      <circle cx="9" cy="21" r="1" />
+                      <circle cx="20" cy="21" r="1" />
+                      <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+                    </svg>
+                    Marketplace
+                  </a>
+                )}
+
+                {activeProduct.githubUrl && (
+                  <a
+                    href={activeProduct.githubUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="tools-mobile-btn-secondary"
+                  >
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor">
+                      <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+                    </svg>
+                    GitHub
+                  </a>
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
         {loading ? (
