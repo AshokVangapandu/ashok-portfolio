@@ -87,6 +87,48 @@ export const MaintenancePage: React.FC = () => {
     }
   };
 
+  const [directEmail, setDirectEmail] = useState('');
+  const [signingIn, setSigningIn] = useState(false);
+  const [authErrorMsg, setAuthErrorMsg] = useState('');
+
+  const handleDirectEmailSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!directEmail || !directEmail.trim()) return;
+    setErrorMsg('');
+    setSubmitting(true);
+    try {
+      const res = await maintenanceService.subscribeToNotify(directEmail);
+      if (res.success) {
+        setSubmitted(true);
+        setIsDuplicate(res.isDuplicate);
+        setFeedbackMessage(res.message);
+      } else {
+        setErrorMsg(res.message);
+      }
+    } catch (err: any) {
+      console.error('[MaintenancePage] Direct email subscribe error:', err);
+      setErrorMsg('Unexpected error. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    setAuthErrorMsg('');
+    setSigningIn(true);
+    try {
+      const res = await signIn();
+      if (res && res.error) {
+        setAuthErrorMsg(res.error.message || 'Google Sign-In failed. Please check your Supabase OAuth setup.');
+        setSigningIn(false);
+      }
+    } catch (err: any) {
+      console.error('[MaintenancePage] Google Sign-In error:', err);
+      setAuthErrorMsg('Unable to connect to Google OAuth. Please try again.');
+      setSigningIn(false);
+    }
+  };
+
   return (
     <div
       style={{
@@ -149,25 +191,35 @@ export const MaintenancePage: React.FC = () => {
               width: '64px',
               height: '64px',
               borderRadius: '20px',
-              background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(217, 119, 6, 0.08))',
-              border: '1px solid rgba(245, 158, 11, 0.3)',
-              color: '#F59E0B',
+              backgroundColor: 'rgba(245, 158, 11, 0.1)',
+              border: '1px solid rgba(245, 158, 11, 0.25)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 0 20px rgba(245, 158, 11, 0.15)'
+              fontSize: '28px'
             }}
           >
-            <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
-            </svg>
+            🛠️
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: 'rgba(245, 158, 11, 0.1)', padding: '6px 14px', borderRadius: '20px', border: '1px solid rgba(245, 158, 11, 0.2)' }}>
-            <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#F59E0B', boxShadow: '0 0 8px #F59E0B' }} />
-            <span style={{ fontSize: '12px', fontWeight: 700, color: '#F59E0B', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
-              Maintenance Mode
-            </span>
+          <div
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              backgroundColor: 'rgba(245, 158, 11, 0.12)',
+              border: '1px solid rgba(245, 158, 11, 0.25)',
+              borderRadius: '999px',
+              padding: '4px 12px',
+              fontSize: '11px',
+              fontWeight: 700,
+              color: '#F59E0B',
+              letterSpacing: '0.06em',
+              textTransform: 'uppercase'
+            }}
+          >
+            <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#F59E0B' }} />
+            Maintenance Mode
           </div>
         </div>
 
@@ -176,11 +228,11 @@ export const MaintenancePage: React.FC = () => {
           <h1
             style={{
               margin: 0,
-              fontSize: '26px',
-              fontWeight: 800,
-              color: '#F8FAFC',
+              fontSize: '28px',
+              fontWeight: 750,
+              color: '#FFFFFF',
               letterSpacing: '-0.02em',
-              lineHeight: 1.25
+              lineHeight: 1.2
             }}
           >
             Portfolio Under Maintenance
@@ -189,9 +241,9 @@ export const MaintenancePage: React.FC = () => {
             style={{
               margin: 0,
               fontSize: '14.5px',
-              color: '#94A3B8',
               lineHeight: 1.6,
-              fontWeight: 450
+              color: '#94A3B8',
+              maxWidth: '440px'
             }}
           >
             I'm currently working on exciting improvements, new projects, and a better experience. Thank you for your patience.
@@ -216,16 +268,19 @@ export const MaintenancePage: React.FC = () => {
           <span>Expected to be back soon</span>
         </div>
 
-        {/* Notify Me Area - Google Sign-In Flow */}
+        {/* Notify Me Area - Google Sign-In & Direct Email Flow */}
         <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '4px' }}>
           {!user ? (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', width: '100%' }}>
               <span style={{ fontSize: '14.5px', fontWeight: 600, color: '#E2E8F0', letterSpacing: '-0.01em' }}>
                 Want to get notified when we're back online?
               </span>
+              
+              {/* 1. Google Sign-In Option */}
               <button
                 type="button"
-                onClick={() => signIn()}
+                onClick={handleGoogleSignIn}
+                disabled={signingIn}
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
@@ -238,10 +293,11 @@ export const MaintenancePage: React.FC = () => {
                   border: 'none',
                   fontWeight: 600,
                   fontSize: '14px',
-                  cursor: 'pointer',
+                  cursor: signingIn ? 'wait' : 'pointer',
                   width: '100%',
                   boxShadow: '0 4px 14px rgba(0,0,0,0.2)',
-                  transition: 'all 0.2s ease'
+                  transition: 'all 0.2s ease',
+                  opacity: signingIn ? 0.7 : 1
                 }}
               >
                 <svg viewBox="0 0 24 24" width="18" height="18">
@@ -250,8 +306,77 @@ export const MaintenancePage: React.FC = () => {
                   <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
                   <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
                 </svg>
-                Continue with Google
+                {signingIn ? 'Connecting to Google...' : 'Continue with Google'}
               </button>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '100%', margin: '2px 0' }}>
+                <div style={{ flex: 1, height: '1px', backgroundColor: 'rgba(255, 255, 255, 0.1)' }} />
+                <span style={{ fontSize: '11px', color: '#64748B', fontWeight: 600, letterSpacing: '0.06em' }}>OR</span>
+                <div style={{ flex: 1, height: '1px', backgroundColor: 'rgba(255, 255, 255, 0.1)' }} />
+              </div>
+
+              {/* 2. Direct Email Subscription Input */}
+              {submitted ? (
+                <div
+                  style={{
+                    width: '100%',
+                    backgroundColor: isDuplicate ? 'rgba(245, 158, 11, 0.1)' : 'rgba(16, 185, 129, 0.1)',
+                    border: isDuplicate ? '1px solid rgba(245, 158, 11, 0.3)' : '1px solid rgba(16, 185, 129, 0.3)',
+                    borderRadius: '10px',
+                    padding: '12px',
+                    color: isDuplicate ? '#F59E0B' : '#10B981',
+                    fontSize: '13px',
+                    fontWeight: 600,
+                    lineHeight: 1.5,
+                    boxSizing: 'border-box'
+                  }}
+                >
+                  {isDuplicate ? 'ℹ ' : '✓ '}{feedbackMessage}
+                </div>
+              ) : (
+                <form onSubmit={handleDirectEmailSubmit} style={{ display: 'flex', gap: '8px', width: '100%' }}>
+                  <input
+                    type="email"
+                    required
+                    value={directEmail}
+                    onChange={(e) => setDirectEmail(e.target.value)}
+                    placeholder="Enter your email address"
+                    style={{
+                      flex: 1,
+                      padding: '11px 14px',
+                      borderRadius: '10px',
+                      backgroundColor: 'rgba(15, 23, 42, 0.8)',
+                      border: '1px solid rgba(255, 255, 255, 0.15)',
+                      color: '#FFFFFF',
+                      fontSize: '13.5px',
+                      outline: 'none'
+                    }}
+                  />
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    style={{
+                      padding: '11px 20px',
+                      borderRadius: '10px',
+                      background: 'linear-gradient(135deg, #7C3AED, #6D28D9)',
+                      color: '#FFFFFF',
+                      border: 'none',
+                      fontWeight: 600,
+                      fontSize: '13.5px',
+                      cursor: submitting ? 'wait' : 'pointer',
+                      whiteSpace: 'nowrap'
+                    }}
+                  >
+                    {submitting ? 'Subscribing...' : 'Notify Me'}
+                  </button>
+                </form>
+              )}
+
+              {(authErrorMsg || errorMsg) && (
+                <span style={{ fontSize: '12.5px', color: '#EF4444', textAlign: 'center', width: '100%', marginTop: '2px' }}>
+                  ⚠️ {authErrorMsg || errorMsg}
+                </span>
+              )}
             </div>
           ) : (
             <div

@@ -24,8 +24,14 @@
 
   function initSupabase() {
     if (supabase) return;
-    const supabaseUrl = (window.APP_CONFIG && window.APP_CONFIG.SUPABASE_URL) || "";
-    const supabaseKey = (window.APP_CONFIG && window.APP_CONFIG.SUPABASE_ANON_KEY) || "";
+    if (typeof window !== 'undefined' && window.supabaseInstance) {
+      supabase = window.supabaseInstance;
+      return;
+    }
+
+    const supabaseUrl = (window.APP_CONFIG && window.APP_CONFIG.SUPABASE_URL) || "https://xpuhbtsgwhgbcvmwzlyd.supabase.co";
+    const supabaseKey = (window.APP_CONFIG && window.APP_CONFIG.SUPABASE_ANON_KEY) || "sb_publishable_Rt97581bW4IkOBlUaCNX4Q_Rldchf_z";
+
     if (window.supabase && isValidSupabaseConfig(supabaseUrl, supabaseKey)) {
       try {
         supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
@@ -33,10 +39,6 @@
       } catch (err) {
         console.warn('[supabase-service] Failed to initialize Supabase client:', err);
       }
-    } else {
-      console.warn(
-        '[Portfolio]\n\nSupabase disabled.\n\nReason:\nInvalid configuration.\n\nThe website will continue running with fallback behaviour.'
-      );
     }
   }
 
@@ -77,6 +79,12 @@
         }
       });
       console.log("AuthService: signInWithOAuth result:", res);
+      if (res.data?.url) {
+        console.log("AuthService: Redirecting browser to Google OAuth URL:", res.data.url);
+        window.location.href = res.data.url;
+      } else if (res.error) {
+        console.error("AuthService: Google OAuth error:", res.error);
+      }
       return res;
     },
 
@@ -713,33 +721,23 @@
 
     const { error } = await supabase
       .from('visitor_profiles')
-      .insert([{
+      .upsert([{
         visitor_id: visitorId,
         updated_at: new Date().toISOString()
-      }]);
+      }], { onConflict: 'visitor_id' });
 
-    if (error && error.code === '23505') return true;
-    if (error) throw error;
+    if (error && error.code !== '23505') logTelemetryWarning('[Telemetry] Profile upsert warning:', error);
     return true;
   };
 
   const saveVisitorProfile = async (profileData) => {
     if (!profileData?.visitor_id) return false;
 
-    const { error: insertError } = await supabase
+    const { error } = await supabase
       .from('visitor_profiles')
-      .insert([profileData]);
+      .upsert([profileData], { onConflict: 'visitor_id' });
 
-    if (!insertError) return true;
-    if (insertError.code !== '23505') throw insertError;
-
-    const { visitor_id, ...profileUpdates } = profileData;
-    const { error: updateError } = await supabase
-      .from('visitor_profiles')
-      .update(profileUpdates)
-      .eq('visitor_id', visitor_id);
-
-    if (updateError) throw updateError;
+    if (error && error.code !== '23505') logTelemetryWarning('[Telemetry] Save profile warning:', error);
     return true;
   };
 
@@ -752,8 +750,8 @@
 
         const { error } = await supabase
           .from('visitor_sessions')
-          .insert([sessionData]);
-        if (error) throw error;
+          .upsert([sessionData], { onConflict: 'id' });
+        if (error && error.code !== '23505') logTelemetryWarning('[Telemetry] Session log warning:', error);
         return true;
       } catch (err) {
         logTelemetryWarning('Analytics: Failed to log session:', err);

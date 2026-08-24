@@ -7,20 +7,32 @@ export const authService = {
    * Redirects the user to Google login, and returns back to the host page origin.
    */
   async signInWithGoogle(): Promise<{ data: any; error: AuthError | null }> {
+    const redirectTo = window.location.origin + window.location.pathname;
+    const baseUrl = (import.meta as any).env?.VITE_SUPABASE_URL || 'https://xpuhbtsgwhgbcvmwzlyd.supabase.co';
+    const fallbackUrl = `${baseUrl}/auth/v1/authorize?provider=google&redirect_to=${encodeURIComponent(redirectTo)}`;
+
     try {
-      const redirectTo = window.location.origin + window.location.pathname;
+      console.log('[authService] Initiating Google OAuth with redirectTo:', redirectTo);
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo,
+          skipBrowserRedirect: true
         },
       });
-      if (data?.url) {
-        window.location.href = data.url;
+
+      if (error) {
+        console.error('[authService] Google OAuth SDK returned error:', error);
       }
-      return { data, error };
+
+      const targetUrl = data?.url || fallbackUrl;
+      console.log('[authService] Navigating browser to Google OAuth URL:', targetUrl);
+      window.location.href = targetUrl;
+      return { data, error: null };
     } catch (err: any) {
-      return { data: null, error: err as AuthError };
+      console.error('[authService] Exception during Google OAuth, using direct endpoint redirect:', err);
+      window.location.href = fallbackUrl;
+      return { data: null, error: null };
     }
   },
 
