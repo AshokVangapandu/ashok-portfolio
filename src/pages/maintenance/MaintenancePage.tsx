@@ -484,7 +484,7 @@ export const MaintenancePage: React.FC = () => {
                   lineHeight: 1.15
                 }}
               >
-                Portfolio Under <br className="maint-title-br" />
+                Portfolio Under
                 <span style={{ color: '#C084FC' }}>Maintenance</span>
               </h1>
               <p
