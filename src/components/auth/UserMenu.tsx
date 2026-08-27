@@ -139,6 +139,9 @@ export const UserMenu: React.FC = () => {
               <p style={{ margin: 0, fontSize: '11px', color: 'rgba(255, 255, 255, 0.44)', wordBreak: 'break-all' }}>
                 {emailVal}
               </p>
+              <span style={{ fontSize: '10px', fontWeight: 700, color: isAdmin ? '#C084FC' : '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.04em', marginTop: '4px', background: isAdmin ? 'rgba(192, 132, 252, 0.12)' : 'rgba(255, 255, 255, 0.05)', border: `1px solid ${isAdmin ? 'rgba(192, 132, 252, 0.25)' : 'rgba(255, 255, 255, 0.08)'}`, padding: '2px 8px', borderRadius: '99px', display: 'inline-block' }}>
+                {isAdmin ? '👑 Administrator' : '👤 Collaborator'}
+              </span>
             </div>
           </div>
 

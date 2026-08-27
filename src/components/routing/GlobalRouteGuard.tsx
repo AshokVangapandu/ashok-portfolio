@@ -16,6 +16,112 @@ interface GlobalRouteGuardProps {
   children: ReactNode;
 }
 
+function AdminBypassDot({ mode }: { mode: 'maintenance' | 'private' }) {
+  const isMaint = mode === 'maintenance';
+  const dotColor = isMaint ? '#F59E0B' : '#A855F7';
+  const titleText = isMaint
+    ? 'Admin Mode — Maintenance Mode Active (Bypass Active)'
+    : 'Admin Mode — Private Mode Active (Bypass Active)';
+
+  useEffect(() => {
+    let existing = document.getElementById('admin-bypass-banner');
+    if (existing) existing.remove();
+
+    if (!document.getElementById('admin-dot-style')) {
+      const style = document.createElement('style');
+      style.id = 'admin-dot-style';
+      style.textContent = `
+        @keyframes adminDotPulse {
+          0%, 100% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 2px #020617, 0 0 10px ${dotColor}, 0 0 16px ${dotColor}; }
+          50% { transform: scale(1.3); opacity: 0.85; box-shadow: 0 0 0 2px #020617, 0 0 16px ${dotColor}, 0 0 24px ${dotColor}; }
+        }
+        .admin-dot-wrapper {
+          position: relative;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .admin-dot-bubble {
+          width: 10px;
+          height: 10px;
+          border-radius: 50%;
+          background-color: ${dotColor};
+          animation: adminDotPulse 2.2s infinite ease-in-out;
+          cursor: pointer;
+          transition: transform 0.2s ease;
+          display: block;
+        }
+        .admin-dot-bubble:hover {
+          transform: scale(1.35) !important;
+        }
+        .admin-dot-tooltip {
+          position: absolute;
+          top: calc(100% + 8px);
+          left: 50%;
+          transform: translateX(-50%) translateY(-4px);
+          background: rgba(15, 23, 42, 0.95);
+          backdrop-filter: blur(10px);
+          border: 1px solid ${isMaint ? 'rgba(245, 158, 11, 0.35)' : 'rgba(168, 85, 247, 0.35)'};
+          color: #F8FAFC;
+          font-size: 11.5px;
+          font-weight: 600;
+          white-space: nowrap;
+          padding: 5px 12px;
+          border-radius: 9999px;
+          box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+          opacity: 0;
+          pointer-events: none;
+          transition: all 0.2s ease;
+          z-index: 999999;
+          font-family: 'Manrope', system-ui, sans-serif;
+        }
+        .admin-dot-wrapper:hover .admin-dot-tooltip {
+          opacity: 1;
+          transform: translateX(-50%) translateY(0);
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
+    const wrapper = document.createElement('div');
+    wrapper.id = 'admin-bypass-banner';
+    wrapper.className = 'admin-dot-wrapper';
+    wrapper.setAttribute('role', 'status');
+    wrapper.setAttribute('aria-label', titleText);
+    wrapper.innerHTML = `
+      <span class="admin-dot-bubble" title="${titleText}"></span>
+      <span class="admin-dot-tooltip">${isMaint ? '🟠 Admin Mode (Maintenance Active)' : '🔒 Admin Mode (Private Active)'}</span>
+    `;
+
+    const attachDot = () => {
+      const brandMark = document.querySelector('.brand-mark') || document.querySelector('.brand');
+      if (brandMark) {
+        if (getComputedStyle(brandMark).overflow === 'hidden') {
+          (brandMark as HTMLElement).style.overflow = 'visible';
+        }
+        if (getComputedStyle(brandMark).position === 'static') {
+          (brandMark as HTMLElement).style.position = 'relative';
+        }
+        wrapper.style.cssText = 'position: absolute; top: -3px; right: -3px; z-index: 99;';
+        brandMark.appendChild(wrapper);
+      } else {
+        wrapper.style.cssText = 'position: fixed; top: 16px; left: 16px; z-index: 999999;';
+        document.body.appendChild(wrapper);
+      }
+    };
+
+    const timer = setTimeout(attachDot, 100);
+    return () => {
+      clearTimeout(timer);
+      if (wrapper.parentNode) {
+        wrapper.parentNode.removeChild(wrapper);
+      }
+    };
+  }, [mode, isMaint, dotColor, titleText]);
+
+  return null;
+}
+
 export const GlobalRouteGuard: React.FC<GlobalRouteGuardProps> = ({ children }) => {
   const { siteMode, isLoading, error, refreshSiteMode } = usePortfolioSettingsContext();
   const { isAdmin, user, loading: authLoading } = useAuth();
@@ -93,40 +199,9 @@ export const GlobalRouteGuard: React.FC<GlobalRouteGuardProps> = ({ children }) 
   // Admin Bypass Architecture: Authenticated active administrators bypass siteMode restrictions
   if (isAdmin) {
     if (siteMode === 'maintenance' || siteMode === 'private') {
-      const isMaint = siteMode === 'maintenance';
       return (
         <>
-          <div
-            role="status"
-            aria-live="polite"
-            style={{
-              position: 'sticky',
-              top: 0,
-              zIndex: 99999,
-              width: '100%',
-              backgroundColor: isMaint ? '#1E1B13' : '#171426',
-              borderBottom: isMaint ? '1px solid rgba(245, 158, 11, 0.4)' : '1px solid rgba(124, 58, 237, 0.4)',
-              color: isMaint ? '#FBBF24' : '#C4B5FD',
-              padding: '10px 20px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '12px',
-              fontSize: '13px',
-              fontWeight: 600,
-              boxShadow: '0 4px 14px rgba(0,0,0,0.3)',
-              fontFamily: "'Manrope', system-ui, sans-serif",
-              boxSizing: 'border-box'
-            }}
-          >
-            <span style={{ fontSize: '14px' }}>{isMaint ? '🟠' : '🔒'}</span>
-            <span style={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-              {isMaint ? 'Admin Mode' : 'Admin Preview'}
-            </span>
-            <span style={{ color: '#E2E8F0', fontWeight: 500 }}>
-              — {isMaint ? 'Portfolio is currently in Maintenance Mode. Visitors are seeing the Maintenance page.' : 'Portfolio is in Private Mode. Visitors see the Private Access page.'}
-            </span>
-          </div>
+          <AdminBypassDot mode={siteMode} />
           {children}
         </>
       );

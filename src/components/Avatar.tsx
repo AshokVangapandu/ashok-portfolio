@@ -39,36 +39,23 @@ export const Avatar: React.FC<AvatarProps> = ({
   } : {};
 
   const getFallbackStyle = (): React.CSSProperties => {
-    if (className.includes('popover-avatar')) {
-      return {
-        width: '48px',
-        height: '48px',
-        borderRadius: '50%',
-        display: 'grid',
-        placeItems: 'center',
-        background: 'linear-gradient(135deg, #7C3AED 0%, #A78BFA 100%)',
-        color: '#fff',
-        fontWeight: 700,
-        fontSize: '14px',
-        ...sizeStyle,
-        ...style
-      };
-    }
     return {
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      background: 'linear-gradient(135deg, #6C3CFF 0%, #8F72FF 100%)',
+      color: '#FFFFFF',
+      fontWeight: 750,
+      fontSize: size && typeof size === 'number' && size <= 36 ? '12px' : '14px',
+      borderRadius: 'inherit',
+      overflow: 'hidden',
+      flexShrink: 0,
       ...sizeStyle,
       ...style
     };
   };
 
-  // Determine fallback CSS classes matching the vanilla implementation
-  let fallbackClass = 'author-avatar author-avatar-initials';
-  if (className.includes('popover-avatar')) {
-    fallbackClass = `${className} avatar-fallback`;
-  } else if (className.includes('navbar-user-avatar') || className.includes('dropdown-user')) {
-    fallbackClass = className.includes('dropdown')
-      ? 'dropdown-user-header-avatar-fallback'
-      : 'navbar-user-avatar-fallback';
-  }
+  let fallbackClass = 'avatar-fallback-initials';
 
   return (
     <>

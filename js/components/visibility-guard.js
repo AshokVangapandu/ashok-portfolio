@@ -345,40 +345,100 @@
     if (!mode || mode === 'public') return;
 
     const isMaint = mode === 'maintenance';
-    const banner = document.createElement('div');
-    banner.id = 'admin-bypass-banner';
-    banner.setAttribute('role', 'status');
-    banner.setAttribute('aria-live', 'polite');
-    banner.style.cssText = `
-      position: sticky;
-      top: 0;
-      z-index: 999999;
-      width: 100%;
-      background-color: ${isMaint ? '#1E1B13' : '#171426'};
-      border-bottom: ${isMaint ? '1px solid rgba(245, 158, 11, 0.4)' : '1px solid rgba(124, 58, 237, 0.4)'};
-      color: ${isMaint ? '#FBBF24' : '#C4B5FD'};
-      padding: 10px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      font-size: 13px;
-      font-weight: 600;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.3);
-      font-family: 'Manrope', system-ui, sans-serif;
-      box-sizing: border-box;
+    const dotColor = isMaint ? '#F59E0B' : '#A855F7';
+    const titleText = isMaint 
+      ? 'Admin Mode — Maintenance Mode Active (Bypass Active)' 
+      : 'Admin Mode — Private Mode Active (Bypass Active)';
+
+    if (!document.getElementById('admin-dot-style')) {
+      const style = document.createElement('style');
+      style.id = 'admin-dot-style';
+      style.textContent = `
+        @keyframes adminDotPulse {
+          0%, 100% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 2px #020617, 0 0 10px ${dotColor}, 0 0 16px ${dotColor}; }
+          50% { transform: scale(1.3); opacity: 0.85; box-shadow: 0 0 0 2px #020617, 0 0 16px ${dotColor}, 0 0 24px ${dotColor}; }
+        }
+        .admin-dot-wrapper {
+          position: relative;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .admin-dot-bubble {
+          width: 10px;
+          height: 10px;
+          border-radius: 50%;
+          background-color: ${dotColor};
+          animation: adminDotPulse 2.2s infinite ease-in-out;
+          cursor: pointer;
+          transition: transform 0.2s ease;
+          display: block;
+        }
+        .admin-dot-bubble:hover {
+          transform: scale(1.35) !important;
+        }
+        .admin-dot-tooltip {
+          position: absolute;
+          top: calc(100% + 8px);
+          left: 50%;
+          transform: translateX(-50%) translateY(-4px);
+          background: rgba(15, 23, 42, 0.95);
+          backdrop-filter: blur(10px);
+          border: 1px solid ${isMaint ? 'rgba(245, 158, 11, 0.35)' : 'rgba(168, 85, 247, 0.35)'};
+          color: #F8FAFC;
+          font-size: 11.5px;
+          font-weight: 600;
+          white-space: nowrap;
+          padding: 5px 12px;
+          border-radius: 9999px;
+          box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+          opacity: 0;
+          pointer-events: none;
+          transition: all 0.2s ease;
+          z-index: 999999;
+          font-family: 'Manrope', system-ui, sans-serif;
+        }
+        .admin-dot-wrapper:hover .admin-dot-tooltip {
+          opacity: 1;
+          transform: translateX(-50%) translateY(0);
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
+    const wrapper = document.createElement('div');
+    wrapper.id = 'admin-bypass-banner';
+    wrapper.className = 'admin-dot-wrapper';
+    wrapper.setAttribute('role', 'status');
+    wrapper.setAttribute('aria-label', titleText);
+    wrapper.innerHTML = `
+      <span class="admin-dot-bubble" title="${titleText}"></span>
+      <span class="admin-dot-tooltip">${isMaint ? '🟠 Admin Mode (Maintenance Active)' : '🔒 Admin Mode (Private Active)'}</span>
     `;
-    banner.innerHTML = `
-      <span style="font-size: 14px;">${isMaint ? '🟠' : '🔒'}</span>
-      <span style="font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em;">
-        ${isMaint ? 'Admin Mode' : 'Admin Preview'}
-      </span>
-      <span style="color: #E2E8F0; font-weight: 500;">
-        — ${isMaint ? 'Portfolio is currently in Maintenance Mode. Visitors are seeing the Maintenance page.' : 'Portfolio is in Private Mode. Visitors see the Private Access page.'}
-      </span>
-    `;
-    if (document.body) {
-      document.body.insertBefore(banner, document.body.firstChild);
+
+    const brandMark = document.querySelector('.brand-mark') || document.querySelector('.brand');
+    if (brandMark) {
+      if (getComputedStyle(brandMark).overflow === 'hidden') {
+        brandMark.style.overflow = 'visible';
+      }
+      if (getComputedStyle(brandMark).position === 'static') {
+        brandMark.style.position = 'relative';
+      }
+      wrapper.style.cssText = `
+        position: absolute;
+        top: -3px;
+        right: -3px;
+        z-index: 99;
+      `;
+      brandMark.appendChild(wrapper);
+    } else {
+      wrapper.style.cssText = `
+        position: fixed;
+        top: 16px;
+        left: 16px;
+        z-index: 999999;
+      `;
+      document.body.appendChild(wrapper);
     }
   }
 
