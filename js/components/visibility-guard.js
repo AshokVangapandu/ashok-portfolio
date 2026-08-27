@@ -24,7 +24,7 @@
       align-items: center;
       justify-content: center;
       z-index: 99999;
-      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      font-family: 'Manrope', system-ui, -apple-system, sans-serif;
       box-sizing: border-box;
       padding: 0;
       opacity: 1;
@@ -365,7 +365,7 @@
       font-size: 13px;
       font-weight: 600;
       box-shadow: 0 4px 14px rgba(0,0,0,0.3);
-      font-family: 'Inter', system-ui, sans-serif;
+      font-family: 'Manrope', system-ui, sans-serif;
       box-sizing: border-box;
     `;
     banner.innerHTML = `
@@ -876,7 +876,7 @@
 
     const modal = document.createElement('div');
     modal.id = 'priv-req-modal';
-    modal.style.cssText = 'position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.7); backdrop-filter:blur(8px); display:flex; align-items:center; justify-content:center; z-index:999999; padding:20px; box-sizing:border-box; font-family:"Inter", sans-serif;';
+    modal.style.cssText = 'position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.7); backdrop-filter:blur(8px); display:flex; align-items:center; justify-content:center; z-index:999999; padding:20px; box-sizing:border-box; font-family:"Manrope", sans-serif;';
     modal.innerHTML = `
       <div style="background:#121824; border:1px solid rgba(255,255,255,0.1); border-radius:20px; max-width:480px; width:100%; padding:32px 28px; box-shadow:0 25px 50px -12px rgba(0,0,0,0.6); display:flex; flex-direction:column; gap:20px; color:#F8FAFC;">
         <div style="display:flex; align-items:center; justify-content:space-between;">
