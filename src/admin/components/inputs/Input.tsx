@@ -21,7 +21,7 @@ export const Input: React.FC<InputProps> = ({
         flexDirection: 'column', 
         gap: 'var(--admin-space-1)',
         width: '100%',
-        fontFamily: "'Inter', sans-serif"
+        fontFamily: "'Manrope', sans-serif"
       }}
     >
       {label && (

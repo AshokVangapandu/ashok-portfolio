@@ -146,7 +146,7 @@ export const ToolsProductsPage: React.FC = () => {
         padding: '36px 24px 80px 24px',
         boxSizing: 'border-box',
         color: '#FFFFFF',
-        fontFamily: "'Inter', sans-serif"
+        fontFamily: "'Manrope', sans-serif"
       }}
     >
       {/* 1. Mobile Page Header (Shown on Mobile ONLY <= 768px) */}
@@ -586,7 +586,7 @@ export const ToolsProductsPage: React.FC = () => {
                     border: '1px solid rgba(255, 255, 255, 0.08)',
                     color: '#FFFFFF',
                     fontSize: '13px',
-                    fontFamily: "'Inter', sans-serif",
+                    fontFamily: "'Manrope', sans-serif",
                     outline: 'none',
                     transition: 'all 0.2s ease',
                     boxSizing: 'border-box'

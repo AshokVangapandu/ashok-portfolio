@@ -43,7 +43,7 @@ export const CategoryTabs: React.FC<CategoryTabsProps> = ({
               fontWeight: 600,
               cursor: 'pointer',
               transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-              fontFamily: "'Inter', sans-serif",
+              fontFamily: "'Manrope', sans-serif",
               outline: 'none',
               boxShadow: isActive ? '0 0 20px rgba(124, 58, 237, 0.15)' : 'none',
             }}

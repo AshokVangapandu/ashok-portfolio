@@ -188,7 +188,7 @@ export const EdithInsights: React.FC = () => {
           display: flex;
           flex-direction: column;
           box-sizing: border-box;
-          font-family: 'Inter', sans-serif;
+          font-family: 'Manrope', sans-serif;
           text-align: left;
           width: 100%;
           transition: transform 250ms cubic-bezier(0.4, 0, 0.2, 1), 

@@ -35,7 +35,7 @@ export const MembersToolbar: React.FC<MembersToolbarProps> = ({
         border: '1px solid var(--admin-border)',
         borderBottom: 'none',
         boxSizing: 'border-box',
-        fontFamily: "'Inter', sans-serif"
+        fontFamily: "'Manrope', sans-serif"
       }}
     >
       {/* Search Input & Select Dropdowns */}

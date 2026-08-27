@@ -19,7 +19,7 @@ export const SecondaryButton: React.FC<SecondaryButtonProps> = ({ children, styl
         fontWeight: 600,
         cursor: 'pointer',
         transition: 'all 0.15s ease',
-        fontFamily: "'Inter', sans-serif",
+        fontFamily: "'Manrope', sans-serif",
         boxShadow: 'var(--admin-shadow-sm)',
         display: 'inline-flex',
         alignItems: 'center',

@@ -3,7 +3,7 @@ import React from 'react';
 
 export const ContactsHeader: React.FC = () => {
   return (
-    <div style={{ marginBottom: 'var(--admin-space-4)', fontFamily: "'Inter', sans-serif" }}>
+    <div style={{ marginBottom: 'var(--admin-space-4)', fontFamily: "'Manrope', sans-serif" }}>
       <h2 
         className="text-heading-lg" 
         style={{ 

@@ -17,7 +17,7 @@ export const ContactsSearch: React.FC<ContactsSearchProps> = ({
       style={{
         position: 'relative',
         width: '240px',
-        fontFamily: "'Inter', sans-serif"
+        fontFamily: "'Manrope', sans-serif"
       }}
     >
       <span 

@@ -46,7 +46,7 @@ export const ContactsFilters: React.FC<ContactsFiltersProps> = ({
               color: isActive ? 'var(--admin-primary)' : 'var(--admin-text-secondary)',
               boxShadow: isActive ? 'var(--admin-shadow-sm)' : 'none',
               transition: 'all 0.15s ease',
-              fontFamily: "'Inter', sans-serif"
+              fontFamily: "'Manrope', sans-serif"
             }}
           >
             {filter.label}

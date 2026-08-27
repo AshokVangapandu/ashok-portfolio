@@ -300,7 +300,7 @@ export const TestimonialDetailsDrawer: React.FC<TestimonialDetailsDrawerProps> =
           display: 'flex',
           flexDirection: 'column',
           outline: 'none',
-          fontFamily: "'Inter', sans-serif",
+          fontFamily: "'Manrope', sans-serif",
           animation: 'slide-in 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards'
         }}
       >

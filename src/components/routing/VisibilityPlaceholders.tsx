@@ -17,7 +17,7 @@ export const GlobalLoadingScreen: React.FC = () => {
         alignItems: 'center',
         justifyContent: 'center',
         zIndex: 99999,
-        fontFamily: "'Inter', system-ui, -apple-system, sans-serif"
+        fontFamily: "'Manrope', system-ui, -apple-system, sans-serif"
       }}
     >
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px' }}>
@@ -71,7 +71,7 @@ export const GlobalErrorScreen: React.FC<{ onRetry?: () => void }> = ({ onRetry 
         padding: '24px',
         boxSizing: 'border-box',
         zIndex: 99999,
-        fontFamily: "'Inter', system-ui, -apple-system, sans-serif"
+        fontFamily: "'Manrope', system-ui, -apple-system, sans-serif"
       }}
     >
       <div

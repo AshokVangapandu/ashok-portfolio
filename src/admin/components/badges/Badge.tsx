@@ -44,7 +44,7 @@ export const Badge: React.FC<BadgeProps> = ({
         backgroundColor: bg,
         color: color,
         textTransform: 'capitalize',
-        fontFamily: "'Inter', sans-serif",
+        fontFamily: "'Manrope', sans-serif",
         lineHeight: 1.25,
         ...style
       }}

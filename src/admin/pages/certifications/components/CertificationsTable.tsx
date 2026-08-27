@@ -128,7 +128,7 @@ export const CertificationsTable: React.FC<CertificationsTableProps> = ({ certif
             width: '100%',
             borderCollapse: 'collapse',
             textAlign: 'left',
-            fontFamily: "'Inter', sans-serif"
+            fontFamily: "'Manrope', sans-serif"
           }}
         >
           <thead>

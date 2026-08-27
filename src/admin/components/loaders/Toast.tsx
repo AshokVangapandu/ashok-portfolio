@@ -46,7 +46,7 @@ export const Toast: React.FC<ToastProps> = ({
         minWidth: '280px',
         maxWidth: '450px',
         gap: 'var(--admin-space-4)',
-        fontFamily: "'Inter', sans-serif",
+        fontFamily: "'Manrope', sans-serif",
         ...style
       }}
     >

@@ -283,7 +283,7 @@ export const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
         alignItems: 'center',
         padding: '24px',
         boxSizing: 'border-box',
-        fontFamily: "'Inter', sans-serif",
+        fontFamily: "'Manrope', sans-serif",
         outline: 'none'
       }}
       onClick={onClose}
@@ -853,7 +853,7 @@ export const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
                             opacity: 0.1,
                             lineHeight: 1,
                             letterSpacing: '-0.03em',
-                            fontFamily: 'system-ui, -apple-system, sans-serif'
+                            fontFamily: "var(--font-primary, 'Manrope', sans-serif)"
                           }}
                         >
                           0{idx + 1}

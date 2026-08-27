@@ -30,7 +30,7 @@ export const Tabs: React.FC<TabsProps> = ({
         borderBottom: '1px solid var(--admin-border)',
         width: '100%',
         gap: 'var(--admin-space-4)',
-        fontFamily: "'Inter', sans-serif",
+        fontFamily: "'Manrope', sans-serif",
         ...style
       }}
     >

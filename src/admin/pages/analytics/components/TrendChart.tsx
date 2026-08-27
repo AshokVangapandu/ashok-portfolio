@@ -95,7 +95,7 @@ export const TrendChart: React.FC<TrendChartProps> = React.memo(({
           padding: '6px 12px',
           borderRadius: '6px',
           fontSize: '11.5px',
-          fontFamily: "'Inter', sans-serif",
+          fontFamily: "'Manrope', sans-serif",
           fontWeight: 500,
           pointerEvents: 'none',
           whiteSpace: 'nowrap',
@@ -298,7 +298,7 @@ export const TrendChart: React.FC<TrendChartProps> = React.memo(({
         boxSizing: 'border-box',
         minWidth: '320px',
         boxShadow: 'var(--admin-shadow-sm)',
-        fontFamily: "'Inter', sans-serif",
+        fontFamily: "'Manrope', sans-serif",
         position: 'relative',
         height: '335px'
       }}

@@ -54,7 +54,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
             alignItems: 'center',
             justifyContent: 'center',
             minHeight: '60vh',
-            fontFamily: "'Inter', system-ui, sans-serif",
+            fontFamily: "'Manrope', system-ui, sans-serif",
             color: '#0f172a',
             background: '#ffffff'
           }}
@@ -99,7 +99,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
             fontSize: '12.5px',
             fontWeight: 600,
             textAlign: 'center',
-            fontFamily: "'Inter', sans-serif",
+            fontFamily: "'Manrope', sans-serif",
             position: 'relative',
             zIndex: 99999,
             display: 'flex',

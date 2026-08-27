@@ -367,7 +367,7 @@ export const ResumePage: React.FC = () => {
                   border: '1px solid var(--admin-border)',
                   borderTop: 'none',
                   borderRadius: '0 0 var(--admin-radius-md) var(--admin-radius-md)',
-                  fontFamily: "'Inter', sans-serif",
+                  fontFamily: "'Manrope', sans-serif",
                   fontSize: '13px',
                   color: 'var(--admin-text-secondary)',
                   boxSizing: 'border-box'

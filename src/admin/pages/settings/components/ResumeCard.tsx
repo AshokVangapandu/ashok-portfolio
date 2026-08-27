@@ -24,7 +24,7 @@ export const ResumeCard: React.FC<ResumeCardProps> = ({
         gap: '20px',
         width: '100%',
         boxSizing: 'border-box',
-        fontFamily: "'Inter', sans-serif"
+        fontFamily: "'Manrope', sans-serif"
       }}
     >
       {/* 1. Header context */}

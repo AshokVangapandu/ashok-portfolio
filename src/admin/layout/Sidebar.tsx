@@ -139,7 +139,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           top: 0,
           left: 0,
           zIndex: 1010,
-          fontFamily: "'Inter', sans-serif",
+          fontFamily: "'Manrope', sans-serif",
           boxSizing: 'border-box',
           overflow: 'visible',
           transition: 'width 280ms cubic-bezier(0.4, 0, 0.2, 1), transform 280ms cubic-bezier(0.4, 0, 0.2, 1)',

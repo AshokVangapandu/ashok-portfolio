@@ -36,7 +36,7 @@ export const Avatar: React.FC<AvatarProps> = ({
     color: '#FFFFFF',
     fontWeight: 600,
     fontSize: `${size * 0.4}px`,
-    fontFamily: "'Inter', sans-serif",
+    fontFamily: "'Manrope', sans-serif",
     border: '2px solid #FFFFFF',
     boxShadow: 'var(--admin-shadow-sm)',
     boxSizing: 'border-box',

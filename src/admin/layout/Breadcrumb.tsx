@@ -46,7 +46,7 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
         gap: 'var(--admin-space-2)',
         fontSize: '12px',
         color: 'var(--admin-text-secondary)',
-        fontFamily: "'Inter', sans-serif",
+        fontFamily: "'Manrope', sans-serif",
         marginBottom: 'var(--admin-space-4)'
       }}
     >

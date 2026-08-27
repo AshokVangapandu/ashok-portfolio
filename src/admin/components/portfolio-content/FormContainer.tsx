@@ -55,7 +55,7 @@ export const FormContainer: React.FC<FormContainerProps> = ({
           display: 'flex',
           flexDirection: 'column',
           boxSizing: 'border-box',
-          fontFamily: "'Inter', sans-serif"
+          fontFamily: "'Manrope', sans-serif"
         }}
       >
         {/* Sticky Header */}

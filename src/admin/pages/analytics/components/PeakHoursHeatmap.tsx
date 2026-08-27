@@ -227,7 +227,7 @@ export const PeakHoursHeatmap: React.FC<PeakHoursHeatmapProps> = ({
         boxSizing: 'border-box',
         minWidth: '320px',
         boxShadow: 'var(--admin-shadow-sm)',
-        fontFamily: "'Inter', sans-serif",
+        fontFamily: "'Manrope', sans-serif",
         position: 'relative',
         overflow: 'hidden'
       }}

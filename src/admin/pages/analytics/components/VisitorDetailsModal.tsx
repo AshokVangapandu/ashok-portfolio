@@ -100,7 +100,7 @@ export const VisitorDetailsModal: React.FC<VisitorDetailsModalProps> = ({
           display: 'flex',
           flexDirection: 'column',
           maxHeight: '90vh',
-          fontFamily: "'Inter', sans-serif",
+          fontFamily: "'Manrope', sans-serif",
           boxSizing: 'border-box',
           overflow: 'hidden',
           animation: 'modalScaleUp 250ms cubic-bezier(0.34, 1.56, 0.64, 1)'

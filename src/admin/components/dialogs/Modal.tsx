@@ -55,7 +55,7 @@ export const Modal: React.FC<ModalProps> = ({
         justifyContent: 'center',
         zIndex: 1000, // ZIndex.modal
         padding: 'var(--admin-space-4)',
-        fontFamily: "'Inter', sans-serif"
+        fontFamily: "'Manrope', sans-serif"
       }}
       onClick={onClose}
     >

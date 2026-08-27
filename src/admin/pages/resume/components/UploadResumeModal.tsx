@@ -101,7 +101,7 @@ export const UploadResumeModal: React.FC<UploadResumeModalProps> = ({
           display: 'flex',
           flexDirection: 'column',
           boxSizing: 'border-box',
-          fontFamily: "'Inter', sans-serif"
+          fontFamily: "'Manrope', sans-serif"
         }}
       >
         {/* Header */}

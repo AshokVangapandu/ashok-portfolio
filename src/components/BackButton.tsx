@@ -44,7 +44,7 @@ export const BackButton: React.FC<BackButtonProps> = ({
         border: 'none',
         outline: 'none',
         width: 'fit-content',
-        fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+        fontFamily: "'Manrope', -apple-system, BlinkMacSystemFont, sans-serif",
         ...style,
       }}
       onMouseEnter={(e) => {

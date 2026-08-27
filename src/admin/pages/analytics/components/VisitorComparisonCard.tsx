@@ -89,7 +89,7 @@ export const VisitorComparisonCard: React.FC<VisitorComparisonCardProps> = ({
         boxSizing: 'border-box',
         minWidth: '300px',
         boxShadow: 'var(--admin-shadow-sm)',
-        fontFamily: "'Inter', sans-serif"
+        fontFamily: "'Manrope', sans-serif"
       }}
     >
       <h3 style={{ margin: '0 0 20px 0', fontSize: '15px', fontWeight: 700, color: 'var(--admin-text)' }}>

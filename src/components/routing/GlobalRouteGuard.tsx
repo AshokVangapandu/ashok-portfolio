@@ -115,7 +115,7 @@ export const GlobalRouteGuard: React.FC<GlobalRouteGuardProps> = ({ children }) 
               fontSize: '13px',
               fontWeight: 600,
               boxShadow: '0 4px 14px rgba(0,0,0,0.3)',
-              fontFamily: "'Inter', system-ui, sans-serif",
+              fontFamily: "'Manrope', system-ui, sans-serif",
               boxSizing: 'border-box'
             }}
           >

@@ -28,7 +28,7 @@ export const StatisticsCard: React.FC<StatisticsCardProps> = ({
               fontSize: '13px',
               color: 'var(--admin-text-secondary)',
               fontWeight: 500,
-              fontFamily: "'Inter', sans-serif"
+              fontFamily: "'Manrope', sans-serif"
             }}
           >
             {title}
@@ -39,7 +39,7 @@ export const StatisticsCard: React.FC<StatisticsCardProps> = ({
               fontWeight: 750,
               color: 'var(--admin-text)',
               fontSize: '28px',
-              fontFamily: "'Inter', sans-serif",
+              fontFamily: "'Manrope', sans-serif",
               letterSpacing: '-0.02em'
             }}
           >
@@ -69,7 +69,7 @@ export const StatisticsCard: React.FC<StatisticsCardProps> = ({
             fontSize: '12px',
             color: 'var(--admin-text-secondary)',
             fontWeight: 500,
-            fontFamily: "'Inter', sans-serif"
+            fontFamily: "'Manrope', sans-serif"
           }}
         >
           {helperText}

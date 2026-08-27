@@ -141,7 +141,7 @@ export const MaintenancePage: React.FC = () => {
         color: '#FFFFFF',
         position: 'relative',
         overflow: 'hidden',
-        fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+        fontFamily: "'Manrope', system-ui, -apple-system, sans-serif",
         boxSizing: 'border-box'
       }}
     >

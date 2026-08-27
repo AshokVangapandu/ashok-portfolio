@@ -277,7 +277,7 @@ export const RequestsApprovalsCard: React.FC = () => {
           display: flex;
           flex-direction: column;
           box-sizing: border-box;
-          font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+          font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
           text-align: left;
           width: 100%;
           gap: 16px;

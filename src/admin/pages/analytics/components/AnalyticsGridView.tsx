@@ -138,7 +138,7 @@ const KPIStatCard: React.FC<{
         gap: '12px',
         boxSizing: 'border-box',
         boxShadow: 'var(--admin-shadow-sm)',
-        fontFamily: "'Inter', sans-serif",
+        fontFamily: "'Manrope', sans-serif",
         position: 'relative',
         minWidth: '160px',
         transition: 'transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1)',

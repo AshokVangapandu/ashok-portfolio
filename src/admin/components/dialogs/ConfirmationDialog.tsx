@@ -125,7 +125,7 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
         justifyContent: 'center',
         padding: '20px',
         boxSizing: 'border-box',
-        fontFamily: "'Inter', sans-serif",
+        fontFamily: "'Manrope', sans-serif",
         animation: `${animateClose ? 'confirmFadeOut' : 'confirmFadeIn'} 0.2s forwards ease-out`
       }}
     >

@@ -34,7 +34,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
         background: '#FFFFFF',
         border: '1px dashed var(--admin-border)',
         borderRadius: 'var(--admin-radius-lg)',
-        fontFamily: "'Inter', sans-serif",
+        fontFamily: "'Manrope', sans-serif",
         gap: 'var(--admin-space-3)',
         ...style
       }}

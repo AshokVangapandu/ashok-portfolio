@@ -31,7 +31,7 @@ export const AnalyticsFilters: React.FC<AnalyticsFiltersProps> = ({
         justifyContent: 'flex-end',
         gap: '16px',
         flexWrap: 'wrap',
-        fontFamily: "'Inter', sans-serif"
+        fontFamily: "'Manrope', sans-serif"
       }}
     >
       {/* 1. Time Range Buttons */}

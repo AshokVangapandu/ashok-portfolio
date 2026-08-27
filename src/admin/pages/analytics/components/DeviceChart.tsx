@@ -108,7 +108,7 @@ export const DeviceChart: React.FC<DeviceChartProps> = ({
         boxSizing: 'border-box',
         minWidth: '300px',
         boxShadow: 'var(--admin-shadow-sm)',
-        fontFamily: "'Inter', sans-serif",
+        fontFamily: "'Manrope', sans-serif",
         position: 'relative'
       }}
     >

@@ -1,4 +1,5 @@
 :root {
+  --font-primary: 'Manrope', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --bg: #020617;
   --bg-soft: #030712;
   --panel: rgba(15, 20, 33, 0.56);

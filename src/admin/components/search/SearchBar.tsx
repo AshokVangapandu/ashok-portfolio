@@ -23,7 +23,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         position: 'relative',
         width: '100%',
         maxWidth: '320px',
-        fontFamily: "'Inter', sans-serif",
+        fontFamily: "'Manrope', sans-serif",
         ...style
       }}
     >

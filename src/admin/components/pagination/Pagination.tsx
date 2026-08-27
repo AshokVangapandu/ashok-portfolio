@@ -55,7 +55,7 @@ export const Pagination: React.FC<PaginationProps> = ({
         justifyContent: 'space-between',
         padding: 'var(--admin-space-4) 0',
         width: '100%',
-        fontFamily: "'Inter', sans-serif",
+        fontFamily: "'Manrope', sans-serif",
         flexWrap: 'wrap',
         gap: 'var(--admin-space-3)',
         ...style

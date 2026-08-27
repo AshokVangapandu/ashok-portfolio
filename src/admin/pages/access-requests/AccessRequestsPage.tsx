@@ -114,7 +114,7 @@ export const AccessRequestsPage: React.FC = () => {
         gap: 'var(--admin-space-6)',
         width: '100%',
         boxSizing: 'border-box',
-        fontFamily: "'Inter', sans-serif"
+        fontFamily: "'Manrope', sans-serif"
       }}
     >
       {/* Error Alert */}
@@ -649,7 +649,7 @@ export const AccessRequestsPage: React.FC = () => {
               display: 'flex',
               flexDirection: 'column',
               gap: '18px',
-              fontFamily: "'Inter', sans-serif"
+              fontFamily: "'Manrope', sans-serif"
             }}
           >
             {/* Header */}

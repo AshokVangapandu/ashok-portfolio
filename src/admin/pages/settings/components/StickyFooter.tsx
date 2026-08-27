@@ -29,7 +29,7 @@ export const StickyFooter: React.FC<StickyFooterProps> = ({
         gap: '12px',
         zIndex: 100,
         boxSizing: 'border-box',
-        fontFamily: "'Inter', sans-serif"
+        fontFamily: "'Manrope', sans-serif"
       }}
     >
       <button

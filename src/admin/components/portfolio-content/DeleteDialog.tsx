@@ -47,7 +47,7 @@ export const DeleteDialog: React.FC<DeleteDialogProps> = ({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={title} footer={footer} size="sm">
-      <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', fontFamily: "'Inter', sans-serif" }}>
+      <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', fontFamily: "'Manrope', sans-serif" }}>
         <span style={{ fontSize: '24px' }}>⚠️</span>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
           <p style={{ margin: 0, fontSize: '13.5px', color: 'var(--admin-text)', lineHeight: 1.5 }}>

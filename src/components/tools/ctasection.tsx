@@ -54,7 +54,7 @@ export const CTASection: React.FC = () => {
           width: '100%',
           boxSizing: 'border-box',
           gap: '24px',
-          fontFamily: "'Inter', sans-serif",
+          fontFamily: "'Manrope', sans-serif",
           position: 'relative',
           overflow: 'hidden'
         }}

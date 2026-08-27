@@ -72,7 +72,7 @@ export const CountryDistribution: React.FC<CountryDistributionProps> = ({
         boxSizing: 'border-box',
         minWidth: '300px',
         boxShadow: 'var(--admin-shadow-sm)',
-        fontFamily: "'Inter', sans-serif"
+        fontFamily: "'Manrope', sans-serif"
       }}
     >
       <style>{`

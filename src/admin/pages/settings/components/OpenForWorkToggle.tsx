@@ -18,7 +18,7 @@ export const OpenForWorkToggle: React.FC<OpenForWorkToggleProps> = ({
         justifyContent: 'space-between',
         width: '100%',
         boxSizing: 'border-box',
-        fontFamily: "'Inter', sans-serif"
+        fontFamily: "'Manrope', sans-serif"
       }}
     >
       {/* LEFT CONTENT */}

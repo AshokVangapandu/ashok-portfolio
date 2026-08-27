@@ -93,7 +93,7 @@ const TestimonialKpiCard: React.FC<TestimonialKpiCardProps> = ({
           box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.04), 0 1px 2px -1px rgba(15, 23, 42, 0.04);
           box-sizing: border-box;
           position: relative;
-          font-family: 'Inter', sans-serif;
+          font-family: 'Manrope', sans-serif;
           text-align: left;
         }
 

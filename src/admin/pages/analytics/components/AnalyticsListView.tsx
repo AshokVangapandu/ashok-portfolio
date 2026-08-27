@@ -247,7 +247,7 @@ export const AnalyticsListView: React.FC<AnalyticsListViewProps> = ({
           boxSizing: 'border-box'
         }}
       >
-        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontFamily: "'Inter', sans-serif" }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontFamily: "'Manrope', sans-serif" }}>
           <thead>
             <tr style={{ backgroundColor: '#F8FAFC', borderBottom: '1px solid var(--admin-border)' }}>
               {['Date & Time', 'Visitor', 'Country', 'Device', 'Source', 'Downloaded From', 'Duration', 'Status', 'Action'].map((h) => (
@@ -266,7 +266,7 @@ export const AnalyticsListView: React.FC<AnalyticsListViewProps> = ({
                     padding: '48px 24px',
                     textAlign: 'center',
                     color: 'var(--admin-text-secondary)',
-                    fontFamily: "'Inter', sans-serif"
+                    fontFamily: "'Manrope', sans-serif"
                   }}
                 >
                   <div
@@ -430,7 +430,7 @@ export const AnalyticsListView: React.FC<AnalyticsListViewProps> = ({
           border: '1px solid var(--admin-border)',
           borderTop: 'none',
           borderRadius: '0 0 var(--admin-radius-md) var(--admin-radius-md)',
-          fontFamily: "'Inter', sans-serif",
+          fontFamily: "'Manrope', sans-serif",
           fontSize: '13px',
           color: 'var(--admin-text-secondary)',
           boxSizing: 'border-box'

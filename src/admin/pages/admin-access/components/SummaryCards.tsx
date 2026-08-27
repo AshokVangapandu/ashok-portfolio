@@ -68,7 +68,7 @@ export const SummaryCards: React.FC<SummaryCardsProps> = ({ summary }) => {
         gap: '20px',
         width: '100%',
         boxSizing: 'border-box',
-        fontFamily: "'Inter', sans-serif"
+        fontFamily: "'Manrope', sans-serif"
       }}
     >
       {cards.map((card) => (

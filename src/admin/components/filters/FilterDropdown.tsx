@@ -25,7 +25,7 @@ export const FilterDropdown: React.FC<FilterDropdownProps> = ({
         display: 'flex',
         flexDirection: 'column',
         gap: 'var(--admin-space-1)',
-        fontFamily: "'Inter', sans-serif",
+        fontFamily: "'Manrope', sans-serif",
         ...style
       }}
     >

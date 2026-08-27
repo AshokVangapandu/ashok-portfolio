@@ -39,7 +39,7 @@ export const FeaturedProject: React.FC<FeaturedProjectProps> = ({
         boxShadow: '0 20px 50px rgba(0, 0, 0, 0.3), inset 0 0 0 1px rgba(255, 255, 255, 0.02)',
         position: 'relative',
         overflow: 'hidden',
-        fontFamily: "'Inter', sans-serif"
+        fontFamily: "'Manrope', sans-serif"
       }}
       className="featured-showcase-container"
     >

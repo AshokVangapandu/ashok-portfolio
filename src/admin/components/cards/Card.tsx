@@ -26,7 +26,7 @@ export const Card: React.FC<CardProps> = ({
     borderRadius: 'var(--admin-radius-md)',
     boxShadow: 'var(--admin-shadow-sm)',
     padding: 'var(--admin-space-4)',
-    fontFamily: "'Inter', sans-serif",
+    fontFamily: "'Manrope', sans-serif",
     display: 'flex',
     flexDirection: 'column',
     gap: 'var(--admin-space-4)',

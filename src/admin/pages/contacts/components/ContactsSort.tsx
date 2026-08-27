@@ -8,7 +8,7 @@ interface ContactsSortProps {
 
 export const ContactsSort: React.FC<ContactsSortProps> = ({ value, onChange }) => {
   return (
-    <div style={{ position: 'relative', display: 'inline-block', fontFamily: "'Inter', sans-serif" }}>
+    <div style={{ position: 'relative', display: 'inline-block', fontFamily: "'Manrope', sans-serif" }}>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value as 'newest' | 'oldest')}

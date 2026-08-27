@@ -24,7 +24,7 @@ export const Table: React.FC<TableProps> = ({
         borderRadius: 'var(--admin-radius-md)',
         background: '#FFFFFF',
         boxShadow: 'var(--admin-shadow-sm)',
-        fontFamily: "'Inter', sans-serif",
+        fontFamily: "'Manrope', sans-serif",
         ...style,
       }}
     >

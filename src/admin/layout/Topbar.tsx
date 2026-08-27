@@ -432,7 +432,7 @@ export const Topbar: React.FC<TopbarProps> = () => {
           position: sticky;
           top: 0;
           z-index: 100;
-          font-family: 'Inter', sans-serif;
+          font-family: 'Manrope', sans-serif;
           box-sizing: border-box;
         }
 

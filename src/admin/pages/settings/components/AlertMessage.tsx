@@ -90,7 +90,7 @@ export const AlertMessage: React.FC<AlertMessageProps> = ({
         width: '100%',
         boxSizing: 'border-box',
         position: 'relative',
-        fontFamily: "'Inter', sans-serif"
+        fontFamily: "'Manrope', sans-serif"
       }}
     >
       <div style={{ marginTop: '2px', display: 'flex', alignItems: 'center', flexShrink: 0 }}>

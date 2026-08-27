@@ -60,7 +60,7 @@ export const Button: React.FC<ButtonProps> = ({
       gap: 'var(--admin-space-2)',
       width: fullWidth ? '100%' : 'auto',
       transition: 'all 0.15s ease',
-      fontFamily: "'Inter', sans-serif",
+      fontFamily: "'Manrope', sans-serif",
       boxShadow: variant === 'ghost' ? 'none' : 'var(--admin-shadow-sm)',
       ...style,
     } as React.CSSProperties;

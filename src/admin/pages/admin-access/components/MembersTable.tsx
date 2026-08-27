@@ -28,7 +28,7 @@ export const MembersTable: React.FC<MembersTableProps> = ({
           borderRadius: '0 0 var(--admin-radius-md) var(--admin-radius-md)',
           boxSizing: 'border-box',
           textAlign: 'center',
-          fontFamily: "'Inter', sans-serif"
+          fontFamily: "'Manrope', sans-serif"
         }}
       >
         <div
@@ -95,7 +95,7 @@ export const MembersTable: React.FC<MembersTableProps> = ({
         borderRadius: '0'
       }}
     >
-      <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontFamily: "'Inter', sans-serif" }}>
+      <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontFamily: "'Manrope', sans-serif" }}>
         <thead>
           <tr style={{ backgroundColor: '#F8FAFC', borderBottom: '1px solid var(--admin-border)' }}>
             {['Member', 'Role', 'Status', 'Last Login', 'Permissions', 'Actions'].map((h) => (

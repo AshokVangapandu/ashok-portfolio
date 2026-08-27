@@ -108,7 +108,7 @@ export const TopBarGreeting: React.FC<TopBarGreetingProps> = ({ userName }) => {
           justify-content: space-between;
           width: 100%;
           gap: 24px;
-          font-family: 'Inter', sans-serif;
+          font-family: 'Manrope', sans-serif;
           box-sizing: border-box;
           animation: topbarFadeIn 0.4s ease-out;
         }

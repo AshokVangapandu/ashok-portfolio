@@ -236,7 +236,7 @@ export const PrivateAccessPage: React.FC = () => {
         boxSizing: 'border-box',
         position: 'relative',
         overflow: 'hidden',
-        fontFamily: "'Inter', system-ui, -apple-system, sans-serif"
+        fontFamily: "'Manrope', system-ui, -apple-system, sans-serif"
       }}
     >
       {/* Ambient Radial Background Glow */}

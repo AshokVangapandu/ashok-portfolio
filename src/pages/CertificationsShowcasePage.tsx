@@ -260,7 +260,7 @@ export const CertificationsShowcasePage: React.FC = () => {
         padding: '36px 24px 60px 24px',
         boxSizing: 'border-box',
         color: '#FFFFFF',
-        fontFamily: "'Inter', sans-serif"
+        fontFamily: "'Manrope', sans-serif"
       }}
     >
       {/* 1. Mobile Page Header (Shown on Mobile ONLY <= 768px) */}

@@ -54,7 +54,7 @@ export const DownloadDetailsModal: React.FC<DownloadDetailsModalProps> = ({
           display: 'flex',
           flexDirection: 'column',
           boxSizing: 'border-box',
-          fontFamily: "'Inter', sans-serif",
+          fontFamily: "'Manrope', sans-serif",
           animation: 'drawerSlideIn 250ms cubic-bezier(0.16, 1, 0.3, 1)'
         }}
       >

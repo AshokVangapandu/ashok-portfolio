@@ -58,7 +58,7 @@ export const MaintenanceSubscribersPage: React.FC = () => {
         gap: 'var(--admin-space-6)',
         width: '100%',
         boxSizing: 'border-box',
-        fontFamily: "'Inter', sans-serif"
+        fontFamily: "'Manrope', sans-serif"
       }}
     >
       {/* Error Banner */}

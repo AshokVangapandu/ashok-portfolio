@@ -47,7 +47,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         boxShadow: featured 
           ? '0 12px 40px rgba(212, 163, 89, 0.04), 0 8px 32px rgba(0, 0, 0, 0.2)' 
           : '0 8px 32px rgba(0, 0, 0, 0.15)',
-        fontFamily: "'Inter', sans-serif",
+        fontFamily: "'Manrope', sans-serif",
         position: 'relative',
         cursor: comingSoon ? 'not-allowed' : 'pointer',
         ...style

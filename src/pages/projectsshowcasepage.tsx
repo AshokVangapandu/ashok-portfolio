@@ -98,7 +98,7 @@ export const ProjectsShowcasePage: React.FC = () => {
         padding: '36px 24px 80px 24px',
         boxSizing: 'border-box',
         color: '#FFFFFF',
-        fontFamily: "'Inter', sans-serif"
+        fontFamily: "'Manrope', sans-serif"
       }}
     >
       {/* Top minimal back control (Desktop) */}

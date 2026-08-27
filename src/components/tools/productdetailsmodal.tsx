@@ -112,7 +112,7 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({
         overflowY: 'auto',
         padding: '40px 24px',
         boxSizing: 'border-box',
-        fontFamily: "'Inter', sans-serif"
+        fontFamily: "'Manrope', sans-serif"
       }}
       onClick={onClose}
     >

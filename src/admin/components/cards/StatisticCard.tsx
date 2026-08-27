@@ -75,7 +75,7 @@ export const StatisticCard: React.FC<StatisticCardProps> = ({
             gap: 'var(--admin-space-1)', 
             marginTop: 'var(--admin-space-2)',
             fontSize: '12.5px',
-            fontFamily: "'Inter', sans-serif"
+            fontFamily: "'Manrope', sans-serif"
           }}
         >
           <span 
