@@ -2608,6 +2608,142 @@ const wireControls = () => {
   loadDynamicTestimonials();
   loadDynamicCertifications();
   loadDynamicProjects();
+  setupDrawerAvatarAuthSync();
+};
+
+const updateDrawerHeaderAvatar = (sessionUser) => {
+  const drawerHeader = document.querySelector('.mobile-drawer-header');
+  const drawerBrandEl = document.querySelector('.mobile-drawer-header .drawer-brand');
+  let headerLoginBtn = document.querySelector('.drawer-header-login-btn');
+  let popover = document.querySelector('.drawer-user-popover');
+  const existingBanner = document.querySelector('.drawer-login-banner');
+  if (existingBanner) existingBanner.remove();
+
+  if (sessionUser) {
+    if (headerLoginBtn) headerLoginBtn.remove();
+    if (drawerBrandEl) drawerBrandEl.style.display = 'flex';
+
+    const brandIconEl = document.querySelector('.drawer-brand-icon');
+    const brandTitleEl = document.querySelector('.drawer-brand-text .brand-title');
+    const brandSubEl = document.querySelector('.drawer-brand-text .brand-subtitle');
+
+    const avatarUrl = sessionUser.user_metadata?.avatar_url || sessionUser.user_metadata?.picture;
+    const fullName = sessionUser.user_metadata?.full_name || sessionUser.email?.split('@')[0] || 'Collaborator';
+    const isAdmin = sessionUser.email?.toLowerCase().includes('ashok') || sessionUser.user_metadata?.role === 'admin';
+    const roleText = isAdmin ? 'Administrator' : 'Collaborator';
+
+    if (brandIconEl) {
+      if (avatarUrl) {
+        brandIconEl.innerHTML = `<img src="${avatarUrl}" alt="${fullName}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;" />`;
+      } else {
+        const initials = fullName.split(/\s+/).map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'AV';
+        brandIconEl.textContent = initials;
+      }
+    }
+    if (brandTitleEl) brandTitleEl.textContent = fullName;
+    if (brandSubEl) brandSubEl.textContent = roleText;
+
+    if (drawerBrandEl) {
+      drawerBrandEl.classList.add('is-authenticated');
+      drawerBrandEl.onclick = () => {
+        let currentPopover = document.querySelector('.drawer-user-popover');
+        if (currentPopover) {
+          currentPopover.remove();
+        } else {
+          currentPopover = document.createElement('div');
+          currentPopover.className = 'drawer-user-popover';
+          currentPopover.innerHTML = `
+            ${isAdmin ? '<a href="/admin" class="popover-attached-item popover-item-admin"><span style="display:inline-flex;align-items:center;gap:6px"><span>👑</span><span>Admin</span></span><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></a>' : ''}
+            <button type="button" class="popover-menu-item-danger-btn drawer-logout-btn">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+              <span>Sign Out</span>
+            </button>
+          `;
+          if (drawerBrandEl) {
+            drawerBrandEl.appendChild(currentPopover);
+            currentPopover.onclick = (e) => e.stopPropagation();
+            const logoutBtn = currentPopover.querySelector('.drawer-logout-btn');
+            if (logoutBtn) {
+              logoutBtn.onclick = async (e) => {
+                e.stopPropagation();
+                currentPopover.remove();
+                if (window.AuthService) {
+                  await window.AuthService.signOut();
+                }
+                updateDrawerHeaderAvatar(null);
+              };
+            }
+          }
+        }
+      };
+    }
+  } else {
+    let allPopovers = document.querySelectorAll('.drawer-user-popover');
+    allPopovers.forEach(p => p.remove());
+
+    if (drawerBrandEl) {
+      drawerBrandEl.classList.remove('is-authenticated');
+      drawerBrandEl.style.setProperty('display', 'none', 'important');
+    }
+
+    if (!headerLoginBtn && drawerHeader) {
+      headerLoginBtn = document.createElement('button');
+      headerLoginBtn.type = 'button';
+      headerLoginBtn.className = 'drawer-header-login-btn';
+      headerLoginBtn.innerHTML = `
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+          <path d="M12.24 10.285V13.4h6.887C18.2 15.614 15.645 18 12.24 18c-3.86 0-7-3.14-7-7s3.14-7 7-7c1.7 0 3.3.6 4.5 1.7l2.4-2.4C17.3 1.5 14.9 0 12.24 0c-6.08 0-11 4.92-11 11s4.92 11 11 11c5.73 0 10.2-4.1 10.2-11 0-.74-.08-1.46-.2-2.115H12.24z" />
+        </svg>
+        <span>Sign in</span>
+      `;
+      headerLoginBtn.onclick = () => {
+        if (window.AuthService) {
+          window.AuthService.signInWithGoogle();
+        }
+      };
+      drawerHeader.insertBefore(headerLoginBtn, drawerHeader.firstChild);
+    }
+  }
+};
+
+const setupDrawerCloseHandlers = () => {
+  const closeBtn = document.querySelector('#drawer-close-btn') || document.querySelector('.drawer-close-btn');
+  const backdrop = document.querySelector('#mobile-drawer-backdrop') || document.querySelector('.mobile-drawer-backdrop');
+  const navMenu = document.querySelector('[data-nav-menu]');
+  const navToggle = document.querySelector('[data-nav-toggle]');
+
+  const closeDrawer = () => {
+    if (navMenu) navMenu.classList.remove('is-open');
+    if (navToggle) {
+      navToggle.classList.remove('is-open');
+      navToggle.setAttribute('aria-expanded', 'false');
+    }
+    if (backdrop) backdrop.classList.remove('is-open');
+    const popover = document.querySelector('.drawer-user-popover');
+    if (popover) popover.remove();
+  };
+
+  if (closeBtn) {
+    closeBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeDrawer();
+    });
+  }
+  if (backdrop) {
+    backdrop.addEventListener('click', closeDrawer);
+  }
+};
+
+const setupDrawerAvatarAuthSync = () => {
+  setupDrawerCloseHandlers();
+  if (window.AuthService) {
+    window.AuthService.getCurrentUser().then(user => {
+      updateDrawerHeaderAvatar(user);
+    });
+    window.AuthService.onAuthStateChange((_event, session) => {
+      updateDrawerHeaderAvatar(session?.user || null);
+    });
+  }
 };
 
 const initApp = () => {
