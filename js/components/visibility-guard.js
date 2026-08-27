@@ -517,7 +517,7 @@
                   <span>Maintenance Mode</span>
                 </div>
                 <div style="display:flex; flex-direction:column; gap:10px; width:100%;">
-                  <h1 class="maint-title" style="margin:0; font-size:clamp(30px, 3.5vw, 42px); font-weight:800; color:#FFFFFF; letter-spacing:-0.02em; line-height:1.15;">Portfolio Under <br class="maint-title-br" /><span style="color:#C084FC;">Maintenance</span></h1>
+                  <h1 class="maint-title" style="margin:0; font-size:clamp(30px, 3.5vw, 42px); font-weight:800; color:#FFFFFF; letter-spacing:-0.02em; line-height:1.15;">Portfolio Under <span style="color:#C084FC;">Maintenance</span></h1>
                   <p class="maint-desc" style="margin:0; font-size:14.5px; color:#94A3B8; line-height:1.55; max-width:500px;">I'm currently working on exciting improvements, new projects, and a better experience. Thank you for your patience.</p>
                 </div>
                 <div class="maint-status-pill" style="display:inline-flex; align-items:center; gap:8px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); padding:8px 18px; border-radius:9999px; font-size:13px; color:#94A3B8; font-weight:500;">
