@@ -10,6 +10,11 @@
   const loaderStyle = document.createElement('style');
   loaderStyle.id = 'visibility-guard-style';
   loaderStyle.innerHTML = `
+    body.is-maintenance-mode .site-header,
+    body.is-maintenance-mode .mobile-bottom-nav,
+    body.is-maintenance-mode [data-header] {
+      display: none !important;
+    }
     .vis-overlay {
       position: fixed;
       top: 0;
@@ -283,9 +288,12 @@
       overlay.style.opacity = '0';
       setTimeout(() => {
         overlay.remove();
+        document.body.classList.remove('is-maintenance-mode');
         document.body.style.overflow = '';
         document.documentElement.style.overflow = '';
       }, 150);
+    } else {
+      document.body.classList.remove('is-maintenance-mode');
     }
   };
 
@@ -507,6 +515,7 @@
       const isAdmin = await checkAdminBypass();
       if (isAdmin) {
         console.log('[visibility-guard] Authenticated administrator detected. Granting full portfolio bypass.');
+        document.body.classList.remove('is-maintenance-mode');
         removeOverlay();
         const mode = await loadSiteMode(service);
         renderAdminModeBanner(mode);
@@ -519,6 +528,7 @@
       const mode = await loadSiteMode(service);
 
       if (mode === 'maintenance') {
+        document.body.classList.add('is-maintenance-mode');
         const client = (window.AuthService && window.AuthService.supabase) ||
           (window.supabase && window.APP_CONFIG?.SUPABASE_URL && window.APP_CONFIG?.SUPABASE_ANON_KEY ? window.supabase.createClient(window.APP_CONFIG.SUPABASE_URL, window.APP_CONFIG.SUPABASE_ANON_KEY) : null);
         let currentUser = null;
@@ -646,6 +656,7 @@
         `;
 
       } else if (mode === 'private') {
+        document.body.classList.add('is-maintenance-mode');
         const client = (window.AuthService && window.AuthService.supabase) ||
           (window.supabase && window.APP_CONFIG?.SUPABASE_URL && window.APP_CONFIG?.SUPABASE_ANON_KEY ? window.supabase.createClient(window.APP_CONFIG.SUPABASE_URL, window.APP_CONFIG.SUPABASE_ANON_KEY) : null);
         let currentUser = null;
@@ -760,6 +771,7 @@
         `;
       } else {
         // Default to public mode
+        document.body.classList.remove('is-maintenance-mode');
         removeOverlay();
       }
     } catch (err) {

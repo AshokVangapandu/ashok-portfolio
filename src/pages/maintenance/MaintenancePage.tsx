@@ -15,6 +15,13 @@ export const MaintenancePage: React.FC = () => {
   const [showEmailForm, setShowEmailForm] = useState(false);
 
   useEffect(() => {
+    document.body.classList.add('is-maintenance-mode');
+    return () => {
+      document.body.classList.remove('is-maintenance-mode');
+    };
+  }, []);
+
+  useEffect(() => {
     let active = true;
     socialLinksService.getLinks().then((data) => {
       if (!active) return;
@@ -148,6 +155,11 @@ export const MaintenancePage: React.FC = () => {
       {/* Scoped CSS for Hover Effects & Full-Screen 60/40 Layout */}
       <style dangerouslySetInnerHTML={{
         __html: `
+        body.is-maintenance-mode .site-header,
+        body.is-maintenance-mode .mobile-bottom-nav,
+        body.is-maintenance-mode [data-header] {
+          display: none !important;
+        }
         .maint-btn-google-primary {
           transition: all 0.2s ease;
         }

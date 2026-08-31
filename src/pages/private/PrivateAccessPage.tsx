@@ -31,6 +31,13 @@ export const PrivateAccessPage: React.FC = () => {
   const [socialLinks, setSocialLinks] = useState<Record<string, string>>({});
 
   useEffect(() => {
+    document.body.classList.add('is-maintenance-mode');
+    return () => {
+      document.body.classList.remove('is-maintenance-mode');
+    };
+  }, []);
+
+  useEffect(() => {
     let active = true;
     socialLinksService.getLinks().then((data) => {
       if (!active) return;

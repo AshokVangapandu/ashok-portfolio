@@ -56,6 +56,13 @@
   }
 }
 
+/* Hide site-header and mobile bottom nav during maintenance mode */
+body.is-maintenance-mode .site-header,
+body.is-maintenance-mode .mobile-bottom-nav,
+body.is-maintenance-mode [data-header] {
+  display: none !important;
+}
+
 @media (max-width: 768px) {
 
   /* 1. Global Reset & Theme overrides */
