@@ -5,6 +5,7 @@ import { supabase } from '../../services/supabase/client';
 import { privateAccessService } from '../../services/privateAccessService';
 import { accessRequestService } from '../../services/accessRequestService';
 import { socialLinksService } from '../../admin/services/socialLinksService';
+import { getUserAvatarUrl } from '../../utils/avatarUtils';
 
 export const PrivateAccessPage: React.FC = () => {
   const { user, signIn, signOut } = useAuth();
@@ -395,11 +396,13 @@ export const PrivateAccessPage: React.FC = () => {
             >
               {/* User Avatar + Display Name + Email */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', width: '100%' }}>
-                {user.user_metadata?.avatar_url || user.user_metadata?.picture ? (
+                {getUserAvatarUrl(user, user.email) ? (
                   <img
-                    src={user.user_metadata?.avatar_url || user.user_metadata?.picture}
+                    src={getUserAvatarUrl(user, user.email)!}
                     alt={user.user_metadata?.full_name || 'User Avatar'}
-                    style={{ width: '42px', height: '42px', borderRadius: '50%', border: '2px solid #7C3AED' }}
+                    referrerPolicy="no-referrer"
+                    crossOrigin="anonymous"
+                    style={{ width: '42px', height: '42px', borderRadius: '50%', border: '2px solid #7C3AED', objectFit: 'cover' }}
                   />
                 ) : (
                   <div

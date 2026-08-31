@@ -6,6 +6,7 @@ interface AvatarProps {
   size?: number | string;
   className?: string;
   style?: React.CSSProperties;
+  email?: string | null;
 }
 
 export const Avatar: React.FC<AvatarProps> = ({
@@ -13,15 +14,27 @@ export const Avatar: React.FC<AvatarProps> = ({
   displayName,
   size,
   className = '',
-  style = {}
+  style = {},
+  email
 }) => {
+  const getInitialSrc = () => {
+    if (imageUrl) return imageUrl;
+    if (email && typeof email === 'string' && email.includes('@')) {
+      return `https://unavatar.io/${encodeURIComponent(email.trim().toLowerCase())}?fallback=false`;
+    }
+    return null;
+  };
+
+  const [currentSrc, setCurrentSrc] = useState<string | null>(getInitialSrc);
   const [imageState, setImageState] = useState<'loading' | 'loaded' | 'error'>(
-    imageUrl ? 'loading' : 'error'
+    getInitialSrc() ? 'loading' : 'error'
   );
 
   useEffect(() => {
-    setImageState(imageUrl ? 'loading' : 'error');
-  }, [imageUrl]);
+    const src = getInitialSrc();
+    setCurrentSrc(src);
+    setImageState(src ? 'loading' : 'error');
+  }, [imageUrl, email]);
 
   const initials = (() => {
     const trimmed = (displayName || '').trim();
@@ -55,15 +68,30 @@ export const Avatar: React.FC<AvatarProps> = ({
     };
   };
 
+  const handleImageError = () => {
+    const unavatarFallback = email && typeof email === 'string' && email.includes('@')
+      ? `https://unavatar.io/${encodeURIComponent(email.trim().toLowerCase())}?fallback=false`
+      : null;
+
+    if (unavatarFallback && currentSrc !== unavatarFallback) {
+      setCurrentSrc(unavatarFallback);
+      setImageState('loading');
+    } else {
+      setImageState('error');
+    }
+  };
+
   let fallbackClass = 'avatar-fallback-initials';
 
   return (
     <>
-      {imageUrl && imageState !== 'error' && (
+      {currentSrc && imageState !== 'error' && (
         <img
-          src={imageUrl}
+          src={currentSrc}
           alt={displayName}
           className={className}
+          referrerPolicy="no-referrer"
+          crossOrigin="anonymous"
           style={{
             ...sizeStyle,
             ...style,
@@ -71,7 +99,7 @@ export const Avatar: React.FC<AvatarProps> = ({
           }}
           loading="lazy"
           onLoad={() => setImageState('loaded')}
-          onError={() => setImageState('error')}
+          onError={handleImageError}
         />
       )}
       {imageState !== 'loaded' && (

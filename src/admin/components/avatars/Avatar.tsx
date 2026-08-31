@@ -1,5 +1,5 @@
 /* src/admin/components/avatars/Avatar.tsx */
-import React from 'react';
+import React, { useState } from 'react';
 
 interface AvatarProps {
   src?: string | null;
@@ -7,6 +7,7 @@ interface AvatarProps {
   size?: number;
   className?: string;
   style?: React.CSSProperties;
+  email?: string | null;
 }
 
 export const Avatar: React.FC<AvatarProps> = ({
@@ -15,14 +16,19 @@ export const Avatar: React.FC<AvatarProps> = ({
   size = 32,
   className = '',
   style,
+  email
 }) => {
   const getInitials = (fullName: string) => {
-    const parts = fullName.split(' ');
-    if (parts.length >= 2) {
+    const parts = (fullName || '').trim().split(/\s+/);
+    if (parts.length >= 2 && parts[0] && parts[1]) {
       return (parts[0][0] + parts[1][0]).toUpperCase();
     }
-    return fullName.substring(0, Math.min(2, fullName.length)).toUpperCase();
+    return (fullName || '??').substring(0, Math.min(2, fullName.length)).toUpperCase();
   };
+
+  const initialSrc = src || (email && email.includes('@') ? `https://unavatar.io/${encodeURIComponent(email.trim().toLowerCase())}?fallback=false` : null);
+  const [currentSrc, setCurrentSrc] = useState<string | null>(initialSrc);
+  const [hasError, setHasError] = useState<boolean>(!initialSrc);
 
   const containerStyle: React.CSSProperties = {
     width: `${size}px`,
@@ -32,7 +38,7 @@ export const Avatar: React.FC<AvatarProps> = ({
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
-    backgroundColor: 'var(--admin-secondary)',
+    backgroundColor: 'var(--admin-secondary, #7C3AED)',
     color: '#FFFFFF',
     fontWeight: 600,
     fontSize: `${size * 0.4}px`,
@@ -43,22 +49,31 @@ export const Avatar: React.FC<AvatarProps> = ({
     ...style
   };
 
-  if (src) {
+  const handleImgError = () => {
+    const unavatarFallback = email && email.includes('@')
+      ? `https://unavatar.io/${encodeURIComponent(email.trim().toLowerCase())}?fallback=false`
+      : null;
+
+    if (unavatarFallback && currentSrc !== unavatarFallback) {
+      setCurrentSrc(unavatarFallback);
+    } else {
+      setHasError(true);
+    }
+  };
+
+  if (currentSrc && !hasError) {
     return (
       <img
-        src={src}
+        src={currentSrc}
         alt={name}
         className={className}
+        referrerPolicy="no-referrer"
+        crossOrigin="anonymous"
         style={{
           ...containerStyle,
           objectFit: 'cover'
         }}
-        onError={(e) => {
-          // Fallback if image fails to load
-          e.currentTarget.style.display = 'none';
-          const sibling = e.currentTarget.nextElementSibling as HTMLElement;
-          if (sibling) sibling.style.display = 'flex';
-        }}
+        onError={handleImgError}
       />
     );
   }

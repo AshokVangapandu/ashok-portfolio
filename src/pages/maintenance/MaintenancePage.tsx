@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { maintenanceService } from '../../services/maintenanceService';
 import { useAuth } from '../../hooks/useAuth';
 import { socialLinksService } from '../../admin/services/socialLinksService';
+import { getUserAvatarUrl } from '../../utils/avatarUtils';
 
 export const MaintenancePage: React.FC = () => {
   const { user, signIn, signOut } = useAuth();
@@ -764,11 +765,13 @@ export const MaintenancePage: React.FC = () => {
                 >
                   {/* User Info Bar */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px', width: '100%' }}>
-                    {user.user_metadata?.avatar_url || user.user_metadata?.picture ? (
+                    {getUserAvatarUrl(user, user.email) ? (
                       <img
-                        src={user.user_metadata?.avatar_url || user.user_metadata?.picture}
+                        src={getUserAvatarUrl(user, user.email)!}
                         alt={user.user_metadata?.full_name || 'User Avatar'}
-                        style={{ width: '38px', height: '38px', borderRadius: '50%', border: '2px solid #7C3AED', flexShrink: 0 }}
+                        referrerPolicy="no-referrer"
+                        crossOrigin="anonymous"
+                        style={{ width: '38px', height: '38px', borderRadius: '50%', border: '2px solid #7C3AED', flexShrink: 0, objectFit: 'cover' }}
                       />
                     ) : (
                       <div

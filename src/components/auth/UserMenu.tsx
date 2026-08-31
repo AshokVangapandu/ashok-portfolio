@@ -3,6 +3,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { LoginButton } from './LoginButton';
 import { LogoutButton } from './LogoutButton';
 import { Avatar } from '../Avatar';
+import { getUserAvatarUrl } from '../../utils/avatarUtils';
 
 /**
  * User Profile dropdown component.
@@ -59,9 +60,9 @@ export const UserMenu: React.FC = () => {
     return <LoginButton />;
   }
 
-  const nameVal = user.user_metadata?.full_name || user.email?.split('@')[0] || 'Collaborator';
+  const nameVal = user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || 'Collaborator';
   const emailVal = user.email || '';
-  const avatarUrl = user.user_metadata?.avatar_url || user.user_metadata?.picture;
+  const avatarUrl = getUserAvatarUrl(user, emailVal);
 
   return (
     <div ref={dropdownRef} style={{ position: 'relative', display: 'inline-block' }}>
@@ -89,7 +90,7 @@ export const UserMenu: React.FC = () => {
           e.currentTarget.style.background = 'rgba(255, 255, 255, 0.03)';
         }}
       >
-        <Avatar imageUrl={avatarUrl} displayName={nameVal} className="navbar-user-avatar" size={32} style={{ objectFit: 'cover' }} />
+        <Avatar imageUrl={avatarUrl} displayName={nameVal} email={emailVal} className="navbar-user-avatar" size={32} style={{ objectFit: 'cover' }} />
         <span style={{ fontSize: '13px', fontWeight: 600, maxWidth: '100px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {nameVal}
         </span>
@@ -131,7 +132,7 @@ export const UserMenu: React.FC = () => {
         >
           {/* User Details (Avatar, Name, Email) */}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', borderBottom: '1px solid rgba(255, 255, 255, 0.06)', paddingBottom: '12px', textAlign: 'center' }}>
-            <Avatar imageUrl={avatarUrl} displayName={nameVal} className="dropdown-user-header-avatar" size={48} style={{ objectFit: 'cover', border: '1.5px solid rgba(143, 133, 255, 0.3)' }} />
+            <Avatar imageUrl={avatarUrl} displayName={nameVal} email={emailVal} className="dropdown-user-header-avatar" size={48} style={{ objectFit: 'cover', border: '1.5px solid rgba(143, 133, 255, 0.3)' }} />
             <div style={{ marginTop: '4px' }}>
               <h4 style={{ margin: '0 0 3px 0', fontSize: '13.5px', fontWeight: 700, color: '#ffffff' }}>
                 {nameVal}

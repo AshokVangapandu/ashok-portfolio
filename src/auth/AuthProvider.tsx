@@ -4,6 +4,7 @@ import { AuthContextType } from './types';
 import { authService } from './authService';
 import { parseAuthError } from './errors';
 import { supabase } from '../services/supabase/client';
+import { getUserAvatarUrl } from '../utils/avatarUtils';
 
 // Initialize context
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -34,7 +35,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.log('[Auth Verification] User authenticated:', {
         email: user.email,
         name: user.user_metadata?.full_name || user.user_metadata?.name || 'Google User',
-        avatar: user.user_metadata?.avatar_url || user.user_metadata?.picture || null,
+        avatar: getUserAvatarUrl(user, user.email),
         id: user.id
       });
     } else if (!user) {
@@ -126,7 +127,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
         if (isUserAdmin && (event === 'SIGNED_IN' || event === 'INITIAL_SESSION')) {
           const name = currentUser.user_metadata?.full_name || currentUser.user_metadata?.name || 'Google User';
-          const avatar = currentUser.user_metadata?.avatar_url || currentUser.user_metadata?.picture || null;
+          const avatar = getUserAvatarUrl(currentUser, cleanEmail);
           
           try {
             const { data: adminRecord, error: fetchErr } = await (supabase as any)

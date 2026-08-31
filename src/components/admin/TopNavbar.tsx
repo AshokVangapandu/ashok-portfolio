@@ -2,6 +2,7 @@ import React from 'react';
 import { useAuth } from '../../hooks/useAuth';
 
 import { Avatar } from '../Avatar';
+import { getUserAvatarUrl } from '../../utils/avatarUtils';
 
 interface TopNavbarProps {
   onToggleSidebar: () => void;
@@ -10,7 +11,7 @@ interface TopNavbarProps {
 export const TopNavbar: React.FC<TopNavbarProps> = ({ onToggleSidebar }) => {
   const { user } = useAuth();
   
-  const avatarUrl = user?.user_metadata?.avatar_url || user?.user_metadata?.picture || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=100&q=80';
+  const avatarUrl = getUserAvatarUrl(user, user?.email) || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=100&q=80';
   const userName = user?.user_metadata?.full_name || user?.user_metadata?.name || 'Administrator';
 
   return (
@@ -65,6 +66,7 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({ onToggleSidebar }) => {
         <Avatar
           imageUrl={avatarUrl}
           displayName={userName}
+          email={user?.email}
           className="navbar-user-avatar"
           size={32}
           style={{ objectFit: 'cover' }}

@@ -4,6 +4,7 @@ import { LoginButton } from './auth/LoginButton';
 import { UserMenu } from './auth/UserMenu';
 import { LogoutButton } from './auth/LogoutButton';
 import { Avatar } from './Avatar';
+import { getUserAvatarUrl } from '../utils/avatarUtils';
 
 /**
  * Responsive Navigation Header Component.
@@ -29,8 +30,8 @@ export const Navbar: React.FC = () => {
     setIsUserMenuOpen(false);
   };
 
-  const userName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User';
-  const userAvatar = user?.user_metadata?.avatar_url || user?.user_metadata?.picture;
+  const userName = user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email?.split('@')[0] || 'User';
+  const userAvatar = getUserAvatarUrl(user, user?.email);
   const roleSubtitle = isAuthenticated && user
     ? (isAdmin ? 'Administrator' : 'Collaborator')
     : 'Navigation';
@@ -83,6 +84,7 @@ export const Navbar: React.FC = () => {
                     <Avatar 
                       imageUrl={userAvatar} 
                       displayName={userName} 
+                      email={user?.email}
                       size={32}
                       style={{ borderRadius: '8px', objectFit: 'cover' }}
                     />
