@@ -1788,9 +1788,21 @@ const loadDynamicResume = async () => {
 
   if (primarySpan) primarySpan.textContent = 'Loading...';
 
+  // Wait up to 5 seconds for window.ResumeService to be available (handles deferred script loading in production)
+  let resumeService = window.ResumeService;
+  if (!resumeService) {
+    for (let i = 0; i < 50; i++) {
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      if (window.ResumeService) {
+        resumeService = window.ResumeService;
+        break;
+      }
+    }
+  }
+
   try {
-    if (window.ResumeService) {
-      const { data: activeResume, error } = await window.ResumeService.getActiveResume();
+    if (resumeService) {
+      const { data: activeResume, error } = await resumeService.getActiveResume();
       
       if (error || !activeResume || !activeResume.public_url) {
         throw new Error(error ? error.message : 'No active resume found');
@@ -1817,7 +1829,8 @@ const loadDynamicResume = async () => {
         let downloadRecord = null;
         try {
           // Perform a fresh dynamic query at the moment of the click
-          const { data: latestResume, error: fetchErr } = await window.ResumeService.getActiveResume();
+          const svc = window.ResumeService || resumeService;
+          const { data: latestResume, error: fetchErr } = await svc.getActiveResume();
           if (fetchErr || !latestResume || !latestResume.public_url) {
             throw new Error(fetchErr ? fetchErr.message : 'No active resume found dynamically');
           }
@@ -1844,7 +1857,7 @@ const loadDynamicResume = async () => {
             download_status: 'completed'
           };
 
-          const { data, error: logError } = await window.ResumeService.logResumeDownload(downloadPayload);
+          const { data, error: logError } = await svc.logResumeDownload(downloadPayload);
           if (logError) throw logError;
           downloadRecord = data;
 
@@ -1869,7 +1882,8 @@ const loadDynamicResume = async () => {
             // Update status to failed if record was logged
             if (downloadRecord && downloadRecord.id) {
               try {
-                await window.ResumeService.updateDownloadStatus(downloadRecord.id, 'failed');
+                const svc = window.ResumeService || resumeService;
+                await svc.updateDownloadStatus(downloadRecord.id, 'failed');
               } catch (updateErr) {
                 console.error('Failed to update download status:', updateErr);
               }
@@ -1922,6 +1936,10 @@ const loadDynamicResume = async () => {
 };
 
 loadDynamicResume();
+if (typeof window !== 'undefined') {
+  window.addEventListener('DOMContentLoaded', loadDynamicResume);
+  window.addEventListener('load', loadDynamicResume);
+}
 
 const initSmoothScrolling = () => {
   if (typeof Lenis === "undefined") return;

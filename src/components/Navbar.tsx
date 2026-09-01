@@ -182,12 +182,12 @@ export const Navbar: React.FC = () => {
                 <svg className="menu-row-chevron" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.2"><polyline points="9 18 15 12 9 6"/></svg>
               </a>
 
-              {/* Row 2: Custom Tooling */}
+              {/* Row 2: Tooling */}
               <a href="#widget-lab" className="mobile-menu-row" onClick={closeMenu}>
                 <div className="menu-row-icon-box">
                   <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg>
                 </div>
-                <span className="menu-row-label">Custom Tooling</span>
+                <span className="menu-row-label">Tooling</span>
                 <svg className="menu-row-chevron" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.2"><polyline points="9 18 15 12 9 6"/></svg>
               </a>
 
@@ -197,15 +197,15 @@ export const Navbar: React.FC = () => {
                   <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
                 </div>
                 <span className="menu-row-label">Certifications</span>
-                <svg className="menu-row-chevron" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.2"><polyline points="9 18 15 12 9 6"/></svg>
+                <svg className="menu-row-chevron" viewBox="0 0 24 24" width="14" height="14" fill="none" strokeWidth="2.2"><polyline points="9 18 15 12 9 6"/></svg>
               </a>
 
-              {/* Row 4: Behind the Build */}
+              {/* Row 4: Process */}
               <a href="#behind-build" className="mobile-menu-row" onClick={closeMenu}>
                 <div className="menu-row-icon-box">
                   <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
                 </div>
-                <span className="menu-row-label">Behind the Build</span>
+                <span className="menu-row-label">Process</span>
                 <svg className="menu-row-chevron" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.2"><polyline points="9 18 15 12 9 6"/></svg>
               </a>
 
