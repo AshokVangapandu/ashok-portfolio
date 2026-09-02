@@ -277,13 +277,18 @@ body.is-maintenance-mode [data-header] {
     left: auto !important;
     width: min(76vw, 340px) !important;
     height: 100vh !important;
+    height: 100dvh !important;
     max-height: 100vh !important;
+    max-height: 100dvh !important;
     background: #0B081B !important;
     border-left: 1px solid rgba(124, 58, 237, 0.25) !important;
     box-shadow: -15px 0 50px rgba(0, 0, 0, 0.85) !important;
     z-index: 100005 !important;
     display: flex !important;
     flex-direction: column !important;
+    justify-content: flex-start !important;
+    align-items: stretch !important;
+    margin: 0 !important;
     padding: 16px 14px 36px !important;
     gap: 10px !important;
     overflow-y: auto !important;
@@ -315,9 +320,11 @@ body.is-maintenance-mode [data-header] {
     align-items: center !important;
     justify-content: space-between !important;
     padding: 6px 4px 12px !important;
+    margin-top: 0 !important;
     margin-bottom: 4px !important;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
-    width: 100%;
+    width: 100% !important;
+    box-sizing: border-box !important;
   }
 
   .drawer-brand {

@@ -36,7 +36,7 @@ Deno.serve(async (req) => {
 
     const { full_name, email, subject, message, created_at } = record;
 
-    const toEmail = Deno.env.get('NOTIFICATION_EMAIL_TO') || Deno.env.get('ADMIN_NOTIFICATION_EMAIL') || 'contact@ashokvangapandu.com';
+    const toEmail = Deno.env.get('NOTIFICATION_EMAIL_TO') || Deno.env.get('ADMIN_NOTIFICATION_EMAIL') || 'ashokvangapandu45@gmail.com';
     const submittedTime = created_at ? new Date(created_at).toLocaleString('en-US', { timeZone: 'UTC' }) + ' UTC' : new Date().toLocaleString();
 
     const htmlContent = `

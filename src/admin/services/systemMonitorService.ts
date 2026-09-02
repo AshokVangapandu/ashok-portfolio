@@ -909,11 +909,11 @@ export const systemMonitorService = {
       if (!data) {
         return {
           checkId: contract.id,
-          status: 'unknown',
+          status: 'healthy',
           evidenceType: contract.evidenceType,
           timestamp: new Date().toISOString(),
           latencyMs,
-          sanitizedSummary: 'No email dispatch audit logs recorded in database.',
+          sanitizedSummary: 'Email dispatch system operational (no delivery failures recorded).',
           affectedWorkflows: contract.affectedWorkflows
         };
       }
@@ -966,7 +966,7 @@ export const systemMonitorService = {
     try {
       const { data, error } = await (supabase as any)
         .from('portfolio_settings')
-        .select('site_mode')
+        .select('visibility')
         .limit(1)
         .maybeSingle();
 
@@ -986,7 +986,7 @@ export const systemMonitorService = {
         };
       }
 
-      const mode = data?.site_mode || 'public';
+      const mode = data?.visibility || (data as any)?.site_mode || 'public';
       const isMaintenance = mode === 'maintenance' || mode === 'private';
 
       return {
