@@ -251,7 +251,7 @@ contactForm?.addEventListener("submit", async (event) => {
     const subjectVal = contactForm.querySelector("#contact-subject").value.trim();
     const messageVal = contactForm.querySelector("#contact-message").value.trim();
 
-    const { error } = await supabaseClient
+    const { data: insertedData, error } = await supabaseClient
       .from("contact_messages")
       .insert([
         {
@@ -262,10 +262,35 @@ contactForm?.addEventListener("submit", async (event) => {
           submitted_from: "Portfolio Website",
           status: "New"
         }
-      ]);
+      ])
+      .select()
+      .maybeSingle();
 
     if (error) {
       throw error;
+    }
+
+    // Fail-safe direct Edge Function invocation to ensure email delivery
+    try {
+      const edgeUrl = `${supabaseUrl}/functions/v1/send-contact-email`;
+      await fetch(edgeUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Webhook-Secret": "db_webhook_secret_99882244"
+        },
+        body: JSON.stringify({
+          record: insertedData || {
+            full_name: nameVal,
+            email: emailVal,
+            subject: subjectVal,
+            message: messageVal,
+            created_at: new Date().toISOString()
+          }
+        })
+      });
+    } catch (edgeErr) {
+      console.warn('[ContactForm] Direct edge function dispatch fallback warning:', edgeErr);
     }
 
     // Telemetry: Upsert visitor profile and save contact submit details
