@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import ReactDOM from 'react-dom/client';
 import { ToolsProductsPage } from './pages/toolsproductspage';
 import './admin.css';
+import { PortfolioBackground } from './components/PortfolioBackground';
 
 const MainLayout: React.FC = () => {
   const [navActive, setNavActive] = useState(false);
@@ -19,18 +20,7 @@ const MainLayout: React.FC = () => {
 
   return (
     <>
-      {/* Background Ribbons */}
-      <div className="site-bg" aria-hidden="true">
-        <div className="light-ribbon ribbon-one"></div>
-        <div className="light-ribbon ribbon-two"></div>
-        <div className="light-ribbon ribbon-three"></div>
-        <div className="aurora"></div>
-        <div className="particle-field">
-          <span></span><span></span><span></span><span></span><span></span>
-          <span></span><span></span><span></span><span></span><span></span>
-        </div>
-        <div className="noise"></div>
-      </div>
+      <PortfolioBackground />
 
       {/* Main Content Showcase */}
       <main>

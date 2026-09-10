@@ -401,7 +401,6 @@ export const PrivateAccessPage: React.FC = () => {
                     src={getUserAvatarUrl(user, user.email)!}
                     alt={user.user_metadata?.full_name || 'User Avatar'}
                     referrerPolicy="no-referrer"
-                    crossOrigin="anonymous"
                     style={{ width: '42px', height: '42px', borderRadius: '50%', border: '2px solid #7C3AED', objectFit: 'cover' }}
                   />
                 ) : (

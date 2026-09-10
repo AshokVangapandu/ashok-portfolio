@@ -39,6 +39,7 @@ export default defineConfig({
         projects: resolve(__dirname, 'pages/projects/index.html'),
         widgets: resolve(__dirname, 'widgets/index.html'),
         certifications: resolve(__dirname, 'certifications/index.html'),
+        resume: resolve(__dirname, 'pages/resume/resume.html'),
       },
     },
   },

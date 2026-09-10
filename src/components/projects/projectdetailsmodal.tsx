@@ -275,8 +275,7 @@ export const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
       style={{
         position: 'fixed',
         inset: 0,
-        backgroundColor: 'rgba(3, 7, 18, 0.95)',
-        backdropFilter: 'blur(16px)',
+        backgroundColor: 'rgba(3, 7, 18, 0.35)',
         zIndex: 9999,
         display: 'flex',
         justifyContent: 'center',
@@ -291,6 +290,7 @@ export const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
       {/* Scrollable Modal Container */}
       <div
         ref={scrollRef}
+        data-particle-scroll
         style={{
           width: '100%',
           maxWidth: '1100px',
@@ -1569,4 +1569,3 @@ export const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
 };
 
 export default ProjectDetailsModal;
-

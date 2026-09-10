@@ -91,7 +91,6 @@ export const Avatar: React.FC<AvatarProps> = ({
           alt={displayName}
           className={className}
           referrerPolicy="no-referrer"
-          crossOrigin="anonymous"
           style={{
             ...sizeStyle,
             ...style,

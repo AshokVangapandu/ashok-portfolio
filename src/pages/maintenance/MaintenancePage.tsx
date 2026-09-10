@@ -770,7 +770,6 @@ export const MaintenancePage: React.FC = () => {
                         src={getUserAvatarUrl(user, user.email)!}
                         alt={user.user_metadata?.full_name || 'User Avatar'}
                         referrerPolicy="no-referrer"
-                        crossOrigin="anonymous"
                         style={{ width: '38px', height: '38px', borderRadius: '50%', border: '2px solid #7C3AED', flexShrink: 0, objectFit: 'cover' }}
                       />
                     ) : (

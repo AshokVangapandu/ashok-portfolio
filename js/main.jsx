@@ -1241,7 +1241,9 @@ const renderTestimonials = (testimonials = []) => {
 
   track.innerHTML = testimonials.map((t, index) => {
     const displayName = t.full_name || t.google_name || "Collaborator";
-    const avatarSrc = t.avatar_url || t.google_avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80";
+    const rawAvatar = t.avatar_url || t.google_avatar || t.picture || "";
+    const email = t.email || t.google_email || "";
+    const avatarSrc = rawAvatar || (email ? `https://unavatar.io/${encodeURIComponent(email.trim().toLowerCase())}?fallback=false` : "");
     const roleStr = t.designation ? (t.company ? `${t.designation} at ${t.company}` : t.designation) : (t.company || "Collaborator");
     
     let normalizedLinkedinUrl = t.linkedin_url ? t.linkedin_url.trim() : '';
@@ -1258,7 +1260,7 @@ const renderTestimonials = (testimonials = []) => {
     ` : '';
 
     const starsHtml = '★'.repeat(t.rating || 5) + '☆'.repeat(5 - (t.rating || 5));
-    const avatarHtml = `<div class="avatar-mount-point" data-image-url="${avatarSrc || ''}" data-display-name="${displayName}" data-class-name="author-avatar"></div>`;
+    const avatarHtml = `<div class="avatar-mount-point" data-image-url="${avatarSrc || ''}" data-display-name="${displayName}" data-email="${email}" data-class-name="author-avatar"></div>`;
 
     const truncated = truncateTestimonial(t.testimonial, 40);
 
@@ -1316,17 +1318,24 @@ const renderTestimonials = (testimonials = []) => {
     });
   };
 
-  initWallOfLoveCarousel();
-  setupReadMoreListeners();
-
   // Mount React Avatar components on all card placeholders
-  track.querySelectorAll(".avatar-mount-point").forEach(el => {
-    const imageUrl = el.getAttribute("data-image-url");
-    const nameVal = el.getAttribute("data-display-name");
-    const className = el.getAttribute("data-class-name");
-    const root = ReactDOM.createRoot(el);
-    root.render(<Avatar imageUrl={imageUrl} displayName={nameVal} className={className} />);
-  });
+  const mountAvatars = () => {
+    track.querySelectorAll(".avatar-mount-point").forEach(el => {
+      if (el._reactMounted) return;
+      el._reactMounted = true;
+      const imageUrl = el.getAttribute("data-image-url");
+      const nameVal = el.getAttribute("data-display-name");
+      const emailVal = el.getAttribute("data-email");
+      const className = el.getAttribute("data-class-name");
+      const root = ReactDOM.createRoot(el);
+      root.render(<Avatar imageUrl={imageUrl} displayName={nameVal} email={emailVal} className={className} />);
+    });
+  };
+
+  mountAvatars();
+  initWallOfLoveCarousel();
+  mountAvatars();
+  setupReadMoreListeners();
 };
 
 // Dynamic testimonial load helper
@@ -1384,11 +1393,13 @@ const loadDynamicTestimonials = async () => {
       if (collabsListEl) {
         collabsListEl.innerHTML = uniqueCollabs.slice(0, 4).map(c => {
           const displayName = c.full_name || c.google_name || "Collaborator";
-          const avatarSrc = c.avatar_url || c.google_avatar || "";
-          if (avatarSrc && (avatarSrc.includes('unsplash') || avatarSrc.includes('google') || avatarSrc.includes('http') || avatarSrc.includes('photo-'))) {
-            return `<img src="${avatarSrc}" alt="${displayName}" title="${displayName}" />`;
+          const rawAvatar = c.avatar_url || c.google_avatar || c.picture || "";
+          const email = c.email || c.google_email || "";
+          const avatarSrc = rawAvatar || (email ? `https://unavatar.io/${encodeURIComponent(email.trim().toLowerCase())}?fallback=false` : "");
+          const initials = displayName.split(/\s+/).map(n => n[0]).slice(0, 2).join('').toUpperCase();
+          if (avatarSrc) {
+            return `<img src="${avatarSrc}" alt="${displayName}" title="${displayName}" referrerpolicy="no-referrer" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='grid';" /><div class="collaborator-avatar-fallback-initials" style="display:none;" title="${displayName}">${initials}</div>`;
           } else {
-            const initials = displayName.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
             return `<div class="collaborator-avatar-fallback-initials" title="${displayName}">${initials}</div>`;
           }
         }).join("");
@@ -1465,11 +1476,13 @@ const loadDynamicTestimonials = async () => {
     if (collabsListEl) {
       collabsListEl.innerHTML = uniqueCollabs.slice(0, 4).map(c => {
         const displayName = c.full_name || c.google_name || "Collaborator";
-        const avatarSrc = c.avatar_url || c.google_avatar || "";
-        if (avatarSrc && (avatarSrc.includes('unsplash') || avatarSrc.includes('google') || avatarSrc.includes('http') || avatarSrc.includes('photo-'))) {
-          return `<img src="${avatarSrc}" alt="${displayName}" title="${displayName}" />`;
+        const rawAvatar = c.avatar_url || c.google_avatar || c.picture || "";
+        const email = c.email || c.google_email || "";
+        const avatarSrc = rawAvatar || (email ? `https://unavatar.io/${encodeURIComponent(email.trim().toLowerCase())}?fallback=false` : "");
+        const initials = displayName.split(/\s+/).map(n => n[0]).slice(0, 2).join('').toUpperCase();
+        if (avatarSrc) {
+          return `<img src="${avatarSrc}" alt="${displayName}" title="${displayName}" referrerpolicy="no-referrer" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='grid';" /><div class="collaborator-avatar-fallback-initials" style="display:none;" title="${displayName}">${initials}</div>`;
         } else {
-          const initials = displayName.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
           return `<div class="collaborator-avatar-fallback-initials" title="${displayName}">${initials}</div>`;
         }
       }).join("");
@@ -2089,8 +2102,13 @@ const setupNavbarAuth = async () => {
   let dropdownOpen = false;
 
   const renderDropdown = async (user) => {
-    const avatar = user.user_metadata?.avatar_url || "";
-    const name = user.user_metadata?.full_name || user.email.split("@")[0];
+    const avatar = user.user_metadata?.avatar_url ||
+                   user.user_metadata?.picture ||
+                   user.user_metadata?.avatar ||
+                   user.user_metadata?.photoURL ||
+                   (Array.isArray(user.identities) && (user.identities[0]?.identity_data?.avatar_url || user.identities[0]?.identity_data?.picture || user.identities[0]?.identity_data?.avatar)) ||
+                   "";
+    const name = user.user_metadata?.full_name || user.user_metadata?.name || user.email.split("@")[0];
     const email = (user.email || "").trim().toLowerCase();
 
     // Retrieve and verify administrator privileges with caching
@@ -2124,8 +2142,8 @@ const setupNavbarAuth = async () => {
       }
     }
 
-    const avatarHtml = `<div class="avatar-mount-point" data-image-url="${avatar || ''}" data-display-name="${name}" data-class-name="navbar-user-avatar"></div>`;
-    const dropdownAvatarHtml = `<div class="avatar-mount-point" data-image-url="${avatar || ''}" data-display-name="${name}" data-class-name="dropdown-user-header-avatar"></div>`;
+    const avatarHtml = `<div class="avatar-mount-point" data-image-url="${avatar || ''}" data-display-name="${name}" data-email="${email}" data-class-name="navbar-user-avatar"></div>`;
+    const dropdownAvatarHtml = `<div class="avatar-mount-point" data-image-url="${avatar || ''}" data-display-name="${name}" data-email="${email}" data-class-name="dropdown-user-header-avatar"></div>`;
 
     container.innerHTML = `
       <button type="button" class="navbar-user-avatar-btn" id="navbar-user-btn" aria-label="Open user menu" aria-expanded="false">
@@ -2158,9 +2176,10 @@ const setupNavbarAuth = async () => {
     container.querySelectorAll(".avatar-mount-point").forEach(el => {
       const imageUrl = el.getAttribute("data-image-url");
       const nameVal = el.getAttribute("data-display-name");
+      const emailVal = el.getAttribute("data-email");
       const className = el.getAttribute("data-class-name");
       const root = ReactDOM.createRoot(el);
-      root.render(<Avatar imageUrl={imageUrl} displayName={nameVal} className={className} />);
+      root.render(<Avatar imageUrl={imageUrl} displayName={nameVal} email={emailVal} className={className} />);
     });
 
     const userBtn = container.querySelector("#navbar-user-btn");
@@ -2412,7 +2431,9 @@ const updateExpandedCard = (index, animate = true) => {
 
     const starsHtml = '★'.repeat(testimonial.rating || 5) + '☆'.repeat(5 - (testimonial.rating || 5));
     const displayName = testimonial.full_name || testimonial.google_name || "Collaborator";
-    const avatarSrc = testimonial.avatar_url || testimonial.google_avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80";
+    const rawAvatar = testimonial.avatar_url || testimonial.google_avatar || testimonial.picture || "";
+    const email = testimonial.email || testimonial.google_email || "";
+    const avatarSrc = rawAvatar || (email ? `https://unavatar.io/${encodeURIComponent(email.trim().toLowerCase())}?fallback=false` : "");
     const roleStr = testimonial.designation ? (testimonial.company ? `${testimonial.designation} &bull; ${testimonial.company}` : testimonial.designation) : (testimonial.company || "Collaborator");
 
     const cardBody = document.querySelector(".reading-card-body");
@@ -2437,7 +2458,7 @@ const updateExpandedCard = (index, animate = true) => {
       if (avatarSlot) {
         const root = avatarSlot._reactRoot || ReactDOM.createRoot(avatarSlot);
         avatarSlot._reactRoot = root;
-        root.render(<Avatar imageUrl={avatarSrc} displayName={displayName} className="popover-avatar" size={48} style={{ borderRadius: "50%", objectFit: "cover" }} />);
+        root.render(<Avatar imageUrl={avatarSrc} displayName={displayName} email={email} className="popover-avatar" size={48} style={{ borderRadius: "50%", objectFit: "cover" }} />);
       }
       if (counterEl) counterEl.textContent = `${index + 1} of ${dynamicTestimonials.length}`;
     };
@@ -2670,16 +2691,21 @@ const updateDrawerHeaderAvatar = (sessionUser) => {
     const brandTitleEl = document.querySelector('.drawer-brand-text .brand-title');
     const brandSubEl = document.querySelector('.drawer-brand-text .brand-subtitle');
 
-    const avatarUrl = sessionUser.user_metadata?.avatar_url || sessionUser.user_metadata?.picture;
-    const fullName = sessionUser.user_metadata?.full_name || sessionUser.email?.split('@')[0] || 'Collaborator';
+    const avatarUrl = sessionUser.user_metadata?.avatar_url ||
+                      sessionUser.user_metadata?.picture ||
+                      sessionUser.user_metadata?.avatar ||
+                      sessionUser.user_metadata?.photoURL ||
+                      (Array.isArray(sessionUser.identities) && (sessionUser.identities[0]?.identity_data?.avatar_url || sessionUser.identities[0]?.identity_data?.picture || sessionUser.identities[0]?.identity_data?.avatar)) ||
+                      (sessionUser.email ? `https://unavatar.io/${encodeURIComponent(sessionUser.email.trim().toLowerCase())}?fallback=false` : "") || "";
+    const fullName = sessionUser.user_metadata?.full_name || sessionUser.user_metadata?.name || sessionUser.email?.split('@')[0] || 'Collaborator';
     const isAdmin = sessionUser.email?.toLowerCase().includes('ashok') || sessionUser.user_metadata?.role === 'admin';
     const roleText = isAdmin ? 'Administrator' : 'Collaborator';
 
     if (brandIconEl) {
+      const initials = fullName.split(/\s+/).map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'AV';
       if (avatarUrl) {
-        brandIconEl.innerHTML = `<img src="${avatarUrl}" alt="${fullName}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;" />`;
+        brandIconEl.innerHTML = `<img src="${avatarUrl}" alt="${fullName}" referrerpolicy="no-referrer" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;" /><span style="display:none;width:100%;height:100%;align-items:center;justify-content:center;">${initials}</span>`;
       } else {
-        const initials = fullName.split(/\s+/).map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'AV';
         brandIconEl.textContent = initials;
       }
     }
