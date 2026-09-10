@@ -361,15 +361,20 @@ class ShareExperienceModal extends HTMLElement {
   }
 
   handleUserChange(user) {
-    if (user) {
-      console.log("[Auth] User loaded:", user.email);
+      const avatarUrl = user.user_metadata?.avatar_url ||
+                        user.user_metadata?.picture ||
+                        user.user_metadata?.avatar ||
+                        user.user_metadata?.photoURL ||
+                        (Array.isArray(user.identities) && (user.identities[0]?.identity_data?.avatar_url || user.identities[0]?.identity_data?.picture || user.identities[0]?.identity_data?.avatar)) ||
+                        (user.email ? `https://unavatar.io/${encodeURIComponent(user.email.trim().toLowerCase())}?fallback=false` : "") || "";
+
       this.userState = {
         isAuthenticated: true,
         userId: user.id,
         provider: "google",
-        name: user.user_metadata?.full_name || user.email.split('@')[0],
+        name: user.user_metadata?.full_name || user.user_metadata?.name || user.email.split('@')[0],
         email: user.email,
-        avatar: user.user_metadata?.avatar_url || ""
+        avatar: avatarUrl
       };
     } else {
       console.log("[Auth] Clear auth states (User signed out or no session)");
@@ -882,10 +887,10 @@ class ShareExperienceModal extends HTMLElement {
 
     if (avatarSlot) {
       if (isAuthed) {
-        // Construct the interactive avatar menu button and dropdown popover
+        const initials = (this.userState.name || 'User').split(/\s+/).map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'U';
         const avatarImageHtml = this.userState.avatar
-          ? `<img src="${this.userState.avatar}" alt="${this.userState.name}" class="google-avatar-header" />`
-          : `<div class="google-avatar-header avatar-fallback">${this.userState.name.substring(0, 2).toUpperCase()}</div>`;
+          ? `<img src="${this.userState.avatar}" alt="${this.userState.name}" class="google-avatar-header" referrerpolicy="no-referrer" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='grid';" /><div class="google-avatar-header avatar-fallback" style="display:none;">${initials}</div>`
+          : `<div class="google-avatar-header avatar-fallback">${initials}</div>`;
 
         avatarSlot.innerHTML = `
           <button type="button" class="avatar-menu-btn" id="avatar-menu-btn" aria-haspopup="true" aria-expanded="false" aria-label="Account menu">
@@ -895,8 +900,8 @@ class ShareExperienceModal extends HTMLElement {
           <div class="account-popover" id="account-popover" aria-hidden="true">
             <div class="popover-user-info">
               ${this.userState.avatar 
-                ? `<img src="${this.userState.avatar}" alt="${this.userState.name}" class="popover-avatar" />`
-                : `<div class="popover-avatar avatar-fallback">${this.userState.name.substring(0, 2).toUpperCase()}</div>`}
+                ? `<img src="${this.userState.avatar}" alt="${this.userState.name}" class="popover-avatar" referrerpolicy="no-referrer" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='grid';" /><div class="popover-avatar avatar-fallback" style="display:none;">${initials}</div>`
+                : `<div class="popover-avatar avatar-fallback">${initials}</div>`}
               <div class="popover-user-details">
                 <span class="popover-name">${this.userState.name}</span>
                 <span class="popover-email">${this.userState.email}</span>
