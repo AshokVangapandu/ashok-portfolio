@@ -201,6 +201,7 @@ class ModalOverlay extends HTMLElement {
 
   open() {
     document.body.classList.add("modal-open");
+    document.documentElement.classList.add("modal-open");
     this.classList.add("is-visible");
 
     // Stop Lenis smooth scrolling to lock page scroll
@@ -221,6 +222,7 @@ class ModalOverlay extends HTMLElement {
     modal?.animateOut(() => {
       this.classList.remove("is-visible");
       document.body.classList.remove("modal-open");
+      document.documentElement.classList.remove("modal-open");
 
       // Resume Lenis smooth scrolling
       if (window.lenis) {
@@ -616,14 +618,15 @@ class ShareExperienceModal extends HTMLElement {
           opacity: 0;
           overflow: hidden;
           pointer-events: none;
-          transform: translateY(20px);
-          transition: max-height 0.8s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.6s ease-out, transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+          transform: translateY(16px);
+          transition: max-height 0.6s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.5s ease-out, transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
         }
         .state-authenticated .form-wrapper-authenticated {
-          max-height: 1200px;
-          opacity: 1;
-          pointer-events: auto;
-          transform: translateY(0);
+          max-height: none !important;
+          opacity: 1 !important;
+          pointer-events: auto !important;
+          transform: translateY(0) !important;
+          overflow: visible !important;
         }
 
         /* Avatar Menu Button and Popover Dropdown */

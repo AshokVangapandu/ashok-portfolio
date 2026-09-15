@@ -582,7 +582,7 @@
 }
 
 /* Responsive Breakpoints */
-@media (max-width: 1020px) {
+@media (max-width: 575px) {
   .contact-redesign {
     grid-template-columns: 1fr;
   }

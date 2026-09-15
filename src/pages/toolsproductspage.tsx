@@ -405,60 +405,71 @@ export const ToolsProductsPage: React.FC = () => {
             })}
           </div>
 
-          {/* Mobile Featured Product Card (Phase 2 - <= 768px) */}
+          {/* Mobile/Tablet Featured Product Card (<= 768px / Tablet) */}
           {activeProduct && (
             <div className="tools-mobile-featured-card">
-              {/* Header badges */}
-              <div className="tools-mobile-featured-header-badges">
-                <span className="tools-mobile-featured-badge">
-                  ⭐ FEATURED PRODUCT
-                </span>
-                <span className="tools-mobile-featured-version">
-                  v{activeProduct.version}
-                </span>
-              </div>
-
-              {/* Product image */}
-              <div className="tools-mobile-featured-img-box">
-                {activeProduct.coverImage && activeProduct.coverImage.toLowerCase().split('?')[0].endsWith('.pdf') ? (
-                  <div className="tools-mobile-pdf-placeholder">
-                    <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="#EF4444" strokeWidth="2">
-                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                      <polyline points="14 2 14 8 20 8" />
-                    </svg>
-                  </div>
-                ) : (
-                  <img
-                    src={activeProduct.coverImage || `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23090D1A"/><circle cx="50" cy="50" r="15" fill="%231E293B" opacity="0.6"/><path d="M42 45 L50 37 L58 45" stroke="%237C5CFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`}
-                    alt={activeProduct.title}
-                    onError={(e) => {
-                      e.currentTarget.src = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23090D1A"/><circle cx="50" cy="50" r="15" fill="%231E293B" opacity="0.6"/><path d="M42 45 L50 37 L58 45" stroke="%237C5CFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`;
-                    }}
-                  />
-                )}
-              </div>
-
-              {/* Title & Metadata */}
-              <div className="tools-mobile-featured-info">
-                <h3 className="tools-mobile-featured-title">{activeProduct.title}</h3>
-                <div className="tools-mobile-featured-submeta">
-                  <span className="tools-mobile-featured-type">{activeProduct.type}</span>
-                  <span className="tools-mobile-dot-sep">•</span>
-                  <span className="tools-mobile-featured-rating">
-                    ★ {activeProduct.rating || 4.9} <span className="tools-mobile-reviews-count">(18 reviews)</span>
-                  </span>
+              <div className="tools-mobile-featured-top-row">
+                {/* Product image */}
+                <div className="tools-mobile-featured-img-box">
+                  {activeProduct.coverImage && activeProduct.coverImage.toLowerCase().split('?')[0].endsWith('.pdf') ? (
+                    <div className="tools-mobile-pdf-placeholder">
+                      <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="#EF4444" strokeWidth="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                        <polyline points="14 2 14 8 20 8" />
+                      </svg>
+                    </div>
+                  ) : (
+                    <img
+                      src={activeProduct.coverImage || `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23090D1A"/><circle cx="50" cy="50" r="15" fill="%231E293B" opacity="0.6"/><path d="M42 45 L50 37 L58 45" stroke="%237C5CFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`}
+                      alt={activeProduct.title}
+                      onError={(e) => {
+                        e.currentTarget.src = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23090D1A"/><circle cx="50" cy="50" r="15" fill="%231E293B" opacity="0.6"/><path d="M42 45 L50 37 L58 45" stroke="%237C5CFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`;
+                      }}
+                    />
+                  )}
                 </div>
-                <p className="tools-mobile-featured-desc">
-                  {activeProduct.description}
-                </p>
-                {activeProduct.description && activeProduct.description.length > 100 && (
-                  <span
-                    className="tools-mobile-read-more"
-                    onClick={() => handleOpenDetails(activeProduct)}
-                  >
-                    Read more...
-                  </span>
-                )}
+
+                {/* Right / Info Column */}
+                <div className="tools-mobile-featured-info-col">
+                  {/* Header badges */}
+                  <div className="tools-mobile-featured-header-badges">
+                    <span className="tools-mobile-featured-badge">
+                      ⭐ SIGNATURE PRODUCT
+                    </span>
+                    <span className="tools-mobile-featured-type-pill">
+                      {activeProduct.type.toUpperCase()}
+                    </span>
+                    <span className="tools-mobile-featured-version">
+                      Version {activeProduct.version}
+                    </span>
+                  </div>
+
+                  {/* Title & Metadata */}
+                  <div className="tools-mobile-featured-info">
+                    <h3 className="tools-mobile-featured-title">{activeProduct.title}</h3>
+                    <div className="tools-mobile-featured-submeta">
+                      {activeProduct.downloads && (
+                        <>
+                          <span className="tools-mobile-featured-downloads">Downloads: <strong style={{ color: '#E2E8F0' }}>{activeProduct.downloads}</strong></span>
+                        </>
+                      )}
+                      <span className="tools-mobile-featured-rating">
+                        Rating: ★ {activeProduct.rating || 5}
+                      </span>
+                    </div>
+                    <p className="tools-mobile-featured-desc">
+                      {activeProduct.description}
+                    </p>
+                    {activeProduct.description && activeProduct.description.length > 100 && (
+                      <span
+                        className="tools-mobile-read-more"
+                        onClick={() => handleOpenDetails(activeProduct)}
+                      >
+                        Read more...
+                      </span>
+                    )}
+                  </div>
+                </div>
               </div>
 
               <hr className="tools-mobile-featured-divider" />

@@ -7,7 +7,7 @@
   <meta name="description"
     content="Ashok Vangapandu - Product Builder & UI/UX Engineer crafting scalable digital experiences, design systems, custom tools, and AI-driven solutions.">
   <title>Ashok Vangapandu | Portfolio</title>
-  <link rel="stylesheet" href="css/main.css?v=1.5">
+  <link rel="stylesheet" href="css/main.css?v=2.9">
   <script>
     // Fast handler for Supabase OAuth popup callbacks
     if (window.opener && (window.location.hash.includes('access_token') || window.location.search.includes('error'))) {
@@ -64,8 +64,10 @@
       </a>
 
       <button class="nav-toggle" type="button" aria-label="Open navigation" aria-expanded="false" data-nav-toggle>
-        <span></span>
-        <span></span>
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="nav-toggle-icon">
+          <polyline points="11 17 6 12 11 7" />
+          <polyline points="18 17 13 12 18 7" />
+        </svg>
       </button>
 
       <div class="nav-links" data-nav-menu>
@@ -268,8 +270,8 @@
         <!-- Mobile-Only Hero Capability Cards (Target Mobile UI Reference) -->
         <div class="mobile-capability-grid">
           <!-- Card 1: Product Engineering -->
-          <article class="mobile-capability-card">
-            <div class="mobile-capability-icon-wrapper">
+          <article class="mobile-capability-card cap-blue">
+            <div class="mobile-capability-icon-wrapper icon-blue">
               <svg viewBox="0 0 48 48" aria-hidden="true" width="20" height="20">
                 <polygon points="24 6 6 15 24 24 42 15 24 6" fill="none" stroke="currentColor" stroke-width="3" />
                 <polyline points="6 24 24 33 42 24" fill="none" stroke="currentColor" stroke-width="3" />
@@ -280,11 +282,12 @@
               <h3>Product Engineering</h3>
               <p>Enterprise Apps &amp; Digital Products</p>
             </div>
+            <div class="mobile-cap-bar bar-blue"></div>
           </article>
 
           <!-- Card 2: Product Design -->
-          <article class="mobile-capability-card">
-            <div class="mobile-capability-icon-wrapper">
+          <article class="mobile-capability-card cap-purple">
+            <div class="mobile-capability-icon-wrapper icon-purple">
               <svg viewBox="0 0 48 48" aria-hidden="true" width="20" height="20">
                 <rect x="8" y="9" width="32" height="28" rx="7" fill="none" stroke="currentColor" stroke-width="3" />
                 <path d="M14 17h20" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
@@ -296,11 +299,12 @@
               <h3>Product Design</h3>
               <p>UX, UI &amp; Design Systems</p>
             </div>
+            <div class="mobile-cap-bar bar-purple"></div>
           </article>
 
           <!-- Card 3: Custom Tooling -->
-          <article class="mobile-capability-card">
-            <div class="mobile-capability-icon-wrapper">
+          <article class="mobile-capability-card cap-teal">
+            <div class="mobile-capability-icon-wrapper icon-teal">
               <svg viewBox="0 0 48 48" aria-hidden="true" width="20" height="20">
                 <rect x="9" y="9" width="12" height="12" rx="4" fill="none" stroke="currentColor" stroke-width="3" />
                 <rect x="27" y="9" width="12" height="12" rx="4" fill="none" stroke="currentColor" stroke-width="3" />
@@ -314,6 +318,7 @@
               <h3>Custom Tooling</h3>
               <p>Widgets, Plugins &amp; Digital Tools</p>
             </div>
+            <div class="mobile-cap-bar bar-teal"></div>
           </article>
         </div>
       </div>
@@ -677,8 +682,9 @@
           <p class="section-kicker">Process / Vision / Execution</p>
           <h2 id="behind-build-title">Behind the Build</h2>
           <div class="build-heading-side">
-            <p class="section-subtitle">Transforming early ideas into scalable digital experiences through focused
+            <p class="section-subtitle build-header-subtext-default">Transforming early ideas into scalable digital experiences through focused
               strategy, refined interaction design, and production-minded execution.</p>
+            <p class="section-subtitle build-header-subtext-tab">Transforming early ideas into scalable digital products through focused design and execution.</p>
             <span class="build-phase-pill"><i aria-hidden="true"></i>5 phases - end-to-end</span>
           </div>
         </div>
@@ -878,8 +884,8 @@
           </div>
         </div>
 
-        <!-- Mobile Projects Grid Stack (Target Mobile Reference UI) -->
-        <div class="mobile-projects-wrapper">
+        <!-- Mobile Projects Grid Stack (Hidden - replaced by unified showcase) -->
+        <div class="mobile-projects-wrapper" style="display: none !important;" aria-hidden="true">
           <!-- Project 1: MediConnect -->
           <article class="mobile-project-card">
             <div class="mobile-project-thumbnail swatch-violet">

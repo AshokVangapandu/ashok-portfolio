@@ -498,6 +498,8 @@
   width: 18px !important;
   height: 18px !important;
   display: block !important;
+  margin: auto !important;
+  flex-shrink: 0 !important;
 }
 
 /* Text Content */

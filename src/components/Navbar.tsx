@@ -64,8 +64,10 @@ export const Navbar: React.FC = () => {
             onClick={() => setIsOpen(!isOpen)}
             data-nav-toggle
           >
-            <span></span>
-            <span></span>
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="nav-toggle-icon">
+              <polyline points="11 17 6 12 11 7" />
+              <polyline points="18 17 13 12 18 7" />
+            </svg>
           </button>
 
           {/* Navigation list containing links and Auth actions */}

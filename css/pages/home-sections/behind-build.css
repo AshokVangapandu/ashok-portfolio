@@ -74,6 +74,14 @@
   text-align: right;
 }
 
+.build-header-subtext-tab {
+  display: none !important;
+}
+
+.build-header-subtext-default {
+  display: block !important;
+}
+
 .build-phase-pill {
   display: inline-flex;
   align-items: center;
@@ -298,6 +306,7 @@
   line-height: 1.7;
   font-weight: 500;
 }
+
 
 .build-tags {
   display: grid;
