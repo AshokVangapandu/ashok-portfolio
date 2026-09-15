@@ -70,7 +70,8 @@ class ShareExperienceCard extends HTMLElement {
         
         <div class="cta-right-action">
           <button type="button" class="profile-action profile-action-primary heard-cta-btn magnetic" id="open-share-modal-btn">
-            <span>Share Your Experience</span>
+            <span class="cta-btn-text-default">Share Your Experience</span>
+            <span class="cta-btn-text-tablet">Share</span>
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" class="cta-arrow-icon">
               <path d="M5 12h14" />
               <path d="m12 5 7 7-7 7" />

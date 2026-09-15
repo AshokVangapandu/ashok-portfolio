@@ -694,9 +694,12 @@ const renderBuildFlow = () => {
     return `
     <article class="build-node build-node-${index + 1} reveal-on-scroll" data-stagger="${stagger}" style="--build-color: ${step.tone}; transition-delay: ${stagger}ms" aria-label="${step.title} workflow step">
       <div class="build-step-index">${step.meta}</div>
-      <span class="build-icon">${renderIcon(step.icon)}</span>
+      <span class="build-icon-mobile">${renderIcon(step.icon)}</span>
       <div class="build-card-copy">
-        <h3>${step.title}</h3>
+        <div class="build-title-row">
+          <h3>${step.title}</h3>
+          <span class="build-icon build-icon-desktop">${renderIcon(step.icon)}</span>
+        </div>
         <p>${step.description}</p>
         <ul class="build-tags" aria-label="${step.title} focus points">
           ${step.tags.map((tag) => `<li>${tag}</li>`).join("")}
@@ -1519,7 +1522,7 @@ const loadDynamicCertifications = async () => {
       // Update trust panel title texts using classes
       const trustTitles = document.querySelectorAll('.certifications-trust-panel-v2 .trust-stat-title');
       if (trustTitles && trustTitles.length >= 2) {
-        trustTitles[0].textContent = totalCount > 0 ? `${totalCount}+` : "0";
+        trustTitles[0].textContent = totalCount > 0 ? `${totalCount}` : "0";
         trustTitles[1].textContent = `${verifiedPercent}%`;
       }
 
