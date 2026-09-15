@@ -650,7 +650,7 @@ const renderIcon = (icon) => {
   if (icon.startsWith("assets/")) {
     return `<img src="${icon}" alt="" class="expertise-img-icon" />`;
   }
-  return brandIcons[icon] || `<svg viewBox="0 0 24 24" aria-hidden="true">${iconPaths[icon]}</svg>`;
+  return brandIcons[icon] || `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${iconPaths[icon]}</svg>`;
 };
 
 const renderExpertise = () => {

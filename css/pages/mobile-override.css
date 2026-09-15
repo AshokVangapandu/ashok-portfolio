@@ -2543,7 +2543,12 @@ body.is-maintenance-mode [data-header] {
     opacity: 0.65 !important;
   }
 
-  .build-node {
+  .build-node,
+  .build-node-1,
+  .build-node-2,
+  .build-node-3,
+  .build-node-4,
+  .build-node-5 {
     position: relative !important;
     margin: 0 !important;
     border-radius: 16px !important;
@@ -2571,6 +2576,7 @@ body.is-maintenance-mode [data-header] {
     box-sizing: border-box !important;
     width: 100% !important;
     overflow: visible !important;
+    min-height: 0 !important;
     /* Allow timeline dot to be visible outside card container */
   }
 
@@ -2607,7 +2613,9 @@ body.is-maintenance-mode [data-header] {
   }
 
   /* Step index number (Top of Column 1) */
-  .build-step-index {
+  .build-step-index,
+  .build-node .build-step-index,
+  .build-node-3 .build-step-index {
     grid-column: 1 !important;
     grid-row: 1 !important;
     align-self: center !important;
@@ -2622,14 +2630,21 @@ body.is-maintenance-mode [data-header] {
     margin: 0 !important;
     width: auto !important;
     box-sizing: border-box !important;
+    line-height: 1 !important;
   }
 
-  .build-icon-desktop {
+  /* Hide desktop top-right icon on mobile */
+  .build-icon-desktop,
+  .build-node .build-icon-desktop,
+  .build-title-row .build-icon,
+  .build-title-row .build-icon-desktop,
+  .build-node .build-title-row .build-icon {
     display: none !important;
   }
 
-  /* Phase Icon (Bottom of Column 1, below the number) */
-  .build-icon-mobile {
+  /* Phase Icon (Bottom of Column 1, below the number on mobile only) */
+  .build-icon-mobile,
+  .build-node .build-icon-mobile {
     grid-column: 1 !important;
     grid-row: 2 !important;
     align-self: center !important;
@@ -2638,7 +2653,6 @@ body.is-maintenance-mode [data-header] {
     align-items: center !important;
     justify-content: center !important;
     width: 34px !important;
-    /* Slightly smaller to fit below the number beautifully */
     height: 34px !important;
     border-radius: 50% !important;
     background: rgba(255, 255, 255, 0.02) !important;
@@ -2652,13 +2666,36 @@ body.is-maintenance-mode [data-header] {
   }
 
   .build-icon-mobile svg,
+  .build-node .build-icon-mobile svg,
   .build-icon svg {
-    width: 16px !important;
-    height: 16px !important;
+    width: 17px !important;
+    height: 17px !important;
+    min-width: 17px !important;
+    min-height: 17px !important;
+    fill: none !important;
+    stroke: currentColor !important;
+    stroke-width: 2.2 !important;
+    stroke-linecap: round !important;
+    stroke-linejoin: round !important;
+    display: block !important;
+  }
+
+  .build-title-row,
+  .build-node .build-title-row {
+    display: block !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
 
   /* Content Column (Spans both rows of Column 2) */
-  .build-card-copy {
+  .build-card-copy,
+  .build-node .build-card-copy,
+  .build-node-1 .build-card-copy,
+  .build-node-2 .build-card-copy,
+  .build-node-3 .build-card-copy,
+  .build-node-4 .build-card-copy,
+  .build-node-5 .build-card-copy {
     grid-column: 2 !important;
     grid-row: 1 / span 2 !important;
     /* Spans top and bottom rows next to index and icon */
@@ -2674,7 +2711,8 @@ body.is-maintenance-mode [data-header] {
     /* Reset flex gap */
   }
 
-  .build-card-copy h3 {
+  .build-card-copy h3,
+  .build-node .build-card-copy h3 {
     font-size: 16px !important;
     font-weight: 700 !important;
     color: #FFFFFF !important;
@@ -2683,10 +2721,12 @@ body.is-maintenance-mode [data-header] {
     position: relative !important;
     padding-bottom: 4px !important;
     line-height: 1.2 !important;
+    display: inline-block !important;
   }
 
   /* Title underline gradient */
-  .build-card-copy h3::after {
+  .build-card-copy h3::after,
+  .build-node .build-card-copy h3::after {
     content: "" !important;
     position: absolute !important;
     left: 0 !important;
@@ -2699,7 +2739,8 @@ body.is-maintenance-mode [data-header] {
     /* Reset margin */
   }
 
-  .build-card-copy p {
+  .build-card-copy p,
+  .build-node .build-card-copy p {
     font-size: 13px !important;
     line-height: 1.45 !important;
     color: #CBD5E1 !important;
@@ -2708,7 +2749,8 @@ body.is-maintenance-mode [data-header] {
     padding: 0 !important;
   }
 
-  .build-tags {
+  .build-tags,
+  .build-node .build-tags {
     display: none !important;
   }
   } /* end @media (max-width: 575px) behind-build */

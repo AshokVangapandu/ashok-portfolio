@@ -1184,21 +1184,21 @@
   }
 
   .badge-top {
-    top: 4% !important;
-    right: -6% !important;
-    transform: scale(clamp(0.78, 1.1vh, 0.98)) !important;
+    top: 5% !important;
+    right: -4% !important;
+    transform: none;
   }
 
   .badge-bottom {
-    left: -6% !important;
-    bottom: 6% !important;
-    transform: scale(clamp(0.78, 1.1vh, 0.98)) !important;
+    left: -4% !important;
+    bottom: 26% !important;
+    transform: none;
   }
 
   .hero-status-badge {
     right: 0% !important;
-    bottom: 2% !important;
-    transform: scale(clamp(0.78, 1.1vh, 0.98)) !important;
+    bottom: 4% !important;
+    transform: none;
   }
 }
 
