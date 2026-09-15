@@ -93,23 +93,23 @@
   max-width: 280px;
   height: 48px;
   padding: 0 24px;
-  background: linear-gradient(135deg, #6C3CFF, #8F72FF);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 50%, #9333EA 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
   border-radius: 12px;
-  color: #FFFFFF;
+  color: #FFFFFF !important;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   text-decoration: none;
-  box-shadow: 0 4px 20px rgba(108, 60, 255, 0.25);
+  box-shadow: 0 4px 20px rgba(124, 58, 237, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.22) !important;
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   box-sizing: border-box;
 }
 
 .cert-footer-cta:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 28px rgba(108, 60, 255, 0.38);
-  border-color: rgba(255, 255, 255, 0.3);
-  color: #FFFFFF;
+  box-shadow: 0 8px 28px rgba(124, 58, 237, 0.48), inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+  color: #FFFFFF !important;
 }
 
 .cert-footer-cta svg {

@@ -16,15 +16,21 @@ export const UserMenu: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Close dropdown on click outside
+  // Close dropdown immediately on click/touch outside
   useEffect(() => {
-    const clickHandler = (event: MouseEvent) => {
+    const clickHandler = (event: MouseEvent | PointerEvent | TouchEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsOpen(false);
       }
     };
-    document.addEventListener('mousedown', clickHandler);
-    return () => document.removeEventListener('mousedown', clickHandler);
+    window.addEventListener('pointerdown', clickHandler, true);
+    window.addEventListener('mousedown', clickHandler, true);
+    window.addEventListener('click', clickHandler, true);
+    return () => {
+      window.removeEventListener('pointerdown', clickHandler, true);
+      window.removeEventListener('mousedown', clickHandler, true);
+      window.removeEventListener('click', clickHandler, true);
+    };
   }, []);
 
   if (isLoading) {

@@ -12,7 +12,7 @@
 }
 
 .portfolio-showcase-shell {
-  width: min(1249px, calc(100% - 40px));
+  width: min(1320px, calc(100% - 44px));
   margin: 0 auto;
 }
 
@@ -639,7 +639,7 @@
   }
 
   .portfolio-showcase-shell {
-    width: min(100% - 28px, 1249px);
+    width: min(100% - 28px, 1320px);
   }
 
   .portfolio-showcase-heading {

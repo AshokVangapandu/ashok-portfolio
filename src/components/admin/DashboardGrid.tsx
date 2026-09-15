@@ -213,16 +213,16 @@ export const DashboardGrid: React.FC = () => {
         />
       </div>
 
-      {/* 3. Content & Publishing Card & Requests & Approvals row */}
+      {/* 3. System Monitor & Requests & Approvals row */}
       <div className="dashboard-grid-row two-cols">
-        <ContentPublishingCard />
+        <SystemMonitor />
         <RequestsApprovalsCard />
       </div>
 
-      {/* 4. Edith Insights & System Monitor Card row */}
+      {/* 4. Edith Insights & Content & Publishing Card row */}
       <div className="dashboard-grid-row two-cols equal">
         <EdithInsights />
-        <SystemMonitor />
+        <ContentPublishingCard />
       </div>
     </div>
   );

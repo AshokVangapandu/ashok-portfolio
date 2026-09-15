@@ -1024,9 +1024,10 @@
 }
 
 .widget-showcase-actions .profile-action-primary {
-  border-color: rgba(143, 133, 255, 0.5);
-  background: #8f85ff;
-  box-shadow: 0 18px 46px rgba(143, 133, 255, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 50%, #9333EA 100%) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 4px 18px rgba(124, 58, 237, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.22) !important;
 }
 
 .widget-showcase-actions .profile-action-secondary {

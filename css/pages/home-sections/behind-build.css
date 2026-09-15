@@ -127,7 +127,7 @@
   min-height: 438px;
   overflow: hidden;
   border: 1px solid rgba(220, 231, 255, 0.11);
-  border-radius: 14px 14px 0 0;
+  border-radius: 16px;
   background:
     linear-gradient(90deg, rgba(0, 214, 198, 0.07), transparent 22%, transparent 78%, rgba(143, 114, 255, 0.06)),
     rgba(7, 17, 33, 0.72);

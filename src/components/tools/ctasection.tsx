@@ -15,7 +15,7 @@ export const CTASection: React.FC = () => {
         <div className="tools-mobile-cta-content">
           <h3 className="tools-mobile-cta-title">Interested in custom tooling?</h3>
           <p className="tools-mobile-cta-desc">
-            Let's build something together. From Mendix plugins to custom Figma plugins and integrations — I can help you create tools that scale.
+            Let's build something together. From custom pluggable widgets and Figma plugins to enterprise integrations — I can help you create tools that scale.
           </p>
         </div>
         <div className="tools-mobile-cta-actions">
@@ -83,7 +83,7 @@ export const CTASection: React.FC = () => {
           Interested in custom tooling?
         </h3>
         <p style={{ margin: 0, fontSize: '14.5px', lineHeight: 1.5, color: '#94A3B8' }}>
-          Let's build something together. From Mendix pluggable widgets to custom Figma plugins and automated design systems — I architect tools that scale.
+          Let's build something together. From custom pluggable widgets and Figma plugins to automated design systems — I architect tools that scale.
         </p>
       </div>
 

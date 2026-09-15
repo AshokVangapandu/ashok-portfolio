@@ -88,7 +88,7 @@ Deno.serve(async (req) => {
           <p>I truly appreciate your kind words and professional support. You can see it live on my portfolio Wall of Love section.</p>
           
           <p style="margin-bottom: 4px;">Regards,</p>
-          <p><strong>Ashok Vangapandu</strong><br><span style="font-size: 13px; color: rgba(255,255,255,0.6);">UI Manager | Mendix UI Specialist</span></p>
+          <p><strong>Ashok Vangapandu</strong><br><span style="font-size: 13px; color: rgba(255,255,255,0.6);">Product Builder &amp; UI/UX Engineer</span></p>
         `,
         ctaText: 'View Wall of Love',
         ctaUrl: portfolioUrl,
@@ -478,7 +478,7 @@ Deno.serve(async (req) => {
                     </div>
                     
                     <p style="margin-bottom: 4px;">Regards,</p>
-                    <p><strong>Ashok Vangapandu</strong><br><span style="font-size: 13px; color: rgba(255,255,255,0.6);">UI Manager | Mendix UI Specialist</span></p>
+                    <p><strong>Ashok Vangapandu</strong><br><span style="font-size: 13px; color: rgba(255,255,255,0.6);">Product Builder &amp; UI/UX Engineer</span></p>
                   </div>
   
                   <div class="links-section">
@@ -507,7 +507,7 @@ Deno.serve(async (req) => {
   
               Regards,
               Ashok Vangapandu
-              UI Manager | Mendix UI Specialist
+              Product Builder & UI/UX Engineer
   
               Portfolio: https://ashokvangapandu.github.io/ashok-portfolio/
               LinkedIn: https://www.linkedin.com/in/ashok-vangapandu/

@@ -39,77 +39,6 @@ export function createParticleBackground(host) {
   const pointer = { x: -1000, y: -1000, active: false, strength: 0 };
   const wrap = (value, size) => ((value % size) + size) % size;
   const lerp = (a, b, amount) => a + (b - a) * amount;
-  const smooth = (start, end, value) => {
-    const t = Math.max(0, Math.min(1, (value - start) / (end - start)));
-    return t * t * (3 - 2 * t);
-  };
-  const hero = document.getElementById('hero');
-  let nucleus = null;
-
-  // Measure only when layout changes. No hero layout reads in the scroll loop.
-  function measureNucleus() {
-    if (!hero || !hero.getClientRects().length) { nucleus = null; return; }
-    const rect = hero.getBoundingClientRect();
-    const top = rect.top + window.scrollY;
-    const bottom = top + rect.height;
-    const obstacles = [...hero.querySelectorAll('.hero-copy > *, .hero-visual, .mobile-hero-wrapper > *')]
-      .filter(el => el.getClientRects().length)
-      .map(el => {
-        const r = el.getBoundingClientRect();
-        return { left: r.left - 8, right: r.right + 8, top: r.top + window.scrollY - 8, bottom: r.bottom + window.scrollY + 8 };
-      });
-    let best = null;
-    // Favor bottom-center, but fit inside actual empty space on stacked layouts.
-    for (const fraction of [0.5, 0.46, 0.54]) {
-      const x = width * fraction;
-      for (let step = 0; step < 14; step++) {
-        const y = bottom - 12 - step * Math.min(12, rect.height / 60);
-        let clearance = Math.min(y - top, bottom - y, width * 0.1);
-        for (const r of obstacles) {
-          const dx = Math.max(r.left - x, 0, x - r.right);
-          const dy = Math.max(r.top - y, 0, y - r.bottom);
-          clearance = Math.min(clearance, Math.hypot(dx, dy));
-        }
-        const score = Math.min(clearance, 65) - Math.abs(fraction - 0.5) * 80 - Math.abs(y - Math.min(bottom - 36, top + height * 0.89)) * 0.08;
-        if (!best || score > best.score) best = { x, y, clearance, score };
-      }
-    }
-    nucleus = { ...best, top, height: rect.height, obstacles,
-      radius: Math.max(2, Math.min(width < 768 ? 8 : 23, best.clearance / 2.8)) };
-  }
-
-  function nucleusState(still) {
-    // Reduced motion keeps the original static starfield, without a frozen orb.
-    if (!nucleus || still) return null;
-    const progress = Math.max(0, Math.min(1, (window.scrollY - nucleus.top) / Math.max(1, nucleus.height)));
-    if (progress >= 0.9) return null;
-    const dissolve = smooth(0.6, 0.9, progress);
-    const radius = nucleus.radius * lerp(0.44, 1, smooth(0, 0.65, progress));
-    return { x: nucleus.x, y: nucleus.y - window.scrollY * 0.28,
-      radius, dissolve, progress };
-  }
-
-  function drawNucleus(state) {
-    const { x, y, radius, dissolve, progress } = state;
-    const pulse = 1 + Math.sin(time * 0.9) * 0.025;
-    const r = radius * pulse;
-    const opacity = (1 - dissolve) * (0.45 + progress * 0.2);
-    const glow = ctx.createRadialGradient(x, y, 0, x, y, r * 2.7);
-    glow.addColorStop(0, `rgba(159,184,255,${opacity * 0.35})`);
-    glow.addColorStop(0.32, `rgba(139,110,255,${opacity * 0.24})`);
-    glow.addColorStop(1, 'rgba(139,110,255,0)');
-    ctx.fillStyle = glow;
-    ctx.fillRect(x - r * 2.7, y - r * 2.7, r * 5.4, r * 5.4);
-    const core = ctx.createRadialGradient(x - r * 0.2, y - r * 0.25, 0, x, y, r);
-    core.addColorStop(0, `rgba(179,196,255,${opacity * 0.3})`);
-    core.addColorStop(0.68, `rgba(128,103,235,${opacity * 0.32})`);
-    core.addColorStop(0.9, `rgba(184,166,255,${opacity})`);
-    core.addColorStop(1, 'rgba(139,110,255,0)');
-    ctx.fillStyle = core;
-    ctx.beginPath();
-    ctx.arc(x, y, r, 0, Math.PI * 2);
-    ctx.fill();
-  }
 
   function measure() {
     width = host.clientWidth || innerWidth;
@@ -125,7 +54,6 @@ export function createParticleBackground(host) {
 
   function atmosphere() {
     if (layoutDirty) {
-      measureNucleus();
       sections = [...document.querySelectorAll('main section[id], footer')]
         .filter(el => el.getClientRects().length)
         .map(el => ({ id: el.id, top: el.getBoundingClientRect().top + window.scrollY }));
@@ -160,19 +88,6 @@ export function createParticleBackground(host) {
     pointer.strength = lerp(pointer.strength, pointer.active && fine.matches && !still ? 1 : 0, ease);
     if (!still) time += dt * speed;
     ctx.clearRect(0, 0, width, height);
-    const transformation = nucleusState(still);
-    if (transformation) {
-      // Exclude content from the new glow; the existing starfield is untouched.
-      ctx.save();
-      for (const r of nucleus.obstacles) {
-        ctx.beginPath();
-        ctx.rect(0, 0, width, height);
-        ctx.rect(r.left, r.top - window.scrollY, r.right - r.left, r.bottom - r.top);
-        ctx.clip('evenodd');
-      }
-      drawNucleus(transformation);
-      ctx.restore();
-    }
 
     for (let i = 0; i < count; i++) {
       const star = stars[i];
@@ -182,24 +97,7 @@ export function createParticleBackground(host) {
       let y = wrap(star.y * (height + pad * 2) - (still ? 0 : time * (1 + depth * 3) + scroll * depth * 0.085 + drift * depth * 0.012), height + pad * 2) - pad;
       // A slowly evolving, faint band adds depth at section transitions.
       x += Math.sin(y / height * Math.PI * 2 + star.phase) * cluster * 12 * depth;
-      let nucleusOpacity = 1;
-      if (transformation && i % 4 === 0) {
-        const { radius, dissolve, progress } = transformation;
-        const angle = i * 2.399963 + time * 0.045 * depth;
-        const orbit = radius * Math.sqrt((i % 19 + 1) / 20);
-        // Each layer releases at a slightly different rate, arriving at its
-        // original starfield position exactly at 90%, including on reverse scroll.
-        const release = smooth(0.6 + depth * 0.025, 0.9, progress);
-        x = lerp(transformation.x + Math.cos(angle) * orbit, x, release);
-        y = lerp(transformation.y + Math.sin(angle) * orbit * 0.85, y, release);
-        nucleusOpacity = lerp(0.65, 1, dissolve);
-        for (const r of nucleus.obstacles) {
-          if (x > r.left && x < r.right && y > r.top - window.scrollY && y < r.bottom - window.scrollY) {
-            nucleusOpacity *= dissolve;
-            break;
-          }
-        }
-      }
+
       const dx = x - pointer.x, dy = y - pointer.y;
       const distance = Math.hypot(dx, dy);
       if (distance > 0 && distance < 150) {
@@ -210,7 +108,7 @@ export function createParticleBackground(host) {
       const edge = Math.min(1, Math.min(x + pad, width + pad - x, y + pad, height + pad - y) / pad);
       const outside = Math.min(1, Math.abs(x / width - 0.5) * 2);
       const twinkle = still ? 0.85 : 0.82 + Math.sin(time * 0.45 + star.phase) * 0.18;
-      const alpha = star.alpha * brightness * twinkle * Math.max(0, edge) * (1 - edgeFocus * (1 - outside) * 0.6) * nucleusOpacity;
+      const alpha = star.alpha * brightness * twinkle * Math.max(0, edge) * (1 - edgeFocus * (1 - outside) * 0.6);
       if (i % 31 === 0) {
         const glow = ctx.createRadialGradient(x, y, 0, x, y, 8);
         glow.addColorStop(0, `rgba(${star.color},${alpha * 0.3})`);
@@ -245,7 +143,6 @@ export function createParticleBackground(host) {
   function leave() { pointer.active = false; }
   const observer = new ResizeObserver(() => { layoutDirty = true; });
   observer.observe(document.body);
-  if (hero) observer.observe(hero);
   window.addEventListener('resize', measure, { passive: true });
   window.addEventListener('pointermove', move, { passive: true });
   document.documentElement.addEventListener('pointerleave', leave);

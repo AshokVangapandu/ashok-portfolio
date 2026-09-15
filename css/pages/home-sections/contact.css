@@ -458,27 +458,21 @@
   justify-content: center;
   gap: 10px;
   padding: 14px 26%;
-  background: #6C3CFF;
-  /* Purple Accent button background */
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
+  background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 50%, #9333EA 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  border-radius: 12px !important;
   font-size: 14px;
   font-weight: 700;
-  color: #FFFFFF;
+  color: #FFFFFF !important;
   cursor: pointer;
   transition: all 220ms var(--ease, ease);
-  box-shadow:
-    0 12px 30px rgba(108, 60, 255, 0.35),
-    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 18px rgba(124, 58, 237, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.22) !important;
 }
 
 .contact-submit-btn:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow:
-    0 16px 36px rgba(108, 60, 255, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
-  background: #7C50FF;
-  /* Slight hover shift */
+  box-shadow: 0 8px 28px rgba(124, 58, 237, 0.48), inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
 }
 
 .contact-submit-btn:disabled {

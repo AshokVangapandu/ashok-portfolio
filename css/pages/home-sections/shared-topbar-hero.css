@@ -302,195 +302,277 @@
 }
 
 .hero-actions {
+  display: flex;
+  align-items: center;
   gap: 14px;
   margin-top: 32px;
 }
 
 .primary-action {
-  min-width: 190px;
-  border-color: rgba(101, 230, 196, 0.28);
-  background:
-    radial-gradient(circle at var(--local-x, 28%) var(--local-y, 24%), rgba(101, 230, 196, 0.2), transparent 38%),
-    linear-gradient(135deg, rgba(31, 50, 74, 0.98), rgba(75, 87, 150, 0.72)),
-    rgba(10, 16, 30, 0.88);
-  box-shadow:
-    0 20px 44px rgba(29, 45, 77, 0.36),
-    0 0 34px rgba(101, 230, 196, 0.11),
-    inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-width: 180px;
+  padding: 13px 24px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 50%, #9333EA 100%) !important;
+  color: #FFFFFF !important;
+  font-size: 15px;
+  font-weight: 700;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  box-shadow: 0 4px 20px rgba(124, 58, 237, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.22) !important;
+  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  text-decoration: none;
 }
 
 .primary-action:hover {
-  border-color: rgba(101, 230, 196, 0.42);
-  box-shadow:
-    0 22px 50px rgba(29, 45, 77, 0.42),
-    0 0 42px rgba(101, 230, 196, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(124, 58, 237, 0.48), inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+.primary-action svg {
+  width: 18px;
+  height: 18px;
+  stroke-width: 2.6;
+  transition: transform 0.2s ease;
+}
+
+.primary-action:hover svg {
+  transform: translateX(3px);
 }
 
 .connect-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   min-width: 150px;
   gap: 9px;
-  padding: 0 20px;
-  color: rgba(244, 247, 255, 0.88);
+  padding: 13px 22px;
+  border-radius: 12px;
+  background: rgba(13, 20, 38, 0.65) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  color: #FFFFFF !important;
+  font-size: 15px;
+  font-weight: 600;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  text-decoration: none;
 }
 
 .connect-action svg {
   width: 18px;
   height: 18px;
   flex: 0 0 auto;
-  fill: currentColor;
+  fill: none;
+  stroke: currentColor;
 }
 
 .connect-action:hover {
-  border-color: rgba(184, 156, 255, 0.34);
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.3) !important;
+  background: rgba(20, 30, 56, 0.75) !important;
   color: #ffffff;
-  box-shadow: 0 16px 34px rgba(184, 156, 255, 0.11);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3), 0 0 20px rgba(139, 92, 246, 0.15) !important;
 }
 
-.capability-cards {
+/* Hero Capability Grid - Image 2 Exact Style */
+.hero-capability-grid {
   order: 5;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
-  width: min(100%, 650px);
-  margin-top: 28px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  width: min(100%, 720px);
+  margin-top: 56px;
+  box-sizing: border-box;
 }
 
-.hero .capability-cards.reveal {
+.hero .hero-capability-grid.reveal {
   opacity: 1;
 }
 
 .hero-copy .socials {
   order: 6;
-  margin-top: 22px;
+  margin-top: 24px;
 }
 
-.capability-cards .capability-card {
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-template-rows: auto auto auto;
-  align-content: start;
-  gap: 9px;
-  min-height: 126px;
-  padding: 12px;
-  border-color: rgba(168, 186, 255, 0.18);
-  border-radius: 14px;
-  background:
-    radial-gradient(circle at 18% 12%, rgba(159, 184, 255, 0.13), transparent 30%),
-    radial-gradient(circle at 88% 92%, rgba(101, 230, 196, 0.055), transparent 36%),
-    linear-gradient(145deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.018)),
-    rgba(7, 12, 24, 0.66);
-  box-shadow:
-    0 18px 46px rgba(0, 0, 0, 0.22),
-    inset 0 1px 0 rgba(255, 255, 255, 0.13),
-    inset 0 -1px 0 rgba(159, 184, 255, 0.055);
-  backdrop-filter: blur(18px) saturate(1.16);
-  -webkit-backdrop-filter: blur(18px) saturate(1.16);
+.hero-cap-card {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
+  min-height: 118px !important;
+  height: auto !important;
+  padding: 14px 14px 12px 14px !important;
+  border-radius: 16px !important;
+  background: rgba(10, 16, 32, 0.75) !important;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: blur(18px) saturate(1.2) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(1.2) !important;
+  box-sizing: border-box !important;
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s ease, border-color 0.25s ease !important;
+  position: relative !important;
+  overflow: hidden !important;
 }
 
-.capability-cards .capability-card::before {
-  opacity: 1;
-  background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.06), transparent 36%),
-    radial-gradient(circle at var(--local-x, 50%) var(--local-y, 20%), rgba(159, 184, 255, 0.11), transparent 44%);
-  mix-blend-mode: screen;
+.hero-cap-card:hover {
+  transform: translateY(-4px) !important;
 }
 
-.capability-cards .capability-card:hover {
-  transform: perspective(700px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(-5px);
-  border-color: rgba(168, 186, 255, 0.28);
-  background:
-    radial-gradient(circle at 18% 12%, rgba(159, 184, 255, 0.17), transparent 32%),
-    radial-gradient(circle at 88% 92%, rgba(101, 230, 196, 0.075), transparent 38%),
-    radial-gradient(circle at var(--local-x, 50%) var(--local-y, 18%), rgba(159, 184, 255, 0.15), transparent 46%),
-    linear-gradient(145deg, rgba(255, 255, 255, 0.095), rgba(255, 255, 255, 0.024)),
-    rgba(7, 12, 24, 0.72);
-  box-shadow:
-    0 24px 58px rgba(0, 0, 0, 0.28),
-    0 0 28px rgba(159, 184, 255, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.16);
+/* Individual Card Borders & Glows */
+.hero-cap-card.cap-card-blue {
+  border: 1px solid rgba(56, 189, 248, 0.32) !important;
+}
+.hero-cap-card.cap-card-blue:hover {
+  border-color: rgba(56, 189, 248, 0.6) !important;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45), 0 0 20px rgba(56, 189, 248, 0.18) !important;
 }
 
-.capability-cards dt {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  gap: 10px;
-  min-width: 0;
+.hero-cap-card.cap-card-purple {
+  border: 1px solid rgba(168, 85, 247, 0.32) !important;
+}
+.hero-cap-card.cap-card-purple:hover {
+  border-color: rgba(168, 85, 247, 0.6) !important;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45), 0 0 20px rgba(168, 85, 247, 0.18) !important;
 }
 
-.capability-cards dt > span:last-child,
-.capability-cards dd {
-  grid-column: auto;
+.hero-cap-card.cap-card-teal {
+  border: 1px solid rgba(20, 184, 166, 0.32) !important;
+}
+.hero-cap-card.cap-card-teal:hover {
+  border-color: rgba(20, 184, 166, 0.6) !important;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45), 0 0 20px rgba(20, 184, 166, 0.18) !important;
 }
 
-.capability-cards dt > span:last-child {
-  display: block;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  color: rgba(244, 247, 255, 0.92);
-  font-size: clamp(12px, 0.9vw, 14px);
-  line-height: 1.1;
-  font-weight: 650;
-  text-wrap: nowrap;
+.hero-cap-card.cap-card-violet {
+  border: 1px solid rgba(139, 92, 246, 0.32) !important;
+}
+.hero-cap-card.cap-card-violet:hover {
+  border-color: rgba(139, 92, 246, 0.6) !important;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45), 0 0 20px rgba(139, 92, 246, 0.18) !important;
 }
 
-.capability-cards dd {
-  position: relative;
-  z-index: 1;
-  margin-top: 0;
-  padding-top: 2px;
-  padding-bottom: 4px;
-  border-bottom: 1px solid rgba(159, 184, 255, 0.2);
-  color: rgba(216, 220, 229, 0.36);
-  font-size: 9px;
-  line-height: 1.22;
-  font-weight: 850;
-  letter-spacing: 0.07em;
+/* Stat Icons in Squircle Gradient Boxes */
+.hero-cap-icon {
+  width: 36px !important;
+  height: 36px !important;
+  min-height: 36px !important;
+  max-height: 36px !important;
+  min-width: 36px !important;
+  max-width: 36px !important;
+  border-radius: 9px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+  box-sizing: border-box !important;
 }
 
-.capability-cards .stat-icon {
-  width: 38px;
-  height: 38px;
-  border: 1px solid rgba(159, 184, 255, 0.22);
-  border-radius: 11px;
-  color: #b9c9ff;
-  background:
-    radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.18), transparent 36%),
-    linear-gradient(145deg, rgba(159, 184, 255, 0.16), rgba(101, 230, 196, 0.055)),
-    rgba(12, 18, 32, 0.42);
-  box-shadow:
-    0 10px 24px rgba(0, 0, 0, 0.18),
-    inset 0 1px 0 rgba(255, 255, 255, 0.14);
-  backdrop-filter: blur(12px) saturate(1.18);
-  -webkit-backdrop-filter: blur(12px) saturate(1.18);
+.hero-cap-icon.icon-blue {
+  background: linear-gradient(135deg, #0284C7 0%, #38BDF8 100%) !important;
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35) !important;
 }
 
-.capability-cards .stat-icon svg {
-  width: 20px;
-  height: 20px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2.6;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  filter: none;
+.hero-cap-icon.icon-purple {
+  background: linear-gradient(135deg, #7C3AED 0%, #A855F7 100%) !important;
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.35) !important;
 }
 
-.capability-design .stat-icon,
-.capability-widget .stat-icon,
-.capability-ai .stat-icon {
-  color: #b9c9ff;
-  background:
-    radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.18), transparent 36%),
-    linear-gradient(145deg, rgba(159, 184, 255, 0.16), rgba(101, 230, 196, 0.055)),
-    rgba(12, 18, 32, 0.42);
+.hero-cap-icon.icon-teal {
+  background: linear-gradient(135deg, #0D9488 0%, #14B8A6 100%) !important;
+  box-shadow: 0 4px 12px rgba(13, 148, 136, 0.35) !important;
 }
 
-@media (max-width: 980px) {
-  .capability-cards {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+.hero-cap-icon.icon-violet {
+  background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%) !important;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35) !important;
+}
+
+.hero-cap-icon svg {
+  width: 18px !important;
+  height: 18px !important;
+  display: block !important;
+}
+
+/* Text Content */
+.hero-cap-info {
+  display: flex !important;
+  flex-direction: column !important;
+  margin: 10px 0 8px 0 !important;
+  padding: 0 !important;
+  min-height: auto !important;
+  width: 100% !important;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.hero-cap-title {
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  color: #FFFFFF !important;
+  letter-spacing: -0.01em !important;
+  line-height: 1.2 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  white-space: nowrap !important;
+}
+
+.hero-cap-subtitle {
+  font-size: 11px !important;
+  color: #94A3B8 !important;
+  font-weight: 450 !important;
+  line-height: 1.25 !important;
+  letter-spacing: -0.01em !important;
+  margin: 3px 0 0 0 !important;
+  padding: 0 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Glowing Indicator Bars */
+.hero-cap-bar {
+  height: 3px !important;
+  width: 36px !important;
+  min-height: 3px !important;
+  max-height: 3px !important;
+  border-radius: 2px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+  flex-shrink: 0 !important;
+}
+
+.hero-cap-bar.bar-blue {
+  background: #38BDF8 !important;
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.7) !important;
+}
+
+.hero-cap-bar.bar-purple {
+  background: #C084FC !important;
+  box-shadow: 0 0 8px rgba(192, 132, 252, 0.7) !important;
+}
+
+.hero-cap-bar.bar-teal {
+  background: #2DD4BF !important;
+  box-shadow: 0 0 8px rgba(45, 212, 191, 0.7) !important;
+}
+
+.hero-cap-bar.bar-violet {
+  background: #A78BFA !important;
+  box-shadow: 0 0 8px rgba(167, 139, 250, 0.7) !important;
+}
+
+@media (max-width: 860px) {
+  .hero-capability-grid {
+    grid-template-columns: 1fr;
     width: 100%;
   }
 }
@@ -730,5 +812,370 @@
     transform: translateX(50%) translateY(0) scale(1);
   }
 }
+
+/* ==========================================================================
+   Precision Dial Scroll Progress Indicator (Sticky Clock - Bottom Right)
+   ========================================================================== */
+
+.hero-scroll-indicator {
+  position: fixed;
+  right: clamp(20px, 3vw, 36px);
+  bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 99;
+  margin: 0;
+  text-align: center;
+  pointer-events: auto;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.precision-dial-link {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  cursor: pointer;
+  position: relative;
+  padding: 4px;
+  border-radius: 16px;
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.precision-dial-link:hover {
+  transform: translateY(-2px);
+}
+
+.precision-dial-gauge {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transition: box-shadow 0.3s ease;
+}
+
+.precision-dial-svg {
+  width: 48px;
+  height: 48px;
+  overflow: visible;
+  display: block;
+}
+
+/* Housing & Track */
+.dial-housing-bg {
+  fill: rgba(10, 16, 32, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.dial-housing-inner {
+  stroke: rgba(255, 255, 255, 0.06);
+  stroke-width: 1px;
+  stroke-dasharray: 2 3;
+  fill: none;
+}
+
+/* Dynamic Circular Progress Ring */
+.dial-progress-ring {
+  transition: stroke-dashoffset 0.15s linear;
+  filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.6));
+}
+
+/* Graduation Ticks */
+.dial-tick.tick-major {
+  stroke: #38BDF8;
+  stroke-width: 1.8px;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 2px rgba(56, 189, 248, 0.6));
+}
+
+.dial-tick.tick-submajor {
+  stroke: rgba(168, 85, 247, 0.7);
+  stroke-width: 1.3px;
+  stroke-linecap: round;
+}
+
+.dial-tick.tick-minor {
+  stroke: rgba(148, 163, 184, 0.28);
+  stroke-width: 1px;
+  stroke-linecap: round;
+}
+
+/* Clock Needle Elements (Points UP at 0°, completely inside circle!) */
+.dial-needle-group {
+  will-change: transform;
+}
+
+.dial-needle-glow {
+  stroke: rgba(56, 189, 248, 0.85);
+  stroke-width: 3.5px;
+  stroke-linecap: round;
+  filter: url(#dial-glow);
+  transition: stroke 0.25s ease;
+}
+
+.dial-needle-body {
+  stroke: url(#needle-gradient);
+  stroke-width: 2.2px;
+  stroke-linecap: round;
+}
+
+.dial-needle-core {
+  stroke: #FFFFFF;
+  stroke-width: 1px;
+  stroke-linecap: round;
+  opacity: 0.95;
+}
+
+.dial-hub-outer {
+  fill: #0B1226;
+  stroke: #38BDF8;
+  stroke-width: 1.5px;
+  transition: stroke 0.25s ease;
+}
+
+.dial-hub-core {
+  fill: #38BDF8;
+  transition: fill 0.25s ease;
+}
+
+/* Hover State */
+.hero-scroll-indicator.is-hovered .precision-dial-gauge {
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.6), 0 0 16px rgba(56, 189, 248, 0.35);
+}
+
+.hero-scroll-indicator.is-hovered .dial-needle-glow {
+  stroke: rgba(192, 132, 252, 0.95);
+}
+
+.hero-scroll-indicator.is-hovered .dial-hub-core {
+  fill: #C084FC;
+}
+
+/* Label & Indicator */
+.precision-dial-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  margin-top: 5px;
+}
+
+.precision-dial-label .label-text {
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #94A3B8;
+  text-transform: uppercase;
+  transition: color 0.25s ease, text-shadow 0.25s ease;
+}
+
+.precision-dial-link:hover .label-text {
+  color: #FFFFFF;
+  text-shadow: 0 0 8px rgba(56, 189, 248, 0.5);
+}
+
+.label-glow-bar {
+  width: 16px;
+  height: 1.5px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #38BDF8, #A855F7);
+  box-shadow: 0 0 6px rgba(56, 189, 248, 0.6);
+  transition: width 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease;
+}
+
+.precision-dial-link:hover .label-glow-bar {
+  width: 26px;
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.85);
+}
+
+/* Scroll Top indicator change */
+.hero-scroll-indicator.can-scroll-top .label-text {
+  color: #38BDF8;
+}
+
+@media (max-width: 980px) {
+  .hero-scroll-indicator {
+    display: none;
+  }
+}
+
+/* ==========================================================================
+   Desktop 100vh Exact Height Responsive Layout (Dynamic Spacing & Scaling)
+   ========================================================================== */
+@media (min-width: 861px) {
+  .hero {
+    height: 100vh !important;
+    min-height: 100vh !important;
+    max-height: 100vh !important;
+    padding-top: var(--header-height) !important;
+    padding-bottom: clamp(16px, 3.5vh, 42px) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+  }
+
+  .hero-container {
+    width: min(1200px, calc(100% - 48px));
+    height: 100%;
+    max-height: calc(100vh - var(--header-height) - 24px);
+    display: grid;
+    grid-template-columns: minmax(0, 1.12fr) minmax(320px, 0.88fr);
+    align-items: center;
+    gap: clamp(24px, 4.5vw, 84px);
+    margin: 0 auto;
+  }
+
+  .hero-copy {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    max-width: 720px;
+    height: 100%;
+  }
+
+  .hero-kicker {
+    margin: 0 0 clamp(8px, 1.6vh, 18px) !important;
+    padding: clamp(6px, 1vh, 9px) clamp(10px, 1.3vw, 14px) !important;
+    font-size: clamp(10.5px, 0.85vw, 12px) !important;
+  }
+
+  .hero-headline {
+    margin: 0 0 clamp(8px, 1.6vh, 20px) !important;
+    font-size: clamp(24px, 3.2vw, 44px) !important;
+    line-height: 1.2 !important;
+  }
+
+  .hero-description {
+    font-size: clamp(13.5px, 1.1vw, 16.5px) !important;
+    line-height: 1.6 !important;
+    margin-bottom: 0 !important;
+  }
+
+  .hero-actions {
+    margin-top: clamp(18px, 3.2vh, 36px) !important;
+    gap: clamp(12px, 1.5vw, 16px) !important;
+  }
+
+  .primary-action {
+    padding: clamp(10px, 1.5vh, 14px) clamp(18px, 2vw, 26px) !important;
+    font-size: clamp(13.5px, 1vw, 15.5px) !important;
+    min-height: clamp(40px, 5.2vh, 50px) !important;
+    min-width: auto !important;
+  }
+
+  .connect-action {
+    padding: clamp(10px, 1.5vh, 14px) clamp(16px, 1.8vw, 22px) !important;
+    font-size: clamp(13.5px, 1vw, 15.5px) !important;
+    min-height: clamp(40px, 5.2vh, 50px) !important;
+    min-width: auto !important;
+  }
+
+  .hero-capability-grid {
+    margin-top: clamp(42px, 5.6vh, 60px) !important;
+    gap: clamp(10px, 1.2vw, 16px) !important;
+    width: 100% !important;
+  }
+
+  .hero-cap-card {
+    min-height: clamp(92px, 13.5vh, 120px) !important;
+    padding: clamp(10px, 1.4vh, 14px) clamp(12px, 1.2vw, 16px) !important;
+    border-radius: clamp(12px, 1.8vh, 18px) !important;
+  }
+
+  .hero-cap-icon {
+    width: clamp(28px, 4vh, 38px) !important;
+    height: clamp(28px, 4vh, 38px) !important;
+    min-width: clamp(28px, 4vh, 38px) !important;
+    min-height: clamp(28px, 4vh, 38px) !important;
+    max-width: clamp(28px, 4vh, 38px) !important;
+    max-height: clamp(28px, 4vh, 38px) !important;
+    border-radius: clamp(7px, 1.1vh, 10px) !important;
+  }
+
+  .hero-cap-icon svg {
+    width: clamp(14px, 2vh, 19px) !important;
+    height: clamp(14px, 2vh, 19px) !important;
+  }
+
+  .hero-cap-info {
+    margin: clamp(6px, 1vh, 10px) 0 clamp(4px, 0.7vh, 8px) 0 !important;
+  }
+
+  .hero-cap-title {
+    font-size: clamp(12.5px, 0.95vw, 14.5px) !important;
+  }
+
+  .hero-cap-subtitle {
+    font-size: clamp(10px, 0.78vw, 11.5px) !important;
+  }
+
+  .hero-cap-bar {
+    height: clamp(2.5px, 0.4vh, 3.5px) !important;
+    min-height: clamp(2.5px, 0.4vh, 3.5px) !important;
+    max-height: clamp(2.5px, 0.4vh, 3.5px) !important;
+    width: clamp(28px, 3.2vw, 40px) !important;
+  }
+
+  .hero-copy .socials {
+    margin-top: clamp(14px, 2.6vh, 28px) !important;
+  }
+
+  .social-link {
+    width: clamp(32px, 4.5vh, 42px) !important;
+    height: clamp(32px, 4.5vh, 42px) !important;
+    border-radius: clamp(8px, 1.2vh, 11px) !important;
+  }
+
+  .social-link svg {
+    width: clamp(15px, 2.2vh, 20px) !important;
+    height: clamp(15px, 2.2vh, 20px) !important;
+  }
+
+  /* Right Visual Frame Profile Image Scaling */
+  .hero-visual {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+  }
+
+  .image-shell {
+    width: min(420px, 48vh, 44vw) !important;
+    aspect-ratio: 1 !important;
+  }
+
+  .badge-top {
+    top: 6% !important;
+    right: -10% !important;
+    transform: scale(clamp(0.8, 1.2vh, 1.05)) !important;
+  }
+
+  .badge-bottom {
+    left: -10% !important;
+    bottom: 8% !important;
+    transform: scale(clamp(0.8, 1.2vh, 1.05)) !important;
+  }
+
+  .hero-status-badge {
+    right: -2% !important;
+    bottom: 4% !important;
+    transform: scale(clamp(0.8, 1.2vh, 1.05)) !important;
+  }
+}
+
+
+
+
 
 

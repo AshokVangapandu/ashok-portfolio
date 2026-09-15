@@ -334,18 +334,9 @@ contactForm?.addEventListener("submit", async (event) => {
 
 const expertise = [
   {
-    title: "Mendix",
-    icon: "assets/images/Mendix-Brandmark.webp",
-    signal: "Low-code delivery",
-    desc1: "Scalable enterprise apps with Atlas UI, microflows, and end-to-end cloud deployment.",
-    chips: ["Atlas UI", "Microflows"],
-    score: 92,
-    tone: "#a78bfa"
-  },
-  {
     title: "Figma",
     icon: "assets/images/FigmaImage.png",
-    signal: "Product design",
+    signal: "Product Design",
     desc1: "Pixel-perfect wireframing, prototyping, and component systems dev-ready from day one.",
     chips: ["Prototypes", "Components"],
     score: 95,
@@ -354,56 +345,65 @@ const expertise = [
   {
     title: "Design System",
     icon: "assets/images/design-system.webp",
-    signal: "Reusable patterns",
+    signal: "Reusable Patterns",
     desc1: "Token architecture to variant logic, building consistency at every scale.",
     chips: ["Tokens", "Variants"],
     score: 90,
     tone: "#a78bfa"
   },
   {
-    title: "Widgets",
-    icon: "assets/images/Widget.png",
-    signal: "Pluggable widgets",
-    desc1: "Custom Mendix widgets built with React and TypeScript, extending platform capabilities.",
-    chips: ["React", "TypeScript"],
-    score: 87,
-    tone: "#a78bfa"
-  },
-  {
     title: "Frontend Dev",
     icon: "assets/images/front-end.svg",
-    signal: "Modern interfaces",
+    signal: "Modern Interfaces",
     desc1: "Responsive, accessible, high-performing interfaces with strong usability and visual engagement.",
     chips: ["Responsive", "Accessibility"],
-    score: 88,
+    score: 95,
     tone: "#a78bfa"
   },
   {
-    title: "JavaScript",
-    icon: "assets/images/javascript-logo.webp",
-    signal: "Interactive UI",
-    desc1: "Dynamic, modular JS architecture for clean interactive components.",
-    chips: ["DOM", "Modules"],
-    score: 85,
+    title: "Widgets",
+    icon: "assets/images/Widget.png",
+    signal: "Pluggable Widgets",
+    desc1: "Custom pluggable components built with React and TypeScript, extending application capabilities.",
+    chips: ["React", "TypeScript"],
+    score: 90,
     tone: "#a78bfa"
+  },
+  {
+    title: "Research & Development",
+    icon: "research-brand",
+    signal: "R&D & Problem Solving",
+    desc1: "Developing solutions through deep research and adaptive learning to solve complex tech challenges.",
+    chips: ["R&D", "Problem Solving"],
+    score: 90,
+    tone: "#60a5fa"
+  },
+  {
+    title: "Mendix",
+    icon: "assets/images/Mendix-Brandmark.webp",
+    signal: "Rapid Delivery",
+    desc1: "Scalable enterprise applications combining Mendix, workflows, and modern development practices.",
+    chips: ["Mendix", "Workflows"],
+    score: 95,
+    tone: "#4ea8ff"
   },
   {
     title: "SCSS",
     icon: "assets/images/SCSS.png",
-    signal: "Style architecture",
+    signal: "Style Architecture",
     desc1: "Modular, maintainable SCSS with mixins, functions, and scalable responsive systems.",
     chips: ["Mixins", "Responsive"],
-    score: 80,
-    tone: "#a78bfa"
+    score: 99,
+    tone: "#f43f5e"
   },
   {
     title: "AI Product Building",
     icon: "sparkles",
     signal: "AI-POWERED DEVELOPMENT",
-    desc1: "Leveraging AI to design, prototype, and build production-ready applications through modern AI-assisted development workflows.",
+    desc1: "Leveraging AI to design, prototype, and build production-ready applications with modern workflows.",
     chips: ["Codex", "AI Agents"],
-    score: 78,
-    tone: "#a78bfa"
+    score: 85,
+    tone: "#22d3ee"
   }
 ];
 
@@ -635,6 +635,14 @@ const brandIcons = {
       <path fill="#ffffff" d="M30.7 28.6c-1.8 2.4-4.1 3.7-6.9 3.7-4.4 0-7.3-3-7.3-7.4 0-5.5 4.2-9.2 9.2-9.2 3.2 0 5.5 1.4 6.4 3.8l-3.4 1.8c-.5-1.3-1.5-2-3.1-2-2.8 0-5 2.3-5 5.4 0 2.3 1.4 3.8 3.6 3.8 1.6 0 2.8-.7 3.8-2l2.7 2.1Z"/>
       <path fill="#ffffff" opacity=".24" d="M13 12c7.7-6.2 19.3-4.6 25 3.4-8.2-4.2-18.1-3.1-25 3.2V12Z"/>
     </svg>
+  `,
+  "research-brand": `
+    <svg class="brand-icon brand-icon-research" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="11" cy="11" r="7"></circle>
+      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      <line x1="11" y1="8" x2="11" y2="14"></line>
+      <line x1="8" y1="11" x2="14" y2="11"></line>
+    </svg>
   `
 };
 
@@ -650,22 +658,22 @@ const renderExpertise = () => {
 
   expertiseGrid.innerHTML = expertise.map((item, index) => {
     const stagger = index * 70;
+    const scoreTier = item.score >= 95 ? "tier-95" : item.score >= 90 ? "tier-90" : "tier-85";
 
     return `
-    <article class="expertise-card tilt-card reveal-on-scroll" data-stagger="${stagger}" style="--skill-color: ${item.tone}; --skill-score: ${item.score}%; transition-delay: ${stagger}ms" aria-label="${item.title} expertise">
+    <article class="expertise-card tilt-card reveal-on-scroll ${scoreTier}" data-stagger="${stagger}" style="--skill-color: ${item.tone}; transition-delay: ${stagger}ms" aria-label="${item.title} expertise">
       <div class="expertise-card-top">
         <div class="expertise-card-meta">
           <span class="expertise-icon">${renderIcon(item.icon)}</span>
           <span class="expertise-signal">${item.signal}</span>
         </div>
-        <span class="expertise-score">${item.score}%</span>
+        <span class="expertise-score ${scoreTier}">${item.score}%</span>
       </div>
       <div class="expertise-card-copy">
         <h3>${item.title}</h3>
         <p>${item.desc1}</p>
       </div>
       <div class="expertise-card-bottom" aria-label="${item.title} focus areas">
-        <div class="expertise-meter" aria-hidden="true"><span></span></div>
         <div class="expertise-tags">
           ${item.chips.map((chip) => `<span>${chip}</span>`).join("")}
         </div>
@@ -720,7 +728,7 @@ const setHeaderState = () => {
 };
 
 const setActiveNavLink = () => {
-  const activationLine = header.offsetHeight + window.innerHeight * 0.18;
+  const activationLine = (header?.offsetHeight || 80) + window.innerHeight * 0.18;
   let activeId = "";
 
   trackedSections.forEach((section) => {
@@ -732,8 +740,12 @@ const setActiveNavLink = () => {
     }
   });
 
-  navSectionLinks.forEach((link) => {
-    const isActive = link.getAttribute("href") === `#${activeId}`;
+  // Dynamically query nav links to support rewritten hrefs and mobile items
+  const allNavLinks = document.querySelectorAll('.nav-links a, .mobile-nav-container a:not(.mobile-nav-dial-item)');
+
+  allNavLinks.forEach((link) => {
+    const href = link.getAttribute("href") || "";
+    const isActive = !!activeId && (href === `#${activeId}` || href.endsWith(`#${activeId}`));
     link.classList.toggle("is-active", isActive);
 
     if (isActive) {
@@ -797,6 +809,7 @@ navMenu.querySelectorAll("a").forEach((link) => {
 
 anchorLinks.forEach((link) => {
   link.addEventListener("click", (event) => {
+    if (typeof link.blur === 'function') link.blur();
     const targetId = link.getAttribute("href");
     if (!targetId || targetId === "#") return;
 
@@ -1619,21 +1632,35 @@ const loadDynamicCertifications = async () => {
 // Dynamic projects highlights load helper
 const loadDynamicProjects = async () => {
   try {
+    // Dynamic Years Experience from April 2023 to current date
+    const calcExperienceYears = () => {
+      const startDate = new Date(2023, 3, 1); // April 1, 2023
+      const now = new Date();
+      const months = (now.getFullYear() - startDate.getFullYear()) * 12 + (now.getMonth() - startDate.getMonth());
+      const years = (months / 12).toFixed(1);
+      return `${years}`;
+    };
+
+    const expYearsVal = calcExperienceYears();
+
+    const yearsEl = document.getElementById('stat-years-experience');
+    if (yearsEl) {
+      yearsEl.textContent = expYearsVal;
+    }
+
+    document.querySelectorAll('.stat-years-val').forEach(el => {
+      el.textContent = expYearsVal;
+    });
+
+    let displayProjects = 10;
+    let displayIndustries = 8;
+
     if (window.ProjectService) {
       const { data: projects, error } = await window.ProjectService.getPublishedProjects();
-      if (error) throw error;
-
-      // 1. Projects Delivered: count of published projects
-      const totalPublished = projects ? projects.length : 0;
-      const projectsDeliveredEl = document.getElementById('stat-projects-delivered');
-      if (projectsDeliveredEl) {
-        projectsDeliveredEl.textContent = `${totalPublished}+`;
-      }
-
-      // 2. Industries Served: unique industries (categories)
-      const uniqueIndustries = new Set();
-      const seenLower = new Set();
-      if (projects) {
+      if (!error && projects) {
+        displayProjects = Math.max(10, projects.length);
+        const uniqueIndustries = new Set();
+        const seenLower = new Set();
         projects.forEach(p => {
           if (p.category) {
             const industry = p.category.trim();
@@ -1644,23 +1671,28 @@ const loadDynamicProjects = async () => {
             }
           }
         });
+        displayIndustries = Math.max(8, uniqueIndustries.size);
       }
-      const totalIndustries = uniqueIndustries.size;
-      const industriesServedEl = document.getElementById('stat-industries-served');
-      if (industriesServedEl) {
-        industriesServedEl.textContent = `${totalIndustries}+`;
-      }
+    }
+
+    const projectsDeliveredEl = document.getElementById('stat-projects-delivered');
+    if (projectsDeliveredEl) {
+      projectsDeliveredEl.textContent = `${displayProjects}+`;
+    }
+
+    const industriesServedEl = document.getElementById('stat-industries-served');
+    if (industriesServedEl) {
+      industriesServedEl.textContent = `${displayIndustries}+`;
     }
   } catch (err) {
     console.warn('Failed to load dynamic projects stats:', err);
-    // Fallback UI
     const projectsDeliveredEl = document.getElementById('stat-projects-delivered');
     if (projectsDeliveredEl) {
-      projectsDeliveredEl.textContent = '0+';
+      projectsDeliveredEl.textContent = '10+';
     }
     const industriesServedEl = document.getElementById('stat-industries-served');
     if (industriesServedEl) {
-      industriesServedEl.textContent = '0+';
+      industriesServedEl.textContent = '8+';
     }
   }
 };
@@ -1847,7 +1879,7 @@ const loadDynamicResume = async () => {
       }
 
       // 1. Setup Download Button
-      if (primarySpan) primarySpan.textContent = 'Download Resume';
+      if (primarySpan) primarySpan.textContent = 'Download';
       downloadResumeBtn.setAttribute('href', '#');
       downloadResumeBtn.removeAttribute('target');
       downloadResumeBtn.removeAttribute('rel');
@@ -1938,7 +1970,7 @@ const loadDynamicResume = async () => {
       });
 
       // 2. Setup View Online Button
-      if (secondarySpan) secondarySpan.textContent = 'View Online';
+      if (secondarySpan) secondarySpan.textContent = 'View';
       viewOnlineBtn.setAttribute('href', activeResume.preview_url || activeResume.public_url);
       viewOnlineBtn.setAttribute('target', '_blank');
       viewOnlineBtn.setAttribute('rel', 'noopener noreferrer');
@@ -2011,31 +2043,6 @@ const initSmoothScrolling = () => {
     requestAnimationFrame(raf);
   }
 
-  // Neon Reading Progress Bar
-  if (!prefersReducedMotion) {
-    const progressBar = document.createElement("div");
-    progressBar.className = "scroll-progress-bar";
-    document.body.appendChild(progressBar);
-
-    if (window.gsap && window.ScrollTrigger) {
-      window.gsap.to(progressBar, {
-        scaleX: 1,
-        ease: "none",
-        scrollTrigger: {
-          trigger: "body",
-          start: "top top",
-          end: "bottom bottom",
-          scrub: true,
-        },
-      });
-    } else {
-      const updateProgressFallback = () => {
-        const scrollPercent = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
-        progressBar.style.transform = `scaleX(${scrollPercent / 100})`;
-      };
-      lenis.on("scroll", updateProgressFallback);
-    }
-  }
 
   // Interactive Velocity-based Card Skewing
   if (!prefersReducedMotion && window.gsap && window.ScrollTrigger) {
@@ -2186,6 +2193,14 @@ const setupNavbarAuth = async () => {
     const dropdown = container.querySelector("#navbar-user-dropdown");
     const logoutBtn = container.querySelector("#navbar-logout-btn");
 
+    const closeUserMenu = () => {
+      if (dropdownOpen) {
+        dropdownOpen = false;
+        dropdown?.classList.remove("is-open");
+        userBtn?.setAttribute("aria-expanded", "false");
+      }
+    };
+
     userBtn?.addEventListener("click", (e) => {
       e.stopPropagation();
       dropdownOpen = !dropdownOpen;
@@ -2207,14 +2222,26 @@ const setupNavbarAuth = async () => {
       }
     });
 
-    // Close on click outside
-    document.addEventListener("click", (e) => {
-      if (dropdownOpen && !container.contains(e.target)) {
-        dropdownOpen = false;
-        dropdown?.classList.remove("is-open");
-        userBtn?.setAttribute("aria-expanded", "false");
+    // Close immediately when clicking anywhere outside using capture phase
+    const handleOutsideClick = (e) => {
+      if (dropdownOpen && container && !container.contains(e.target)) {
+        closeUserMenu();
       }
-    });
+    };
+
+    if (window._navbarUserMenuCleanup) {
+      window._navbarUserMenuCleanup();
+    }
+
+    window.addEventListener("pointerdown", handleOutsideClick, true);
+    window.addEventListener("mousedown", handleOutsideClick, true);
+    window.addEventListener("click", handleOutsideClick, true);
+
+    window._navbarUserMenuCleanup = () => {
+      window.removeEventListener("pointerdown", handleOutsideClick, true);
+      window.removeEventListener("mousedown", handleOutsideClick, true);
+      window.removeEventListener("click", handleOutsideClick, true);
+    };
   };
 
   const renderLoginButton = (isLoading = false) => {

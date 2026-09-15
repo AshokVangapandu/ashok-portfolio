@@ -137,22 +137,38 @@
 }
 
 .resume-download-panel .profile-action {
-  min-width: 156px;
-  min-height: 50px;
+  min-width: 120px;
+  min-height: 48px;
   border-radius: 12px;
-  font-size: 13px;
+  font-size: 14px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .resume-download-panel .profile-action-primary {
-  border-color: rgba(64, 156, 255, 0.48);
-  background: #409cff;
-  box-shadow: 0 18px 46px rgba(64, 156, 255, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 50%, #9333EA 100%) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 4px 18px rgba(124, 58, 237, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.22) !important;
+  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+}
+
+.resume-download-panel .profile-action-primary:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 28px rgba(124, 58, 237, 0.48), inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
 }
 
 .resume-download-panel .profile-action-secondary {
-  border-color: rgba(157, 169, 194, 0.2);
-  background: rgba(255, 255, 255, 0.055);
-  color: rgba(226, 234, 255, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #FFFFFF !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
 }
 
 .resume-download-panel .profile-action svg {
@@ -189,12 +205,18 @@
   }
 
   .resume-download-panel .profile-actions {
-    width: 100%;
-    display: grid;
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: center !important;
+    gap: 12px !important;
   }
 
   .resume-download-panel .profile-action {
-    width: 100%;
+    flex: 1 1 0% !important;
+    width: auto !important;
+    min-width: 0 !important;
+    padding: 12px 14px !important;
   }
 }
 

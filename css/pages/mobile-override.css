@@ -446,6 +446,7 @@ body.is-maintenance-mode [data-header] {
       opacity: 0;
       transform: translateY(-6px);
     }
+
     to {
       opacity: 1;
       transform: translateY(0);
@@ -731,7 +732,7 @@ body.is-maintenance-mode [data-header] {
     display: flex !important;
     flex-direction: column;
     gap: 20px;
-    padding: calc(var(--header-height) + 20px) 16px 24px;
+    padding: calc(var(--header-height) + 24px) 16px 24px;
     max-width: 500px;
     margin: 0 auto;
   }
@@ -757,7 +758,7 @@ body.is-maintenance-mode [data-header] {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transform: translateY(5px) scale(1.15);
+    transform: translateY(14px) scale(1.12);
   }
 
   .mobile-hero-identity {
@@ -786,21 +787,28 @@ body.is-maintenance-mode [data-header] {
 
   .mobile-tech-chips {
     display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: clamp(4px, 1.5vw, 8px);
+    width: 100%;
   }
 
   .mobile-chip {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 6px 12px;
+    justify-content: center;
+    gap: 5px;
+    padding: 5px clamp(5px, 1.6vw, 10px);
     background: rgba(108, 60, 255, 0.08);
     border: 1px solid rgba(108, 60, 255, 0.22);
     border-radius: 99px;
     color: #FFFFFF;
-    font-size: 11px;
+    font-size: clamp(9.5px, 2.4vw, 11px);
     font-weight: 650;
+    white-space: nowrap;
+    flex: 1 1 auto;
+    text-align: center;
   }
 
   .chip-dot {
@@ -940,14 +948,16 @@ body.is-maintenance-mode [data-header] {
   }
 
   .mobile-btn-primary {
-    background: #6C3CFF;
-    color: #FFFFFF;
-    box-shadow: 0 4px 14px rgba(108, 60, 255, 0.35);
+    background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 50%, #9333EA 100%) !important;
+    color: #FFFFFF !important;
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+    box-shadow: 0 4px 18px rgba(124, 58, 237, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+    border-radius: 12px !important;
   }
 
   .mobile-btn-primary:active {
-    background: #552cdb;
     transform: scale(0.98);
+    box-shadow: 0 2px 10px rgba(124, 58, 237, 0.3) !important;
   }
 
   .mobile-btn-secondary {
@@ -1008,6 +1018,8 @@ body.is-maintenance-mode [data-header] {
   }
 
   /* Dynamic Accent Colors for each card based on category title */
+  [aria-label="Enterprise Platforms expertise"],
+  [aria-label="Low-Code & Enterprise expertise"],
   [aria-label="Mendix expertise"] {
     --skill-color: #4EA8FF !important;
   }
@@ -1028,8 +1040,9 @@ body.is-maintenance-mode [data-header] {
     --skill-color: #6366F1 !important;
   }
 
+  [aria-label="Research & Development expertise"],
   [aria-label="JavaScript expertise"] {
-    --skill-color: #6366F1 !important;
+    --skill-color: #60A5FA !important;
   }
 
   [aria-label="SCSS expertise"] {
@@ -1041,192 +1054,102 @@ body.is-maintenance-mode [data-header] {
   }
 
   .expertise-card {
-    display: grid !important;
-    grid-template-columns: 44px 1fr auto !important;
-    grid-template-rows: auto auto auto auto !important;
-    column-gap: 12px !important;
-    row-gap: 8px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
     padding: 16px !important;
     background: linear-gradient(145deg, #0e111f, #070913) !important;
     background-image:
       radial-gradient(circle at 20% 20%, color-mix(in srgb, var(--skill-color) 6%, transparent), transparent 60%),
       linear-gradient(145deg, #0e111f, #070913) !important;
-    border: 1px solid color-mix(in srgb, var(--skill-color) 8%, rgba(255, 255, 255, 0.04)) !important;
+    border: 1px solid color-mix(in srgb, var(--skill-color) 12%, rgba(255, 255, 255, 0.05)) !important;
     border-radius: 16px !important;
-    box-shadow:
-      0 8px 24px -8px rgba(0, 0, 0, 0.6),
-      inset 0 1px 1px rgba(255, 255, 255, 0.02) !important;
+    box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.6) !important;
     transform: none !important;
     min-height: auto !important;
-    transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease !important;
   }
 
-  .expertise-card:hover,
-  .expertise-card:active {
-    border-color: color-mix(in srgb, var(--skill-color) 25%, transparent) !important;
-    box-shadow:
-      0 10px 28px rgba(0, 0, 0, 0.5),
-      0 0 12px color-mix(in srgb, var(--skill-color) 6%, transparent),
-      inset 0 1px 1px rgba(255, 255, 255, 0.04) !important;
+  .expertise-card-top {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
   }
 
-  .expertise-card-top,
-  .expertise-card-meta,
-  .expertise-card-copy,
-  .expertise-card-bottom {
-    display: contents !important;
+  .expertise-card-meta {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
   }
 
   .expertise-icon {
-    grid-column: 1 !important;
-    grid-row: 1 / span 2 !important;
-    width: 44px !important;
-    height: 44px !important;
-    border-radius: 14px !important;
-    background: linear-gradient(135deg, color-mix(in srgb, var(--skill-color) 15%, transparent), color-mix(in srgb, var(--skill-color) 5%, transparent)) !important;
-    border: 1px solid color-mix(in srgb, var(--skill-color) 20%, transparent) !important;
-    box-shadow: 0 4px 10px color-mix(in srgb, var(--skill-color) 6%, transparent) !important;
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 10px !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     flex-shrink: 0 !important;
-    color: color-mix(in srgb, var(--skill-color) 85%, #fff) !important;
-    align-self: start !important;
   }
 
   .expertise-icon svg,
   .expertise-icon img {
-    width: 20px !important;
-    height: 20px !important;
+    width: 18px !important;
+    height: 18px !important;
     object-fit: contain !important;
   }
 
-  .expertise-card h3 {
-    grid-column: 2 !important;
-    grid-row: 1 !important;
-    align-self: center !important;
-    font-size: 16px !important;
-    font-weight: 700 !important;
-    color: #FFFFFF !important;
-    margin: 0 !important;
-    text-align: left !important;
-    line-height: 1.2 !important;
-    letter-spacing: -0.01em !important;
-  }
-
-  /* Badge styling using .expertise-signal and replacing its content */
   .expertise-signal {
-    grid-column: 3 !important;
-    grid-row: 1 !important;
-    display: inline-flex !important;
-    align-self: center !important;
-    justify-self: end !important;
-    font-size: 0 !important;
-    text-transform: none !important;
-    letter-spacing: 0 !important;
+    font-size: 10px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.08em !important;
+    text-transform: uppercase !important;
+    color: rgba(154, 166, 204, 0.75) !important;
   }
 
   .expertise-signal::after {
-    font-size: 8.5px !important;
-    font-weight: 700 !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.05em !important;
-    padding: 2.5px 8px !important;
-    border-radius: 99px !important;
-    color: color-mix(in srgb, var(--skill-color) 90%, #fff) !important;
-    background: transparent !important;
-    border: 1px solid color-mix(in srgb, var(--skill-color) 35%, transparent) !important;
-    white-space: nowrap !important;
-  }
-
-  [aria-label="Mendix expertise"] .expertise-signal::after {
-    content: "Expert" !important;
-  }
-
-  [aria-label="Figma expertise"] .expertise-signal::after {
-    content: "Specialist" !important;
-  }
-
-  [aria-label="Design System expertise"] .expertise-signal::after {
-    content: "Advanced" !important;
-  }
-
-  [aria-label="Widgets expertise"] .expertise-signal::after {
-    content: "Expert" !important;
-  }
-
-  [aria-label="Frontend Dev expertise"] .expertise-signal::after {
-    content: "Advanced" !important;
-  }
-
-  [aria-label="JavaScript expertise"] .expertise-signal::after {
-    content: "Advanced" !important;
-  }
-
-  [aria-label="SCSS expertise"] .expertise-signal::after {
-    content: "Advanced" !important;
-  }
-
-  [aria-label="AI Product Building expertise"] .expertise-signal::after {
-    content: "Explorer" !important;
-  }
-
-  /* Hide the percentage text since it's not in the reference design */
-  .expertise-score {
     display: none !important;
   }
 
-  /* Progress indicator styled as 5 circular dots */
-  .expertise-meter {
-    grid-column: 2 / span 2 !important;
-    grid-row: 2 !important;
-    width: 46px !important;
-    height: 6px !important;
-    background: rgba(255, 255, 255, 0.12) !important;
-    border-radius: 0 !important;
-    margin: 1px 0 3px 0 !important;
-    position: relative !important;
-    overflow: hidden !important;
-    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='46' height='6'%3E%3Crect width='6' height='6' rx='3' fill='black'/%3E%3Crect x='10' width='6' height='6' rx='3' fill='black'/%3E%3Crect x='20' width='6' height='6' rx='3' fill='black'/%3E%3Crect x='30' width='6' height='6' rx='3' fill='black'/%3E%3Crect x='40' width='6' height='6' rx='3' fill='black'/%3E%3C/svg%3E") !important;
-    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='46' height='6'%3E%3Crect width='6' height='6' rx='3' fill='black'/%3E%3Crect x='10' width='6' height='6' rx='3' fill='black'/%3E%3Crect x='20' width='6' height='6' rx='3' fill='black'/%3E%3Crect x='30' width='6' height='6' rx='3' fill='black'/%3E%3Crect x='40' width='6' height='6' rx='3' fill='black'/%3E%3C/svg%3E") !important;
-    mask-size: contain !important;
-    mask-repeat: no-repeat !important;
+  .expertise-score {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
   }
 
-  .expertise-meter span {
-    display: block !important;
-    width: var(--skill-score) !important;
-    height: 100% !important;
-    background: var(--skill-color) !important;
-    box-shadow: 0 0 6px color-mix(in srgb, var(--skill-color) 40%, transparent) !important;
-    border-radius: 0 !important;
+  .expertise-card-copy {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 6px !important;
   }
 
-  /* Description flows under the icon for shorter compact height */
+  .expertise-card h3 {
+    font-size: 17px !important;
+    font-weight: 700 !important;
+    color: #FFFFFF !important;
+    margin: 0 !important;
+  }
+
   .expertise-card p {
-    grid-column: 1 / -1 !important;
-    grid-row: 3 !important;
     font-size: 13px !important;
-    line-height: 1.45 !important;
+    line-height: 1.5 !important;
     color: #94a3b8 !important;
-    margin: 2px 0 !important;
-    text-align: left !important;
-    max-width: 100% !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    display: -webkit-box !important;
-    -webkit-line-clamp: 2 !important;
-    -webkit-box-orient: vertical !important;
+    margin: 0 !important;
+  }
+
+  .expertise-card-bottom {
+    display: flex !important;
+    width: 100% !important;
+  }
+
+  .expertise-meter {
+    display: none !important;
   }
 
   .expertise-tags {
-    grid-column: 1 / -1 !important;
-    grid-row: 4 !important;
     display: flex !important;
     flex-wrap: wrap !important;
     gap: 6px !important;
-    margin-top: 4px !important;
-    align-self: center !important;
   }
 
   .expertise-tags span {
@@ -1237,8 +1160,6 @@ body.is-maintenance-mode [data-header] {
     color: #cbd5e1 !important;
     font-size: 10px !important;
     font-weight: 500 !important;
-    text-transform: none !important;
-    letter-spacing: 0 !important;
   }
 
   /* Removed right arrow from expertise cards */
@@ -3290,8 +3211,15 @@ body.is-maintenance-mode [data-header] {
     transition: transform 200ms ease, stroke 200ms ease !important;
   }
 
-  .mobile-nav-item:hover,
-  .mobile-nav-item:focus-visible,
+  .mobile-nav-item:hover {
+    color: #C084FC !important;
+  }
+
+  .mobile-nav-item:focus,
+  .mobile-nav-item:focus-visible {
+    outline: none !important;
+  }
+
   .mobile-nav-item.is-active {
     color: #C084FC !important;
     background: rgba(124, 58, 237, 0.16) !important;
@@ -3301,6 +3229,52 @@ body.is-maintenance-mode [data-header] {
 
   .mobile-nav-item.is-active svg {
     transform: scale(1.1) !important;
+  }
+
+  /* Mobile Navigation Dial Item Styling */
+  .mobile-nav-dial-item {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 1px !important;
+    padding: 5px 8px !important;
+    min-width: 44px !important;
+  }
+
+  .mobile-dial-container {
+    position: relative !important;
+    width: 22px !important;
+    height: 22px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .mobile-dial-svg {
+    width: 22px !important;
+    height: 22px !important;
+    overflow: visible !important;
+  }
+
+  .mobile-dial-progress-ring {
+    transition: stroke-dashoffset 150ms linear !important;
+  }
+
+  .mobile-dial-percent {
+    font-size: 8px !important;
+    font-weight: 800 !important;
+    color: #38BDF8 !important;
+    line-height: 1 !important;
+    letter-spacing: -0.02em !important;
+    margin-top: 1px !important;
+    transition: color 200ms ease !important;
+  }
+
+  .mobile-nav-dial-item:hover .mobile-dial-percent,
+  .mobile-nav-dial-item.is-active .mobile-dial-percent {
+    color: #EC4899 !important;
+    text-shadow: 0 0 6px rgba(236, 72, 153, 0.6) !important;
   }
 
   /* 14. Mobile Certifications Redesign overrides */
@@ -4101,10 +4075,10 @@ body.is-maintenance-mode [data-header] {
   .tools-mobile-btn-primary {
     flex: 1 1 100% !important;
     padding: 12px 16px !important;
-    border-radius: 10px !important;
-    background: linear-gradient(135deg, #7C3AED, #6D28D9) !important;
+    border-radius: 12px !important;
+    background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 50%, #9333EA 100%) !important;
     color: #FFFFFF !important;
-    border: none !important;
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
     font-size: 13.5px !important;
     font-weight: 700 !important;
     cursor: pointer !important;
@@ -4112,7 +4086,7 @@ body.is-maintenance-mode [data-header] {
     align-items: center !important;
     justify-content: center !important;
     gap: 6px !important;
-    box-shadow: 0 4px 16px rgba(124, 58, 237, 0.3) !important;
+    box-shadow: 0 4px 18px rgba(124, 58, 237, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
   }
 
   .tools-mobile-btn-secondary {
