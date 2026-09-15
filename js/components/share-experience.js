@@ -121,11 +121,11 @@ class TextAreaField extends HTMLElement {
     `;
 
     const textarea = this.querySelector("textarea");
-    
+
     // Find the counter in the testimonial header row
     const getCounterElements = () => {
-      const counterEl = this.closest("share-experience-modal")?.querySelector("#current-word-count") || 
-                        document.querySelector("#current-word-count");
+      const counterEl = this.closest("share-experience-modal")?.querySelector("#current-word-count") ||
+        document.querySelector("#current-word-count");
       return {
         counter: counterEl,
         wrapper: counterEl?.closest(".char-counter")
@@ -157,8 +157,8 @@ class TextAreaField extends HTMLElement {
     const textarea = this.querySelector("textarea");
     if (textarea) {
       textarea.value = val;
-      const counterEl = this.closest("share-experience-modal")?.querySelector("#current-word-count") || 
-                        document.querySelector("#current-word-count");
+      const counterEl = this.closest("share-experience-modal")?.querySelector("#current-word-count") ||
+        document.querySelector("#current-word-count");
       const wrapper = counterEl?.closest(".char-counter");
       const words = getWordCount(val);
       if (counterEl) counterEl.textContent = words;
@@ -196,12 +196,14 @@ class ModalOverlay extends HTMLElement {
         this.close();
       }
     };
+
   }
 
   open() {
     document.body.classList.add("modal-open");
+    document.documentElement.classList.add("modal-open");
     this.classList.add("is-visible");
-    
+
     // Stop Lenis smooth scrolling to lock page scroll
     if (window.lenis) {
       window.lenis.stop();
@@ -209,7 +211,7 @@ class ModalOverlay extends HTMLElement {
 
     // Attach global ESC key listener
     window.addEventListener("keydown", this.escHandler);
-    
+
     // Trigger animations inside the modal container
     const modal = this.querySelector("share-experience-modal");
     modal?.animateIn();
@@ -220,7 +222,8 @@ class ModalOverlay extends HTMLElement {
     modal?.animateOut(() => {
       this.classList.remove("is-visible");
       document.body.classList.remove("modal-open");
-      
+      document.documentElement.classList.remove("modal-open");
+
       // Resume Lenis smooth scrolling
       if (window.lenis) {
         window.lenis.start();
@@ -289,7 +292,7 @@ class ShareExperienceModal extends HTMLElement {
             if (error) throw error;
             console.log("[Auth] Session restored successfully.");
             this.isLoading = false;
-            
+
             // Retrieve current user and render immediately
             const user = await window.AuthService.getCurrentUser();
             this.handleUserChange(user);
@@ -361,12 +364,13 @@ class ShareExperienceModal extends HTMLElement {
   }
 
   handleUserChange(user) {
+    if (user) {
       const avatarUrl = user.user_metadata?.avatar_url ||
-                        user.user_metadata?.picture ||
-                        user.user_metadata?.avatar ||
-                        user.user_metadata?.photoURL ||
-                        (Array.isArray(user.identities) && (user.identities[0]?.identity_data?.avatar_url || user.identities[0]?.identity_data?.picture || user.identities[0]?.identity_data?.avatar)) ||
-                        (user.email ? `https://unavatar.io/${encodeURIComponent(user.email.trim().toLowerCase())}?fallback=false` : "") || "";
+        user.user_metadata?.picture ||
+        user.user_metadata?.avatar ||
+        user.user_metadata?.photoURL ||
+        (Array.isArray(user.identities) && (user.identities[0]?.identity_data?.avatar_url || user.identities[0]?.identity_data?.picture || user.identities[0]?.identity_data?.avatar)) ||
+        (user.email ? `https://unavatar.io/${encodeURIComponent(user.email.trim().toLowerCase())}?fallback=false` : "") || "";
 
       this.userState = {
         isAuthenticated: true,
@@ -394,7 +398,7 @@ class ShareExperienceModal extends HTMLElement {
     this.popoverOpen = !this.popoverOpen;
     const popover = this.querySelector("#account-popover");
     const menuBtn = this.querySelector("#avatar-menu-btn");
-    
+
     if (popover) {
       if (this.popoverOpen) {
         popover.classList.add("is-open");
@@ -446,7 +450,7 @@ class ShareExperienceModal extends HTMLElement {
         const height = 600;
         const left = window.screen.width / 2 - width / 2;
         const top = window.screen.height / 2 - height / 2;
-        
+
         console.log("[Auth] Redirecting to Google. Opening Popup:", data.url);
         const authPopup = window.open(
           data.url,
@@ -526,6 +530,19 @@ class ShareExperienceModal extends HTMLElement {
             grid-template-columns: 1fr;
             gap: 16px;
           }
+          .modal-header-container {
+            padding-right: 32px !important;
+          }
+          .modal-header-container.has-avatar {
+            gap: 12px !important;
+          }
+          .google-avatar-header {
+            width: 42px !important;
+            height: 42px !important;
+          }
+          .modal-header-text {
+            gap: 2px !important;
+          }
         }
         .form-group label {
           color: rgba(255, 255, 255, 0.5) !important;
@@ -601,14 +618,15 @@ class ShareExperienceModal extends HTMLElement {
           opacity: 0;
           overflow: hidden;
           pointer-events: none;
-          transform: translateY(20px);
-          transition: max-height 0.8s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.6s ease-out, transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+          transform: translateY(16px);
+          transition: max-height 0.6s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.5s ease-out, transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
         }
         .state-authenticated .form-wrapper-authenticated {
-          max-height: 1200px;
-          opacity: 1;
-          pointer-events: auto;
-          transform: translateY(0);
+          max-height: none !important;
+          opacity: 1 !important;
+          pointer-events: auto !important;
+          transform: translateY(0) !important;
+          overflow: visible !important;
         }
 
         /* Avatar Menu Button and Popover Dropdown */
@@ -843,9 +861,9 @@ class ShareExperienceModal extends HTMLElement {
 
     const closeBtn = this.querySelector(".close-modal-btn");
     const googleBtn = this.querySelector("#google-auth-btn");
-    
+
     initMagnetic(closeBtn);
-    
+
     closeBtn?.addEventListener("click", () => {
       this.closest("modal-overlay")?.close();
     });
@@ -899,9 +917,9 @@ class ShareExperienceModal extends HTMLElement {
           
           <div class="account-popover" id="account-popover" aria-hidden="true">
             <div class="popover-user-info">
-              ${this.userState.avatar 
-                ? `<img src="${this.userState.avatar}" alt="${this.userState.name}" class="popover-avatar" referrerpolicy="no-referrer" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='grid';" /><div class="popover-avatar avatar-fallback" style="display:none;">${initials}</div>`
-                : `<div class="popover-avatar avatar-fallback">${initials}</div>`}
+              ${this.userState.avatar
+            ? `<img src="${this.userState.avatar}" alt="${this.userState.name}" class="popover-avatar" referrerpolicy="no-referrer" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='grid';" /><div class="popover-avatar avatar-fallback" style="display:none;">${initials}</div>`
+            : `<div class="popover-avatar avatar-fallback">${initials}</div>`}
               <div class="popover-user-details">
                 <span class="popover-name">${this.userState.name}</span>
                 <span class="popover-email">${this.userState.email}</span>
@@ -1005,12 +1023,12 @@ class ShareExperienceModal extends HTMLElement {
 
     const ratingInput = this.querySelector("#testimonial-rating");
     const starBtns = this.querySelectorAll(".rating-star-btn");
-    
+
     starBtns.forEach(btn => {
       btn.addEventListener("click", () => {
         const val = btn.getAttribute("data-value");
         if (ratingInput) ratingInput.value = val;
-        
+
         starBtns.forEach(b => {
           const starVal = b.getAttribute("data-value");
           if (parseInt(starVal) <= parseInt(val)) {
@@ -1024,7 +1042,7 @@ class ShareExperienceModal extends HTMLElement {
 
     form.addEventListener("submit", (event) => {
       event.preventDefault();
-      
+
       if (!this.userState.isAuthenticated || !this.userState.userId) {
         showToast("error", "Authentication Required", "Please sign in with Google to submit a testimonial.", 4000);
         return;
@@ -1034,7 +1052,7 @@ class ShareExperienceModal extends HTMLElement {
 
       const designationInput = this.querySelector("#role-designation");
       const designationVal = designationInput ? designationInput.value.trim() : "";
-      
+
       const companyInput = this.querySelector("#company-org");
       const companyVal = companyInput ? companyInput.value.trim() : "";
 
@@ -1042,10 +1060,10 @@ class ShareExperienceModal extends HTMLElement {
 
       const linkedinInput = this.querySelector("#linkedin-url");
       const linkedinVal = linkedinInput.value.trim();
-      
+
       const testimonialComp = this.querySelector("#form-testimonial");
       const testimonialVal = testimonialComp ? testimonialComp.value.trim() : "";
-      
+
       const consentCheck = this.querySelector("#consent-check");
       const consentVal = consentCheck ? consentCheck.checked : false;
 
@@ -1127,13 +1145,13 @@ class ShareExperienceModal extends HTMLElement {
                   showToast("error", "Something went wrong", "Unable to submit your testimonial. Please try again.", 4000);
                 } else {
                   showToast("success", "✅ Submitted", "Your testimonial has been submitted for review.", 4000);
-                  
+
                   form.reset();
                   if (testimonialComp) testimonialComp.value = "";
-                  
+
                   this.submitted = true;
                   this.render();
-                  
+
                   setTimeout(() => {
                     this.closest("modal-overlay")?.close();
                     this.submitted = false;
@@ -1202,7 +1220,7 @@ class ShareExperienceModal extends HTMLElement {
     this.style.opacity = "0";
     this.style.transform = "scale(0.95) translateY(15px)";
     this.style.transition = "opacity 300ms cubic-bezier(0.25, 1, 0.5, 1), transform 300ms cubic-bezier(0.25, 1, 0.5, 1)";
-    
+
     this.offsetHeight;
 
     this.style.opacity = "1";
