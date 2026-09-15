@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { supabase } from '../services/supabase/client';
 import { BackButton } from '../components/BackButton';
 
@@ -84,23 +84,6 @@ export const CertificationsShowcasePage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [visibleCount, setVisibleCount] = useState(6);
 
-  const [activeRailIndex, setActiveRailIndex] = useState(0);
-  const railRef = useRef<HTMLDivElement>(null);
-
-  const handleRailScroll = () => {
-    if (railRef.current && filteredCertifications.length > 0) {
-      const scrollLeft = railRef.current.scrollLeft;
-      const cardWidth = 172; // 160px width + 12px gap
-      const index = Math.round(scrollLeft / cardWidth);
-      const safeIndex = Math.min(Math.max(0, index), filteredCertifications.length - 1);
-      setActiveRailIndex(safeIndex);
-      const targetCard = filteredCertifications[safeIndex];
-      if (targetCard && targetCard.id !== selectedCard?.id) {
-        handleCardSelect(targetCard);
-      }
-    }
-  };
-
   const handleCardSelect = (card: CertificationCard) => {
     if (card.id === selectedCard?.id) return;
     setIsTransitioning(true);
@@ -178,7 +161,7 @@ export const CertificationsShowcasePage: React.FC = () => {
       desc: 'Industry Recognized',
       glowColor: 'rgba(167, 139, 250, 0.25)',
       icon: (
-        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#a855f7" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#a855f7" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
           <circle cx="12" cy="8" r="7" />
           <path d="M8.21 13.89L7 23l5-3 5 3-1.21-9.12" />
           <polygon points="12 5 13 8 16 8 13.5 10 14.5 13 12 11 9.5 13 10.5 10 8 8 11 8 12 5" fill="#a855f7" />
@@ -191,7 +174,7 @@ export const CertificationsShowcasePage: React.FC = () => {
       desc: 'Global Brands',
       glowColor: 'rgba(59, 130, 246, 0.25)',
       icon: (
-        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#3b82f6" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#3b82f6" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
           <circle cx="12" cy="12" r="10" />
           <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
           <path d="M2 12h20" />
@@ -204,7 +187,7 @@ export const CertificationsShowcasePage: React.FC = () => {
       desc: 'Authentic Credentials',
       glowColor: 'rgba(16, 185, 129, 0.25)',
       icon: (
-        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#10b981" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#10b981" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
           <path d="m9 11 2 2 4-4" />
         </svg>
@@ -249,540 +232,56 @@ export const CertificationsShowcasePage: React.FC = () => {
   }, [filteredCertifications, visibleCount]);
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '32px',
-        width: '100%',
-        maxWidth: '1280px',
-        margin: '0 auto',
-        padding: '36px 24px 60px 24px',
-        boxSizing: 'border-box',
-        color: '#FFFFFF',
-        fontFamily: "'Manrope', sans-serif"
-      }}
-    >
-      {/* 1. Mobile Page Header (Shown on Mobile ONLY <= 768px) */}
-      <div className="cert-mobile-header-bar">
-        <button
-          type="button"
-          className="projects-mobile-back-btn"
-          onClick={() => {
-            const baseUrl = typeof window !== 'undefined' && window.location.pathname.startsWith('/ashok-portfolio')
-              ? '/ashok-portfolio/'
-              : '/';
-            window.location.href = `${baseUrl}#certifications`;
-          }}
-          aria-label="Go Back"
-        >
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5">
-            <line x1="19" y1="12" x2="5" y2="12" />
-            <polyline points="12 19 5 12 12 5" />
-          </svg>
-          <span>Back to Portfolio</span>
-        </button>
-        <button
-          type="button"
-          className="projects-mobile-share-btn"
-          onClick={() => {
-            if (navigator.share) {
-              navigator.share({
-                title: 'Professional Certifications | Ashok Vangapandu',
-                url: window.location.href
-              }).catch(() => {});
-            } else if (navigator.clipboard) {
-              navigator.clipboard.writeText(window.location.href);
-              if (typeof window !== 'undefined' && (window as any).showToast) {
-                (window as any).showToast('success', 'Link Copied', 'Certifications page link copied to clipboard!', 3000);
-              }
-            }
-          }}
-          aria-label="Share page"
-        >
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="18" cy="5" r="3" />
-            <circle cx="6" cy="12" r="3" />
-            <circle cx="18" cy="19" r="3" />
-            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
-            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
-          </svg>
-        </button>
-      </div>
-
-      {/* 2. Mobile Certifications Hero & Stats (Shown on Mobile ONLY <= 768px) */}
-      <div className="cert-mobile-hero-wrapper">
-        {/* Hero split layout: Left info, Right 3D Shield */}
-        <div className="cert-mobile-hero-top">
-          <div className="cert-mobile-hero-text">
-            <h1 className="cert-mobile-hero-title">
-              Professional <br />
-              <span className="purple-gradient-text">Certifications</span>
-            </h1>
-            <p className="cert-mobile-hero-desc">
-              Trusted credentials from globally recognized organizations that validate my skills and expertise.
-            </p>
-          </div>
-
-          {/* 3D Premium Purple Shield & Diploma Illustration */}
-          <div className="cert-mobile-hero-visual">
-            <svg viewBox="0 0 200 200" width="120" height="120" fill="none" style={{ filter: 'drop-shadow(0 12px 28px rgba(124, 58, 237, 0.5))' }}>
-              <defs>
-                <linearGradient id="certShieldGrad3D" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#C4B5FD" />
-                  <stop offset="35%" stopColor="#8B5CF6" />
-                  <stop offset="70%" stopColor="#6D28D9" />
-                  <stop offset="100%" stopColor="#3B0764" />
-                </linearGradient>
-                <linearGradient id="certShieldInnerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="rgba(255, 255, 255, 0.25)" />
-                  <stop offset="100%" stopColor="rgba(139, 92, 246, 0.05)" />
-                </linearGradient>
-                <linearGradient id="certPlatformGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#3B0764" />
-                  <stop offset="50%" stopColor="#1E1B4B" />
-                  <stop offset="100%" stopColor="#090518" />
-                </linearGradient>
-                <linearGradient id="certStar3D" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#FFFFFF" />
-                  <stop offset="60%" stopColor="#F5F3FF" />
-                  <stop offset="100%" stopColor="#DDD6FE" />
-                </linearGradient>
-                <linearGradient id="certScrollGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="#EDE9FE" />
-                  <stop offset="50%" stopColor="#DDD6FE" />
-                  <stop offset="100%" stopColor="#C4B5FD" />
-                </linearGradient>
-                <filter id="glow3D" x="-20%" y="-20%" width="140%" height="140%">
-                  <feGaussianBlur stdDeviation="6" result="blur" />
-                  <feComposite in="SourceGraphic" in2="blur" operator="over" />
-                </filter>
-              </defs>
-
-              {/* 3D Perspective Platform Base */}
-              <g transform="translate(0, 20)">
-                <ellipse cx="100" cy="140" rx="72" ry="24" fill="url(#certPlatformGrad)" stroke="rgba(139, 92, 247, 0.4)" strokeWidth="1.5" />
-                <ellipse cx="100" cy="136" rx="60" ry="18" fill="rgba(124, 58, 237, 0.18)" />
-              </g>
-
-              {/* Glowing Background Particles */}
-              <circle cx="45" cy="45" r="2.5" fill="#A78BFA" opacity="0.6" filter="url(#glow3D)" />
-              <circle cx="160" cy="55" r="2" fill="#C4B5FD" opacity="0.7" filter="url(#glow3D)" />
-              <circle cx="150" cy="120" r="3" fill="#8B5CF6" opacity="0.5" filter="url(#glow3D)" />
-
-              {/* Main 3D Metallic Shield */}
-              <g transform="translate(0, -5)">
-                {/* Outer Drop Shadow Path */}
-                <path
-                  d="M100 22 C138 22, 158 38, 158 84 C158 132, 100 158, 100 158 C100 158, 42 132, 42 84 C42 38, 62 22, 100 22 Z"
-                  fill="url(#certShieldGrad3D)"
-                  stroke="rgba(255, 255, 255, 0.45)"
-                  strokeWidth="2"
-                  filter="drop-shadow(0 8px 16px rgba(0,0,0,0.5))"
-                />
-                {/* Inner Bevel Shield */}
-                <path
-                  d="M100 32 C130 32, 147 45, 147 84 C147 122, 100 144, 100 144 C100 144, 53 122, 53 84 C53 45, 70 32, 100 32 Z"
-                  fill="url(#certShieldInnerGrad)"
-                  stroke="rgba(255, 255, 255, 0.2)"
-                  strokeWidth="1.2"
-                />
-
-                {/* 3D Glossy Star on Shield */}
-                <polygon
-                  points="100,52 108,74 131,74 112,88 119,110 100,96 81,110 88,88 69,74 92,74"
-                  fill="url(#certStar3D)"
-                  filter="drop-shadow(0 4px 10px rgba(0,0,0,0.4))"
-                />
-
-                {/* Star Center Highlight */}
-                <polygon points="100,56 106,73 123,73 109,84 114,101 100,90" fill="rgba(255,255,255,0.6)" />
-              </g>
-
-              {/* 3D Diploma Scroll Ribbon */}
-              <g transform="translate(118, 112) rotate(-22)" filter="drop-shadow(0 6px 12px rgba(0,0,0,0.4))">
-                <rect x="0" y="0" width="52" height="18" rx="9" fill="url(#certScrollGrad)" stroke="#7C3AED" strokeWidth="1.8" />
-                <circle cx="52" cy="9" r="9" fill="#A78BFA" stroke="#6D28D9" strokeWidth="1.5" />
-                <circle cx="52" cy="9" r="4.5" fill="#5B21B6" />
-                {/* Ribbon Tie */}
-                <rect x="22" y="-1" width="7" height="20" fill="#F59E0B" rx="1.5" />
-              </g>
-            </svg>
-          </div>
-        </div>
-
-        {/* Compact Unified Statistics Panel (3 Columns with vertical dividers) */}
-        <div className="cert-mobile-stats-panel">
-          <div className="cert-mobile-stat-col">
-            <div className="cert-mobile-stat-icon purple">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="12" cy="8" r="6" />
-                <path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11" />
-              </svg>
-            </div>
-            <span className="cert-mobile-stat-value">{certifications.length > 0 ? `${certifications.length}+` : '0'}</span>
-            <span className="cert-mobile-stat-label">Certifications</span>
-            <span className="cert-mobile-stat-sublabel">Industry Recognized</span>
-          </div>
-
-          <div className="cert-mobile-stat-divider" />
-
-          <div className="cert-mobile-stat-col">
-            <div className="cert-mobile-stat-icon blue">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="12" cy="12" r="10" />
-                <line x1="2" y1="12" x2="22" y2="12" />
-                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10z" />
-              </svg>
-            </div>
-            <span className="cert-mobile-stat-value">{uniquePlatformsCount}</span>
-            <span className="cert-mobile-stat-label">Platforms</span>
-            <span className="cert-mobile-stat-sublabel">Global Brands</span>
-          </div>
-
-          <div className="cert-mobile-stat-divider" />
-
-          <div className="cert-mobile-stat-col">
-            <div className="cert-mobile-stat-icon green">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                <polyline points="9 12 11 14 15 10" />
-              </svg>
-            </div>
-            <span className="cert-mobile-stat-value">100%</span>
-            <span className="cert-mobile-stat-label">Verified</span>
-            <span className="cert-mobile-stat-sublabel">Authentic Credentials</span>
-          </div>
-        </div>
-      </div>
-
-      {/* 3. Mobile Certification Collection Rail (Shown on Mobile ONLY <= 768px) */}
-      <div className="cert-mobile-collection-wrapper">
-        <div className="cert-mobile-collection-header">
-          <span className="cert-mobile-collection-title">My Certifications</span>
-          
-          {/* Compact Mobile Search Bar replacing View All */}
-          <div className="cert-mobile-header-search">
-            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#94A3B8" strokeWidth="2.5" style={{ flexShrink: 0 }}>
-              <circle cx="11" cy="11" r="8" />
-              <line x1="21" y1="21" x2="16.65" y2="16.65" />
-            </svg>
-            <input
-              type="text"
-              placeholder="Search..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="cert-mobile-header-search-input"
-            />
-            {searchQuery && (
-              <button
-                type="button"
-                onClick={() => setSearchQuery('')}
-                className="cert-mobile-search-clear"
-                aria-label="Clear search"
-              >
-                ✕
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* Horizontal Rail */}
-        <div className="cert-mobile-rail" ref={railRef} onScroll={handleRailScroll}>
-          {filteredCertifications.length === 0 ? (
-            <div className="cert-mobile-empty-state">
-              No certifications found matching your search.
-            </div>
-          ) : (
-            filteredCertifications.map((card) => {
-              const isActive = selectedCard?.id === card.id;
-              return (
-                <div
-                  key={card.id}
-                  className={`cert-mobile-card ${isActive ? 'active' : ''}`}
-                  onClick={() => handleCardSelect(card)}
-                >
-                  <div className="cert-mobile-card-top">
-                    <div className="cert-mobile-card-logo">{card.logo}</div>
-                    {card.isFeatured && (
-                      <span className="cert-mobile-card-featured">
-                        <span>⭐</span> Featured
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="cert-mobile-card-body">
-                    <h3 className="cert-mobile-card-title">{card.title}</h3>
-                    <p className="cert-mobile-card-issuer">{card.issuer}</p>
-                    <span className="cert-mobile-card-verified">
-                      <svg viewBox="0 0 24 24" width="8" height="8" fill="none" stroke="currentColor" strokeWidth="4">
-                        <polyline points="20 6 9 17 4 12" />
-                      </svg>
-                      Verified
-                    </span>
-                  </div>
-
-                  <div className="cert-mobile-card-footer">
-                    <span className="cert-mobile-card-date">📅 {card.issueDate}</span>
-                    <a
-                      href={card.verificationUrl || '#'}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="cert-mobile-card-link"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      View Credential ↗
-                    </a>
-                  </div>
-                </div>
-              );
-            })
-          )}
-        </div>
-
-        {/* Rail Dots Pagination */}
-        {filteredCertifications.length > 0 && (
-          <div className="cert-mobile-dots">
-            {filteredCertifications.map((card, idx) => (
-              <span
-                key={idx}
-                className={`cert-mobile-dot ${activeRailIndex === idx ? 'active' : ''}`}
-                onClick={() => {
-                  setActiveRailIndex(idx);
-                  handleCardSelect(card);
-                  if (railRef.current) {
-                    railRef.current.scrollTo({ left: idx * 172, behavior: 'smooth' });
-                  }
-                }}
-              />
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* 4. Mobile Certificate Preview (Shown on Mobile ONLY <= 768px) */}
-      <div className="cert-mobile-preview-wrapper">
-        <div className="cert-mobile-preview-header">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#A78BFA" strokeWidth="2">
-            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-          </svg>
-          <span>Certificate Preview</span>
-        </div>
-
-        {displayCard && (
-          <div className="cert-mobile-preview-card">
-            {/* Certificate Image Box */}
-            <div className="cert-mobile-preview-img-box">
-              {displayCard.pdfUrl ? (
-                displayCard.pdfUrl.toLowerCase().split('?')[0].endsWith('.pdf') ? (
-                  <iframe
-                    src={`${displayCard.pdfUrl}#toolbar=0&navpanes=0&scrollbar=0&view=Fit`}
-                    title={displayCard.title}
-                    scrolling="no"
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      border: 'none',
-                      borderRadius: '12px',
-                      backgroundColor: '#FFFFFF',
-                      overflow: 'hidden',
-                      pointerEvents: 'auto'
-                    }}
-                  />
-                ) : (
-                  <img
-                    src={displayCard.pdfUrl}
-                    alt={displayCard.title}
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'contain',
-                      borderRadius: '12px',
-                      backgroundColor: '#FFFFFF',
-                      display: 'block'
-                    }}
-                  />
-                )
-              ) : (
-                <div className="cert-mobile-preview-fallback">
-                  <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#64748B" strokeWidth="1.5">
-                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                    <circle cx="8.5" cy="8.5" r="1.5" />
-                    <polyline points="21 15 16 10 5 21" />
-                  </svg>
-                  <span>No Certificate Image Available</span>
-                </div>
-              )}
-            </div>
-
-            {/* Verified Badge Pill */}
-            <div style={{ display: 'flex', marginTop: '12px' }}>
-              <span className="cert-mobile-preview-badge">
-                <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" strokeWidth="4">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-                VERIFIED CREDENTIAL
-              </span>
-            </div>
-
-            {/* Title & Issuer */}
-            <h3 className="cert-mobile-preview-title">{displayCard.title}</h3>
-            <p className="cert-mobile-preview-issuer">{displayCard.issuer}</p>
-
-            {/* Stacked Details Grid */}
-            <div className="cert-mobile-preview-meta-grid">
-              <div className="cert-mobile-preview-meta-item">
-                <span className="meta-icon">📅</span>
-                <div className="meta-text">
-                  <span className="meta-label">Issued</span>
-                  <span className="meta-val">{displayCard.issueDate || '—'}</span>
-                </div>
-              </div>
-
-              <div className="cert-mobile-preview-meta-item">
-                <span className="meta-icon">🔒</span>
-                <div className="meta-text">
-                  <span className="meta-label">Credential ID</span>
-                  <span className="meta-val">{displayCard.credentialId || '—'}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Skills Validated List */}
-            <div className="cert-mobile-skills-box">
-              <span className="cert-mobile-skills-title">Skills Validated</span>
-              <div className="cert-mobile-skills-list">
-                {displayCard.skills && displayCard.skills.length > 0 ? (
-                  displayCard.skills.map((skill, idx) => (
-                    <div key={idx} className="cert-mobile-skill-item">
-                      <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="#A78BFA" strokeWidth="4">
-                        <polyline points="20 6 9 17 4 12" />
-                      </svg>
-                      <span>{skill}</span>
-                    </div>
-                  ))
-                ) : (
-                  <span style={{ fontSize: '12px', color: '#64748B' }}>—</span>
-                )}
-              </div>
-            </div>
-
-            {/* Download PDF Action Button */}
-            <button
-              type="button"
-              disabled={!displayCard.pdfUrl}
-              onClick={() => displayCard.pdfUrl && window.open(displayCard.pdfUrl, '_blank')}
-              className="cert-mobile-download-btn"
-            >
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                <polyline points="7 10 12 15 17 10" />
-                <line x1="12" y1="15" x2="12" y2="3" />
-              </svg>
-              Download PDF
-            </button>
-
-            {/* Verification Note */}
-            <div className="cert-mobile-verify-note">
-              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-              </svg>
-              <span>All credentials are verified and sourced from official providers.</span>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Top minimal back control (Desktop ONLY > 768px) */}
-      <div className="cert-desktop-back-wrapper" style={{ width: '100%', display: 'flex', justifyContent: 'flex-start' }}>
+    <div className="cert-showcase-container">
+      {/* Top minimal back control */}
+      <div className="cert-back-wrapper">
         <BackButton label="Back to Portfolio" fallbackUrl={`${baseUrl}#certifications`} />
       </div>
-      {/* 1. Top Section (Hero Split Layout) (Desktop ONLY > 768px) */}
-      <section
-        className="cert-desktop-hero-section"
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          gap: '40px',
-          width: '100%'
-        }}
-      >
+
+      {/* 1. Top Hero Section (Split Layout: Title on Left, 3 Stat Cards on Right) */}
+      <section className="cert-hero-section">
         {/* Left Side: Headings */}
-        <div style={{ flex: 1, display: 'flex', alignItems: 'flex-start', gap: '20px' }}>
+        <div className="cert-hero-left">
           {/* Medal Icon on the left */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '4px', flexShrink: 0 }}>
-            <svg viewBox="0 0 24 24" width="40" height="46" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: '#a855f7', filter: 'drop-shadow(0 0 12px rgba(168, 85, 247, 0.4))' }}>
+          <div className="cert-hero-medal-icon">
+            <svg viewBox="0 0 24 24" width="38" height="42" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M12 2L3 7v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5z" />
               <polygon points="12 8 13.5 11 16.5 11 14 13 15 16 12 14 9 16 10 13 7.5 11 10.5 11" fill="rgba(168, 85, 247, 0.2)" stroke="#a855f7" strokeWidth="1.5" />
             </svg>
           </div>
+
           {/* Text Stack on the right of the icon */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            <div
-              style={{
-                color: '#a855f7',
-                fontSize: '11px',
-                fontWeight: 700,
-                textTransform: 'uppercase',
-                letterSpacing: '0.08em',
-                lineHeight: '1.2'
-              }}
-            >
+          <div className="cert-hero-text-stack">
+            <div className="cert-hero-tag">
               CERTIFICATIONS
             </div>
-            <h1
-              style={{
-                fontSize: '32px',
-                fontWeight: 700,
-                color: '#ffffff',
-                margin: 0,
-                letterSpacing: '-0.02em',
-                lineHeight: '1.1'
-              }}
-            >
+            <h1 className="cert-hero-title">
               Professional Certifications
             </h1>
-            <p style={{ fontSize: '14.5px', lineHeight: '1.5', color: '#94A3B8', margin: '4px 0 0 0', maxWidth: '520px' }}>
+            <p className="cert-hero-desc">
               Trusted credentials from globally recognized organizations that validate my skills and expertise.
             </p>
           </div>
         </div>
 
-        {/* Right Side: 3 Stats Cards (Centered Vertically) */}
-        <div style={{ display: 'flex', gap: '16px', flexShrink: 0, alignItems: 'center' }}>
+        {/* Right Side: 3 Stats Cards */}
+        <div className="cert-hero-stats">
           {stats.map((stat, idx) => (
-            <div
-              key={idx}
-              style={{
-                width: '170px',
-                padding: '16px 20px',
-                background: 'rgba(13, 17, 30, 0.45)',
-                border: '1px solid rgba(255, 255, 255, 0.05)',
-                borderRadius: '16px',
-                backdropFilter: 'blur(20px)',
-                WebkitBackdropFilter: 'blur(20px)',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
-                boxSizing: 'border-box',
-                height: '110px'
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', width: '100%' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '2px' }}>
+            <div key={idx} className="cert-stat-card">
+              <div className="cert-stat-top-row">
+                <div className="cert-stat-icon-wrap">
                   {stat.icon}
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                  <div style={{ fontSize: '26px', fontWeight: 650, color: '#ffffff', lineHeight: '1.1' }}>
+                <div className="cert-stat-numbers">
+                  <div className="cert-stat-val">
                     {stat.value}
                   </div>
-                  <div style={{ fontSize: '11.5px', fontWeight: 550, color: '#94A3B8', marginTop: '1px' }}>
+                  <div className="cert-stat-label">
                     {stat.label}
                   </div>
                 </div>
               </div>
-              <div style={{ fontSize: '11px', color: '#475569', marginTop: '8px', textAlign: 'left', fontWeight: 500 }}>
+              <div className="cert-stat-desc">
                 {stat.desc}
               </div>
             </div>
@@ -790,32 +289,13 @@ export const CertificationsShowcasePage: React.FC = () => {
         </div>
       </section>
 
-      {/* 2. Main Content (Two-Column Layout) */}
-      <section
-        className="cert-desktop-main-grid"
-        style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 410px',
-          gap: '56px',
-          alignItems: 'start',
-          width: '100%'
-        }}
-      >
+      {/* 2. Main Content (Two-Column Layout: Left Search + Grid, Right Sticky Preview) */}
+      <section className="cert-main-grid">
         {/* Left Column: Search Bar & Grid Cards */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '28px', flex: 1 }}>
+        <div className="cert-left-col">
           {/* Search bar Component */}
-          <div style={{ position: 'relative', width: '100%', boxSizing: 'border-box' }}>
-            <span
-              style={{
-                position: 'absolute',
-                left: '18px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                color: '#4B5563',
-                display: 'flex',
-                alignItems: 'center'
-              }}
-            >
+          <div className={`cert-search-box ${searchFocused ? 'focused' : ''}`}>
+            <span className="cert-search-icon-left">
               <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="11" cy="11" r="8" />
                 <line x1="21" y1="21" x2="16.65" y2="16.65" />
@@ -826,72 +306,53 @@ export const CertificationsShowcasePage: React.FC = () => {
               placeholder="Search certifications, platforms or skills..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '16px 50px 16px 48px',
-                background: 'rgba(13, 17, 30, 0.45)',
-                border: searchFocused ? '1px solid rgba(124, 92, 255, 0.5)' : '1px solid rgba(255, 255, 255, 0.05)',
-                borderRadius: '999px',
-                color: '#ffffff',
-                fontSize: '14px',
-                boxSizing: 'border-box',
-                outline: 'none',
-                transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
-                boxShadow: searchFocused ? '0 0 20px rgba(124, 92, 255, 0.15)' : 'none',
-                backdropFilter: 'blur(20px)',
-                WebkitBackdropFilter: 'blur(20px)'
-              }}
+              className="cert-search-input"
               onFocus={() => setSearchFocused(true)}
               onBlur={() => setSearchFocused(false)}
             />
-            <span
-              style={{
-                position: 'absolute',
-                right: '20px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                color: '#94A3B8',
-                display: 'flex',
-                alignItems: 'center',
-                cursor: 'pointer'
-              }}
-            >
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="4" y1="21" x2="4" y2="14" />
-                <line x1="4" y1="10" x2="4" y2="3" />
-                <line x1="12" y1="21" x2="12" y2="12" />
-                <line x1="12" y1="8" x2="12" y2="3" />
-                <line x1="20" y1="21" x2="20" y2="16" />
-                <line x1="20" y1="12" x2="20" y2="3" />
-                <line x1="1" y1="14" x2="7" y2="14" />
-                <line x1="9" y1="8" x2="15" y2="8" />
-                <line x1="17" y1="16" x2="23" y2="16" />
-              </svg>
+            <span className="cert-search-icon-right">
+              {searchQuery ? (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery('')}
+                  style={{ background: 'none', border: 'none', color: '#94A3B8', cursor: 'pointer', padding: 0, display: 'flex' }}
+                  aria-label="Clear search"
+                >
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                  </svg>
+                </button>
+              ) : (
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="4" y1="21" x2="4" y2="14" />
+                  <line x1="4" y1="10" x2="4" y2="3" />
+                  <line x1="12" y1="21" x2="12" y2="12" />
+                  <line x1="12" y1="8" x2="12" y2="3" />
+                  <line x1="20" y1="21" x2="20" y2="16" />
+                  <line x1="20" y1="12" x2="20" y2="3" />
+                  <line x1="1" y1="14" x2="7" y2="14" />
+                  <line x1="9" y1="8" x2="15" y2="8" />
+                  <line x1="17" y1="16" x2="23" y2="16" />
+                </svg>
+              )}
             </span>
           </div>
 
           {loading ? (
-            <div style={{ textAlign: 'center', color: '#94A3B8', padding: '120px 0', fontSize: '15px', background: 'rgba(13, 17, 30, 0.2)', borderRadius: '16px', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
+            <div className="cert-state-msg">
               Loading certifications showcase...
             </div>
           ) : error ? (
-            <div style={{ textAlign: 'center', color: '#EF4444', padding: '120px 0', fontSize: '15px', background: 'rgba(13, 17, 30, 0.2)', borderRadius: '16px', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
+            <div className="cert-state-msg error">
               Error loading certifications: {error}
             </div>
           ) : (
             <>
-              {/* Grid Cards Component (Strictly 3 Columns Desktop) */}
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(3, 1fr)',
-                  gap: '24px',
-                  width: '100%',
-                  boxSizing: 'border-box'
-                }}
-              >
+              {/* Grid Cards Component */}
+              <div className="cert-cards-grid">
                 {filteredCertifications.length === 0 ? (
-                  <div style={{ gridColumn: 'span 3', textAlign: 'center', color: '#94A3B8', padding: '80px 0', fontSize: '14.5px', background: 'rgba(13, 17, 30, 0.2)', borderRadius: '16px', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
+                  <div className="cert-empty-state">
                     No certifications found matching your search.
                   </div>
                 ) : (
@@ -904,71 +365,16 @@ export const CertificationsShowcasePage: React.FC = () => {
                         onMouseEnter={() => setHoveredCard(card.id)}
                         onMouseLeave={() => setHoveredCard(null)}
                         onClick={() => handleCardSelect(card)}
-                        style={{
-                          background: isActive ? 'rgba(34, 43, 73, 0.85)' : (isHovered ? 'rgba(28, 35, 60, 0.7)' : 'rgba(23, 29, 49, 0.54)'),
-                          border: isActive
-                            ? '1px solid #7C5CFF'
-                            : (isHovered
-                              ? (card.isFeatured ? '1px solid rgba(251, 191, 36, 0.55)' : '1px solid rgba(124, 92, 255, 0.45)')
-                              : (card.isFeatured ? '1px solid rgba(251, 191, 36, 0.22)' : '1px solid rgba(255, 255, 255, 0.09)')),
-                          borderRadius: '16px',
-                          padding: '24px',
-                          display: 'flex',
-                          flexDirection: 'column',
-                          justifyContent: 'space-between',
-                          boxShadow: isActive
-                            ? (card.isFeatured ? '0 14px 40px rgba(0, 0, 0, 0.35), 0 0 25px rgba(251, 191, 36, 0.22)' : '0 14px 40px rgba(0, 0, 0, 0.35), 0 0 25px rgba(124, 92, 255, 0.25)')
-                            : (isHovered
-                              ? (card.isFeatured ? '0 24px 48px rgba(0, 0, 0, 0.35), 0 0 30px rgba(251, 191, 36, 0.14)' : '0 24px 48px rgba(0, 0, 0, 0.35), 0 0 30px rgba(124, 92, 255, 0.16)')
-                              : '0 14px 40px rgba(0, 0, 0, 0.28)'),
-                          transform: isHovered ? 'translateY(-6px) scale(1.01)' : (isActive ? 'translateY(-2px)' : 'translateY(0)'),
-                          transition: 'all 250ms cubic-bezier(0.16, 1, 0.3, 1)',
-                          cursor: 'pointer',
-                          boxSizing: 'border-box',
-                          minHeight: '240px',
-                          height: '100%',
-                          backdropFilter: 'blur(20px)',
-                          WebkitBackdropFilter: 'blur(20px)'
-                        }}
+                        className={`cert-card ${isActive ? 'active' : ''} ${card.isFeatured ? 'featured' : ''} ${isHovered ? 'hovered' : ''}`}
                       >
                         {/* Top: Logo and badges */}
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-                          <div
-                            style={{
-                              width: '44px',
-                              height: '44px',
-                              borderRadius: '10px',
-                              background: 'rgba(255, 255, 255, 0.03)',
-                              border: '1px solid rgba(255, 255, 255, 0.08)',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              overflow: 'hidden',
-                              boxSizing: 'border-box'
-                            }}
-                          >
+                        <div className="cert-card-top-row">
+                          <div className="cert-card-logo-box">
                             {card.logo}
                           </div>
 
                           {card.isFeatured && (
-                            <span
-                              style={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                gap: '4px',
-                                fontSize: '10.5px',
-                                fontWeight: 650,
-                                color: '#FBBF24',
-                                background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(251, 191, 36, 0.08) 100%)',
-                                padding: '4px 10px',
-                                borderRadius: '999px',
-                                border: '1px solid rgba(251, 191, 36, 0.3)',
-                                boxShadow: '0 0 10px rgba(251, 191, 36, 0.08)',
-                                backdropFilter: 'blur(4px)',
-                                WebkitBackdropFilter: 'blur(4px)',
-                                lineHeight: 1
-                              }}
-                            >
+                            <span className="cert-card-featured-badge">
                               <span style={{ fontSize: '9px' }}>⭐</span>
                               <span>Featured</span>
                             </span>
@@ -976,40 +382,16 @@ export const CertificationsShowcasePage: React.FC = () => {
                         </div>
 
                         {/* Middle: Title, Issuer, and Verified badge */}
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '16px', flex: 1 }}>
-                          <h3
-                            style={{
-                              margin: 0,
-                              fontSize: '16px',
-                              fontWeight: 750,
-                              color: '#FFFFFF',
-                              lineHeight: 1.35,
-                              letterSpacing: '-0.01em'
-                            }}
-                          >
+                        <div className="cert-card-info-stack">
+                          <h3 className="cert-card-title">
                             {card.title}
                           </h3>
-                          <p style={{ margin: 0, fontSize: '13px', color: '#64748B', fontWeight: 500, marginBottom: '2px' }}>
+                          <p className="cert-card-issuer">
                             {card.issuer}
                           </p>
                           <div style={{ display: 'flex' }}>
-                            <span
-                              style={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                gap: '4px',
-                                fontSize: '10.5px',
-                                fontWeight: 600,
-                                color: '#10B981',
-                                background: 'rgba(16, 185, 129, 0.06)',
-                                padding: '3px 8px',
-                                borderRadius: '999px',
-                                border: '1px solid rgba(16, 185, 129, 0.08)',
-                                textTransform: 'capitalize',
-                                lineHeight: 1
-                              }}
-                            >
-                              <svg viewBox="0 0 24 24" width="9" height="9" fill="none" stroke="currentColor" strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                            <span className="cert-card-verified-badge">
+                              <svg viewBox="0 0 24 24" width="9" height="9" fill="none" stroke="currentColor" strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round">
                                 <polyline points="20 6 9 17 4 12" />
                               </svg>
                               Verified
@@ -1018,17 +400,7 @@ export const CertificationsShowcasePage: React.FC = () => {
                         </div>
 
                         {/* Date with calendar icon */}
-                        <div
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '6px',
-                            color: '#64748B',
-                            fontSize: '12px',
-                            fontWeight: 500,
-                            marginTop: '8px'
-                          }}
-                        >
+                        <div className="cert-card-date-row">
                           <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
                             <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
                             <line x1="16" y1="2" x2="16" y2="6" />
@@ -1039,37 +411,11 @@ export const CertificationsShowcasePage: React.FC = () => {
                         </div>
 
                         {/* Bottom: View Credential link */}
-                        <div
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            marginTop: '16px',
-                            paddingTop: '12px',
-                            borderTop: '1px solid rgba(255, 255, 255, 0.04)'
-                          }}
-                        >
-                          <span
-                            style={{
-                              fontSize: '12.5px',
-                              fontWeight: 600,
-                              color: isHovered ? '#A78BFA' : '#94A3B8',
-                              transition: 'color 0.2s ease',
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              gap: '4px'
-                            }}
-                          >
+                        <div className="cert-card-bottom-link-row">
+                          <span className="cert-card-link-text">
                             View Credential →
                           </span>
-                          <span
-                            style={{
-                              color: isHovered ? '#A78BFA' : '#64748B',
-                              transition: 'color 0.2s ease',
-                              display: 'flex',
-                              alignItems: 'center'
-                            }}
-                          >
+                          <span className="cert-card-link-icon">
                             <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                               <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
                               <polyline points="15 3 21 3 21 9" />
@@ -1085,37 +431,11 @@ export const CertificationsShowcasePage: React.FC = () => {
 
               {/* Bottom: Show More button */}
               {visibleCount < filteredCertifications.length && (
-                <div style={{ display: 'flex', justifyContent: 'center', marginTop: '16px' }}>
+                <div className="cert-show-more-wrap">
                   <button
                     type="button"
                     onClick={() => setVisibleCount(prev => prev + 6)}
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '8px',
-                      padding: '10px 24px',
-                      background: 'rgba(13, 17, 30, 0.45)',
-                      border: '1px solid rgba(255, 255, 255, 0.08)',
-                      borderRadius: '999px',
-                      color: '#94A3B8',
-                      fontSize: '13.5px',
-                      fontWeight: 600,
-                      cursor: 'pointer',
-                      transition: 'all 0.2s ease',
-                      boxSizing: 'border-box',
-                      backdropFilter: 'blur(20px)',
-                      WebkitBackdropFilter: 'blur(20px)'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
-                      e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.15)';
-                      e.currentTarget.style.color = '#FFFFFF';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.background = 'rgba(13, 17, 30, 0.45)';
-                      e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)';
-                      e.currentTarget.style.color = '#94A3B8';
-                    }}
+                    className="cert-show-more-btn"
                   >
                     <span>Show More Certifications</span>
                     <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
@@ -1129,155 +449,68 @@ export const CertificationsShowcasePage: React.FC = () => {
         </div>
 
         {/* Right Column: Sticky Preview Sidebar */}
-        <aside
-          style={{
-            position: 'sticky',
-            top: '120px',
-            padding: '24px',
-            background: 'rgba(35, 43, 71, 0.64)',
-            border: '1px solid rgba(255, 255, 255, 0.14)',
-            borderRadius: '20px',
-            backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '24px',
-            boxSizing: 'border-box',
-            boxShadow: '0 32px 64px rgba(0, 0, 0, 0.45), inset 0 2px 12px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.12)',
-            width: '410px'
-          }}
-        >
+        <aside className="cert-preview-sidebar">
           {/* Header Row */}
-          <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-            <span style={{ display: 'flex', marginTop: '3px' }}>
+          <div className="cert-preview-header">
+            <span style={{ display: 'flex', marginTop: '2px', flexShrink: 0 }}>
               <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#A78BFA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
               </svg>
             </span>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-              <h3 style={{ fontSize: '17px', fontWeight: 750, color: '#ffffff', margin: 0, letterSpacing: '-0.01em' }}>
+            <div className="cert-preview-header-text">
+              <h3 className="cert-preview-title">
                 Certificate Preview
               </h3>
-              <span style={{ fontSize: '13px', color: '#64748B', fontWeight: 500 }}>
+              <span className="cert-preview-subtitle">
                 Click on any certificate to view full details.
               </span>
             </div>
           </div>
 
           {!displayCard ? (
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                height: '300px',
-                color: '#64748B',
-                gap: '8px',
-                border: '1.5px dashed rgba(255, 255, 255, 0.08)',
-                borderRadius: '12px'
-              }}
-            >
+            <div className="cert-preview-empty">
               <span>No certificate selected</span>
             </div>
           ) : (
             <div
-              style={{
-                opacity: isTransitioning ? 0 : 1,
-                transform: isTransitioning ? 'translateY(6px)' : 'translateY(0)',
-                transition: 'opacity 150ms ease, transform 150ms ease',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '24px',
-                width: '100%',
-                boxSizing: 'border-box'
-              }}
+              className={`cert-preview-body ${isTransitioning ? 'transitioning' : ''}`}
             >
               {/* Large Certificate Preview/Mockup */}
-              <div style={{ width: '100%', boxSizing: 'border-box', height: '252px', position: 'relative' }}>
+              <div className="cert-preview-img-box">
                 {displayCard.pdfUrl ? (
                   displayCard.pdfUrl.toLowerCase().includes('.pdf') ? (
                     <iframe
                       src={`${displayCard.pdfUrl}#toolbar=0&navpanes=0`}
                       title={displayCard.title}
-                      style={{
-                        width: '100%',
-                        height: '100%',
-                        border: 'none',
-                        borderRadius: '12px',
-                        backgroundColor: '#FFFFFF',
-                        boxShadow: '0 10px 25px rgba(0, 0, 0, 0.2)'
-                      }}
+                      className="cert-preview-frame"
                     />
                   ) : (
                     <img
                       src={displayCard.pdfUrl}
                       alt={displayCard.title}
-                      style={{
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'contain',
-                        borderRadius: '12px',
-                        backgroundColor: '#FFFFFF',
-                        border: '1px solid rgba(255, 255, 255, 0.08)',
-                        boxShadow: '0 10px 25px rgba(0, 0, 0, 0.2)',
-                        display: 'block'
-                      }}
+                      className="cert-preview-img"
                     />
                   )
                 ) : (
-                  <div
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      borderRadius: '12px',
-                      border: '1.5px dashed rgba(255, 255, 255, 0.15)',
-                      backgroundColor: 'rgba(255, 255, 255, 0.02)',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '12px',
-                      color: '#94A3B8',
-                      boxSizing: 'border-box'
-                    }}
-                  >
+                  <div className="cert-preview-no-img">
                     <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" strokeWidth="1.5">
                       <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
                       <circle cx="8.5" cy="8.5" r="1.5" />
                       <polyline points="21 15 16 10 5 21" />
                     </svg>
-                    <span style={{ fontSize: '13px', fontWeight: 500 }}>
-                      No Certificate Image Available
-                    </span>
+                    <span>No Certificate Image Available</span>
                   </div>
                 )}
               </div>
 
               {/* Details Card Content */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <div className="cert-preview-info-wrap">
                 {/* Header / Verified Badge row */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px' }}>
-                  <h4 style={{ fontSize: '18px', fontWeight: 800, color: '#ffffff', margin: 0, lineHeight: 1.3 }}>
+                <div className="cert-preview-title-row">
+                  <h4 className="cert-preview-cert-title">
                     {displayCard.title}
                   </h4>
-                  <span
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '4px',
-                      fontSize: '11px',
-                      fontWeight: 700,
-                      color: '#10B981',
-                      background: 'rgba(16, 185, 129, 0.08)',
-                      padding: '4px 10px',
-                      borderRadius: '999px',
-                      border: '1px solid rgba(16, 185, 129, 0.15)',
-                      textTransform: 'capitalize',
-                      lineHeight: 1,
-                      flexShrink: 0
-                    }}
-                  >
+                  <span className="cert-preview-badge-pill">
                     <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
                       <polyline points="20 6 9 17 4 12" />
                     </svg>
@@ -1286,15 +519,15 @@ export const CertificationsShowcasePage: React.FC = () => {
                 </div>
 
                 {/* Grid of metadata and skills */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '24px', width: '100%' }}>
+                <div className="cert-preview-meta-grid">
                   {/* Left Column: Metadata details */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  <div className="cert-preview-meta-col">
                     {[
                       {
                         label: 'Issued By',
                         value: displayCard.issuer || '—',
                         icon: (
-                          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#A78BFA" strokeWidth="2.2">
+                          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#A78BFA" strokeWidth="2.2">
                             <circle cx="12" cy="8" r="6" />
                             <path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11" />
                           </svg>
@@ -1323,28 +556,15 @@ export const CertificationsShowcasePage: React.FC = () => {
                         )
                       }
                     ].map((item, idx) => (
-                      <div key={idx} style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
-                        <div
-                          style={{
-                            width: '28px',
-                            height: '28px',
-                            borderRadius: '8px',
-                            background: 'rgba(255,255,255,0.02)',
-                            border: '1px solid rgba(255,255,255,0.05)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            flexShrink: 0,
-                            marginTop: '2px'
-                          }}
-                        >
+                      <div key={idx} className="cert-preview-meta-item">
+                        <div className="cert-preview-meta-icon-box">
                           {item.icon}
                         </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                          <span style={{ fontSize: '11px', color: '#64748B', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.02em' }}>
+                        <div className="cert-preview-meta-text-box">
+                          <span className="cert-preview-meta-label">
                             {item.label}
                           </span>
-                          <span style={{ fontSize: '13.5px', color: '#E2E8F0', fontWeight: 600 }}>
+                          <span className="cert-preview-meta-val">
                             {item.value}
                           </span>
                         </div>
@@ -1353,24 +573,24 @@ export const CertificationsShowcasePage: React.FC = () => {
                   </div>
 
                   {/* Right Column: Validated Skills */}
-                  <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    <span style={{ fontSize: '11px', color: '#64748B', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '10px' }}>
+                  <div className="cert-preview-skills-col">
+                    <span className="cert-preview-skills-heading">
                       Skills Validated
                     </span>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <div className="cert-preview-skills-list">
                       {displayCard.skills && displayCard.skills.length > 0 ? (
                         displayCard.skills.map((skill, index) => (
-                          <div key={index} style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                          <div key={index} className="cert-preview-skill-item">
                             <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="#A78BFA" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
                               <polyline points="20 6 9 17 4 12" />
                             </svg>
-                            <span style={{ fontSize: '11.5px', color: '#94A3B8', fontWeight: 500, lineHeight: 1.2 }}>
+                            <span className="cert-preview-skill-text">
                               {skill}
                             </span>
                           </div>
                         ))
                       ) : (
-                        <span style={{ fontSize: '12.5px', color: '#64748B', fontWeight: 500 }}>—</span>
+                        <span style={{ fontSize: '12px', color: '#64748B', fontWeight: 500 }}>—</span>
                       )}
                     </div>
                   </div>
@@ -1383,35 +603,7 @@ export const CertificationsShowcasePage: React.FC = () => {
                   type="button"
                   disabled={!displayCard.pdfUrl}
                   onClick={() => displayCard.pdfUrl && window.open(displayCard.pdfUrl, '_blank')}
-                  style={{
-                    width: '100%',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '8px',
-                    padding: '12px 0',
-                    background: 'rgba(255,255,255,0.02)',
-                    border: '1px solid rgba(255, 255, 255, 0.08)',
-                    borderRadius: '8px',
-                    color: displayCard.pdfUrl ? '#FFFFFF' : '#64748B',
-                    fontSize: '13px',
-                    fontWeight: 750,
-                    cursor: displayCard.pdfUrl ? 'pointer' : 'not-allowed',
-                    transition: 'all 0.2s ease',
-                    boxSizing: 'border-box'
-                  }}
-                  onMouseEnter={(e) => {
-                    if (displayCard.pdfUrl) {
-                      e.currentTarget.style.background = 'rgba(255, 255, 255, 0.06)';
-                      e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.15)';
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (displayCard.pdfUrl) {
-                      e.currentTarget.style.background = 'rgba(255, 255, 255, 0.02)';
-                      e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)';
-                    }
-                  }}
+                  className="cert-preview-download-btn"
                 >
                   <span>Download PDF</span>
                   <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -1425,13 +617,13 @@ export const CertificationsShowcasePage: React.FC = () => {
           )}
 
           {/* Footer Note */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'center', marginTop: '4px' }}>
+          <div className="cert-preview-footer-note">
             <span>
               <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#64748B" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
               </svg>
             </span>
-            <span style={{ fontSize: '11px', color: '#64748B', fontWeight: 550, letterSpacing: '0.01em' }}>
+            <span>
               All credentials are verified and sourced from official providers.
             </span>
           </div>

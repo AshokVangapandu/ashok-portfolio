@@ -59,11 +59,11 @@
 
 .new-portfolio-title {
   margin: 0;
-  font-size: clamp(28px, 4.2vw, 40px);
+  font-size: clamp(22px, 2.8vw, 30px);
   font-weight: 750;
   color: #FFFFFF;
   line-height: 1.25;
-  letter-spacing: 0;
+  letter-spacing: -0.01em;
 }
 
 .new-portfolio-title .gradient-text {
@@ -74,7 +74,7 @@
 
 .new-portfolio-subtitle {
   margin: 0;
-  font-size: 15px;
+  font-size: 14.5px;
   line-height: 1.6;
   color: #94A3B8;
 }
@@ -108,8 +108,8 @@
 .new-action-row {
   display: flex;
   align-items: center;
-  gap: 16px;
-  flex-wrap: wrap;
+  gap: 12px;
+  flex-wrap: nowrap;
   margin-top: 8px;
 }
 
@@ -139,9 +139,9 @@
   height: 44px;
   border-radius: 50%;
   background-color: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   color: #C4B5FD;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   text-decoration: none;
@@ -151,20 +151,8 @@
 
 .new-btn-icon:hover {
   background-color: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(143, 133, 255, 0.3);
   color: #FFFFFF;
-}
-
-.new-action-subtext-group {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.new-action-subtext {
-  font-size: 13px;
-  color: #64748B;
-  font-weight: 600;
 }
 
 .new-portfolio-mockup {
@@ -380,7 +368,7 @@
 }
 
 /* Responsive updates for footer */
-@media (max-width: 1024px) {
+@media (max-width: 860px) {
   .new-portfolio-main {
     grid-template-columns: 1fr !important;
     gap: 40px !important;

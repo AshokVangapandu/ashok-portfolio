@@ -34,7 +34,7 @@
 }
 
 .navbar {
-  width: min(1180px, calc(100% - 40px));
+  width: min(1180px, calc(100% - 96px));
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -92,17 +92,17 @@
 .nav-links {
   justify-self: end;
   justify-content: flex-end;
-  gap: clamp(18px, 2.2vw, 28px);
+  gap: clamp(14px, 1.6vw, 22px);
 }
 
 .nav-links a {
   display: inline-flex;
   align-items: center;
-  min-height: 40px;
+  min-height: 38px;
   color: rgba(244, 247, 255, 0.62);
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 500;
-  letter-spacing: 0;
+  letter-spacing: 0.01em;
   text-shadow: none;
   white-space: nowrap;
   transition: color 240ms ease, opacity 240ms ease, transform 240ms var(--ease), text-shadow 240ms ease;
@@ -168,8 +168,8 @@
   }
 
   .nav-links a {
-    padding: 14px 12px;
-    font-size: 15px;
+    padding: 12px 10px;
+    font-size: 13.5px;
   }
 }
 
@@ -386,7 +386,7 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 14px;
   width: min(100%, 720px);
-  margin-top: 56px;
+  margin-top: 36px;
   box-sizing: border-box;
 }
 
@@ -396,7 +396,7 @@
 
 .hero-copy .socials {
   order: 6;
-  margin-top: 24px;
+  margin-top: 28px;
 }
 
 .hero-cap-card {
@@ -1018,7 +1018,7 @@
     min-height: 100vh !important;
     max-height: 100vh !important;
     padding-top: var(--header-height) !important;
-    padding-bottom: clamp(16px, 3.5vh, 42px) !important;
+    padding-bottom: clamp(12px, 2.5vh, 28px) !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: center !important;
@@ -1030,11 +1030,11 @@
   .hero-container {
     width: min(1200px, calc(100% - 48px));
     height: 100%;
-    max-height: calc(100vh - var(--header-height) - 24px);
+    max-height: calc(100vh - var(--header-height) - 16px);
     display: grid;
-    grid-template-columns: minmax(0, 1.12fr) minmax(320px, 0.88fr);
+    grid-template-columns: minmax(0, 1.15fr) minmax(300px, 0.85fr);
     align-items: center;
-    gap: clamp(24px, 4.5vw, 84px);
+    gap: clamp(20px, 3.6vw, 64px);
     margin: 0 auto;
   }
 
@@ -1042,106 +1042,132 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    max-width: 720px;
+    max-width: 680px;
     height: 100%;
   }
 
+  .hero-copy h1 {
+    font-size: clamp(32px, 3.8vw, 46px) !important;
+    font-weight: 760 !important;
+    line-height: 1.15 !important;
+    margin: 0 0 clamp(16px, 2.4vh, 24px) 0 !important;
+    padding-bottom: clamp(12px, 1.8vh, 16px) !important;
+    white-space: nowrap !important;
+    letter-spacing: -0.01em !important;
+    text-shadow: 0 14px 34px rgba(0, 0, 0, 0.28) !important;
+  }
+
+  .hero-copy h1::after {
+    width: min(34%, 180px) !important;
+    height: 2px !important;
+  }
+
   .hero-kicker {
-    margin: 0 0 clamp(8px, 1.6vh, 18px) !important;
-    padding: clamp(6px, 1vh, 9px) clamp(10px, 1.3vw, 14px) !important;
-    font-size: clamp(10.5px, 0.85vw, 12px) !important;
+    margin: 0 0 clamp(14px, 2.2vh, 20px) !important;
+    padding: clamp(6px, 0.9vh, 8px) clamp(12px, 1.2vw, 15px) !important;
+    font-size: clamp(10px, 0.82vw, 11px) !important;
+    letter-spacing: 0.14em !important;
   }
 
   .hero-headline {
-    margin: 0 0 clamp(8px, 1.6vh, 20px) !important;
-    font-size: clamp(24px, 3.2vw, 44px) !important;
+    margin: 0 0 clamp(12px, 1.8vh, 18px) !important;
+    font-size: clamp(22px, 2.8vw, 38px) !important;
     line-height: 1.2 !important;
   }
 
   .hero-description {
-    font-size: clamp(13.5px, 1.1vw, 16.5px) !important;
-    line-height: 1.6 !important;
+    font-size: clamp(15px, 1.18vw, 17px) !important;
+    line-height: 1.7 !important;
+    max-width: 580px !important;
     margin-bottom: 0 !important;
   }
 
   .hero-actions {
-    margin-top: clamp(18px, 3.2vh, 36px) !important;
-    gap: clamp(12px, 1.5vw, 16px) !important;
+    margin-top: clamp(22px, 3.4vh, 32px) !important;
+    gap: clamp(12px, 1.3vw, 16px) !important;
   }
 
   .primary-action {
-    padding: clamp(10px, 1.5vh, 14px) clamp(18px, 2vw, 26px) !important;
-    font-size: clamp(13.5px, 1vw, 15.5px) !important;
-    min-height: clamp(40px, 5.2vh, 50px) !important;
+    padding: clamp(10px, 1.4vh, 13px) clamp(18px, 1.8vw, 24px) !important;
+    font-size: clamp(13.5px, 0.98vw, 15px) !important;
+    min-height: clamp(40px, 5.2vh, 48px) !important;
     min-width: auto !important;
+    border-radius: 12px !important;
   }
 
   .connect-action {
-    padding: clamp(10px, 1.5vh, 14px) clamp(16px, 1.8vw, 22px) !important;
-    font-size: clamp(13.5px, 1vw, 15.5px) !important;
-    min-height: clamp(40px, 5.2vh, 50px) !important;
+    padding: clamp(10px, 1.4vh, 13px) clamp(16px, 1.6vw, 22px) !important;
+    font-size: clamp(13.5px, 0.98vw, 15px) !important;
+    min-height: clamp(40px, 5.2vh, 48px) !important;
     min-width: auto !important;
+    border-radius: 12px !important;
   }
 
   .hero-capability-grid {
-    margin-top: clamp(42px, 5.6vh, 60px) !important;
+    margin-top: clamp(28px, 4.2vh, 42px) !important;
     gap: clamp(10px, 1.2vw, 16px) !important;
     width: 100% !important;
   }
 
   .hero-cap-card {
-    min-height: clamp(92px, 13.5vh, 120px) !important;
-    padding: clamp(10px, 1.4vh, 14px) clamp(12px, 1.2vw, 16px) !important;
-    border-radius: clamp(12px, 1.8vh, 18px) !important;
+    min-height: clamp(90px, 12.5vh, 112px) !important;
+    padding: clamp(11px, 1.5vh, 15px) clamp(12px, 1.2vw, 16px) !important;
+    border-radius: clamp(12px, 1.8vh, 16px) !important;
   }
 
   .hero-cap-icon {
-    width: clamp(28px, 4vh, 38px) !important;
-    height: clamp(28px, 4vh, 38px) !important;
-    min-width: clamp(28px, 4vh, 38px) !important;
-    min-height: clamp(28px, 4vh, 38px) !important;
-    max-width: clamp(28px, 4vh, 38px) !important;
-    max-height: clamp(28px, 4vh, 38px) !important;
-    border-radius: clamp(7px, 1.1vh, 10px) !important;
+    width: clamp(28px, 3.8vh, 36px) !important;
+    height: clamp(28px, 3.8vh, 36px) !important;
+    min-width: clamp(28px, 3.8vh, 36px) !important;
+    min-height: clamp(28px, 3.8vh, 36px) !important;
+    max-width: clamp(28px, 3.8vh, 36px) !important;
+    max-height: clamp(28px, 3.8vh, 36px) !important;
+    border-radius: clamp(7px, 1vh, 10px) !important;
   }
 
   .hero-cap-icon svg {
-    width: clamp(14px, 2vh, 19px) !important;
-    height: clamp(14px, 2vh, 19px) !important;
+    width: clamp(14px, 2vh, 18px) !important;
+    height: clamp(14px, 2vh, 18px) !important;
   }
 
   .hero-cap-info {
-    margin: clamp(6px, 1vh, 10px) 0 clamp(4px, 0.7vh, 8px) 0 !important;
+    margin: clamp(6px, 0.9vh, 9px) 0 clamp(3px, 0.5vh, 6px) 0 !important;
   }
 
   .hero-cap-title {
-    font-size: clamp(12.5px, 0.95vw, 14.5px) !important;
+    font-size: clamp(12.5px, 0.92vw, 14px) !important;
   }
 
   .hero-cap-subtitle {
-    font-size: clamp(10px, 0.78vw, 11.5px) !important;
+    font-size: clamp(10px, 0.76vw, 11.5px) !important;
   }
 
   .hero-cap-bar {
-    height: clamp(2.5px, 0.4vh, 3.5px) !important;
-    min-height: clamp(2.5px, 0.4vh, 3.5px) !important;
-    max-height: clamp(2.5px, 0.4vh, 3.5px) !important;
-    width: clamp(28px, 3.2vw, 40px) !important;
+    height: clamp(2.5px, 0.35vh, 3px) !important;
+    min-height: clamp(2.5px, 0.35vh, 3px) !important;
+    max-height: clamp(2.5px, 0.35vh, 3px) !important;
+    width: clamp(28px, 3vw, 38px) !important;
   }
 
   .hero-copy .socials {
-    margin-top: clamp(14px, 2.6vh, 28px) !important;
+    margin-top: clamp(22px, 3.4vh, 34px) !important;
+    gap: clamp(10px, 1.2vw, 14px) !important;
   }
 
+  .hero-copy .socials a,
   .social-link {
-    width: clamp(32px, 4.5vh, 42px) !important;
-    height: clamp(32px, 4.5vh, 42px) !important;
-    border-radius: clamp(8px, 1.2vh, 11px) !important;
+    width: clamp(34px, 4.2vh, 42px) !important;
+    height: clamp(34px, 4.2vh, 42px) !important;
+    border-radius: clamp(8px, 1.1vh, 11px) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
   }
 
+  .hero-copy .socials a svg,
   .social-link svg {
-    width: clamp(15px, 2.2vh, 20px) !important;
-    height: clamp(15px, 2.2vh, 20px) !important;
+    width: clamp(16px, 2vh, 20px) !important;
+    height: clamp(16px, 2vh, 20px) !important;
   }
 
   /* Right Visual Frame Profile Image Scaling */
@@ -1153,26 +1179,65 @@
   }
 
   .image-shell {
-    width: min(420px, 48vh, 44vw) !important;
+    width: min(340px, 44vh, 38vw) !important;
     aspect-ratio: 1 !important;
   }
 
   .badge-top {
-    top: 6% !important;
-    right: -10% !important;
-    transform: scale(clamp(0.8, 1.2vh, 1.05)) !important;
+    top: 4% !important;
+    right: -6% !important;
+    transform: scale(clamp(0.78, 1.1vh, 0.98)) !important;
   }
 
   .badge-bottom {
-    left: -10% !important;
-    bottom: 8% !important;
-    transform: scale(clamp(0.8, 1.2vh, 1.05)) !important;
+    left: -6% !important;
+    bottom: 6% !important;
+    transform: scale(clamp(0.78, 1.1vh, 0.98)) !important;
   }
 
   .hero-status-badge {
-    right: -2% !important;
-    bottom: 4% !important;
-    transform: scale(clamp(0.8, 1.2vh, 1.05)) !important;
+    right: 0% !important;
+    bottom: 2% !important;
+    transform: scale(clamp(0.78, 1.1vh, 0.98)) !important;
+  }
+}
+
+/* ==========================================================================
+   Unified Responsive Inline Padding Alignment Across All Desktop/Laptop Sections (>= 861px)
+   Provides consistent, fluid breathing room from tablet/1024px to 1440px+
+   ========================================================================== */
+@media (min-width: 861px) {
+  .navbar,
+  .hero-container,
+  .expertise-shell,
+  .widget-lab-shell,
+  .certifications-shell,
+  .behind-build-shell,
+  .portfolio-showcase-shell,
+  .profile-shell,
+  .heard-shell,
+  .contact-header,
+  .contact-shell {
+    width: min(1180px, calc(100% - 96px)) !important;
+    max-width: min(1180px, calc(100% - 96px)) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    box-sizing: border-box !important;
+  }
+
+  .heard-hero-grid {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  .wall-topbar {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  .contact-header {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
   }
 }
 

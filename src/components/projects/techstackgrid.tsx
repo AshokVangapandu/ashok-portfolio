@@ -1,4 +1,4 @@
-/* src/components/projects/TechStackGrid.tsx */
+/* src/components/projects/techstackgrid.tsx */
 import React, { useState, useEffect, useRef } from 'react';
 import scssLogo from '../../../assets/images/SCSS.png';
 import mendixLogo from '../../../assets/images/Mendix-Brandmark.webp';
@@ -11,7 +11,7 @@ export const TechStackGrid: React.FC = () => {
       icon: (
         <img 
           src={mendixLogo} 
-          style={{ width: '30px', height: '30px', objectFit: 'contain' }} 
+          style={{ width: '28px', height: '28px', objectFit: 'contain' }} 
           alt="Mendix" 
         />
       )
@@ -20,7 +20,7 @@ export const TechStackGrid: React.FC = () => {
       name: 'React',
       label: 'UI Framework',
       icon: (
-        <svg viewBox="-11.5 -10.23 23 20.46" width="32" height="32">
+        <svg viewBox="-11.5 -10.23 23 20.46" width="30" height="30">
           <circle cx="0" cy="0" r="2.05" fill="#61DAFB"/>
           <g stroke="#61DAFB" strokeWidth="1" fill="none">
             <ellipse rx="11" ry="4.2"/>
@@ -34,7 +34,7 @@ export const TechStackGrid: React.FC = () => {
       name: 'TypeScript',
       label: 'Typed Scripting',
       icon: (
-        <svg viewBox="0 0 100 100" width="32" height="32">
+        <svg viewBox="0 0 100 100" width="30" height="30">
           <rect width="100" height="100" fill="#3178C6" rx="12" />
           <path d="M63 40h-8.5v35h-9V40h-8.5v-7.5H63V40zm12.5 19.3c-1.5-1-3.6-1.7-6.2-1.7-3 0-4.8 1.4-4.8 3.5 0 2 1.6 3 4.8 4.2 4.6 1.7 8.3 3.5 8.3 8.7 0 5.4-4.5 9-11.3 9-3.7 0-7.2-1.1-9.2-2.7l3-6.5c1.8 1.3 4.5 2.2 7 2.2 3.1 0 4.8-1.4 4.8-3.6 0-2.3-1.8-3.2-5.1-4.5-4.5-1.7-8-3.8-8-8.5 0-5 4-8.7 10.5-8.7 3.3 0 6 1 7.7 2.1l-3.2 6.1z" fill="#FFFFFF"/>
         </svg>
@@ -42,11 +42,11 @@ export const TechStackGrid: React.FC = () => {
     },
     {
       name: 'SCSS',
-      label: 'Sassy CSS Styles',
+      label: 'Sassy Styles',
       icon: (
         <img 
           src={scssLogo} 
-          style={{ width: '32px', height: '32px', objectFit: 'contain' }} 
+          style={{ width: '30px', height: '30px', objectFit: 'contain' }} 
           alt="SCSS" 
         />
       )
@@ -55,7 +55,7 @@ export const TechStackGrid: React.FC = () => {
       name: 'Figma',
       label: 'UI/UX Design',
       icon: (
-        <svg viewBox="0 0 38 57" width="22" height="32" fill="none">
+        <svg viewBox="0 0 38 57" width="20" height="30" fill="none">
           <path d="M19 19C19 8.5 10.5 0 0 0V19H19Z" fill="#F24E1E" />
           <path d="M19 0H38V19H19V0Z" fill="#FF7262" />
           <path d="M19 19H38V38H19V19Z" fill="#10B981" />
@@ -68,7 +68,7 @@ export const TechStackGrid: React.FC = () => {
       name: 'Node.js',
       label: 'Runtime Engine',
       icon: (
-        <svg viewBox="0 0 24 24" width="32" height="32" fill="#339933">
+        <svg viewBox="0 0 24 24" width="30" height="30" fill="#339933">
           <path d="M12 1.3L3.1 6.4v10.2l8.9 5.1 8.9-5.1V6.4L12 1.3zm6.6 14.3l-6.6 3.8-6.6-3.8V8.6l6.6-3.8 6.6 3.8v7z"/>
         </svg>
       )
@@ -77,7 +77,7 @@ export const TechStackGrid: React.FC = () => {
       name: 'Vite',
       label: 'Fast Bundling',
       icon: (
-        <svg viewBox="0 0 256 256" width="32" height="32">
+        <svg viewBox="0 0 256 256" width="30" height="30">
           <defs>
             <linearGradient id="viteGrad" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stopColor="#41D1FF" />
@@ -98,18 +98,16 @@ export const TechStackGrid: React.FC = () => {
   const animationFrameRef = useRef<number>();
   const glideFrameRef = useRef<number>();
   const isPausedRef = useRef(false);
-  const speedRef = useRef(0.88); // Matching increased speed
+  const speedRef = useRef(0.8);
   
-  const targetSpeed = 0.88;
+  const targetSpeed = 0.8;
   const acceleration = 0.016;
 
-  // Real-time style interpolation based on card centering
   const updateCardStyles = () => {
     if (!containerRef.current) return;
     const container = containerRef.current;
     const containerCenter = container.scrollLeft + container.clientWidth / 2;
     
-    // Update bottom scroll progress indicator bar
     const oneThird = container.scrollWidth / 3;
     if (oneThird > 0) {
       const progress = (container.scrollLeft % oneThird) / oneThird;
@@ -124,49 +122,35 @@ export const TechStackGrid: React.FC = () => {
       const cardCenter = card.offsetLeft + card.clientWidth / 2;
       const distance = Math.abs(cardCenter - containerCenter);
       
-      // Interpolation boundary range
-      const maxDist = 200;
-      const pct = Math.max(0, 1 - distance / maxDist); // 0 -> 1
+      const maxDist = 180;
+      const pct = Math.max(0, 1 - distance / maxDist);
       
-      // Scale: 0.92 -> 1.03 (gentle 1.03x scale on active card)
-      const scale = 0.92 + pct * 0.11;
+      const scale = 0.94 + pct * 0.09;
+      const opacity = 0.4 + pct * 0.6;
+      const blurVal = (1 - pct) * 1.0;
+      const saturateVal = 60 + pct * 40;
+      const translateY = pct * -3;
       
-      // Opacity: 0.35 -> 1.00
-      const opacity = 0.35 + pct * 0.65;
-      
-      // Reduced Blur by 20%: max blur is 1.2px
-      const blurVal = (1 - pct) * 1.2;
-      
-      // Saturation: 50% -> 100%
-      const saturateVal = 50 + pct * 50;
-      
-      // Floating vertical movement (2px - 4px upward translation)
-      const translateY = pct * -3.5;
-      
-      // Apply style attributes directly
       card.style.transform = `scale(${scale}) translateY(${translateY}px) translateZ(0)`;
       card.style.opacity = `${opacity}`;
       card.style.filter = `blur(${blurVal}px) saturate(${saturateVal}%)`;
       
-      // Refined Active Card Border & Glass styling:
       const glowOpacity = pct * 0.6;
-      const borderOpacity = 0.04 + pct * 0.38;
+      const borderOpacity = 0.05 + pct * 0.35;
       card.style.borderColor = `rgba(167, 139, 250, ${borderOpacity})`;
-      card.style.backgroundColor = `rgba(10, 15, 30, ${0.4 + pct * 0.25})`;
+      card.style.backgroundColor = `rgba(10, 15, 30, ${0.45 + pct * 0.25})`;
       card.style.boxShadow = `
-        0 8px 24px rgba(0, 0, 0, ${0.12 + pct * 0.08}), 
-        0 0 24px rgba(167, 139, 250, ${glowOpacity * 0.16}),
-        inset 0 1px 0 rgba(255, 255, 255, 0.02)
+        0 8px 24px rgba(0, 0, 0, ${0.15 + pct * 0.1}), 
+        0 0 20px rgba(167, 139, 250, ${glowOpacity * 0.18}),
+        inset 0 1px 0 rgba(255, 255, 255, 0.04)
       `;
       
-      // Increase icon wrapper scale and brightness
       const iconWrapper = card.querySelector('.tech-icon-wrapper') as HTMLElement;
       if (iconWrapper) {
-        iconWrapper.style.transform = `scale(${1 + pct * 0.12})`;
-        iconWrapper.style.filter = `brightness(${1 + pct * 0.25})`;
+        iconWrapper.style.transform = `scale(${1 + pct * 0.1})`;
+        iconWrapper.style.filter = `brightness(${1 + pct * 0.2})`;
       }
       
-      // Slide open the label subtext smoothly
       const label = card.querySelector('.tech-label') as HTMLElement;
       if (label) {
         label.style.opacity = `${pct}`;
@@ -175,13 +159,11 @@ export const TechStackGrid: React.FC = () => {
     });
   };
 
-  // Continuous linear animation loop
   useEffect(() => {
     const loop = () => {
       if (containerRef.current) {
         const container = containerRef.current;
         
-        // PAUSE & RESUME physics
         if (isPausedRef.current) {
           if (speedRef.current > 0) {
             speedRef.current = Math.max(0, speedRef.current - 0.04);
@@ -217,7 +199,6 @@ export const TechStackGrid: React.FC = () => {
     };
   }, []);
 
-  // Center alignment on mount
   useEffect(() => {
     const initScroll = () => {
       if (!containerRef.current) return;
@@ -233,7 +214,6 @@ export const TechStackGrid: React.FC = () => {
     initScroll();
   }, []);
 
-  // Center child card on click
   const smoothScrollToChild = (childIndex: number) => {
     if (!containerRef.current) return;
     const container = containerRef.current;
@@ -247,7 +227,7 @@ export const TechStackGrid: React.FC = () => {
     const startScroll = container.scrollLeft;
     
     const startTime = performance.now();
-    const duration = 650;
+    const duration = 600;
     
     if (glideFrameRef.current) cancelAnimationFrame(glideFrameRef.current);
     
@@ -269,7 +249,6 @@ export const TechStackGrid: React.FC = () => {
     glideFrameRef.current = requestAnimationFrame(animate);
   };
 
-  // Get index of the child card closest to center
   const getCenteredCardIndex = () => {
     if (!containerRef.current) return 0;
     const container = containerRef.current;
@@ -328,309 +307,102 @@ export const TechStackGrid: React.FC = () => {
   };
 
   return (
-    <div style={{ width: '100%' }}>
-      {/* 1. DESKTOP SLIDER CONTAINER (Shown on Desktop ONLY > 768px) */}
+    <div className="tech-showcase-container">
+      {/* 1. Header Area with centered badge pill and title */}
+      <div className="tech-showcase-header">
+        <div className="tech-badge-pill">
+          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="#A78BFA" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
+          </svg>
+          <span>TECH & TOOLS I WORK WITH</span>
+        </div>
+
+        <h2 className="tech-showcase-title">
+          Modern technologies powering <span className="purple-gradient-text">enterprise</span> solutions
+        </h2>
+      </div>
+
+      {/* 2. Interactive Slider Track Wrapper with Navigation Arrows */}
       <div
-        className="tech-desktop-grid-container"
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: '40px',
-          width: '100%',
-          boxSizing: 'border-box',
-          padding: '60px 0 20px 0',
-          borderTop: '1px solid rgba(255, 255, 255, 0.05)',
-          position: 'relative'
-        }}
+        className="tech-slider-wrapper"
+        onMouseEnter={() => { isPausedRef.current = true; }}
+        onMouseLeave={() => { isPausedRef.current = false; }}
       >
-        {/* 1. Header Text */}
-        <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          <span
-            style={{
-              fontSize: '11px',
-              fontWeight: 850,
-              color: '#A78BFA',
-              letterSpacing: '0.2em',
-              textTransform: 'uppercase'
-            }}
-          >
-            TECH & TOOLS I WORK WITH
-          </span>
-          <h2
-            style={{
-              margin: 0,
-              fontSize: 'clamp(28px, 4vw, 42px)',
-              fontWeight: 800,
-              color: '#FFFFFF',
-              letterSpacing: '-0.02em',
-              lineHeight: 1.2
-            }}
-          >
-            Modern technologies powering <br />
-            <span style={{ background: 'linear-gradient(135deg, #7C3AED, #A78BFA)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-              enterprise
-            </span> solutions
-          </h2>
-        </div>
-
-        {/* 2. Slider Viewport Container Wrapper */}
-        <div
-          style={{
-            width: '100%',
-            position: 'relative',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '0 24px',
-            boxSizing: 'border-box'
-          }}
-          onMouseEnter={() => { isPausedRef.current = true; }}
-          onMouseLeave={() => { isPausedRef.current = false; }}
+        {/* Left Arrow Button */}
+        <button
+          onClick={handlePrev}
+          type="button"
+          aria-label="Previous Technology"
+          className="slider-arrow slider-arrow-left"
         >
-          {/* Left Arrow Button */}
-          <button
-            onClick={handlePrev}
-            type="button"
-            style={{
-              width: '40px',
-              height: '40px',
-              borderRadius: '50%',
-              backgroundColor: 'rgba(255, 255, 255, 0.02)',
-              border: '1px solid rgba(255, 255, 255, 0.06)',
-              color: '#C4B5FD',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              zIndex: 10,
-              position: 'absolute',
-              left: '24px',
-              transition: 'all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1)'
-            }}
-            className="slider-arrow"
-          >
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="19" y1="12" x2="5" y2="12" />
-              <polyline points="12 19 5 12 12 5" />
-            </svg>
-          </button>
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+        </button>
 
-          {/* Viewport container */}
-          <div
-            ref={containerRef}
-            onScroll={updateCardStyles}
-            style={{
-              width: 'calc(100% - 100px)',
-              overflowX: 'auto',
-              display: 'flex',
-              alignItems: 'center',
-              padding: '28px 0',
-              scrollBehavior: 'auto',
-              position: 'relative',
-              maskImage: 'linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%)',
-              WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%)'
-            }}
-            className="horizontal-scroll-carousel"
-          >
-            {tripledTechs.map((tech, idx) => {
-              return (
-                <React.Fragment key={idx}>
-                  <div
-                    data-type="card"
-                    onClick={() => smoothScrollToChild(idx * 2)}
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '8px',
-                      cursor: 'pointer',
-                      flexShrink: 0,
-                      width: '120px',
-                      height: '120px',
-                      borderRadius: '16px',
-                      border: '1px solid rgba(255, 255, 255, 0.05)',
-                      padding: '16px 8px',
-                      boxSizing: 'border-box',
-                      transition: 'transform 0.15s ease-out, opacity 0.15s ease-out, border-color 0.15s ease-out, background-color 0.15s ease-out, box-shadow 0.15s ease-out, filter 0.15s ease-out',
-                      willChange: 'transform, opacity, filter',
-                      position: 'relative'
-                    }}
-                  >
-                    <div
-                      className="tech-icon-wrapper"
-                      style={{
-                        transition: 'transform 0.2s ease, filter 0.2s ease',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                      }}
-                    >
-                      {tech.icon}
-                    </div>
-                    
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1px', alignItems: 'center' }}>
-                      <span
-                        style={{
-                          fontSize: '12.5px',
-                          fontWeight: 600,
-                          color: '#FFFFFF',
-                          textAlign: 'center',
-                          whiteSpace: 'nowrap'
-                        }}
-                      >
-                        {tech.name}
-                      </span>
-                      <span
-                        className="tech-label"
-                        style={{
-                          fontSize: '9px',
-                          color: '#A78BFA',
-                          fontWeight: 500,
-                          textAlign: 'center',
-                          whiteSpace: 'nowrap',
-                          opacity: 0,
-                          height: 0,
-                          overflow: 'hidden',
-                          transition: 'opacity 0.2s ease, height 0.2s ease'
-                        }}
-                      >
-                        {tech.label}
-                      </span>
-                    </div>
+        {/* Viewport container */}
+        <div
+          ref={containerRef}
+          onScroll={updateCardStyles}
+          className="tech-scroll-track"
+        >
+          {tripledTechs.map((tech, idx) => {
+            return (
+              <React.Fragment key={idx}>
+                <div
+                  data-type="card"
+                  onClick={() => smoothScrollToChild(idx * 2)}
+                  className="tech-card"
+                >
+                  <div className="tech-icon-wrapper">
+                    {tech.icon}
                   </div>
+                  
+                  <div className="tech-card-text">
+                    <span className="tech-name">
+                      {tech.name}
+                    </span>
+                    <span className="tech-label">
+                      {tech.label}
+                    </span>
+                  </div>
+                </div>
 
-                  <span
-                    style={{
-                      color: 'rgba(139, 92, 246, 0.25)',
-                      fontSize: '12px',
-                      margin: '0 24px',
-                      flexShrink: 0,
-                      userSelect: 'none'
-                    }}
-                  >
-                    ♦
-                  </span>
-                </React.Fragment>
-              );
-            })}
-          </div>
-
-          {/* Right Arrow Button */}
-          <button
-            onClick={handleNext}
-            type="button"
-            style={{
-              width: '40px',
-              height: '40px',
-              borderRadius: '50%',
-              backgroundColor: 'rgba(255, 255, 255, 0.02)',
-              border: '1px solid rgba(255, 255, 255, 0.06)',
-              color: '#C4B5FD',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              zIndex: 10,
-              position: 'absolute',
-              right: '24px',
-              transition: 'all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1)'
-            }}
-            className="slider-arrow"
-          >
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="5" y1="12" x2="19" y2="12" />
-              <polyline points="12 5 19 12 12 19" />
-            </svg>
-          </button>
+                <span className="tech-separator-diamond">
+                  ♦
+                </span>
+              </React.Fragment>
+            );
+          })}
         </div>
 
-        {/* Fluid animated scroll progress bar indicator */}
+        {/* Right Arrow Button */}
+        <button
+          onClick={handleNext}
+          type="button"
+          aria-label="Next Technology"
+          className="slider-arrow slider-arrow-right"
+        >
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+        </button>
+      </div>
+
+      {/* 3. Fluid scroll progress bar indicator */}
+      <div className="tech-progress-bar-bg">
         <div
+          className="tech-progress-bar-fill"
           style={{
-            width: '100px',
-            height: '2px',
-            backgroundColor: 'rgba(255, 255, 255, 0.08)',
-            borderRadius: '999px',
-            position: 'relative',
-            overflow: 'hidden',
-            marginTop: '-12px'
+            left: `${scrollProgress * 70}%`
           }}
-        >
-          <div
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: `${scrollProgress * 70}%`,
-              width: '30%',
-              height: '100%',
-              backgroundColor: '#8B5CF6',
-              borderRadius: '999px',
-              boxShadow: '0 0 6px rgba(139, 92, 246, 0.6)',
-              transition: 'left 0.15s cubic-bezier(0.25, 0.8, 0.25, 1)'
-            }}
-          />
-        </div>
-
-        <span
-          style={{
-            fontSize: '11px',
-            color: '#475569',
-            fontWeight: 600,
-            textTransform: 'uppercase',
-            letterSpacing: '0.04em'
-          }}
-        >
-          Technologies behind the products I build
-        </span>
+        />
       </div>
 
-      {/* 2. MOBILE TECH CONTAINER (Shown on Mobile ONLY <= 768px) */}
-      <div className="tech-mobile-grid-container">
-        <div className="tech-mobile-header">
-          <div className="projects-mobile-badge-pill">
-            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="#A78BFA" strokeWidth="2">
-              <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
-            </svg>
-            <span>TECH & TOOLS I WORK WITH</span>
-          </div>
-
-          <h2 className="tech-mobile-title">
-            Modern technologies powering <span className="purple-gradient-text">enterprise</span> solutions
-          </h2>
-        </div>
-
-        {/* Mobile Icon-Only Auto-Scrolling Ticker */}
-        <div className="tech-mobile-ticker-wrapper">
-          <div className="tech-mobile-ticker-track">
-            {tripledTechs.map((tech, idx) => (
-              <div key={idx} className="tech-mobile-icon-card" title={tech.name}>
-                {tech.icon}
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <style dangerouslySetInnerHTML={{__html: `
-        .horizontal-scroll-carousel::-webkit-scrollbar {
-          display: none !important;
-        }
-        .horizontal-scroll-carousel {
-          -ms-overflow-style: none !important;
-          scrollbar-width: none !important;
-        }
-        .slider-arrow:hover {
-          background-color: rgba(124, 58, 237, 0.15) !important;
-          border-color: rgba(124, 58, 237, 0.3) !important;
-          color: #FFFFFF !important;
-          transform: scale(1.05);
-        }
-        .slider-arrow:active {
-          transform: scale(0.95);
-        }
-      `}} />
+      {/* 4. Footer Subtext */}
+      <span className="tech-footer-subtext">
+        TECHNOLOGIES BEHIND THE PRODUCTS I BUILD
+      </span>
     </div>
   );
 };

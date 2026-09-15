@@ -17,7 +17,7 @@
 }
 
 .heard-shell {
-  width: min(100%, 1440px);
+  width: min(1180px, calc(100% - 96px));
   margin: 0 auto;
 }
 
@@ -152,13 +152,13 @@
 
 .wall-card {
   flex: 0 0 clamp(300px, 25vw, 360px);
-  min-height: 420px;
+  min-height: auto;
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 28px;
+  gap: 14px;
+  padding: 22px 24px;
   border: 1px solid rgba(180, 188, 255, 0.09);
-  border-radius: 24px;
+  border-radius: 20px;
   background:
     radial-gradient(circle at 82% 8%, rgba(143, 133, 255, 0.055), transparent 36%),
     rgba(255, 255, 255, 0.026);
@@ -1343,9 +1343,9 @@ body.modal-open {
 /* Outer grid container to replace wall-heading layout */
 .heard-hero-grid {
   display: grid;
-  grid-template-columns: 1.1fr 1fr;
-  gap: clamp(32px, 5vw, 64px);
-  padding: 80px clamp(24px, 5vw, 78px) 40px;
+  grid-template-columns: minmax(0, 1fr) minmax(460px, 1.25fr);
+  gap: clamp(24px, 4vw, 56px);
+  padding: 80px 0 40px;
   align-items: center;
 }
 
@@ -1453,7 +1453,7 @@ body.modal-open {
 .heard-hero-right {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
   width: 100%;
 }
 
@@ -1462,13 +1462,15 @@ body.modal-open {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 24px;
+  padding: 16px 28px;
   background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.07);
   border-radius: 20px;
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03), 0 10px 30px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .heard-stat-item {
@@ -1485,6 +1487,7 @@ body.modal-open {
   width: 38px;
   height: 38px;
   border-radius: 50%;
+  flex-shrink: 0;
 }
 
 .stat-icon-wrapper svg {
@@ -1525,38 +1528,43 @@ body.modal-open {
   font-size: 11px;
   color: rgba(255, 255, 255, 0.45);
   margin-top: 2px;
+  white-space: nowrap;
 }
 
 .stat-divider {
   width: 1px;
   height: 36px;
   background: rgba(255, 255, 255, 0.08);
-  margin: 0 16px;
+  margin: 0 14px;
+  flex-shrink: 0;
 }
 
 /* Horizontal Share Your Experience CTA */
+share-experience-card {
+  display: block;
+  width: 100%;
+}
+
 .heard-cta-panel {
   display: grid;
   grid-template-columns: auto 1fr auto;
-  gap: 24px;
+  gap: 20px;
   align-items: center;
-  padding: 24px;
-  background:
-    radial-gradient(circle at 10% 10%, rgba(143, 133, 255, 0.04), transparent 50%),
-    rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(143, 133, 255, 0.08);
-  border-radius: 24px;
+  padding: 18px 28px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 20px;
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03), 0 10px 30px rgba(0, 0, 0, 0.2);
   width: 100%;
   box-sizing: border-box;
 }
 
 .cta-left-decor {
   position: relative;
-  width: 60px;
-  height: 60px;
+  width: 52px;
+  height: 52px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1564,11 +1572,11 @@ body.modal-open {
 }
 
 .cta-icon-center {
-  width: 38px;
-  height: 38px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   background: rgba(143, 133, 255, 0.12);
-  border: 1px solid rgba(143, 133, 255, 0.2);
+  border: 1px solid rgba(143, 133, 255, 0.22);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1584,26 +1592,26 @@ body.modal-open {
 .cta-orbit-ring {
   position: absolute;
   border-radius: 50%;
-  border: 1px dashed rgba(143, 133, 255, 0.15);
+  border: 1px dashed rgba(143, 133, 255, 0.2);
   animation: rotateOrbit 20s linear infinite;
 }
 
 .ring-outer {
-  width: 58px;
-  height: 58px;
+  width: 52px;
+  height: 52px;
 }
 
 .ring-middle {
-  width: 48px;
-  height: 48px;
+  width: 44px;
+  height: 44px;
   border-style: dotted;
   animation-duration: 15s;
   animation-direction: reverse;
 }
 
 .ring-inner {
-  width: 38px;
-  height: 38px;
+  width: 36px;
+  height: 36px;
 }
 
 @keyframes rotateOrbit {
@@ -1619,7 +1627,7 @@ body.modal-open {
 .cta-middle-copy {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
   text-align: left;
 }
 
@@ -1628,42 +1636,53 @@ body.modal-open {
   font-size: 18px;
   font-weight: 700;
   color: #ffffff;
+  white-space: nowrap;
 }
 
 .cta-middle-copy p {
   margin: 0;
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.5);
-  line-height: 1.4;
+  font-size: 12.5px;
+  color: rgba(164, 177, 207, 0.7);
+  line-height: 1.45;
 }
 
 .cta-right-action {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
-  gap: 8px;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
 }
 
 .heard-cta-btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  padding: 10px 20px;
-  background: linear-gradient(135deg, #7c3aed, #2563eb);
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #6C3CFF 0%, #8B5CF6 100%);
   color: #ffffff;
   border-radius: 999px;
   border: none;
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 4px 14px rgba(124, 58, 237, 0.3);
+  box-shadow: 0 4px 18px rgba(108, 60, 255, 0.4);
   transition: all 250ms ease;
   white-space: nowrap;
 }
 
+.cta-btn-text-default {
+  display: inline;
+}
+
+.cta-btn-text-tablet {
+  display: none;
+}
+
 .heard-cta-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(124, 58, 237, 0.45);
+  box-shadow: 0 6px 24px rgba(108, 60, 255, 0.55);
 }
 
 .cta-arrow-icon {
@@ -1677,8 +1696,11 @@ body.modal-open {
 }
 
 .cta-meta-text {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.4);
+  font-size: 10.5px;
+  color: rgba(164, 177, 207, 0.55);
+  white-space: nowrap;
+  text-align: center;
+  margin: 0;
 }
 
 /* Voices Subheader Layout */
@@ -1766,15 +1788,15 @@ body.modal-open {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 12px;
-  flex-grow: 1;
+  gap: 10px;
+  flex-grow: 0;
   width: 100%;
 }
 
 .card-testimonial-text {
-  font-size: 14.5px !important;
+  font-size: 14px !important;
   color: rgba(255, 255, 255, 0.75) !important;
-  line-height: 1.6 !important;
+  line-height: 1.55 !important;
   text-align: left;
   margin: 0;
 }
@@ -1788,7 +1810,7 @@ body.modal-open {
   height: 1px;
   width: 100%;
   background: rgba(255, 255, 255, 0.06);
-  margin: 4px 0;
+  margin: 2px 0;
 }
 
 .card-author-row {
@@ -1866,7 +1888,7 @@ body.modal-open {
 }
 
 /* Responsive adjustments */
-@media (max-width: 1024px) {
+@media (max-width: 860px) {
   .heard-hero-grid {
     grid-template-columns: 1fr;
     gap: 40px;
@@ -2012,9 +2034,9 @@ body.modal-open {
 
 /* Card consistent dimensions */
 .wall-card {
-  height: 400px !important;
-  min-height: 400px !important;
-  justify-content: space-between !important;
+  height: auto !important;
+  min-height: auto !important;
+  justify-content: flex-start !important;
   box-sizing: border-box !important;
 }
 
