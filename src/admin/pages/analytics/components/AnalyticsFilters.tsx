@@ -29,13 +29,13 @@ export const AnalyticsFilters: React.FC<AnalyticsFiltersProps> = ({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'flex-end',
-        gap: '16px',
+        gap: '12px',
         flexWrap: 'wrap',
         fontFamily: "'Manrope', sans-serif"
       }}
     >
       {/* 1. Time Range Buttons */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
         {ranges.map((r) => {
           const isActive = timeRange === r.id;
           return (
@@ -44,15 +44,17 @@ export const AnalyticsFilters: React.FC<AnalyticsFiltersProps> = ({
               onClick={() => setTimeRange(r.id)}
               className="hover-scale active-press"
               style={{
-                padding: '8px 16px',
-                borderRadius: '8px',
-                border: isActive ? 'none' : '1px solid var(--admin-border)',
-                backgroundColor: isActive ? 'var(--admin-primary)' : '#FFFFFF',
-                color: isActive ? '#FFFFFF' : 'var(--admin-text-secondary)',
+                padding: '8px 18px',
+                borderRadius: '10px',
+                border: isActive ? 'none' : '1px solid #E2E8F0',
+                backgroundColor: isActive ? '#7C3AED' : '#FFFFFF',
+                backgroundImage: isActive ? 'linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%)' : 'none',
+                color: isActive ? '#FFFFFF' : '#475569',
+                boxShadow: isActive ? '0 2px 8px rgba(124, 58, 237, 0.25)' : '0 1px 2px rgba(0, 0, 0, 0.02)',
                 fontSize: '13px',
                 fontWeight: 600,
                 cursor: 'pointer',
-                transition: 'all 0.15s ease'
+                transition: 'all 0.18s ease'
               }}
             >
               {r.label}
@@ -65,25 +67,29 @@ export const AnalyticsFilters: React.FC<AnalyticsFiltersProps> = ({
           onClick={onRefresh}
           className="hover-scale active-press"
           aria-label="Refresh stats"
+          title="Refresh analytics data"
           style={{
             display: 'inline-flex',
             alignItems: 'center',
             justifyContent: 'center',
-            padding: '8px',
-            border: '1px solid var(--admin-border)',
-            borderRadius: '8px',
+            padding: '8px 10px',
+            border: '1px solid #E2E8F0',
+            borderRadius: '10px',
             backgroundColor: '#FFFFFF',
-            color: 'var(--admin-text-secondary)',
+            color: '#64748B',
             cursor: 'pointer',
-            transition: 'all 0.15s ease'
+            boxShadow: '0 1px 2px rgba(0, 0, 0, 0.02)',
+            transition: 'all 0.18s ease'
           }}
           onMouseOver={(e) => {
-            e.currentTarget.style.backgroundColor = 'var(--admin-surface)';
-            e.currentTarget.style.color = 'var(--admin-primary)';
+            e.currentTarget.style.backgroundColor = '#F8FAFC';
+            e.currentTarget.style.color = '#7C3AED';
+            e.currentTarget.style.borderColor = '#C4B5FD';
           }}
           onMouseOut={(e) => {
             e.currentTarget.style.backgroundColor = '#FFFFFF';
-            e.currentTarget.style.color = 'var(--admin-text-secondary)';
+            e.currentTarget.style.color = '#64748B';
+            e.currentTarget.style.borderColor = '#E2E8F0';
           }}
         >
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -93,18 +99,16 @@ export const AnalyticsFilters: React.FC<AnalyticsFiltersProps> = ({
         </button>
       </div>
 
-      {/* Separator line */}
-      <div style={{ height: '24px', width: '1px', backgroundColor: 'var(--admin-border)' }} />
-
       {/* 2. View Toggle */}
       <div
         style={{
           display: 'inline-flex',
           backgroundColor: '#FFFFFF',
-          border: '1px solid var(--admin-border)',
-          borderRadius: '8px',
-          padding: '2px',
-          boxSizing: 'border-box'
+          border: '1px solid #E2E8F0',
+          borderRadius: '10px',
+          padding: '3px',
+          boxSizing: 'border-box',
+          boxShadow: '0 1px 2px rgba(0, 0, 0, 0.02)'
         }}
       >
         <button
@@ -113,15 +117,17 @@ export const AnalyticsFilters: React.FC<AnalyticsFiltersProps> = ({
             display: 'inline-flex',
             alignItems: 'center',
             gap: '6px',
-            padding: '6px 12px',
+            padding: '6px 14px',
             border: 'none',
-            borderRadius: '6px',
-            backgroundColor: viewMode === 'grid' ? 'var(--admin-primary)' : 'transparent',
-            color: viewMode === 'grid' ? '#FFFFFF' : 'var(--admin-text-secondary)',
-            fontSize: '12.5px',
+            borderRadius: '8px',
+            backgroundColor: viewMode === 'grid' ? '#7C3AED' : 'transparent',
+            backgroundImage: viewMode === 'grid' ? 'linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%)' : 'none',
+            color: viewMode === 'grid' ? '#FFFFFF' : '#64748B',
+            boxShadow: viewMode === 'grid' ? '0 2px 6px rgba(124, 58, 237, 0.25)' : 'none',
+            fontSize: '13px',
             fontWeight: 600,
             cursor: 'pointer',
-            transition: 'all 0.15s ease'
+            transition: 'all 0.18s ease'
           }}
         >
           <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -139,15 +145,17 @@ export const AnalyticsFilters: React.FC<AnalyticsFiltersProps> = ({
             display: 'inline-flex',
             alignItems: 'center',
             gap: '6px',
-            padding: '6px 12px',
+            padding: '6px 14px',
             border: 'none',
-            borderRadius: '6px',
-            backgroundColor: viewMode === 'list' ? 'var(--admin-primary)' : 'transparent',
-            color: viewMode === 'list' ? '#FFFFFF' : 'var(--admin-text-secondary)',
-            fontSize: '12.5px',
+            borderRadius: '8px',
+            backgroundColor: viewMode === 'list' ? '#7C3AED' : 'transparent',
+            backgroundImage: viewMode === 'list' ? 'linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%)' : 'none',
+            color: viewMode === 'list' ? '#FFFFFF' : '#64748B',
+            boxShadow: viewMode === 'list' ? '0 2px 6px rgba(124, 58, 237, 0.25)' : 'none',
+            fontSize: '13px',
             fontWeight: 600,
             cursor: 'pointer',
-            transition: 'all 0.15s ease'
+            transition: 'all 0.18s ease'
           }}
         >
           <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -166,3 +174,4 @@ export const AnalyticsFilters: React.FC<AnalyticsFiltersProps> = ({
 };
 
 export default AnalyticsFilters;
+

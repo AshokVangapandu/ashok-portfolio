@@ -6,6 +6,7 @@ interface ActivityFeedProps {
   activities: AnalyticsActivity[];
   loading?: boolean;
   error?: boolean;
+  timeRange?: string;
   onRetry?: () => void;
 }
 
@@ -39,12 +40,24 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
   activities = [],
   loading = false,
   error = false,
+  timeRange = '30days',
   onRetry,
 }) => {
   // Local state ticker to trigger rerenders of relative timestamps
   const [_, setTick] = useState<number>(0);
   // Holds unique IDs of batches that are expanded inline
   const [expandedBatches, setExpandedBatches] = useState<Set<string>>(new Set());
+
+  // Subtitle formatting based on date filter (matches Visitor Trend header)
+  const subtitleText = useMemo(() => {
+    const labels: Record<string, string> = {
+      today: 'Today',
+      '7days': 'Last 7 Days',
+      '30days': 'Last 30 Days',
+      '90days': 'Last 90 Days',
+    };
+    return `${labels[timeRange] || 'Last 30 Days'} • Updated just now`;
+  }, [timeRange]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -264,9 +277,22 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
         height: '335px'
       }}
     >
-      <h3 style={{ margin: '0 0 20px 0', fontSize: '15px', fontWeight: 700, color: 'var(--admin-text)' }}>
-        Recent Activity
-      </h3>
+      {/* Card Header */}
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '3px',
+          marginBottom: '20px'
+        }}
+      >
+        <h3 style={{ margin: 0, fontSize: '15px', fontWeight: 700, color: 'var(--admin-text)' }}>
+          Recent Activity
+        </h3>
+        <span style={{ fontSize: '12px', color: 'var(--admin-text-secondary)', fontWeight: 500 }}>
+          {subtitleText}
+        </span>
+      </div>
 
       <div
         className="activity-scroll-area"

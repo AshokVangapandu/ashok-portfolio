@@ -3,24 +3,38 @@ import React from 'react';
 
 export const AnalyticsHeader: React.FC = () => {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginBottom: 'var(--admin-space-2)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
       <h1
         style={{
           margin: 0,
-          fontSize: '28px',
-          fontWeight: 700,
-          color: 'var(--admin-text)',
-          letterSpacing: '-0.02em'
+          fontSize: '32px',
+          fontWeight: 800,
+          color: '#0F172A',
+          letterSpacing: '-0.025em',
+          lineHeight: '1.2',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px'
         }}
       >
-        Portfolio Analytics
+        <span>Portfolio</span>
+        <span
+          style={{
+            background: 'linear-gradient(135deg, #7C3AED 0%, #6366F1 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+          }}
+        >
+          Analytics
+        </span>
       </h1>
       <p
         style={{
           margin: 0,
-          color: 'var(--admin-text-secondary)',
-          fontSize: '14px',
-          fontWeight: 500
+          color: '#64748B',
+          fontSize: '14.5px',
+          fontWeight: 500,
+          lineHeight: '1.4'
         }}
       >
         Monitor portfolio traffic, visitor engagement and project performance in real time.
@@ -30,3 +44,4 @@ export const AnalyticsHeader: React.FC = () => {
 };
 
 export default AnalyticsHeader;
+

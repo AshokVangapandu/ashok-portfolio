@@ -1,5 +1,6 @@
 /* src/admin/pages/analytics/AnalyticsPage.tsx */
 import React, { useState } from 'react';
+import analyticsBg from '../../../../assets/images/analytics-dashboard-bg.png';
 import { useAnalytics } from '../../hooks/useAnalytics';
 import { AnalyticsHeader } from './components/AnalyticsHeader';
 import { AnalyticsFilters } from './components/AnalyticsFilters';
@@ -50,73 +51,103 @@ export const AnalyticsPage: React.FC = () => {
   const isSkeleton = loading && !summary;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--admin-space-6)', boxSizing: 'border-box' }}>
-      
-      {/* 1. Header controls */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '16px', marginBottom: '8px' }}>
-        <AnalyticsHeader />
-        
-        <AnalyticsFilters
-          timeRange={timeRange}
-          setTimeRange={setTimeRange}
-          viewMode={viewMode}
-          setViewMode={setViewMode}
-          onRefresh={refresh}
+    <div style={{ position: 'relative', width: '100%', minHeight: '100%', boxSizing: 'border-box' }}>
+      {/* Fixed background: softened & lightened so it looks subtle and elegant */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundImage: `url(${analyticsBg})`,
+          backgroundPosition: 'center',
+          backgroundSize: 'cover',
+          backgroundRepeat: 'no-repeat',
+          opacity: 0.35,
+          zIndex: 0,
+          pointerEvents: 'none',
+        }}
+      />
+
+      {/* Content wrapper */}
+      <div
+        style={{
+          position: 'relative',
+          zIndex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 'var(--admin-space-6)',
+          boxSizing: 'border-box',
+        }}
+      >
+        {/* 1. Header controls */}
+        <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '16px', marginBottom: '8px' }}>
+          <AnalyticsHeader />
+          
+          <AnalyticsFilters
+            timeRange={timeRange}
+            setTimeRange={setTimeRange}
+            viewMode={viewMode}
+            setViewMode={setViewMode}
+            onRefresh={refresh}
+          />
+        </div>
+
+        {/* 2. Main presentation views with transition wrappers */}
+        {isSkeleton ? (
+          <AnalyticsSkeleton />
+        ) : (
+          <div
+            key={viewMode} // Re-mount or re-render to trigger smooth keyframe fade animations
+            style={{
+              animation: 'viewFadeIn 250ms ease-out',
+              boxSizing: 'border-box'
+            }}
+          >
+            {viewMode === 'list' ? (
+              <AnalyticsListView
+                visitorSessions={visitorSessions}
+                totalCount={totalVisitorsCount}
+                search={search}
+                setSearch={setSearch}
+                page={page}
+                setPage={setPage}
+                pageSize={pageSize}
+                setPageSize={setPageSize}
+                onRefresh={refresh}
+                onViewDetails={setSelectedVisitor}
+              />
+            ) : (
+              <AnalyticsGridView
+                summary={summary}
+                trends={trends}
+                activities={activities}
+                locations={locations}
+                sources={sources}
+                devices={devices}
+                browsers={browsers}
+                operatingSystems={operatingSystems}
+                visitorComparison={visitorComparison}
+                peakHours={peakHours}
+                loading={loading}
+                error={error}
+                timeRange={timeRange}
+                trendMode={trendMode}
+                setTrendMode={setTrendMode}
+                onRetry={refresh}
+              />
+            )}
+          </div>
+        )}
+
+        {/* 3. Detailed inspection modal overlay */}
+        <VisitorDetailsModal
+          visitor={selectedVisitor}
+          onClose={() => setSelectedVisitor(null)}
         />
       </div>
-
-      {/* 2. Main presentation views with transition wrappers */}
-      {isSkeleton ? (
-        <AnalyticsSkeleton />
-      ) : (
-        <div
-          key={viewMode} // Re-mount or re-render to trigger smooth keyframe fade animations
-          style={{
-            animation: 'viewFadeIn 250ms ease-out',
-            boxSizing: 'border-box'
-          }}
-        >
-          {viewMode === 'list' ? (
-            <AnalyticsListView
-              visitorSessions={visitorSessions}
-              totalCount={totalVisitorsCount}
-              search={search}
-              setSearch={setSearch}
-              page={page}
-              setPage={setPage}
-              pageSize={pageSize}
-              setPageSize={setPageSize}
-              onRefresh={refresh}
-              onViewDetails={setSelectedVisitor}
-            />
-          ) : (
-            <AnalyticsGridView
-              summary={summary}
-              trends={trends}
-              activities={activities}
-              locations={locations}
-              sources={sources}
-              devices={devices}
-              browsers={browsers}
-              operatingSystems={operatingSystems}
-              visitorComparison={visitorComparison}
-              peakHours={peakHours}
-              loading={loading}
-              error={error}
-              timeRange={timeRange}
-              trendMode={trendMode}
-              setTrendMode={setTrendMode}
-              onRetry={refresh}
-            />
-          )}
-        </div>
-      )}
-
-      {/* 3. Detailed inspection modal overlay */}
-      <VisitorDetailsModal
-        visitor={selectedVisitor}
-        onClose={() => setSelectedVisitor(null)}
-      />
 
       {/* Embedded view transition keyframes */}
       <style dangerouslySetInnerHTML={{__html: `
@@ -130,3 +161,4 @@ export const AnalyticsPage: React.FC = () => {
 };
 
 export default AnalyticsPage;
+

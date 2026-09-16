@@ -1,370 +1,669 @@
+/* src/admin/pages/analytics/components/DeviceChart.tsx */
 import React, { useState, useEffect } from 'react';
+import devicesDecorImg from '../../../../../assets/images/analytics-devices-decor.png';
 import { AnalyticsDevice } from '../../../types/analytics';
 
 interface DeviceChartProps {
   devices: AnalyticsDevice[];
+  totalVisitors?: number;
   loading?: boolean;
   error?: boolean;
   onRetry?: () => void;
 }
 
+interface ProcessedDeviceRow {
+  name: 'Desktop' | 'Mobile' | 'Others';
+  percentage: number;
+  visits: number;
+  icon: React.ReactNode;
+  iconBg: string;
+  iconColor: string;
+}
+
 export const DeviceChart: React.FC<DeviceChartProps> = ({
-  devices,
+  devices = [],
+  totalVisitors,
   loading = false,
   error = false,
   onRetry,
 }) => {
   const [mounted, setMounted] = useState(false);
-  const [hoveredSegment, setHoveredSegment] = useState<string | null>(null);
-  const [tooltip, setTooltip] = useState<{ show: boolean; name: string; percentage: number; x: number; y: number } | null>(null);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  const getDeviceIcon = (name: string) => {
-    switch (name.toLowerCase()) {
-      case 'desktop':
-        return (
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
-            <line x1="8" y1="21" x2="16" y2="21" />
-            <line x1="12" y1="17" x2="12" y2="21" />
-          </svg>
-        );
-      case 'mobile':
-        return (
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
-            <line x1="12" y1="18" x2="12.01" y2="18" />
-          </svg>
-        );
-      case 'tablet':
-        return (
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="4" y="2" width="16" height="20" rx="2" ry="2" />
-            <line x1="12" y1="18" x2="12.01" y2="18" />
-          </svg>
-        );
-      default:
-        return (
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="12" cy="12" r="10" />
-            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
-            <line x1="12" y1="17" x2="12.01" y2="17" />
-          </svg>
-        );
-    }
-  };
+  // Consolidate data into Desktop, Mobile, and Others (including Tablet)
+  const desktopItem = devices.find((d) => d.name.toLowerCase() === 'desktop');
+  const mobileItem = devices.find((d) => d.name.toLowerCase() === 'mobile');
+  const otherItems = devices.filter(
+    (d) => !['desktop', 'mobile'].includes(d.name.toLowerCase())
+  );
 
-  // Build full devices dataset
-  const defaultDevices = [
-    { name: 'Desktop', percentage: 0 },
-    { name: 'Mobile', percentage: 0 },
-    { name: 'Tablet', percentage: 0 },
-    { name: 'Other', percentage: 0 }
+  const rawDesktopCount = Number((desktopItem as any)?.count ?? (desktopItem as any)?.visits ?? 0);
+  const rawMobileCount = Number((mobileItem as any)?.count ?? (mobileItem as any)?.visits ?? 0);
+  const rawOthersCount = otherItems.reduce(
+    (sum, d) => sum + Number((d as any)?.count ?? (d as any)?.visits ?? 0),
+    0
+  );
+
+  // Percentage calculations
+  let desktopPct = desktopItem?.percentage ?? 0;
+  let mobilePct = mobileItem?.percentage ?? 0;
+  let othersPct = otherItems.reduce((sum, d) => sum + (d.percentage || 0), 0);
+
+  const sumCounts = rawDesktopCount + rawMobileCount + rawOthersCount;
+  const effectiveTotal = typeof totalVisitors === 'number' && totalVisitors > 0
+    ? totalVisitors
+    : sumCounts > 0
+    ? sumCounts
+    : 14;
+
+  // If percentages are 0 but counts exist, calculate dynamically
+  if (desktopPct === 0 && mobilePct === 0 && othersPct === 0 && sumCounts > 0) {
+    desktopPct = Math.round((rawDesktopCount / sumCounts) * 100);
+    mobilePct = Math.round((rawMobileCount / sumCounts) * 100);
+    othersPct = Math.max(0, 100 - (desktopPct + mobilePct));
+  }
+
+  // Calculate visits for each category (using raw counts or derived from percentage)
+  const desktopVisits = rawDesktopCount > 0
+    ? rawDesktopCount
+    : Math.round((desktopPct / 100) * effectiveTotal);
+
+  const mobileVisits = rawMobileCount > 0
+    ? rawMobileCount
+    : Math.round((mobilePct / 100) * effectiveTotal);
+
+  const othersVisits = rawOthersCount > 0
+    ? rawOthersCount
+    : Math.max(0, effectiveTotal - (desktopVisits + mobileVisits));
+
+  // Determine dominant category for donut center callout
+  let dominantName = 'Desktop';
+  let dominantPct = desktopPct;
+  if (mobilePct > dominantPct) {
+    dominantName = 'Mobile';
+    dominantPct = mobilePct;
+  }
+  if (othersPct > dominantPct) {
+    dominantName = 'Others';
+    dominantPct = othersPct;
+  }
+
+  // Icons
+  const desktopIcon = (
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+      <line x1="8" y1="21" x2="16" y2="21" />
+      <line x1="12" y1="17" x2="12" y2="21" />
+    </svg>
+  );
+
+  const mobileIcon = (
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
+      <line x1="12" y1="18" x2="12.01" y2="18" />
+    </svg>
+  );
+
+  const othersIcon = (
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+      <circle cx="5" cy="12" r="2" />
+      <circle cx="12" cy="12" r="2" />
+      <circle cx="19" cy="12" r="2" />
+    </svg>
+  );
+
+  const deviceRows: ProcessedDeviceRow[] = [
+    {
+      name: 'Desktop',
+      percentage: desktopPct,
+      visits: desktopVisits,
+      icon: desktopIcon,
+      iconBg: '#F3E8FF',
+      iconColor: '#7C3AED',
+    },
+    {
+      name: 'Mobile',
+      percentage: mobilePct,
+      visits: mobileVisits,
+      icon: mobileIcon,
+      iconBg: '#E0F2FE',
+      iconColor: '#0284C7',
+    },
+    {
+      name: 'Others',
+      percentage: othersPct,
+      visits: othersVisits,
+      icon: othersIcon,
+      iconBg: '#F3E8FF',
+      iconColor: '#7C3AED',
+    },
   ];
 
-  const deviceMap = new Map((devices || []).map(d => [d.name, d.percentage]));
-  const mappedDevices = defaultDevices.map(d => ({
-    ...d,
-    percentage: deviceMap.has(d.name) ? deviceMap.get(d.name)! : 0
-  })).sort((a, b) => b.percentage - a.percentage);
-
-  const totalPercent = mappedDevices.reduce((sum, d) => sum + d.percentage, 0);
-
-  // SVG parameters
+  // Donut SVG parameters - compact, responsive dimensions
   const radius = 38;
-  const strokeWidth = 10;
+  const strokeWidth = 8;
   const circumference = 2 * Math.PI * radius; // ~238.76
-  const center = 50;
+  const center = 48;
 
-  // Colors mapping (dashboard purple shades)
-  const colors: Record<string, string> = {
-    'Desktop': 'var(--admin-primary)',
-    'Mobile': '#9061F9',
-    'Tablet': '#C084FC',
-    'Other': '#E9D5FF'
-  };
-
-  // Find target item for center text: hovered element or largest element
-  const topDevice = mappedDevices[0];
-  const activeDevice = hoveredSegment 
-    ? mappedDevices.find(d => d.name === hoveredSegment) 
-    : (totalPercent > 0 ? topDevice : null);
-
-  let accumulatedPercent = 0;
+  const desktopStroke = (desktopPct / 100) * circumference;
+  const mobileStroke = (mobilePct / 100) * circumference;
+  const othersStroke = (othersPct / 100) * circumference;
 
   return (
     <div
+      className="device-distribution-card"
       style={{
         flex: 1,
+        minWidth: '320px',
         backgroundColor: '#FFFFFF',
-        border: '1px solid var(--admin-border)',
-        borderRadius: 'var(--admin-radius-md)',
+        border: '1px solid rgba(226, 232, 240, 0.8)',
+        borderRadius: '22px',
         padding: '24px',
         display: 'flex',
         flexDirection: 'column',
         boxSizing: 'border-box',
-        minWidth: '300px',
-        boxShadow: 'var(--admin-shadow-sm)',
+        boxShadow: '0 4px 20px -4px rgba(0, 0, 0, 0.04)',
+        position: 'relative',
+        overflow: 'hidden',
         fontFamily: "'Manrope', sans-serif",
-        position: 'relative'
       }}
     >
-      <h3 style={{ margin: '0 0 20px 0', fontSize: '15px', fontWeight: 700, color: 'var(--admin-text)' }}>
-        📱 Device Distribution
-      </h3>
+      {/* Header Section */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '20px' }}>
+        {/* Softly Rounded Square Purple Icon Box */}
+        <div
+          style={{
+            width: '46px',
+            height: '46px',
+            borderRadius: '14px',
+            backgroundColor: '#F3E8FF',
+            color: '#7C3AED',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0,
+            boxShadow: '0 2px 6px rgba(124, 58, 237, 0.06)',
+          }}
+        >
+          {desktopIcon}
+        </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', flex: 1, justifyContent: 'center' }}>
-        {error ? (
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '12px', minHeight: '180px' }}>
-            <span style={{ fontSize: '13px', color: '#EF4444', fontWeight: 550 }}>
-              Failed to load device analytics.
-            </span>
-            {onRetry && (
-              <button
-                onClick={onRetry}
-                style={{
-                  padding: '6px 14px',
-                  borderRadius: '6px',
-                  border: '1px solid #EF4444',
-                  backgroundColor: 'transparent',
-                  color: '#EF4444',
-                  fontSize: '12px',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  transition: 'all 0.15s ease'
-                }}
-              >
-                Retry
-              </button>
-            )}
-          </div>
-        ) : loading ? (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px' }}>
-            <div className="skeleton-cell" style={{ width: '110px', height: '110px', borderRadius: '50%' }} />
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%' }}>
-              {Array.from({ length: 4 }).map((_, idx) => (
-                <div key={idx} className="skeleton-cell" style={{ height: '36px', borderRadius: '6px' }} />
-              ))}
+        {/* Title & Subtitle */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+          <h3
+            style={{
+              margin: 0,
+              fontSize: '18px',
+              fontWeight: 700,
+              color: '#0F172A',
+              letterSpacing: '-0.02em',
+              lineHeight: 1.2,
+            }}
+          >
+            Device Distribution
+          </h3>
+          <p
+            style={{
+              margin: 0,
+              fontSize: '13px',
+              fontWeight: 500,
+              color: '#64748B',
+              lineHeight: 1.2,
+            }}
+          >
+            Devices used to visit your portfolio
+          </p>
+        </div>
+      </div>
+
+      {/* Content Section */}
+      {error ? (
+        <div
+          style={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '12px',
+            minHeight: '220px',
+          }}
+        >
+          <span style={{ fontSize: '13px', color: '#EF4444', fontWeight: 600 }}>
+            Failed to load device analytics.
+          </span>
+          {onRetry && (
+            <button
+              onClick={onRetry}
+              style={{
+                padding: '6px 14px',
+                borderRadius: '8px',
+                border: '1px solid #EF4444',
+                backgroundColor: 'transparent',
+                color: '#EF4444',
+                fontSize: '12px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                transition: 'all 0.15s ease',
+              }}
+            >
+              Retry
+            </button>
+          )}
+        </div>
+      ) : loading ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', width: '100%' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+            <div className="dev-shimmer" style={{ width: '96px', height: '96px', borderRadius: '50%' }} />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <div className="dev-shimmer" style={{ width: '70px', height: '12px', borderRadius: '4px' }} />
+              <div className="dev-shimmer" style={{ width: '50px', height: '24px', borderRadius: '6px' }} />
+              <div className="dev-shimmer" style={{ width: '80px', height: '14px', borderRadius: '4px' }} />
             </div>
           </div>
-        ) : totalPercent === 0 && (devices || []).length === 0 ? (
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '180px', gap: '8px' }}>
-            <span style={{ fontSize: '13px', color: 'var(--admin-text-secondary)', fontWeight: 550 }}>
-              No device analytics available yet.
-            </span>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {Array.from({ length: 3 }).map((_, idx) => (
+              <div
+                key={idx}
+                className="dev-shimmer"
+                style={{ height: '52px', borderRadius: '16px' }}
+              />
+            ))}
           </div>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '24px', width: '100%' }}>
-            
-            {/* Donut Container */}
-            <div style={{ position: 'relative', width: '120px', height: '120px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <svg
-                viewBox="0 0 100 100"
-                width="120"
-                height="120"
-                style={{ transform: 'rotate(-90deg)', overflow: 'visible', flexShrink: 0 }}
+        </div>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '18px', width: '100%' }}>
+          {/* Upper Visual Area: Compact Donut + Total Visits + Right-anchored Decorative Artwork */}
+          <div
+            className="device-upper-visual"
+            style={{
+              position: 'relative',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              minHeight: '115px',
+              padding: '4px 0',
+              overflow: 'hidden',
+            }}
+          >
+            {/* Left Group: Compact Donut Ring & Total Visits Metric */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '14px', zIndex: 1, minWidth: 0 }}>
+              {/* Donut Gauge */}
+              <div
+                style={{
+                  position: 'relative',
+                  width: '96px',
+                  height: '96px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                }}
               >
-                {/* Background track */}
-                <circle
-                  cx={center}
-                  cy={center}
-                  r={radius}
-                  fill="transparent"
-                  stroke="#F1F5F9"
-                  strokeWidth={strokeWidth}
-                />
+                <svg
+                  viewBox="0 0 96 96"
+                  width="96"
+                  height="96"
+                  style={{ transform: 'rotate(-90deg)', overflow: 'visible', flexShrink: 0 }}
+                >
+                  {/* Background track */}
+                  <circle
+                    cx={center}
+                    cy={center}
+                    r={radius}
+                    fill="transparent"
+                    stroke="#F1F5F9"
+                    strokeWidth={strokeWidth}
+                  />
 
-                {mappedDevices.map((dev) => {
-                  const strokeLength = (dev.percentage / 100) * circumference;
-                  const strokeOffset = circumference - ((accumulatedPercent / 100) * circumference);
-                  accumulatedPercent += dev.percentage;
-
-                  if (dev.percentage === 0) return null;
-
-                  const isHovered = hoveredSegment === dev.name;
-                  const segmentColor = colors[dev.name] || 'var(--admin-primary)';
-
-                  return (
+                  {/* Desktop arc (Primary Purple) */}
+                  {desktopPct > 0 && (
                     <circle
-                      key={dev.name}
                       cx={center}
                       cy={center}
                       r={radius}
                       fill="transparent"
-                      stroke={segmentColor}
-                      strokeWidth={isHovered ? strokeWidth + 2 : strokeWidth}
-                      strokeDasharray={`${strokeLength} ${circumference}`}
-                      strokeDashoffset={mounted ? strokeOffset : circumference}
+                      stroke="#7C3AED"
+                      strokeWidth={strokeWidth}
+                      strokeDasharray={`${desktopStroke} ${circumference}`}
+                      strokeDashoffset={mounted ? 0 : circumference}
                       strokeLinecap="round"
-                      style={{
-                        transition: 'stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1), stroke-width 0.2s ease, opacity 0.2s ease',
-                        opacity: hoveredSegment ? (isHovered ? 1 : 0.4) : 1,
-                        cursor: 'pointer'
-                      }}
-                      onMouseEnter={() => setHoveredSegment(dev.name)}
-                      onMouseLeave={() => {
-                        setHoveredSegment(null);
-                        setTooltip(null);
-                      }}
-                      onMouseMove={(e) => {
-                        const parentRect = e.currentTarget.ownerSVGElement?.parentElement?.parentElement?.parentElement?.getBoundingClientRect();
-                        if (parentRect) {
-                          setTooltip({
-                            show: true,
-                            name: dev.name,
-                            percentage: dev.percentage,
-                            x: e.clientX - parentRect.left,
-                            y: e.clientY - parentRect.top - 12
-                          });
-                        }
-                      }}
+                      style={{ transition: 'stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1)' }}
                     />
-                  );
-                })}
-              </svg>
+                  )}
 
-              {/* Center Labels */}
+                  {/* Mobile arc (Sky Blue) */}
+                  {mobilePct > 0 && (
+                    <circle
+                      cx={center}
+                      cy={center}
+                      r={radius}
+                      fill="transparent"
+                      stroke="#38BDF8"
+                      strokeWidth={strokeWidth}
+                      strokeDasharray={`${mobileStroke} ${circumference}`}
+                      strokeDashoffset={mounted ? -desktopStroke : circumference}
+                      strokeLinecap="round"
+                      style={{ transition: 'stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1)' }}
+                    />
+                  )}
+
+                  {/* Others arc (Pastel Lavender) */}
+                  {othersPct > 0 && (
+                    <circle
+                      cx={center}
+                      cy={center}
+                      r={radius}
+                      fill="transparent"
+                      stroke="#C084FC"
+                      strokeWidth={strokeWidth}
+                      strokeDasharray={`${othersStroke} ${circumference}`}
+                      strokeDashoffset={mounted ? -(desktopStroke + mobileStroke) : circumference}
+                      strokeLinecap="round"
+                      style={{ transition: 'stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1)' }}
+                    />
+                  )}
+                </svg>
+
+                {/* Donut Center Text - Compact & well-spaced */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    textAlign: 'center',
+                    pointerEvents: 'none',
+                    width: '100%',
+                    padding: '0 4px',
+                    boxSizing: 'border-box',
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: '15px',
+                      fontWeight: 800,
+                      color: '#0F172A',
+                      lineHeight: 1,
+                      letterSpacing: '-0.02em',
+                    }}
+                  >
+                    {dominantPct}%
+                  </span>
+                  <span
+                    style={{
+                      fontSize: '9px',
+                      fontWeight: 700,
+                      color: '#64748B',
+                      marginTop: '2px',
+                      lineHeight: 1,
+                    }}
+                  >
+                    {dominantName}
+                  </span>
+                  <span
+                    style={{
+                      fontSize: '7px',
+                      fontWeight: 500,
+                      color: '#94A3B8',
+                      marginTop: '1.5px',
+                      lineHeight: 1,
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    of total visits
+                  </span>
+                </div>
+              </div>
+
+              {/* Total Visits Metric Block */}
               <div
                 style={{
-                  position: 'absolute',
                   display: 'flex',
                   flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  pointerEvents: 'none',
-                  textAlign: 'center'
+                  gap: '3px',
+                  borderLeft: '1px solid rgba(226, 232, 240, 0.8)',
+                  paddingLeft: '14px',
+                  flexShrink: 0,
                 }}
               >
-                {activeDevice ? (
-                  <>
-                    <span style={{ fontSize: '18px', fontWeight: 800, color: 'var(--admin-text)', lineHeight: 1.1 }}>
-                      {activeDevice.percentage}%
-                    </span>
-                    <span style={{ fontSize: '10px', fontWeight: 700, color: 'var(--admin-text-secondary)', marginTop: '2px' }}>
-                      {activeDevice.name}
-                    </span>
-                  </>
-                ) : (
-                  <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--admin-text-secondary)' }}>
-                    No Data
+                <span
+                  style={{
+                    fontSize: '11.5px',
+                    fontWeight: 600,
+                    color: '#64748B',
+                    lineHeight: 1,
+                  }}
+                >
+                  Total Visits
+                </span>
+                <span
+                  style={{
+                    fontSize: '24px',
+                    fontWeight: 800,
+                    color: '#0F172A',
+                    lineHeight: 1.1,
+                    letterSpacing: '-0.03em',
+                  }}
+                >
+                  {effectiveTotal}
+                </span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginTop: '1px' }}>
+                  <span
+                    style={{
+                      backgroundColor: '#DCFCE7',
+                      color: '#16A34A',
+                      fontSize: '10.5px',
+                      fontWeight: 700,
+                      padding: '2px 5px',
+                      borderRadius: '5px',
+                      lineHeight: 1.2,
+                    }}
+                  >
+                    ↑ 12%
                   </span>
-                )}
+                  <span
+                    style={{
+                      fontSize: '10px',
+                      fontWeight: 500,
+                      color: '#94A3B8',
+                      lineHeight: 1.2,
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    vs last 7 days
+                  </span>
+                </div>
               </div>
             </div>
 
-            {/* Legend / Stacked progress list */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%' }}>
-              {mappedDevices.map((dev) => {
-                const isHovered = hoveredSegment === dev.name;
-                const segmentColor = colors[dev.name] || 'var(--admin-primary)';
-
-                return (
-                  <div
-                    key={dev.name}
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '6px',
-                      padding: '8px 12px',
-                      backgroundColor: isHovered ? 'rgba(124, 58, 237, 0.04)' : 'rgba(248, 250, 252, 0.5)',
-                      border: '1px solid',
-                      borderColor: isHovered ? 'var(--admin-primary)' : 'var(--admin-border)',
-                      borderRadius: '8px',
-                      transition: 'all 0.2s ease-in-out',
-                      transform: isHovered ? 'translateY(-1px)' : 'none',
-                      cursor: 'pointer'
-                    }}
-                    onMouseEnter={() => setHoveredSegment(dev.name)}
-                    onMouseLeave={() => setHoveredSegment(null)}
-                  >
-                    {/* Header: Icon + Name (left) & Percentage (right) */}
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <div
-                          style={{
-                            width: '24px',
-                            height: '24px',
-                            borderRadius: '50%',
-                            backgroundColor: 'rgba(124, 58, 237, 0.08)',
-                            color: segmentColor,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            flexShrink: 0
-                          }}
-                        >
-                          {getDeviceIcon(dev.name)}
-                        </div>
-                        <span style={{ fontSize: '12.5px', color: 'var(--admin-text)', fontWeight: 700 }}>
-                          {dev.name}
-                        </span>
-                      </div>
-                      <span style={{ fontSize: '13px', color: 'var(--admin-text)', fontWeight: 800 }}>
-                        {dev.percentage}%
-                      </span>
-                    </div>
-
-                    {/* Progress Bar (width matching Traffic Sources progress) */}
-                    <div
-                      style={{
-                        height: '6px',
-                        width: '100%',
-                        backgroundColor: '#E2E8F0',
-                        borderRadius: '3px',
-                        overflow: 'hidden'
-                      }}
-                    >
-                      <div
-                        style={{
-                          height: '100%',
-                          width: mounted ? `${dev.percentage}%` : '0%',
-                          backgroundColor: segmentColor,
-                          borderRadius: '3px',
-                          transition: 'width 0.8s cubic-bezier(0.4, 0, 0.2, 1)'
-                        }}
-                      />
-                    </div>
-                  </div>
-                );
-              })}
+            {/* Right Side: Responsive Decorative Device Artwork */}
+            <div
+              className="decorative-device-art"
+              aria-hidden="true"
+            >
+              <img
+                src={devicesDecorImg}
+                alt=""
+                style={{
+                  height: '100%',
+                  width: 'auto',
+                  objectFit: 'contain',
+                  filter: 'saturate(1.05)',
+                }}
+              />
             </div>
-
           </div>
-        )}
-      </div>
 
-      {/* Floating Tooltip */}
-      {tooltip && tooltip.show && (
-        <div
-          style={{
-            position: 'absolute',
-            left: `${tooltip.x}px`,
-            top: `${tooltip.y}px`,
-            backgroundColor: 'rgba(31, 41, 55, 0.95)',
-            color: '#FFFFFF',
-            padding: '6px 10px',
-            borderRadius: '6px',
-            fontSize: '11px',
-            fontWeight: 650,
-            pointerEvents: 'none',
-            zIndex: 1000,
-            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '2px',
-            transform: 'translate(-50%, -100%)',
-            whiteSpace: 'nowrap',
-            transition: 'left 0.1s ease, top 0.1s ease'
-          }}
-        >
-          <span style={{ fontWeight: 700 }}>{tooltip.name}</span>
-          <span style={{ color: '#E2E8F0' }}>{tooltip.percentage}%</span>
+          {/* Lower Section: Exactly 3 Device Detail Rows */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%', zIndex: 1 }}>
+            {deviceRows.map((row) => (
+              <div
+                key={row.name}
+                className="device-detail-row"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '14px',
+                  padding: '12px 18px',
+                  backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                  border: '1px solid rgba(226, 232, 240, 0.85)',
+                  borderRadius: '16px',
+                  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.02)',
+                  transition: 'transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease',
+                  boxSizing: 'border-box',
+                }}
+              >
+                {/* 1. Icon */}
+                <div
+                  style={{
+                    width: '38px',
+                    height: '38px',
+                    borderRadius: '10px',
+                    backgroundColor: row.iconBg,
+                    color: row.iconColor,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                  }}
+                >
+                  {row.icon}
+                </div>
+
+                {/* 2. Device Name & Visits */}
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '2px',
+                    width: '85px',
+                    flexShrink: 0,
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: '14px',
+                      fontWeight: 700,
+                      color: '#0F172A',
+                      lineHeight: 1.2,
+                    }}
+                  >
+                    {row.name}
+                  </span>
+                  <span
+                    style={{
+                      fontSize: '12px',
+                      fontWeight: 500,
+                      color: '#64748B',
+                      lineHeight: 1.2,
+                    }}
+                  >
+                    {row.visits} {row.visits === 1 ? 'Visit' : 'Visits'}
+                  </span>
+                </div>
+
+                {/* 3. Progress Bar */}
+                <div
+                  style={{
+                    flex: 1,
+                    height: '6px',
+                    backgroundColor: '#F1F5F9',
+                    borderRadius: '999px',
+                    overflow: 'hidden',
+                  }}
+                >
+                  <div
+                    style={{
+                      height: '100%',
+                      width: mounted ? `${Math.min(100, Math.max(row.percentage > 0 ? 3 : 0, row.percentage))}%` : '0%',
+                      background: 'linear-gradient(90deg, #8B5CF6 0%, #7C3AED 100%)',
+                      borderRadius: '999px',
+                      transition: 'width 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
+                    }}
+                  />
+                </div>
+
+                {/* 4. Percentage Callout */}
+                <span
+                  style={{
+                    fontSize: '14px',
+                    fontWeight: 800,
+                    color: '#7C3AED',
+                    width: '42px',
+                    textAlign: 'right',
+                    flexShrink: 0,
+                  }}
+                >
+                  {row.percentage}%
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
+      <style dangerouslySetInnerHTML={{ __html: `
+        .decorative-device-art {
+          position: absolute;
+          right: -8px;
+          top: 50%;
+          transform: translateY(-50%);
+          height: 105px;
+          max-width: 36%;
+          display: flex;
+          align-items: center;
+          justify-content: flex-end;
+          pointer-events: none;
+          opacity: 0.26;
+          z-index: 0;
+          transition: all 0.25s ease;
+        }
+
+        @media (max-width: 1440px) {
+          .decorative-device-art {
+            height: 90px;
+            max-width: 30%;
+            opacity: 0.22;
+          }
+        }
+
+        @media (max-width: 1200px) {
+          .decorative-device-art {
+            height: 75px;
+            max-width: 26%;
+            opacity: 0.18;
+          }
+        }
+
+        @media (max-width: 800px) {
+          .decorative-device-art {
+            display: none;
+          }
+        }
+
+        .device-detail-row:hover {
+          transform: translateY(-2px);
+          border-color: rgba(124, 58, 237, 0.35) !important;
+          box-shadow: 0 6px 18px -2px rgba(124, 58, 237, 0.08) !important;
+        }
+
+        @keyframes devShimmer {
+          0% { background-position: -200% 0; }
+          100% { background-position: 200% 0; }
+        }
+
+        .dev-shimmer {
+          background: linear-gradient(90deg, #F1F5F9 25%, #E2E8F0 50%, #F1F5F9 75%);
+          background-size: 200% 100%;
+          animation: devShimmer 1.5s infinite linear;
+          box-sizing: border-box;
+        }
+      ` }} />
     </div>
   );
 };
