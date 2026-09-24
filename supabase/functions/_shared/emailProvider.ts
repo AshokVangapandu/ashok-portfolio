@@ -41,6 +41,7 @@ export interface SendEmailOptions {
   text?: string;
   from?: EmailSender;
   replyTo?: EmailRecipient;
+  headers?: Record<string, string>;
 }
 
 /**
@@ -146,6 +147,9 @@ export class BrevoEmailProvider implements IEmailProvider {
       };
     }
 
+    // Generate unique entity reference to prevent Gmail thread collapse
+    const uniqueEntityRef = `msg-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+
     // Construct Brevo v3 SMTP API Payload
     const payload: any = {
       sender,
@@ -153,7 +157,12 @@ export class BrevoEmailProvider implements IEmailProvider {
       subject: options.subject,
       htmlContent: options.html,
       ...(options.text ? { textContent: options.text } : {}),
-      ...(options.replyTo ? { replyTo: { email: options.replyTo.email, ...(options.replyTo.name ? { name: options.replyTo.name } : {}) } } : {})
+      ...(options.replyTo ? { replyTo: { email: options.replyTo.email, ...(options.replyTo.name ? { name: options.replyTo.name } : {}) } } : {}),
+      headers: {
+        'X-Entity-Ref-ID': uniqueEntityRef,
+        'X-Auto-Response-Suppress': 'OOF, AutoReply',
+        ...(options.headers || {})
+      }
     };
 
     try {

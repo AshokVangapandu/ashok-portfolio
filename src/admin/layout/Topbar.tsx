@@ -1,11 +1,13 @@
-/* src/admin/layout/Topbar.tsx */
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { supabase } from '../../services/supabase/client';
+import { getWeatherData, WeatherData } from '../services/weatherService';
+import { useAdminNotifications, AdminNotification } from '../hooks/useAdminNotifications';
 
 interface TopbarProps {
   onToggleSidebar?: () => void;
-  pageTitle: string; // Preserved in signature to prevent compile errors
+  pageTitle: string;
+  onNavigate?: (path: string) => void;
 }
 
 // 1. Reusable NotificationItem Component
@@ -16,6 +18,8 @@ interface NotificationItemProps {
   timestamp: string;
   iconBg: string;
   iconColor: string;
+  isRead?: boolean;
+  onClick?: () => void;
 }
 
 export const NotificationItem: React.FC<NotificationItemProps> = ({
@@ -25,9 +29,14 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({
   timestamp,
   iconBg,
   iconColor,
+  isRead = true,
+  onClick,
 }) => {
   return (
-    <div className="premium-notification-item">
+    <div
+      className={`premium-notification-item ${!isRead ? 'unread' : ''}`}
+      onClick={onClick}
+    >
       <div
         className="notification-icon-box"
         style={{ backgroundColor: iconBg, color: iconColor }}
@@ -35,8 +44,11 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({
         {icon}
       </div>
       <div className="notification-item-details">
-        <h4 className="notification-item-title">{title}</h4>
-        <p className="notification-item-desc">{description}</p>
+        <div className="notification-item-header">
+          <h4 className="notification-item-title">{title}</h4>
+          {!isRead && <span className="notification-unread-dot" />}
+        </div>
+        <p className="notification-item-desc" title={description}>{description}</p>
         <span className="notification-item-time">{timestamp}</span>
       </div>
     </div>
@@ -44,12 +56,69 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({
 };
 
 // 2. Main Topbar Component
-export const Topbar: React.FC<TopbarProps> = () => {
+export const Topbar: React.FC<TopbarProps> = ({ onNavigate }) => {
   const { user, logout } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [greeting, setGreeting] = useState('Good Afternoon');
   const [adminName, setAdminName] = useState<string | null>(null);
+
+  const handleNavigate = (path: string) => {
+    if (onNavigate) {
+      onNavigate(path);
+    } else if (typeof window !== 'undefined') {
+      window.history.pushState({}, '', path);
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    }
+  };
+
+  // Dynamic admin notifications
+  const {
+    notifications,
+    unreadCount,
+    markAllAsRead,
+    markAsRead
+  } = useAdminNotifications();
+
+  // Dynamic weather state
+  const [weather, setWeather] = useState<WeatherData | null>(null);
+  const [weatherLoading, setWeatherLoading] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchWeather = async (force = false) => {
+      try {
+        const data = await getWeatherData(force);
+        if (isMounted) {
+          setWeather(data);
+          setWeatherLoading(false);
+        }
+      } catch (err) {
+        console.warn('[Topbar] Error loading weather:', err);
+        if (isMounted) {
+          setWeatherLoading(false);
+        }
+      }
+    };
+
+    fetchWeather(false);
+    const interval = setInterval(() => fetchWeather(true), 15 * 60 * 1000);
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
+  }, []);
+
+  const conditionEmoji = useMemo(() => {
+    if (!weather) return '☀️';
+    const c = (weather.condition || '').toLowerCase();
+    if (c.includes('thunder')) return '⛈️';
+    if (c.includes('rain') || c.includes('drizzle') || c.includes('shower')) return '🌧️';
+    if (c.includes('snow') || c.includes('ice') || c.includes('blizzard')) return '❄️';
+    if (c.includes('fog') || c.includes('mist') || c.includes('haze')) return '🌫️';
+    if (c.includes('cloud') || c.includes('overcast')) return '⛅';
+    return '☀️';
+  }, [weather]);
  
   // Fetch admin name from database if authenticated
   useEffect(() => {
@@ -71,64 +140,6 @@ export const Topbar: React.FC<TopbarProps> = () => {
     };
     fetchAdminName();
   }, [user]);
-
-  // Dynamic notifications state
-  const [pendingCount, setPendingCount] = useState(0);
-  const [pendingTestimonials, setPendingTestimonials] = useState<any[]>([]);
-  const [readIds, setReadIds] = useState<string[]>(() => {
-    try {
-      return JSON.parse(localStorage.getItem('read_testimonial_ids') || '[]');
-    } catch {
-      return [];
-    }
-  });
-
-  const fetchPendingTestimonials = useCallback(async () => {
-    try {
-      const { data, error } = await supabase
-        .from('testimonials')
-        .select('id, full_name, created_at')
-        .eq('status', 'pending');
-      
-      if (!error && data) {
-        setPendingTestimonials(data);
-        const unread = data.filter((t: any) => !readIds.includes(t.id));
-        setPendingCount(unread.length);
-      }
-    } catch (err) {
-      console.error('Error fetching pending notifications:', err);
-    }
-  }, [readIds]);
-
-  useEffect(() => {
-    fetchPendingTestimonials();
-
-    // Subscribe to realtime updates on testimonials
-    const channel = supabase
-      .channel('topbar-testimonial-changes')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'testimonials' },
-        () => {
-          fetchPendingTestimonials();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [fetchPendingTestimonials]);
-
-  // Mark pending notifications as read when dropdown is opened
-  useEffect(() => {
-    if (notificationsOpen && pendingTestimonials.length > 0) {
-      const allIds = pendingTestimonials.map((t) => t.id);
-      localStorage.setItem('read_testimonial_ids', JSON.stringify(allIds));
-      setReadIds(allIds);
-      setPendingCount(0);
-    }
-  }, [notificationsOpen, pendingTestimonials]);
 
   // Calculate greeting based on local time
   useEffect(() => {
@@ -160,64 +171,31 @@ export const Topbar: React.FC<TopbarProps> = () => {
 
   const userInitials = getInitials(userDisplayName);
 
-  // Static fallback list of notifications
-  const staticNotifications = [
-    {
-      id: 1,
-      title: 'New Contact Received',
-      description: 'John Doe submitted a contact request.',
-      timestamp: '2 minutes ago',
-      iconBg: 'rgba(59, 130, 246, 0.08)',
-      iconColor: '#2563EB',
-      icon: (
-        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-          <polyline points="22,6 12,13 2,6" />
-        </svg>
-      )
-    },
-    {
-      id: 3,
-      title: 'Resume Downloaded',
-      description: 'Your resume was downloaded.',
-      timestamp: '1 hour ago',
-      iconBg: 'rgba(34, 197, 94, 0.08)',
-      iconColor: '#16A34A',
-      icon: (
-        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-          <polyline points="14 2 14 8 20 8" />
-        </svg>
-      )
+  const getNotificationIcon = (type: AdminNotification['type']) => {
+    switch (type) {
+      case 'testimonial':
+        return (
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+          </svg>
+        );
+      case 'contact':
+        return (
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+            <polyline points="22,6 12,13 2,6" />
+          </svg>
+        );
+      case 'download':
+        return (
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+            <polyline points="14 2 14 8 20 8" />
+            <line x1="12" y1="18" x2="12" y2="12" />
+            <polyline points="9 15 12 18 15 15" />
+          </svg>
+        );
     }
-  ];
-
-  // Map dynamic pending notifications
-  const dynamicNotifications = pendingTestimonials.map((t: any) => {
-    const isUnread = !readIds.includes(t.id);
-    const dateObj = new Date(t.created_at);
-    return {
-      id: `testimonial-${t.id}`,
-      title: 'New Testimonial Submitted',
-      description: `${t.full_name || 'Collaborator'} submitted a testimonial awaiting review.`,
-      timestamp: dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
-      iconBg: isUnread ? 'rgba(124, 58, 237, 0.15)' : 'rgba(245, 158, 11, 0.08)',
-      iconColor: isUnread ? 'var(--admin-primary)' : '#D97706',
-      icon: (
-        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-        </svg>
-      )
-    };
-  });
-
-  const allNotifications = [...dynamicNotifications, ...staticNotifications];
-
-  const handleMarkAllRead = () => {
-    const allIds = pendingTestimonials.map((t) => t.id);
-    localStorage.setItem('read_testimonial_ids', JSON.stringify(allIds));
-    setReadIds(allIds);
-    setPendingCount(0);
   };
 
   return (
@@ -235,11 +213,18 @@ export const Topbar: React.FC<TopbarProps> = () => {
       {/* Right Controls Container */}
       <div className="topbar-right-controls">
         {/* 2. Weather Information Widget */}
-        <div className="weather-widget-card" title="Local Weather Conditions">
-          <span className="weather-widget-icon">☀️</span>
+        <div
+          className="weather-widget-card"
+          title={weather ? `${weather.condition} in ${weather.city}` : 'Local Weather Conditions'}
+        >
+          <span className="weather-widget-icon">{conditionEmoji}</span>
           <div className="weather-widget-text">
-            <span className="weather-temp">30°C</span>
-            <span className="weather-city">Hyderabad</span>
+            <span className="weather-temp">
+              {weather ? `${weather.temperature}°C` : (weatherLoading ? '--°C' : '30°C')}
+            </span>
+            <span className="weather-city">
+              {weather ? weather.city : (weatherLoading ? 'Locating...' : 'Local')}
+            </span>
           </div>
         </div>
 
@@ -257,7 +242,7 @@ export const Topbar: React.FC<TopbarProps> = () => {
             </svg>
             
             {/* Unread badge count */}
-            {pendingCount > 0 && <div className="notification-badge">{pendingCount}</div>}
+            {unreadCount > 0 && <div className="notification-badge">{unreadCount}</div>}
           </button>
 
           {notificationsOpen && (
@@ -274,35 +259,63 @@ export const Topbar: React.FC<TopbarProps> = () => {
                 <div className="notification-panel-header">
                   <div className="panel-header-left">
                     <h4 className="panel-title-text">Notifications</h4>
-                    <span className="panel-unread-sub">You have {pendingCount} unread notifications</span>
+                    <span className="panel-unread-sub">
+                      You have {unreadCount} unread notification{unreadCount === 1 ? '' : 's'}
+                    </span>
                   </div>
-                  <button
-                    onClick={handleMarkAllRead}
-                    className="mark-read-btn"
-                  >
-                    Mark all as read
-                  </button>
+                  {notifications.length > 0 && unreadCount > 0 && (
+                    <button
+                      onClick={markAllAsRead}
+                      className="mark-read-btn"
+                    >
+                      Mark all as read
+                    </button>
+                  )}
                 </div>
 
                 {/* Notification Feed List */}
                 <div className="notification-items-list">
-                  {allNotifications.map((item) => (
-                    <NotificationItem
-                      key={item.id}
-                      icon={item.icon}
-                      title={item.title}
-                      description={item.description}
-                      timestamp={item.timestamp}
-                      iconBg={item.iconBg}
-                      iconColor={item.iconColor}
-                    />
-                  ))}
+                  {notifications.length === 0 ? (
+                    <div className="notification-empty-state">
+                      <div className="empty-bell-icon">🔔</div>
+                      <p className="empty-title">No new notifications</p>
+                      <p className="empty-subtitle">You're all caught up!</p>
+                    </div>
+                  ) : (
+                    notifications.map((item) => (
+                      <NotificationItem
+                        key={item.id}
+                        icon={getNotificationIcon(item.type)}
+                        title={item.title}
+                        description={item.description}
+                        timestamp={item.timestamp}
+                        iconBg={item.iconBg}
+                        iconColor={item.iconColor}
+                        isRead={item.isRead}
+                        onClick={() => {
+                          markAsRead(item.id);
+                          setNotificationsOpen(false);
+                          if (item.type === 'testimonial') handleNavigate('/admin/testimonials');
+                          else if (item.type === 'contact') handleNavigate('/admin/contacts');
+                          else if (item.type === 'download') handleNavigate('/admin/resume');
+                        }}
+                      />
+                    ))
+                  )}
                 </div>
 
                 {/* Panel Footer */}
                 <div className="notification-panel-footer">
-                  <a href="#/admin/notifications" onClick={(e) => { e.preventDefault(); setNotificationsOpen(false); }} className="view-all-notifications-link">
-                    <span>View All Notifications</span>
+                  <a
+                    href="#/admin"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setNotificationsOpen(false);
+                      handleNavigate('/admin/testimonials');
+                    }}
+                    className="view-all-notifications-link"
+                  >
+                    <span>View All Testimonials & Activity</span>
                     <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                       <line x1="5" y1="12" x2="19" y2="12" />
                       <polyline points="12 5 19 12 12 19" />
@@ -655,10 +668,19 @@ export const Topbar: React.FC<TopbarProps> = () => {
           text-align: left;
           width: 100%;
           box-sizing: border-box;
+          position: relative;
         }
 
         .premium-topbar .premium-notification-item:hover {
           background-color: rgba(124, 58, 237, 0.02);
+        }
+
+        .premium-topbar .premium-notification-item.unread {
+          background-color: rgba(124, 58, 237, 0.03);
+        }
+
+        .premium-topbar .premium-notification-item.unread:hover {
+          background-color: rgba(124, 58, 237, 0.06);
         }
 
         .premium-topbar .notification-icon-box {
@@ -680,11 +702,26 @@ export const Topbar: React.FC<TopbarProps> = () => {
           overflow: hidden;
         }
 
+        .premium-topbar .notification-item-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 8px;
+        }
+
         .premium-topbar .notification-item-title {
           font-size: 13px;
           font-weight: 700;
           color: #1E293B;
           margin: 0;
+        }
+
+        .premium-topbar .notification-unread-dot {
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          background-color: #7C3AED;
+          flex-shrink: 0;
         }
 
         .premium-topbar .notification-item-desc {
@@ -703,6 +740,36 @@ export const Topbar: React.FC<TopbarProps> = () => {
           color: #94A3B8;
           font-weight: 550;
           margin-top: 2px;
+        }
+
+        /* Empty state */
+        .premium-topbar .notification-empty-state {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          padding: 36px 20px;
+          text-align: center;
+        }
+
+        .premium-topbar .empty-bell-icon {
+          font-size: 28px;
+          margin-bottom: 8px;
+          filter: grayscale(0.2);
+        }
+
+        .premium-topbar .empty-title {
+          font-size: 13.5px;
+          font-weight: 700;
+          color: #334155;
+          margin: 0 0 4px 0;
+        }
+
+        .premium-topbar .empty-subtitle {
+          font-size: 11.5px;
+          color: #94A3B8;
+          font-weight: 500;
+          margin: 0;
         }
 
         /* Panel Footer */

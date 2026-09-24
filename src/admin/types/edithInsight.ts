@@ -22,6 +22,9 @@ export interface EdithInsight {
   category: string; // e.g. 'Resume', 'Contacts', 'Certifications', 'Analytics', 'Projects'
   title: string;
   description: string;
+  contextText?: string;
+  badgeText?: string;
+  badgeType?: 'needs_attention' | 'positive' | 'neutral';
   actionText?: string;
   actionDestination?: string;
   actionType?: 'internal-route' | 'external-link';

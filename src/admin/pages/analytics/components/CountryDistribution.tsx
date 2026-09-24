@@ -154,61 +154,83 @@ export const CountryDistribution: React.FC<CountryDistributionProps> = ({
   error = false,
   onRetry,
 }) => {
-  // Sort locations descending
-  const sorted = [...(locations || [])].sort(
-    (a, b) => (b.count || 0) - (a.count || 0) || (b.percentage || 0) - (a.percentage || 0)
+  // Filter resolved countries (excluding Others and Unknown from top ranking slots)
+  const resolved = (locations || []).filter(
+    (l) => !l.isOthers && l.country !== 'Others' && l.country !== 'Other' && l.country !== 'Unknown' && l.country.trim() !== ''
   );
+  const backendOthers = (locations || []).find((l) => l.isOthers || l.country === 'Others' || l.country === 'Other');
 
-  const totalVisits = sorted.reduce((sum, l) => sum + (l.count || 0), 0);
+  // Total visits calculation
+  const totalVisits = (locations || []).reduce((sum, l) => sum + (l.count || 0), 0);
 
-  // Top 3 countries
-  const top3 = sorted.slice(0, 3);
-  const remaining = sorted.slice(3);
+  // Top 3 resolved countries
+  const topResolved = resolved.slice(0, 3);
 
-  const displayItems: ProcessedLocationItem[] = top3.map((loc, idx) => {
-    const rawPct = typeof loc.percentage === 'number' && loc.percentage > 0
-      ? loc.percentage
-      : totalVisits > 0
-      ? Math.round(((loc.count || 0) / totalVisits) * 100)
-      : 0;
+  // Others count: use backend calculated Others, or fallback to total minus top 3
+  const othersVisits = backendOthers
+    ? backendOthers.count || 0
+    : Math.max(0, totalVisits - topResolved.reduce((sum, c) => sum + (c.count || 0), 0));
 
-    return {
+  const itemsToDisplay: {
+    rank?: number;
+    country: string;
+    visits: number;
+    isoCode: string;
+    isOthers: boolean;
+    rawPct: number;
+  }[] = [
+    ...topResolved.map((loc, idx) => ({
       rank: idx + 1,
-      country: loc.country === 'Unknown' ? 'Unknown' : loc.country,
+      country: loc.country,
       visits: loc.count || 0,
-      percentage: rawPct,
       isoCode: resolveIsoCode(loc.country, loc.countryCode || loc.code),
       isOthers: false,
-    };
-  });
-
-  // Calculate 4th "Others" item
-  if (remaining.length > 0 || (sorted.length > 0 && displayItems.length < 4)) {
-    const othersVisits = remaining.reduce((sum, l) => sum + (l.count || 0), 0);
-    const top3PctSum = displayItems.reduce((sum, item) => sum + item.percentage, 0);
-    const othersPercentage = remaining.length > 0
-      ? Math.max(0, 100 - top3PctSum)
-      : 0;
-
-    displayItems.push({
+      rawPct:
+        typeof loc.percentage === 'number' && loc.percentage > 0
+          ? loc.percentage
+          : totalVisits > 0
+          ? ((loc.count || 0) / totalVisits) * 100
+          : 0,
+    })),
+    {
       country: 'Others',
       visits: othersVisits,
-      percentage: othersPercentage,
       isoCode: '',
       isOthers: true,
+      rawPct:
+        backendOthers && typeof backendOthers.percentage === 'number'
+          ? backendOthers.percentage
+          : totalVisits > 0
+          ? (othersVisits / totalVisits) * 100
+          : 0,
+    },
+  ];
+
+  // Adjust percentages so the displayed sum is exactly 100%
+  const roundedPercentages = itemsToDisplay.map((item) => Math.round(item.rawPct));
+  const currentSum = roundedPercentages.reduce((a, b) => a + b, 0);
+  const diff = 100 - currentSum;
+
+  if (diff !== 0 && totalVisits > 0) {
+    let maxIdx = 0;
+    let maxVal = -1;
+    itemsToDisplay.forEach((item, idx) => {
+      if (item.visits > 0 && item.rawPct > maxVal) {
+        maxVal = item.rawPct;
+        maxIdx = idx;
+      }
     });
+    roundedPercentages[maxIdx] += diff;
   }
 
-  // Ensure exactly 4 items for 2x2 grid if there are some locations
-  while (displayItems.length > 0 && displayItems.length < 4) {
-    displayItems.push({
-      country: 'Others',
-      visits: 0,
-      percentage: 0,
-      isoCode: '',
-      isOthers: true,
-    });
-  }
+  const displayItems: ProcessedLocationItem[] = itemsToDisplay.map((item, idx) => ({
+    rank: item.rank,
+    country: item.country,
+    visits: item.visits,
+    percentage: roundedPercentages[idx],
+    isoCode: item.isoCode,
+    isOthers: item.isOthers,
+  }));
 
   return (
     <div
@@ -377,7 +399,7 @@ export const CountryDistribution: React.FC<CountryDistributionProps> = ({
               </div>
             ))}
           </div>
-        ) : sorted.length === 0 ? (
+        ) : totalVisits === 0 ? (
           <div
             style={{
               flex: 1,

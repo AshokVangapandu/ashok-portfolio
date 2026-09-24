@@ -3,7 +3,6 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { DashboardBanner } from './DashboardBanner';
 import { KpiCard } from './KpiCard';
 import { ContentPublishingCard } from './ContentPublishingCard';
-import { RequestsApprovalsCard } from './RequestsApprovalsCard';
 import { EdithInsights } from './EdithInsights';
 import { SystemMonitor } from './SystemMonitor';
 import { useContactMessages } from '../../hooks/useContactMessages';
@@ -11,6 +10,7 @@ import { analyticsService } from '../../admin/services/analyticsService';
 import { testimonialService } from '../../admin/services/testimonialService';
 import { resumeDownloadService } from '../../admin/services/resumeDownloadService';
 import { projectService } from '../../admin/services/projectService';
+import { toolsProductsService } from '../../admin/services/toolsProductsService';
 
 export const DashboardGrid: React.FC = () => {
   // 1. Contact Messages (existing hook)
@@ -31,9 +31,11 @@ export const DashboardGrid: React.FC = () => {
   const [resumeDownloadsCount, setResumeDownloadsCount] = useState<number>(0);
   const [resumeTrend, setResumeTrend] = useState<string>('+0.0%');
 
-  // 5. Projects (Published count)
+  // 5. Projects & Tools (Published count of Projects + Tools/Products)
   const [projectsLoading, setProjectsLoading] = useState<boolean>(true);
+  const [toolsLoading, setToolsLoading] = useState<boolean>(true);
   const [publishedProjectsCount, setPublishedProjectsCount] = useState<number>(0);
+  const [toolsCount, setToolsCount] = useState<number>(0);
 
   // 6. Live Visitors
   const [liveLoading, setLiveLoading] = useState<boolean>(true);
@@ -93,7 +95,7 @@ export const DashboardGrid: React.FC = () => {
         setResumeLoading(false);
       });
 
-    // 5. Published Projects
+    // 5a. Published Projects
     setProjectsLoading(true);
     projectService.getProjects()
       .then((projects) => {
@@ -107,6 +109,22 @@ export const DashboardGrid: React.FC = () => {
       })
       .finally(() => {
         setProjectsLoading(false);
+      });
+
+    // 5b. Published Tools & Custom Products
+    setToolsLoading(true);
+    toolsProductsService.getToolsProducts()
+      .then((tools) => {
+        if (tools && Array.isArray(tools)) {
+          const publishedTools = tools.filter(t => t.status === 'published' || !t.status);
+          setToolsCount(publishedTools.length);
+        }
+      })
+      .catch((err) => {
+        console.warn('[DashboardGrid] Error fetching tools & products:', err);
+      })
+      .finally(() => {
+        setToolsLoading(false);
       });
 
     // 6. Live Visitors
@@ -129,31 +147,33 @@ export const DashboardGrid: React.FC = () => {
 
   return (
     <div className="dashboard-grid-container">
-      {/* Statistics Cards List */}
+      {/* Statistics Cards List (5 KPI Cards) */}
       <div className="stats-grid">
         <KpiCard
-          label="Total Visitors"
+          label="Visitors"
           value={totalVisitors.toLocaleString()}
-          badge={visitorsTrend}
-          badgeType={visitorsTrend.startsWith('-') ? 'negative' : 'positive'}
+          showTrend={true}
+          trend={visitorsTrend || '-2.5%'}
+          trendPeriod="vs last week"
+          colorScheme="indigo"
           loading={analyticsLoading}
           icon={
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
               <circle cx="9" cy="7" r="4" />
-              <path d="M23 21v-2a4 4 0 0 3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+              <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
             </svg>
           }
         />
         
         <KpiCard
-          label="Contact Messages"
+          label="Messages"
           value={contactsCount.toLocaleString()}
-          badge={contactsTrend}
-          badgeType={contactsTrend.startsWith('-') ? 'negative' : 'positive'}
+          colorScheme="violet"
           loading={contactsLoading || analyticsLoading}
           icon={
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
               <polyline points="22,6 12,13 2,6" />
             </svg>
@@ -163,60 +183,48 @@ export const DashboardGrid: React.FC = () => {
         <KpiCard
           label="Testimonials"
           value={approvedTestimonialsCount.toLocaleString()}
+          colorScheme="amber"
           loading={testimonialsLoading}
           icon={
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
             </svg>
           }
         />
         
         <KpiCard
-          label="Resume Downloads"
+          label="Downloads"
           value={resumeDownloadsCount.toLocaleString()}
-          badge={resumeTrend}
-          badgeType={resumeTrend.startsWith('-') ? 'negative' : 'positive'}
+          colorScheme="cyan"
           loading={resumeLoading}
           icon={
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
             </svg>
           }
         />
         
         <KpiCard
-          label="Projects"
-          value={publishedProjectsCount.toLocaleString()}
+          label="Projects & Tools"
+          value={(publishedProjectsCount + toolsCount).toLocaleString()}
           badge="Active"
           badgeType="neutral"
-          loading={projectsLoading}
+          colorScheme="pink"
+          loading={projectsLoading || toolsLoading}
           icon={
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
               <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
               <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
             </svg>
           }
         />
-        
-        <KpiCard
-          label="Live Visitors"
-          value={liveVisitorsCount.toLocaleString()}
-          badge="🟢 Live"
-          badgeType="positive"
-          loading={liveLoading}
-          icon={
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-              <circle cx="12" cy="7" r="4" />
-            </svg>
-          }
-        />
       </div>
 
-      {/* 3. System Monitor & Requests & Approvals row */}
-      <div className="dashboard-grid-row two-cols">
+      {/* 3. System Monitor full-width workspace */}
+      <div className="dashboard-grid-row">
         <SystemMonitor />
-        <RequestsApprovalsCard />
       </div>
 
       {/* 4. Edith Insights & Content & Publishing Card row */}

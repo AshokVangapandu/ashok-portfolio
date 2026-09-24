@@ -37,7 +37,7 @@ Deno.serve(async (req) => {
     // Initialize Supabase client using Service Role key to query active admins
     const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
     const supabaseServiceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
-    
+
     if (!supabaseUrl || !supabaseServiceRoleKey) {
       throw new Error("Missing Supabase configuration environment keys.");
     }

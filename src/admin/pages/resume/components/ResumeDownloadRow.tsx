@@ -2,6 +2,7 @@
 import React from 'react';
 import { ResumeDownload } from '../../../types/resumeDownload';
 import { DownloadStatusBadge } from './DownloadStatusBadge';
+import { Avatar } from '../../../components/avatars/Avatar';
 
 interface ResumeDownloadRowProps {
   download: ResumeDownload;
@@ -65,18 +66,12 @@ export const ResumeDownloadRow: React.FC<ResumeDownloadRowProps> = ({
       {/* 2. Visitor Column */}
       <td style={{ padding: '16px var(--admin-space-4)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          {download.isKnown && download.avatarUrl ? (
-            <img
+          {download.isKnown ? (
+            <Avatar
               src={download.avatarUrl}
-              alt={download.visitorName}
-              style={{
-                width: '36px',
-                height: '36px',
-                borderRadius: '50%',
-                objectFit: 'cover',
-                border: '1px solid var(--admin-border)',
-                flexShrink: 0
-              }}
+              name={download.visitorName}
+              email={download.visitorEmail}
+              size={36}
             />
           ) : (
             defaultAvatar
@@ -85,26 +80,26 @@ export const ResumeDownloadRow: React.FC<ResumeDownloadRowProps> = ({
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <span
               style={{
-                fontWeight: 700,
+                fontWeight: download.isKnown ? 700 : 600,
                 fontSize: '13.5px',
-                color: download.isKnown ? 'var(--admin-text)' : 'var(--admin-text-secondary)',
+                color: download.isKnown ? 'var(--admin-text)' : '#334155',
                 whiteSpace: 'nowrap'
               }}
             >
               {download.visitorName}
             </span>
-            {download.isKnown && download.visitorEmail && (
-              <span
-                style={{
-                  fontSize: '11px',
-                  color: 'var(--admin-text-secondary)',
-                  fontWeight: 500,
-                  whiteSpace: 'nowrap'
-                }}
-              >
-                {download.visitorEmail}
-              </span>
-            )}
+            <span
+              style={{
+                fontSize: '11px',
+                color: 'var(--admin-text-secondary)',
+                fontWeight: 500,
+                whiteSpace: 'nowrap'
+              }}
+            >
+              {download.isKnown
+                ? (download.visitorEmail || 'Registered user')
+                : `ID: ${download.visitorId ? download.visitorId.substring(0, 6).toUpperCase() : 'UNKNOWN'}`}
+            </span>
           </div>
         </div>
       </td>
@@ -131,17 +126,12 @@ export const ResumeDownloadRow: React.FC<ResumeDownloadRowProps> = ({
         {download.source}
       </td>
 
-      {/* 6. Downloaded From Column */}
-      <td style={{ padding: '16px var(--admin-space-4)', color: 'var(--admin-text-secondary)', fontSize: '13px', fontWeight: 500 }}>
-        {download.downloadedFrom}
-      </td>
-
-      {/* 7. Duration Column */}
+      {/* 6. Duration Column */}
       <td style={{ padding: '16px var(--admin-space-4)', color: 'var(--admin-text-secondary)', fontSize: '13px', fontWeight: 500 }}>
         {download.duration}
       </td>
 
-      {/* 8. Status Column */}
+      {/* 7. Status Column */}
       <td style={{ padding: '16px var(--admin-space-4)' }}>
         <DownloadStatusBadge status={download.status} />
       </td>

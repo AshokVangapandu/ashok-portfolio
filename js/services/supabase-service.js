@@ -6,6 +6,15 @@
  * - window.AuthService
  * - window.TestimonialService
  * - window.AdminService
+ * - window.CertificationService
+ * - window.ProjectService
+ * - window.ResumeService
+ * - window.PortfolioSettingsService
+ * - window.MaintenanceService
+ * - window.PrivateAccessService
+ * - window.AccessRequestService
+ * - window.SocialLinksService
+ * - window.AnalyticsService
  */
 
 (function() {
@@ -45,7 +54,6 @@
   // Attempt immediate initialization
   initSupabase();
 
-  // Setup event fallback listeners to run after module scripts have executed
   if (typeof document !== 'undefined') {
     document.addEventListener('DOMContentLoaded', initSupabase);
   }
@@ -158,7 +166,8 @@
         display_order: null,
         rating: testimonial.rating,
         designation: testimonial.designation || null,
-        company: testimonial.company || null
+        company: testimonial.company || null,
+        country: testimonial.country || null
       };
 
       // Telemetry: Upsert visitor profile if visitor_id is present locally
@@ -182,42 +191,7 @@
     },
 
     async createTestimonial(testimonial) {
-      initSupabase();
-      if (!supabase) throw new Error("Supabase Client is not initialized.");
-      const dbTestimonial = {
-        user_id: testimonial.user_id || null,
-        full_name: testimonial.google_name || testimonial.full_name,
-        email: testimonial.google_email || testimonial.email,
-        avatar_url: testimonial.google_avatar || testimonial.avatar_url || null,
-        linkedin_url: testimonial.linkedin_url || null,
-        testimonial: testimonial.testimonial,
-        status: 'pending',
-        featured: false,
-        is_visible: false,
-        display_order: null,
-        rating: testimonial.rating,
-        designation: testimonial.designation || null,
-        company: testimonial.company || null
-      };
-
-      // Telemetry: Upsert visitor profile if visitor_id is present locally
-      const visitorId = typeof localStorage !== 'undefined' ? localStorage.getItem('visitor_id') : null;
-      if (visitorId) {
-        supabase
-          .from('visitor_profiles')
-          .upsert({
-            visitor_id: visitorId,
-            full_name: dbTestimonial.full_name,
-            email: dbTestimonial.email,
-            avatar_url: dbTestimonial.avatar_url,
-            updated_at: new Date().toISOString()
-          }, { onConflict: 'visitor_id' })
-          .then(() => {});
-      }
-
-      return await supabase
-        .from('testimonials')
-        .insert([dbTestimonial]);
+      return await this.submitTestimonial(testimonial);
     },
 
     async hasSubmittedTestimonial(userId) {
@@ -364,29 +338,95 @@
   };
 
   /**
+   * Helper to check if an error is due to expired or invalid authentication credentials.
+   */
+  const isAuthOrTokenError = (err) => {
+    if (!err) return false;
+    const msg = String(err.message || '').toLowerCase();
+    const code = String(err.code || '').toUpperCase();
+    const status = Number(err.status) || 0;
+    return (
+      code === 'PGRST301' ||
+      status === 401 ||
+      status === 403 ||
+      msg.includes('jwt') ||
+      msg.includes('token') ||
+      msg.includes('unauthorized') ||
+      msg.includes('expired') ||
+      msg.includes('cryptographic')
+    );
+  };
+
+  /**
+   * Helper to execute a clean, unauthenticated public REST fetch for portfolio_settings.
+   * Ensures an expired user JWT in browser storage does not block public access.
+   */
+  const fetchPublicVisibilityCleanAnon = async () => {
+    const supabaseUrl = (window.APP_CONFIG && window.APP_CONFIG.SUPABASE_URL) || "https://xpuhbtsgwhgbcvmwzlyd.supabase.co";
+    const supabaseKey = (window.APP_CONFIG && window.APP_CONFIG.SUPABASE_ANON_KEY) || "sb_publishable_Rt97581bW4IkOBlUaCNX4Q_Rldchf_z";
+
+    if (!isValidSupabaseConfig(supabaseUrl, supabaseKey)) {
+      throw new Error('Invalid Supabase configuration.');
+    }
+
+    const endpoint = `${supabaseUrl}/rest/v1/portfolio_settings?select=visibility&limit=1`;
+    const response = await fetch(endpoint, {
+      method: 'GET',
+      headers: {
+        'apikey': supabaseKey,
+        'Authorization': `Bearer ${supabaseKey}`
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`Public settings fetch returned HTTP status ${response.status}`);
+    }
+
+    const rows = await response.json();
+    if (!Array.isArray(rows) || rows.length === 0 || !rows[0].visibility) {
+      throw new Error('Public visibility setting is unavailable or malformed.');
+    }
+
+    return rows[0].visibility;
+  };
+
+  /**
    * PortfolioSettingsService
    * Exposes global site visibility settings and availability toggles.
    */
   const PortfolioSettingsService = {
     async getSiteMode() {
       initSupabase();
-      if (!supabase) throw new Error('Supabase client is not initialized.');
       try {
-        const { data, error } = await supabase
-          .from('portfolio_settings')
-          .select('visibility')
-          .limit(1)
-          .maybeSingle();
-        if (error) {
-          console.error("Error fetching site_mode from Supabase:", error);
-          throw error;
+        if (supabase) {
+          const { data, error } = await supabase
+            .from('portfolio_settings')
+            .select('visibility')
+            .limit(1)
+            .maybeSingle();
+
+          if (!error && data?.visibility) {
+            return data.visibility;
+          }
+
+          if (error && isAuthOrTokenError(error)) {
+            console.warn('[PortfolioSettingsService] Stale auth session detected during public visibility check. Recovering via clean anonymous request.');
+            return await fetchPublicVisibilityCleanAnon();
+          }
+
+          if (error) {
+            console.warn('[PortfolioSettingsService] Initial query failed, attempting clean anonymous fetch:', error);
+            return await fetchPublicVisibilityCleanAnon();
+          }
+
+          if (!data?.visibility) {
+            return await fetchPublicVisibilityCleanAnon();
+          }
+        } else {
+          return await fetchPublicVisibilityCleanAnon();
         }
-        if (!data?.visibility) {
-          throw new Error('Portfolio visibility setting is unavailable.');
-        }
-        return data.visibility;
       } catch (err) {
-        console.error("Failed to load site mode:", err);
+        console.error("[PortfolioSettingsService] Failed to load site mode:", err);
         throw err;
       }
     },
@@ -721,23 +761,45 @@
 
     const { error } = await supabase
       .from('visitor_profiles')
-      .upsert([{
+      .insert([{
         visitor_id: visitorId,
         updated_at: new Date().toISOString()
-      }], { onConflict: 'visitor_id' });
+      }]);
 
-    if (error && error.code !== '23505') logTelemetryWarning('[Telemetry] Profile upsert warning:', error);
+    if (error && error.code !== '23505') {
+      logTelemetryWarning('[Telemetry] Profile insert warning:', error);
+      return false;
+    }
     return true;
   };
 
   const saveVisitorProfile = async (profileData) => {
     if (!profileData?.visitor_id) return false;
 
+    const cleanData = {
+      updated_at: profileData.updated_at || new Date().toISOString()
+    };
+    if (profileData.full_name && profileData.full_name.trim()) cleanData.full_name = profileData.full_name.trim();
+    if (profileData.email && profileData.email.trim()) cleanData.email = profileData.email.trim();
+    if (profileData.avatar_url && profileData.avatar_url.trim()) cleanData.avatar_url = profileData.avatar_url.trim();
+
+    // First attempt update for existing profile row
     const { error } = await supabase
       .from('visitor_profiles')
-      .upsert([profileData], { onConflict: 'visitor_id' });
+      .update(cleanData)
+      .eq('visitor_id', profileData.visitor_id);
 
-    if (error && error.code !== '23505') logTelemetryWarning('[Telemetry] Save profile warning:', error);
+    if (error) {
+      // If update fails or profile does not exist yet, attempt insert
+      const insertData = { ...cleanData, visitor_id: profileData.visitor_id };
+      const { error: insertError } = await supabase
+        .from('visitor_profiles')
+        .insert([insertData]);
+      if (insertError && insertError.code !== '23505') {
+        logTelemetryWarning('[Telemetry] Save profile insert warning:', insertError);
+        return false;
+      }
+    }
     return true;
   };
 
@@ -750,8 +812,11 @@
 
         const { error } = await supabase
           .from('visitor_sessions')
-          .upsert([sessionData], { onConflict: 'id' });
-        if (error && error.code !== '23505') logTelemetryWarning('[Telemetry] Session log warning:', error);
+          .insert([sessionData]);
+        if (error && error.code !== '23505') {
+          logTelemetryWarning('[Telemetry] Session log warning:', error);
+          return false;
+        }
         return true;
       } catch (err) {
         logTelemetryWarning('Analytics: Failed to log session:', err);

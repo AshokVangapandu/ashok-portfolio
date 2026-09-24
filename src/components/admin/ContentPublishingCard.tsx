@@ -3,109 +3,73 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { projectService } from '../../admin/services/projectService';
 import { certificationService } from '../../admin/services/certificationService';
 import { testimonialService } from '../../admin/services/testimonialService';
-import { resumeService } from '../../admin/services/resumeService';
 import { AdminProject } from '../../admin/types/project';
 import { Certification } from '../../admin/types/certification';
-import { ResumeSetting } from '../../admin/types/resume';
 
 export const ContentPublishingCard: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
+  const [lastEvaluatedAt, setLastEvaluatedAt] = useState<Date>(new Date());
 
-  // Top Metric Counts
-  const [publishedCount, setPublishedCount] = useState<number>(0);
-  const [draftsCount, setDraftsCount] = useState<number>(0);
-  const [needsReviewCount, setNeedsReviewCount] = useState<number>(0);
+  // Aggregate Metric Counts
+  const [publishedTotal, setPublishedTotal] = useState<number>(0);
+  const [draftsTotal, setDraftsTotal] = useState<number>(0);
+  const [needsReviewTotal, setNeedsReviewTotal] = useState<number>(0);
 
-  // Category Subtext Counts
-  const [publishedProjects, setPublishedProjects] = useState<number>(0);
-  const [publishedCertifications, setPublishedCertifications] = useState<number>(0);
-  const [approvedTestimonials, setApprovedTestimonials] = useState<number>(0);
-  const [resumeSubtext, setResumeSubtext] = useState<string>('Up to date');
+  // Content Items Specific Counts
+  const [projectsPublished, setProjectsPublished] = useState<number>(0);
+  const [projectsDrafts, setProjectsDrafts] = useState<number>(0);
 
-  // Attention Banner Content
-  const [bannerTitle, setBannerTitle] = useState<string>('All items up to date');
-  const [bannerSubtitle, setBannerSubtitle] = useState<string>('All portfolio content is organized and publication ready.');
+  const [certsPublished, setCertsPublished] = useState<number>(0);
+  const [certsDrafts, setCertsDrafts] = useState<number>(0);
+  const [certsPending, setCertsPending] = useState<number>(0);
+
+  const [testimonialsApproved, setTestimonialsApproved] = useState<number>(0);
+  const [testimonialsPending, setTestimonialsPending] = useState<number>(0);
 
   const loadContentData = useCallback(async () => {
     setLoading(true);
     try {
-      const [projectsRes, certsRes, testimonialSummary, activeResume] = await Promise.all([
+      const [projectsRes, certsRes, testimonialSummary] = await Promise.all([
         projectService.getProjects().catch(() => [] as AdminProject[]),
         certificationService.getCertifications().catch(() => [] as Certification[]),
-        testimonialService.getSummary().catch(() => ({ total: 0, approved: 0, pending: 0, rejected: 0 })),
-        resumeService.getActiveResume().catch(() => null as ResumeSetting | null)
+        testimonialService.getSummary().catch(() => ({ total: 0, approved: 0, pending: 0, rejected: 0 }))
       ]);
 
-      // 1. Projects Breakdown
-      const pubProjects = projectsRes.filter(p => p.status === 'published').length;
+      // 1. Projects
+      const pubProjs = projectsRes.filter(p => p.status === 'published').length;
       const draftProjs = projectsRes.filter(p => p.status === 'draft').length;
-      const missingThumbProjs = projectsRes.filter(p => !p.coverImageUrl || p.coverImageUrl.trim() === '').length;
 
-      // 2. Certifications Breakdown
+      // 2. Certifications
       const pubCerts = certsRes.filter(c => c.status === 'published').length;
       const draftCerts = certsRes.filter(c => c.status === 'draft').length;
       const pendingCerts = certsRes.filter(c => (c.status as string) === 'pending').length;
 
-      // 3. Testimonials Breakdown
+      // 3. Testimonials
       const appTestimonials = testimonialSummary.approved || 0;
       const pendingTestimonials = testimonialSummary.pending || 0;
 
-      // 4. Resume Subtext
-      let rSub = 'Up to date';
-      if (!activeResume) {
-        rSub = 'No active resume';
-      } else if (activeResume.updatedAt || activeResume.uploadedAt) {
-        const dateStr = activeResume.updatedAt || activeResume.uploadedAt;
-        const d = new Date(dateStr);
-        if (!isNaN(d.getTime())) {
-          const diffMs = Date.now() - d.getTime();
-          const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-          if (days <= 0) {
-            rSub = 'Updated today';
-          } else if (days === 1) {
-            rSub = 'Updated 1 day ago';
-          } else {
-            rSub = `Updated ${days} days ago`;
-          }
-        }
-      }
+      // Aggregates
+      const totalPub = pubProjs + pubCerts + appTestimonials;
+      const totalDrafts = draftProjs + draftCerts;
+      const totalReview = pendingTestimonials + pendingCerts;
 
-      // 5. Aggregate Summaries
-      const pubTotal = pubProjects + pubCerts + appTestimonials;
-      const draftTotal = draftProjs + draftCerts + pendingTestimonials;
+      setProjectsPublished(pubProjs);
+      setProjectsDrafts(draftProjs);
 
-      // 6. Actionable Attention Items
-      const attentionItems: string[] = [];
-      if (pendingTestimonials > 0) {
-        attentionItems.push(`${pendingTestimonials} ${pendingTestimonials === 1 ? 'Testimonial' : 'Testimonials'} pending approval`);
-      }
-      if (pendingCerts > 0) {
-        attentionItems.push(`${pendingCerts} ${pendingCerts === 1 ? 'Certification' : 'Certifications'} pending review`);
-      }
-      if (missingThumbProjs > 0) {
-        attentionItems.push(`${missingThumbProjs} ${missingThumbProjs === 1 ? 'Project' : 'Projects'} missing thumbnail`);
-      }
+      setCertsPublished(pubCerts);
+      setCertsDrafts(draftCerts);
+      setCertsPending(pendingCerts);
 
-      const reviewTotal = pendingTestimonials + pendingCerts + missingThumbProjs;
+      setTestimonialsApproved(appTestimonials);
+      setTestimonialsPending(pendingTestimonials);
 
-      setPublishedCount(pubTotal);
-      setDraftsCount(draftTotal);
-      setNeedsReviewCount(reviewTotal);
+      setPublishedTotal(totalPub);
+      setDraftsTotal(totalDrafts);
+      setNeedsReviewTotal(totalReview);
 
-      setPublishedProjects(pubProjects);
-      setPublishedCertifications(pubCerts);
-      setApprovedTestimonials(appTestimonials);
-      setResumeSubtext(rSub);
-
-      if (reviewTotal > 0) {
-        setBannerTitle(`${reviewTotal} ${reviewTotal === 1 ? 'item needs' : 'items need'} attention`);
-        setBannerSubtitle(attentionItems.join('  •  '));
-      } else {
-        setBannerTitle('All items up to date');
-        setBannerSubtitle('All portfolio content is organized and publication ready.');
-      }
+      setLastEvaluatedAt(new Date());
     } catch (err) {
-      console.warn('[ContentPublishingCard] Error loading content data:', err);
+      console.warn('[ContentPublishingCard] Error loading content publishing data:', err);
     } finally {
       setLoading(false);
     }
@@ -115,155 +79,255 @@ export const ContentPublishingCard: React.FC = () => {
     loadContentData();
   }, [loadContentData]);
 
+  const handleNavigate = (destination: string) => {
+    window.history.pushState({}, '', destination);
+    window.dispatchEvent(new PopStateEvent('popstate'));
+  };
+
+  const formattedTimestamp = lastEvaluatedAt.toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true
+  });
+
   return (
     <div className="content-publishing-card">
-      {/* 1. Header Section */}
-      <div className="card-header-area">
-        <div className="header-left">
-          <div className="header-icon-box">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      {/* 1. Header with Icon, Titles & Dynamic Header Status Pill */}
+      <div className="cp-header">
+        <div className="cp-header-left">
+          <div className="cp-header-icon-box">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M12 20h9" />
               <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
             </svg>
           </div>
-          <div>
-            <h3 className="card-title-text">Content & Publishing</h3>
-            <p className="card-subtitle-text">Keep your portfolio content organized and publication-ready.</p>
+          <div className="cp-header-titles">
+            <h3 className="cp-title">Content & Publishing</h3>
+            <p className="cp-subtitle">Keep your portfolio content organized and publication-ready.</p>
           </div>
         </div>
+
+        {/* Dynamic Status Pill */}
+        {needsReviewTotal > 0 ? (
+          <div className="cp-status-pill pill-attention">
+            <span className="pill-dot dot-amber" />
+            <span>Content needs attention</span>
+          </div>
+        ) : draftsTotal > 0 ? (
+          <div className="cp-status-pill pill-drafts">
+            <span className="pill-dot dot-purple" />
+            <span>Content has unpublished drafts</span>
+          </div>
+        ) : (
+          <div className="cp-status-pill pill-success">
+            <span className="pill-dot dot-green" />
+            <span>Content is up to date</span>
+          </div>
+        )}
       </div>
 
-      {/* 2. Top Summary Metric Cards (3 Columns) */}
-      <div className="summary-cards-row">
-        <div className="metric-card published">
-          <div className="metric-header">
-            <span className="dot green"></span>
-            <span className="metric-label green-label">PUBLISHED</span>
-          </div>
-          <span className="metric-count">{loading ? '...' : publishedCount.toLocaleString()}</span>
-        </div>
-
-        <div className="metric-card drafts">
-          <div className="metric-header">
-            <span className="dot purple"></span>
-            <span className="metric-label purple-label">DRAFTS</span>
-          </div>
-          <span className="metric-count">{loading ? '...' : draftsCount.toLocaleString()}</span>
-        </div>
-
-        <div className="metric-card review">
-          <div className="metric-header">
-            <span className="dot orange"></span>
-            <span className="metric-label orange-label">NEEDS REVIEW</span>
-          </div>
-          <span className="metric-count">{loading ? '...' : needsReviewCount.toLocaleString()}</span>
-        </div>
-      </div>
-
-      {/* 3. Categories Grid (2x2) */}
-      <div className="categories-grid">
-        <div className="category-card">
-          <div className="cat-icon-box purple-bg">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
-              <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
-            </svg>
-          </div>
-          <div className="cat-details">
-            <span className="cat-title">Projects</span>
-            <span className="cat-sub">{loading ? '...' : `${publishedProjects} Published`}</span>
-          </div>
-        </div>
-
-        <div className="category-card">
-          <div className="cat-icon-box green-bg">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="8" r="6" />
-              <path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11" />
-            </svg>
-          </div>
-          <div className="cat-details">
-            <span className="cat-title">Certifications</span>
-            <span className="cat-sub">{loading ? '...' : `${publishedCertifications} Published`}</span>
-          </div>
-        </div>
-
-        <div className="category-card">
-          <div className="cat-icon-box pink-bg">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-            </svg>
-          </div>
-          <div className="cat-details">
-            <span className="cat-title">Testimonials</span>
-            <span className="cat-sub">{loading ? '...' : `${approvedTestimonials} Approved`}</span>
-          </div>
-        </div>
-
-        <div className="category-card">
-          <div className="cat-icon-box orange-bg">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      {/* 2. Top 3 Summary Metric Cards */}
+      <div className="cp-summary-cards-row">
+        {/* PUBLISHED */}
+        <div className="cp-summary-card card-published">
+          <div className="summary-card-icon icon-published">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
               <polyline points="14 2 14 8 20 8" />
+              <line x1="16" y1="13" x2="8" y2="13" />
+              <line x1="16" y1="17" x2="8" y2="17" />
             </svg>
           </div>
-          <div className="cat-details">
-            <span className="cat-title">Resume</span>
-            <span className="cat-sub">{loading ? '...' : resumeSubtext}</span>
+          <div className="summary-card-body">
+            <span className="summary-card-label label-published">PUBLISHED</span>
+            <span className="summary-card-count">{loading ? '...' : publishedTotal}</span>
+            <span className="summary-card-sub">Live on your portfolio</span>
+          </div>
+        </div>
+
+        {/* DRAFTS */}
+        <div className="cp-summary-card card-drafts">
+          <div className="summary-card-icon icon-drafts">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 20h9" />
+              <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+            </svg>
+          </div>
+          <div className="summary-card-body">
+            <span className="summary-card-label label-drafts">DRAFTS</span>
+            <span className="summary-card-count">{loading ? '...' : draftsTotal}</span>
+            <span className="summary-card-sub">Not yet published</span>
+          </div>
+        </div>
+
+        {/* NEEDS REVIEW */}
+        <div className="cp-summary-card card-review">
+          <div className="summary-card-icon icon-review">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 6 12 12 16 14" />
+            </svg>
+          </div>
+          <div className="summary-card-body">
+            <span className="summary-card-label label-review">NEEDS REVIEW</span>
+            <span className="summary-card-count">{loading ? '...' : needsReviewTotal}</span>
+            <span className="summary-card-sub">Awaiting your review</span>
           </div>
         </div>
       </div>
 
-      {/* 4. Horizontal Pipeline Legend Bar */}
-      <div className="pipeline-legend-bar">
-        <div className="legend-item">
-          <span className="legend-dot green"></span>
-          <span className="legend-title">Published</span>
-          <span className="legend-desc">Content that is currently live.</span>
-        </div>
-
-        <div className="legend-item">
-          <span className="legend-dot purple"></span>
-          <span className="legend-title">Drafts</span>
-          <span className="legend-desc">Content that exists but is not published.</span>
-        </div>
-
-        <div className="legend-item">
-          <span className="legend-dot orange"></span>
-          <span className="legend-title">Needs Review</span>
-          <span className="legend-desc">Content requiring admin attention.</span>
-        </div>
-      </div>
-
-      {/* 5. Bottom Attention & Action Banner */}
-      <div className={`attention-cta-banner ${needsReviewCount === 0 ? 'banner-all-clear' : ''}`}>
-        <div className="banner-left">
-          <div className={`warning-icon-wrapper ${needsReviewCount === 0 ? 'icon-success' : ''}`}>
-            {needsReviewCount > 0 ? (
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
-                <line x1="12" y1="9" x2="12" y2="13" />
-                <line x1="12" y1="17" x2="12.01" y2="17" />
+      {/* 3. Content Rows List (Projects, Certifications, Testimonials) */}
+      <div className="cp-content-list">
+        {/* Projects Row */}
+        <div
+          className="cp-content-row"
+          onClick={() => handleNavigate('/admin/projects')}
+        >
+          <div className="row-left">
+            <div className="row-icon-box icon-projects">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+                <line x1="12" y1="22.08" x2="12" y2="12" />
               </svg>
+            </div>
+            <div className="row-details">
+              <h4 className="row-title">Projects</h4>
+              <p className="row-desc">Showcase your work and key projects.</p>
+            </div>
+          </div>
+
+          <div className="row-right">
+            <span className="row-status-pill pill-published">
+              <span className="row-pill-dot dot-green" />
+              {loading ? '...' : `${projectsPublished} Published`}
+            </span>
+            <button
+              type="button"
+              className="row-action-link"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleNavigate('/admin/projects');
+              }}
+            >
+              <span>View Projects</span>
+              <span className="action-arrow">→</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Certifications Row */}
+        <div
+          className={`cp-content-row ${certsPending > 0 ? 'highlight-attention' : ''}`}
+          onClick={() => handleNavigate('/admin/certifications')}
+        >
+          <div className="row-left">
+            <div className="row-icon-box icon-certs">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="8" r="6" />
+                <path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11" />
+              </svg>
+            </div>
+            <div className="row-details">
+              <h4 className="row-title">Certifications</h4>
+              <p className="row-desc">Display your professional certifications.</p>
+            </div>
+          </div>
+
+          <div className="row-right">
+            {certsPending > 0 ? (
+              <span className="row-status-pill pill-attention">
+                <span className="row-pill-dot dot-amber" />
+                {loading ? '...' : `${certsPending} Needs Review`}
+              </span>
             ) : (
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-                <polyline points="22 4 12 14.01 9 11.01" />
-              </svg>
+              <span className="row-status-pill pill-published">
+                <span className="row-pill-dot dot-green" />
+                {loading ? '...' : `${certsPublished} Published`}
+              </span>
             )}
-          </div>
-          <div className="banner-text">
-            <h5 className="banner-title">{loading ? 'Loading content status...' : bannerTitle}</h5>
-            <p className="banner-sub">{loading ? 'Checking publication status...' : bannerSubtitle}</p>
+            <button
+              type="button"
+              className="row-action-link"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleNavigate('/admin/certifications');
+              }}
+            >
+              <span>{certsPending > 0 ? 'Review Certifications' : 'View Certifications'}</span>
+              <span className="action-arrow">→</span>
+            </button>
           </div>
         </div>
 
-        <button className="view-content-btn" type="button">
-          <span>View Content</span>
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="5" y1="12" x2="19" y2="12" />
-            <polyline points="12 5 19 12 12 19" />
+        {/* Testimonials Row */}
+        <div
+          className={`cp-content-row ${testimonialsPending > 0 ? 'highlight-attention' : ''}`}
+          onClick={() => handleNavigate('/admin/testimonials')}
+        >
+          <div className="row-left">
+            <div className="row-icon-box icon-testimonials">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+              </svg>
+            </div>
+            <div className="row-details">
+              <h4 className="row-title">Testimonials</h4>
+              <p className="row-desc">Share feedback from clients and colleagues.</p>
+            </div>
+          </div>
+
+          <div className="row-right">
+            {testimonialsPending > 0 ? (
+              <span className="row-status-pill pill-attention">
+                <span className="row-pill-dot dot-amber" />
+                {loading ? '...' : `${testimonialsPending} Needs Review`}
+              </span>
+            ) : (
+              <span className="row-status-pill pill-published">
+                <span className="row-pill-dot dot-green" />
+                {loading ? '...' : `${testimonialsApproved} Approved`}
+              </span>
+            )}
+            <button
+              type="button"
+              className="row-action-link"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleNavigate('/admin/testimonials');
+              }}
+            >
+              <span>{testimonialsPending > 0 ? 'Review Testimonials' : 'View Testimonials'}</span>
+              <span className="action-arrow">→</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* 4. Footer Row */}
+      <div className="cp-footer">
+        <button
+          type="button"
+          className="cp-footer-updated"
+          onClick={() => loadContentData()}
+          title="Refresh content data"
+        >
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2" />
           </svg>
+          <span>Last updated: {formattedTimestamp}</span>
+        </button>
+
+        <button
+          type="button"
+          className="cp-footer-link"
+          onClick={() => handleNavigate('/admin/projects')}
+        >
+          <span>Manage Content</span>
+          <span className="action-arrow">→</span>
         </button>
       </div>
 
@@ -271,361 +335,396 @@ export const ContentPublishingCard: React.FC = () => {
       <style dangerouslySetInnerHTML={{ __html: `
         .content-publishing-card {
           background: #FFFFFF;
-          border: 1px solid #EAEBEF;
+          border: 1px solid #E2E8F0;
           border-radius: 20px;
           padding: 24px;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+          box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.03), 0 2px 6px -1px rgba(15, 23, 42, 0.02);
           display: flex;
           flex-direction: column;
           box-sizing: border-box;
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+          font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
           text-align: left;
           width: 100%;
-          gap: 20px;
-          transition: border-color 200ms ease, box-shadow 200ms ease;
+          gap: 18px;
         }
 
-        .content-publishing-card:hover {
-          border-color: rgba(99, 102, 241, 0.2);
-          box-shadow: 0 6px 16px rgba(0, 0, 0, 0.04);
-        }
-
-        /* 1. Header Area */
-        .content-publishing-card .card-header-area {
+        /* 1. Header Section */
+        .content-publishing-card .cp-header {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          width: 100%;
-        }
-
-        .content-publishing-card .header-left {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-        }
-
-        .content-publishing-card .header-icon-box {
-          width: 38px;
-          height: 38px;
-          border-radius: 10px;
-          background-color: rgba(124, 58, 237, 0.08);
-          color: #7C3AED;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          flex-shrink: 0;
-        }
-
-        .content-publishing-card .card-title-text {
-          font-size: 18px;
-          font-weight: 700;
-          margin: 0 0 2px 0;
-          color: #1E1B4B;
-          letter-spacing: -0.01em;
-        }
-
-        .content-publishing-card .card-subtitle-text {
-          font-size: 13px;
-          color: #64748B;
-          margin: 0;
-          font-weight: 450;
-        }
-
-        .content-publishing-card .quick-edit-btn {
-          display: inline-flex;
-          align-items: center;
-          gap: 6px;
-          padding: 7px 14px;
-          border-radius: 10px;
-          background: #F5F3FF;
-          border: 1px solid #DDD6FE;
-          color: #6D28D9;
-          font-size: 12.5px;
-          font-weight: 600;
-          cursor: pointer;
-          transition: all 0.15s ease;
-        }
-
-        .content-publishing-card .quick-edit-btn:hover {
-          background: #EDE9FE;
-          border-color: #C4B5FD;
-        }
-
-        /* 2. Top Summary Metric Cards (3 Columns) */
-        .content-publishing-card .summary-cards-row {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 16px;
-          width: 100%;
-        }
-
-        .content-publishing-card .metric-card {
-          padding: 16px;
-          border-radius: 14px;
-          display: flex;
-          flex-direction: column;
-          gap: 8px;
-          border: 1px solid transparent;
-        }
-
-        .content-publishing-card .metric-card.published {
-          background: #F2FBF7;
-          border-color: #D1F2E4;
-        }
-
-        .content-publishing-card .metric-card.drafts {
-          background: #F5F3FF;
-          border-color: #EDE9FE;
-        }
-
-        .content-publishing-card .metric-card.review {
-          background: #FFFBEB;
-          border-color: #FDE68A;
-        }
-
-        .content-publishing-card .metric-header {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-        }
-
-        .content-publishing-card .dot {
-          width: 7px;
-          height: 7px;
-          border-radius: 50%;
-          flex-shrink: 0;
-        }
-
-        .content-publishing-card .dot.green { background-color: #10B981; }
-        .content-publishing-card .dot.purple { background-color: #7C3AED; }
-        .content-publishing-card .dot.orange { background-color: #F59E0B; }
-
-        .content-publishing-card .metric-label {
-          font-size: 11px;
-          font-weight: 700;
-          letter-spacing: 0.04em;
-        }
-
-        .content-publishing-card .green-label { color: #047857; }
-        .content-publishing-card .purple-label { color: #5B21B6; }
-        .content-publishing-card .orange-label { color: #B45309; }
-
-        .content-publishing-card .metric-count {
-          font-size: 26px;
-          font-weight: 800;
-          color: #0F172A;
-          line-height: 1;
-        }
-
-        /* 3. Categories Grid (2x2) */
-        .content-publishing-card .categories-grid {
-          display: grid;
-          grid-template-columns: repeat(2, 1fr);
           gap: 12px;
           width: 100%;
         }
 
-        .content-publishing-card .category-card {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          padding: 14px 16px;
-          border-radius: 14px;
-          border: 1px solid #F1F5F9;
-          background: #FFFFFF;
-          transition: border-color 0.15s ease, box-shadow 0.15s ease;
-        }
-
-        .content-publishing-card .category-card:hover {
-          border-color: #E2E8F0;
-          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
-        }
-
-        .content-publishing-card .cat-icon-box {
-          width: 36px;
-          height: 36px;
-          border-radius: 10px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          flex-shrink: 0;
-        }
-
-        .content-publishing-card .purple-bg { background: #EEF2FF; color: #4F46E5; }
-        .content-publishing-card .green-bg { background: #ECFDF5; color: #059669; }
-        .content-publishing-card .pink-bg { background: #FDF2F8; color: #DB2777; }
-        .content-publishing-card .orange-bg { background: #FFF7ED; color: #EA580C; }
-
-        .content-publishing-card .cat-details {
-          display: flex;
-          flex-direction: column;
-          gap: 2px;
-        }
-
-        .content-publishing-card .cat-title {
-          font-size: 14px;
-          font-weight: 700;
-          color: #1E293B;
-        }
-
-        .content-publishing-card .cat-sub {
-          font-size: 12px;
-          color: #64748B;
-          font-weight: 450;
-        }
-
-        /* 4. Horizontal Pipeline Legend Bar */
-        .content-publishing-card .pipeline-legend-bar {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 12px 18px;
-          border-radius: 12px;
-          background: #FAFAFC;
-          border: 1px solid #F1F5F9;
-          gap: 16px;
-        }
-
-        .content-publishing-card .legend-item {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          font-size: 12px;
-        }
-
-        .content-publishing-card .legend-dot {
-          width: 6px;
-          height: 6px;
-          border-radius: 50%;
-          flex-shrink: 0;
-        }
-
-        .content-publishing-card .legend-dot.green { background: #10B981; }
-        .content-publishing-card .legend-dot.purple { background: #7C3AED; }
-        .content-publishing-card .legend-dot.orange { background: #F59E0B; }
-
-        .content-publishing-card .legend-title {
-          font-weight: 700;
-          color: #1E293B;
-        }
-
-        .content-publishing-card .legend-desc {
-          color: #64748B;
-          font-weight: 450;
-        }
-
-        /* 5. Bottom Attention & Action Banner */
-        .content-publishing-card .attention-cta-banner {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 16px 20px;
-          border-radius: 14px;
-          background: #FFFBEB;
-          border: 1px solid #FDE68A;
-          width: 100%;
-          box-sizing: border-box;
-          gap: 16px;
-        }
-
-        .content-publishing-card .attention-cta-banner.banner-all-clear {
-          background: #F0FDF4;
-          border-color: #BBF7D0;
-        }
-
-        .content-publishing-card .banner-left {
+        .content-publishing-card .cp-header-left {
           display: flex;
           align-items: center;
           gap: 14px;
         }
 
-        .content-publishing-card .warning-icon-wrapper {
-          width: 36px;
-          height: 36px;
-          border-radius: 10px;
-          background: #F59E0B;
-          color: #FFFFFF;
+        .content-publishing-card .cp-header-icon-box {
+          width: 44px;
+          height: 44px;
+          border-radius: 12px;
+          background: #F3E8FF;
+          color: #9333EA;
           display: flex;
           align-items: center;
           justify-content: center;
           flex-shrink: 0;
         }
 
-        .content-publishing-card .warning-icon-wrapper.icon-success {
-          background: #16A34A;
-        }
-
-        .content-publishing-card .banner-text {
+        .content-publishing-card .cp-header-titles {
           display: flex;
           flex-direction: column;
           gap: 2px;
         }
 
-        .content-publishing-card .banner-title {
-          font-size: 13.5px;
+        .content-publishing-card .cp-title {
+          font-size: 19px;
           font-weight: 700;
-          color: #B45309;
+          color: #0F172A;
           margin: 0;
+          letter-spacing: -0.015em;
+          line-height: 1.25;
         }
 
-        .content-publishing-card .banner-all-clear .banner-title {
+        .content-publishing-card .cp-subtitle {
+          font-size: 13px;
+          color: #64748B;
+          margin: 0;
+          font-weight: 500;
+          line-height: 1.3;
+        }
+
+        /* Header Status Pill */
+        .content-publishing-card .cp-status-pill {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          font-size: 12px;
+          font-weight: 600;
+          padding: 5px 12px;
+          border-radius: 999px;
+          flex-shrink: 0;
+          white-space: nowrap;
+        }
+
+        .content-publishing-card .pill-success {
+          background: #F0FDF4;
+          border: 1px solid #DCFCE7;
           color: #15803D;
         }
 
-        .content-publishing-card .banner-sub {
-          font-size: 12.5px;
-          color: #92400E;
-          margin: 0;
+        .content-publishing-card .pill-attention {
+          background: #FFFBEB;
+          border: 1px solid #FEF3C7;
+          color: #B45309;
+        }
+
+        .content-publishing-card .pill-drafts {
+          background: #F5F3FF;
+          border: 1px solid #EDE9FE;
+          color: #6D28D9;
+        }
+
+        .content-publishing-card .pill-dot {
+          width: 7px;
+          height: 7px;
+          border-radius: 50%;
+        }
+
+        .content-publishing-card .dot-green { background: #16A34A; }
+        .content-publishing-card .dot-amber { background: #D97706; }
+        .content-publishing-card .dot-purple { background: #7C3AED; }
+
+        /* 2. Top Summary Metric Cards */
+        .content-publishing-card .cp-summary-cards-row {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 14px;
+          width: 100%;
+        }
+
+        .content-publishing-card .cp-summary-card {
+          border-radius: 14px;
+          padding: 14px 16px;
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          border: 1px solid transparent;
+          transition: transform 150ms ease, box-shadow 150ms ease;
+        }
+
+        .content-publishing-card .cp-summary-card:hover {
+          transform: translateY(-1.5px);
+          box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+        }
+
+        .content-publishing-card .card-published {
+          background: #F0FDF4;
+          border-color: #DCFCE7;
+        }
+
+        .content-publishing-card .card-drafts {
+          background: #F5F3FF;
+          border-color: #EDE9FE;
+        }
+
+        .content-publishing-card .card-review {
+          background: #FFFBEB;
+          border-color: #FEF3C7;
+        }
+
+        .content-publishing-card .summary-card-icon {
+          width: 36px;
+          height: 36px;
+          border-radius: 10px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+        }
+
+        .content-publishing-card .icon-published { background: #DCFCE7; color: #16A34A; }
+        .content-publishing-card .icon-drafts { background: #EDE9FE; color: #7C3AED; }
+        .content-publishing-card .icon-review { background: #FEF3C7; color: #D97706; }
+
+        .content-publishing-card .summary-card-body {
+          display: flex;
+          flex-direction: column;
+          gap: 1px;
+        }
+
+        .content-publishing-card .summary-card-label {
+          font-size: 10.5px;
+          font-weight: 750;
+          letter-spacing: 0.04em;
+        }
+
+        .content-publishing-card .label-published { color: #15803D; }
+        .content-publishing-card .label-drafts { color: #6D28D9; }
+        .content-publishing-card .label-review { color: #B45309; }
+
+        .content-publishing-card .summary-card-count {
+          font-size: 22px;
+          font-weight: 800;
+          color: #0F172A;
+          line-height: 1.1;
+        }
+
+        .content-publishing-card .summary-card-sub {
+          font-size: 11.5px;
+          color: #64748B;
           font-weight: 500;
         }
 
-        .content-publishing-card .banner-all-clear .banner-sub {
-          color: #166534;
+        /* 3. Content Rows List */
+        .content-publishing-card .cp-content-list {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+          width: 100%;
         }
 
-        .content-publishing-card .view-content-btn {
+        .content-publishing-card .cp-content-row {
+          background: #FFFFFF;
+          border: 1px solid #E2E8F0;
+          border-radius: 14px;
+          padding: 14px 18px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 14px;
+          cursor: pointer;
+          transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease;
+          box-sizing: border-box;
+          width: 100%;
+        }
+
+        .content-publishing-card .cp-content-row:hover {
+          transform: translateY(-1.5px);
+          border-color: #CBD5E1;
+          box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
+        }
+
+        .content-publishing-card .cp-content-row.highlight-attention {
+          background: #FFFDF5;
+          border-color: #FCD34D;
+        }
+
+        .content-publishing-card .row-left {
+          display: flex;
+          align-items: center;
+          gap: 14px;
+          min-width: 0;
+        }
+
+        .content-publishing-card .row-icon-box {
+          width: 38px;
+          height: 38px;
+          border-radius: 10px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+        }
+
+        .content-publishing-card .icon-projects { background: #F3E8FF; color: #7C3AED; }
+        .content-publishing-card .icon-certs { background: #ECFDF5; color: #059669; }
+        .content-publishing-card .icon-testimonials { background: #FFE4E6; color: #E11D48; }
+
+        .content-publishing-card .row-details {
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+        }
+
+        .content-publishing-card .row-title {
+          font-size: 14.5px;
+          font-weight: 700;
+          color: #0F172A;
+          margin: 0;
+          line-height: 1.25;
+        }
+
+        .content-publishing-card .row-desc {
+          font-size: 12.5px;
+          color: #64748B;
+          margin: 0;
+          font-weight: 500;
+          line-height: 1.35;
+        }
+
+        .content-publishing-card .row-right {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          flex-shrink: 0;
+        }
+
+        .content-publishing-card .row-status-pill {
+          display: inline-flex;
+          align-items: center;
+          gap: 5px;
+          font-size: 11.5px;
+          font-weight: 650;
+          padding: 3px 10px;
+          border-radius: 999px;
+          white-space: nowrap;
+        }
+
+        .content-publishing-card .pill-published {
+          background: #DCFCE7;
+          color: #15803D;
+        }
+
+        .content-publishing-card .row-pill-dot {
+          width: 5px;
+          height: 5px;
+          border-radius: 50%;
+        }
+
+        .content-publishing-card .row-action-link {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          background: transparent;
+          border: none;
+          color: #4F46E5;
+          font-size: 13px;
+          font-weight: 650;
+          cursor: pointer;
+          padding: 0;
+          white-space: nowrap;
+          transition: color 150ms ease, transform 150ms ease;
+        }
+
+        .content-publishing-card .row-action-link:hover {
+          color: #3730A3;
+          transform: translateX(2px);
+        }
+
+        .content-publishing-card .action-arrow {
+          font-size: 14px;
+          line-height: 1;
+        }
+
+        /* 4. Footer Row */
+        .content-publishing-card .cp-footer {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding-top: 14px;
+          border-top: 1px solid #F1F5F9;
+          gap: 12px;
+          width: 100%;
+        }
+
+        .content-publishing-card .cp-footer-updated {
           display: inline-flex;
           align-items: center;
           gap: 6px;
           background: transparent;
           border: none;
-          color: #D97706;
-          font-size: 13px;
-          font-weight: 700;
+          color: #64748B;
+          font-size: 12px;
+          font-weight: 500;
           cursor: pointer;
-          transition: color 0.15s ease, transform 0.15s ease;
-          white-space: nowrap;
           padding: 0;
+          transition: color 150ms ease;
         }
 
-        .content-publishing-card .view-content-btn:hover {
-          color: #B45309;
+        .content-publishing-card .cp-footer-updated:hover {
+          color: #0F172A;
+        }
+
+        .content-publishing-card .cp-footer-link {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          background: transparent;
+          border: none;
+          color: #4F46E5;
+          font-size: 13px;
+          font-weight: 650;
+          cursor: pointer;
+          padding: 0;
+          transition: color 150ms ease, transform 150ms ease;
+        }
+
+        .content-publishing-card .cp-footer-link:hover {
+          color: #3730A3;
           transform: translateX(2px);
         }
 
-        /* Responsiveness */
-        @media (max-width: 768px) {
-          .content-publishing-card .pipeline-legend-bar {
+        /* Responsive Breakpoints */
+        @media (max-width: 640px) {
+          .content-publishing-card {
+            padding: 16px;
+          }
+          .content-publishing-card .cp-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+          }
+          .content-publishing-card .cp-summary-cards-row {
+            grid-template-columns: 1fr;
+          }
+          .content-publishing-card .cp-content-row {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+          }
+          .content-publishing-card .row-right {
+            width: 100%;
+            justify-content: space-between;
+          }
+          .content-publishing-card .cp-footer {
             flex-direction: column;
             align-items: flex-start;
             gap: 8px;
-          }
-        }
-
-        @media (max-width: 640px) {
-          .content-publishing-card .summary-cards-row {
-            grid-template-columns: 1fr;
-          }
-          .content-publishing-card .categories-grid {
-            grid-template-columns: 1fr;
-          }
-          .content-publishing-card .attention-cta-banner {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 12px;
-          }
-          .content-publishing-card .view-content-btn {
-            align-self: flex-end;
           }
         }
       `}} />

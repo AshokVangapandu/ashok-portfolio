@@ -1,0 +1,334 @@
+// scratch/preview_approved_email.js
+import fs from 'fs';
+
+const emailAssetsBase = 'https://xpuhbtsgwhgbcvmwzlyd.supabase.co/storage/v1/object/public/email-assets';
+const EMAIL_IMAGE_URLS = {
+  logo: `${emailAssetsBase}/av-logo.png`,
+  testimonialReceived: `${emailAssetsBase}/testimonial-received.png`,
+  testimonialApproved: `${emailAssetsBase}/testimonial-approved-v2.png`,
+  nextStep: `${emailAssetsBase}/email-next-step.png`,
+  view: `${emailAssetsBase}/email-icon-view.png`,
+  check: `${emailAssetsBase}/email-check.png`,
+  portfolio: `${emailAssetsBase}/portfolio-icon.png`,
+  linkedin: `${emailAssetsBase}/linkedin-icon.png`,
+  github: `${emailAssetsBase}/github-icon.png`,
+};
+
+function renderTestimonialApprovedEmail(options) {
+  const {
+    name = 'there',
+    portfolioUrl = 'https://ashokvangapandu.com',
+    testimonialUrl
+  } = options;
+
+  const base = portfolioUrl.replace(/\/+$/, '');
+  const displayDomain = base.replace(/^https?:\/\/(www\.)?/, '');
+  const displayName = (name || 'there').trim();
+  const targetTestimonialUrl = testimonialUrl || `${base}/#testimonials`;
+
+  const logoUrl = EMAIL_IMAGE_URLS.logo;
+  const illustrationUrl = EMAIL_IMAGE_URLS.testimonialApproved;
+  const iconCheckUrl = EMAIL_IMAGE_URLS.check;
+  const iconPortfolioUrl = EMAIL_IMAGE_URLS.portfolio;
+  const iconLinkedinUrl = EMAIL_IMAGE_URLS.linkedin;
+  const iconGithubUrl = EMAIL_IMAGE_URLS.github;
+
+  return `
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="supported-color-schemes" content="dark" />
+  <title>Your testimonial is now live 🎉</title>
+  <style type="text/css">
+    body, table, td, p, a, li {
+      -webkit-text-size-adjust: 100%;
+      -ms-text-size-adjust: 100%;
+    }
+    table, td {
+      mso-table-lspace: 0pt;
+      mso-table-rspace: 0pt;
+    }
+    img {
+      -ms-interpolation-mode: bicubic;
+      border: 0;
+      height: auto;
+      line-height: 100%;
+      outline: none;
+      text-decoration: none;
+    }
+    body {
+      margin: 0 !important;
+      padding: 0 !important;
+      width: 100% !important;
+      background-color: #070B14;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    }
+    @media only screen and (max-width: 600px) {
+      .email-container {
+        width: 100% !important;
+        max-width: 100% !important;
+        border-radius: 0 !important;
+        border-left: none !important;
+        border-right: none !important;
+      }
+      .mobile-padding {
+        padding-left: 20px !important;
+        padding-right: 20px !important;
+      }
+      .mobile-hero-col {
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        text-align: left !important;
+      }
+      .mobile-hero-img-col {
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        text-align: center !important;
+        padding-top: 16px !important;
+      }
+      .mobile-hero-img {
+        margin: 0 auto !important;
+        width: 180px !important;
+        height: auto !important;
+      }
+      .mobile-footer-col {
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin-bottom: 12px !important;
+      }
+      .mobile-header-links {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+<body style="margin: 0; padding: 0; background-color: #070B14; color: #FFFFFF; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+  <!-- Anti-collapse Preheader -->
+  <div style="display: none; max-height: 0px; overflow: hidden; font-size: 1px; line-height: 1px; opacity: 0; color: #070B14; mso-hide: all;">
+    Your testimonial has been approved and is now live on Ashok Vangapandu's portfolio.&#847;&zwnj;&nbsp;&#8199;
+  </div>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #070B14; margin: 0; padding: 36px 12px;">
+    <tr>
+      <td align="center" valign="top">
+        
+        <table role="presentation" class="email-container" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width: 600px; width: 100%; background: #0B0F19 radial-gradient(circle at top right, rgba(108, 60, 255, 0.15) 0%, transparent 60%); background-color: #0B0F19; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; overflow: hidden; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);">
+          
+          <!-- 1. HEADER SECTION -->
+          <tr>
+            <td class="mobile-padding" style="padding: 28px 32px 24px 32px; border-bottom: 1px solid rgba(255, 255, 255, 0.06);">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td align="left" valign="middle">
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td valign="middle" style="padding-right: 12px;">
+                          <a href="${base}" target="_blank" style="text-decoration: none; display: block;">
+                            <img src="${logoUrl}" width="38" height="34" alt="AV Logo" style="display: block; width: 38px; height: 34px; border: 0;" />
+                          </a>
+                        </td>
+                        <td valign="middle">
+                          <div style="font-size: 16px; font-weight: 700; color: #FFFFFF; letter-spacing: -0.01em; line-height: 1.2;">Ashok Vangapandu</div>
+                          <div style="font-size: 9px; font-weight: 700; color: #64748B; letter-spacing: 1.2px; text-transform: uppercase; line-height: 1.2; margin-top: 2px;">TURNING IDEAS INTO IMPACT</div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                  
+                  <td align="right" valign="middle" class="mobile-header-links" style="font-size: 10px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: #94A3B8;">
+                    <a href="${base}" target="_blank" style="color: #94A3B8; text-decoration: none;">PORTFOLIO</a>
+                    <span style="color: rgba(255, 255, 255, 0.2); padding: 0 8px;">|</span>
+                    <a href="${base}#projects" target="_blank" style="color: #94A3B8; text-decoration: none;">PROJECTS</a>
+                    <span style="color: rgba(255, 255, 255, 0.2); padding: 0 8px;">|</span>
+                    <a href="${base}#writing" target="_blank" style="color: #94A3B8; text-decoration: none;">BLOG</a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- 2. STATUS BADGE & HERO SECTION -->
+          <tr>
+            <td class="mobile-padding" style="padding: 32px 32px 24px 32px;">
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 18px;">
+                <tr>
+                  <td style="background-color: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.35); border-radius: 9999px; padding: 5px 14px;">
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td valign="middle" style="padding-right: 6px;">
+                          <img src="${iconCheckUrl}" width="14" height="14" alt="Check" style="display: block; width: 14px; height: 14px;" />
+                        </td>
+                        <td valign="middle" style="font-size: 11px; font-weight: 700; letter-spacing: 0.8px; color: #34D399; text-transform: uppercase; line-height: 1;">
+                          TESTIMONIAL APPROVED
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td class="mobile-hero-col" valign="middle" align="left" style="padding-right: 16px;">
+                    <h1 style="margin: 0 0 10px 0; font-size: 32px; font-weight: 800; color: #FFFFFF; line-height: 1.15; letter-spacing: -0.02em;">
+                      Your testimonial<br />
+                      <span style="color: #38BDF8;">is now live</span> 🎉
+                    </h1>
+                    <p style="margin: 0; font-size: 14px; color: #94A3B8; line-height: 1.55; max-width: 320px;">
+                      Thank you once again for sharing<br />your experience. It means a lot to me.
+                    </p>
+                  </td>
+
+                  <td class="mobile-hero-img-col" valign="middle" align="right" width="190" style="width: 190px;">
+                    <img src="${illustrationUrl}" class="mobile-hero-img" width="180" height="150" alt="Testimonial approved illustration" style="display: block; width: 180px; height: auto; border: 0;" />
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- 3. PERSONALIZED BODY CONTENT -->
+          <tr>
+            <td class="mobile-padding" style="padding: 0 32px 28px 32px; font-size: 14.5px; color: #CBD5E1; line-height: 1.65;">
+              <p style="margin: 0 0 14px 0; font-size: 16px; font-weight: 700; color: #FFFFFF;">
+                Hi ${displayName},
+              </p>
+              <p style="margin: 0 0 14px 0;">
+                I’m happy to let you know that your testimonial has been reviewed and is now featured on my portfolio.
+              </p>
+              <p style="margin: 0 0 14px 0;">
+                Your kind words truly mean a lot to me, and I’m grateful that you took the time to share your experience.
+              </p>
+              <p style="margin: 0 0 22px 0;">
+                If you’d like to see how your testimonial appears, you can view it on my portfolio.
+              </p>
+
+              <!-- 4. VIEW ON PORTFOLIO CTA BUTTON -->
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin: 0 0 28px 0;">
+                <tr>
+                  <td align="left">
+                    <a href="${targetTestimonialUrl}" target="_blank" style="display: inline-block; padding: 13px 28px; background: linear-gradient(135deg, #6C3CFF 0%, #38BDF8 100%); background-color: #6C3CFF; color: #FFFFFF; font-weight: 700; font-size: 14px; text-decoration: none; border-radius: 12px; box-shadow: 0 4px 14px rgba(108, 60, 255, 0.35);">
+                      View on Portfolio &rarr;
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- 5. QUOTE SECTION -->
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin: 28px 0 24px 0;">
+                <tr>
+                  <td align="center">
+                    <div style="font-size: 26px; color: #818CF8; line-height: 1; margin-bottom: 8px;">❝</div>
+                    <div style="font-size: 14px; font-style: italic; color: #E2E8F0; line-height: 1.5; margin-bottom: 8px;">
+                      "Your feedback helps me keep learning and creating."
+                    </div>
+                    <div style="font-size: 9.5px; font-weight: 700; color: #64748B; letter-spacing: 1.4px; text-transform: uppercase;">
+                      — THANK YOU FOR BEING A PART OF THIS JOURNEY —
+                    </div>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Divider -->
+              <div style="height: 1px; background-color: rgba(255, 255, 255, 0.08); margin: 24px 0 20px 0;"></div>
+            </td>
+          </tr>
+
+          <!-- 6. FOOTER SOCIAL LINKS -->
+          <tr>
+            <td class="mobile-padding" style="padding: 0 32px 28px 32px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td class="mobile-footer-col" valign="top" width="33%" style="padding-right: 8px;">
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td valign="middle" style="padding-right: 10px;">
+                          <a href="${base}" target="_blank" style="text-decoration: none;">
+                            <img src="${iconPortfolioUrl}" width="34" height="34" alt="Portfolio" style="display: block; width: 34px; height: 34px;" />
+                          </a>
+                        </td>
+                        <td valign="middle">
+                          <div style="font-size: 12px; font-weight: 700; color: #FFFFFF; line-height: 1.2;">Portfolio</div>
+                          <div>
+                            <a href="${base}" target="_blank" style="color: #38BDF8; font-size: 11px; text-decoration: none; line-height: 1.2;">${displayDomain}</a>
+                          </div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+
+                  <td class="mobile-footer-col" valign="top" width="33%" style="padding: 0 4px;">
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td valign="middle" style="padding-right: 10px;">
+                          <a href="https://www.linkedin.com/in/ashok-vangapandu/" target="_blank" style="text-decoration: none;">
+                            <img src="${iconLinkedinUrl}" width="34" height="34" alt="LinkedIn" style="display: block; width: 34px; height: 34px;" />
+                          </a>
+                        </td>
+                        <td valign="middle">
+                          <div style="font-size: 12px; font-weight: 700; color: #FFFFFF; line-height: 1.2;">LinkedIn</div>
+                          <div>
+                            <a href="https://www.linkedin.com/in/ashok-vangapandu/" target="_blank" style="color: #38BDF8; font-size: 11px; text-decoration: none; line-height: 1.2;">linkedin.com/in/ashok-vangapandu</a>
+                          </div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+
+                  <td class="mobile-footer-col" valign="top" width="34%" style="padding-left: 8px;">
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td valign="middle" style="padding-right: 10px;">
+                          <a href="https://github.com/AshokVangapandu" target="_blank" style="text-decoration: none;">
+                            <img src="${iconGithubUrl}" width="34" height="34" alt="GitHub" style="display: block; width: 34px; height: 34px;" />
+                          </a>
+                        </td>
+                        <td valign="middle">
+                          <div style="font-size: 12px; font-weight: 700; color: #FFFFFF; line-height: 1.2;">GitHub</div>
+                          <div>
+                            <a href="https://github.com/AshokVangapandu" target="_blank" style="color: #38BDF8; font-size: 11px; text-decoration: none; line-height: 1.2;">github.com/AshokVangapandu</a>
+                          </div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- 7. AUTOMATED FOOTER NOTE -->
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top: 24px; border-top: 1px solid rgba(255, 255, 255, 0.06); padding-top: 20px;">
+                <tr>
+                  <td align="center" style="font-size: 11px; color: #64748B; line-height: 1.6;">
+                    <div>This is an automated email sent after your testimonial was approved.</div>
+                    <div style="margin-top: 2px;">Thank you for your support! 💙</div>
+                  </td>
+                </tr>
+              </table>
+
+            </td>
+          </tr>
+
+        </table>
+
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+  `.trim();
+}
+
+const html = renderTestimonialApprovedEmail({
+  name: 'Alex Johnson',
+  portfolioUrl: 'https://ashokvangapandu.com',
+  testimonialUrl: 'https://ashokvangapandu.com/#testimonials'
+});
+
+fs.writeFileSync('scratch/preview_approved_email.html', html);
+fs.writeFileSync('public/preview_approved_email.html', html);
+console.log('✓ Generated updated preview_approved_email.html');

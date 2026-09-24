@@ -26,6 +26,7 @@ console.log('Static js directory copied to dist/js successfully!');
 copyDir('assets/images', 'dist/assets/images');
 copyDir('assets/icons', 'dist/assets/icons');
 copyDir('assets/documents', 'dist/assets/documents');
+copyDir('public/email-assets', 'dist/email-assets');
 console.log('Static assets subdirectories copied successfully!');
 
 // Copy CNAME file if it exists

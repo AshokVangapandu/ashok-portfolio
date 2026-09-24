@@ -51,12 +51,12 @@ const MainLayout: React.FC = () => {
       let os = 'Other';
       let deviceType = 'Desktop';
 
-      if (ua.includes('Firefox')) browser = 'Firefox';
+      if (ua.includes('Firefox') || ua.includes('FxiOS')) browser = 'Firefox';
       else if (ua.includes('SamsungBrowser')) browser = 'Samsung Browser';
       else if (ua.includes('Opera') || ua.includes('OPR')) browser = 'Opera';
       else if (ua.includes('Trident')) browser = 'Internet Explorer';
-      else if (ua.includes('Edge') || ua.includes('Edg')) browser = 'Edge';
-      else if (ua.includes('Chrome')) browser = 'Chrome';
+      else if (ua.includes('Edge') || ua.includes('Edg') || ua.includes('EdgiOS')) browser = 'Edge';
+      else if (ua.includes('Chrome') || ua.includes('CriOS')) browser = 'Chrome';
       else if (ua.includes('Safari')) browser = 'Safari';
 
       if (ua.includes('Windows')) os = 'Windows';

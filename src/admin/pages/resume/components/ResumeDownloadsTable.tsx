@@ -18,7 +18,6 @@ export const ResumeDownloadsTable: React.FC<ResumeDownloadsTableProps> = ({
     'Country',
     'Device',
     'Source',
-    'Downloaded From',
     'Duration',
     'Status',
     'Action'

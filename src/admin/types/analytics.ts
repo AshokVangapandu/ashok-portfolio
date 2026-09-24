@@ -33,34 +33,72 @@ export interface AnalyticsLocation {
   country: string;
   count: number;
   percentage: number;
-  code: string;
+  code?: string;
   countryCode?: string;
   cities?: string[];
+  isOthers?: boolean;
+}
+
+export interface AnalyticsSourceItem {
+  rank?: number;
+  source: string;
+  display?: string;
+  count: number;
+  percentage: number;
+  type: string;
+}
+
+export interface AnalyticsSourcesOthers {
+  count: number;
+  percentage: number;
+  sources: AnalyticsSourceItem[];
+}
+
+export interface AnalyticsSourcesResponse {
+  totalCount?: number;
+  topSources: AnalyticsSourceItem[];
+  others: AnalyticsSourcesOthers;
 }
 
 export interface AnalyticsSource {
-  rank: number;
+  rank?: number;
   source: string;
+  display?: string;
+  count?: number;
+  visits?: number;
   percentage: number;
-  type: 'linkedin' | 'google' | 'github' | 'direct' | 'other';
+  type?: string;
+  isOthers?: boolean;
+  otherSources?: AnalyticsSourceItem[];
 }
 
 export interface AnalyticsDevice {
   name: string;
+  count?: number;
+  visits?: number;
   percentage: number;
 }
 
 export interface AnalyticsBrowser {
   name: string;
+  count?: number;
+  visits?: number;
   percentage: number;
+  rank?: number;
 }
 
 export interface AnalyticsOperatingSystem {
   name: string;
+  count?: number;
+  visits?: number;
   percentage: number;
+  rank?: number;
 }
 
 export interface VisitorComparison {
+  totalUniqueVisitors: number;
+  newVisitors: number;
+  returningVisitors: number;
   newPercentage: number;
   returningPercentage: number;
   newTrend: string;
@@ -98,15 +136,15 @@ export interface VisitorSession {
   visitedAt: string; // "Jan 15, 2024\n10:42 AM"
   visitorName: string | null;
   visitorEmail: string | null;
-  avatarUrl?: string | null;
-  country: string | null;
-  city: string | null;
-  device: string;
+  avatarUrl: string | null;
+  country: string;
+  city: string;
+  device: 'Desktop' | 'Mobile' | 'Tablet';
   browser: string;
-  os?: string; // Add optional fields to map easily if needed
+  os: string;
   source: string;
   landingPage: string;
-  sessionDuration: number; // Duration in seconds
+  sessionDuration: number; // duration in seconds
   isKnownVisitor: boolean;
-  lastActivity: string; // ISO timestamp string or formatted date
+  lastActivity: string;
 }

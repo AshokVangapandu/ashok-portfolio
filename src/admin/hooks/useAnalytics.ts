@@ -7,6 +7,7 @@ import {
   AnalyticsActivity,
   AnalyticsLocation,
   AnalyticsSource,
+  AnalyticsSourcesResponse,
   AnalyticsDevice,
   AnalyticsBrowser,
   AnalyticsOperatingSystem,
@@ -45,7 +46,7 @@ export const useAnalytics = () => {
   const [trends, setTrends] = useState<AnalyticsTrend[]>([]);
   const [activities, setActivities] = useState<AnalyticsActivity[]>([]);
   const [locations, setLocations] = useState<AnalyticsLocation[]>([]);
-  const [sources, setSources] = useState<AnalyticsSource[]>([]);
+  const [sources, setSources] = useState<AnalyticsSourcesResponse | AnalyticsSource[] | any>([]);
   const [devices, setDevices] = useState<AnalyticsDevice[]>([]);
   const [browsers, setBrowsers] = useState<AnalyticsBrowser[]>([]);
   const [operatingSystems, setOperatingSystems] = useState<AnalyticsOperatingSystem[]>([]);

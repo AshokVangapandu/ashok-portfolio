@@ -34,50 +34,57 @@ export const DeviceChart: React.FC<DeviceChartProps> = ({
   }, []);
 
   // Consolidate data into Desktop, Mobile, and Others (including Tablet)
-  const desktopItem = devices.find((d) => d.name.toLowerCase() === 'desktop');
-  const mobileItem = devices.find((d) => d.name.toLowerCase() === 'mobile');
-  const otherItems = devices.filter(
-    (d) => !['desktop', 'mobile'].includes(d.name.toLowerCase())
+  const desktopItem = (devices || []).find((d) => d.name?.toLowerCase() === 'desktop');
+  const mobileItem = (devices || []).find((d) => d.name?.toLowerCase() === 'mobile');
+  const otherItems = (devices || []).filter(
+    (d) => !['desktop', 'mobile'].includes((d.name || '').toLowerCase())
   );
 
-  const rawDesktopCount = Number((desktopItem as any)?.count ?? (desktopItem as any)?.visits ?? 0);
-  const rawMobileCount = Number((mobileItem as any)?.count ?? (mobileItem as any)?.visits ?? 0);
-  const rawOthersCount = otherItems.reduce(
-    (sum, d) => sum + Number((d as any)?.count ?? (d as any)?.visits ?? 0),
+  const desktopVisits = Number(desktopItem?.count ?? desktopItem?.visits ?? 0);
+  const mobileVisits = Number(mobileItem?.count ?? mobileItem?.visits ?? 0);
+  const othersVisits = otherItems.reduce(
+    (sum, d) => sum + Number(d.count ?? d.visits ?? 0),
     0
   );
 
-  // Percentage calculations
-  let desktopPct = desktopItem?.percentage ?? 0;
-  let mobilePct = mobileItem?.percentage ?? 0;
-  let othersPct = otherItems.reduce((sum, d) => sum + (d.percentage || 0), 0);
-
-  const sumCounts = rawDesktopCount + rawMobileCount + rawOthersCount;
+  const sumCounts = desktopVisits + mobileVisits + othersVisits;
   const effectiveTotal = typeof totalVisitors === 'number' && totalVisitors > 0
     ? totalVisitors
-    : sumCounts > 0
-    ? sumCounts
-    : 14;
+    : sumCounts;
 
-  // If percentages are 0 but counts exist, calculate dynamically
-  if (desktopPct === 0 && mobilePct === 0 && othersPct === 0 && sumCounts > 0) {
-    desktopPct = Math.round((rawDesktopCount / sumCounts) * 100);
-    mobilePct = Math.round((rawMobileCount / sumCounts) * 100);
-    othersPct = Math.max(0, 100 - (desktopPct + mobilePct));
+  // Percentage calculations based directly on counts when sumCounts > 0
+  let desktopPct = desktopItem && typeof desktopItem.percentage === 'number' && desktopItem.percentage > 0
+    ? desktopItem.percentage
+    : effectiveTotal > 0
+    ? Math.round((desktopVisits / effectiveTotal) * 100)
+    : 0;
+
+  let mobilePct = mobileItem && typeof mobileItem.percentage === 'number' && mobileItem.percentage > 0
+    ? mobileItem.percentage
+    : effectiveTotal > 0
+    ? Math.round((mobileVisits / effectiveTotal) * 100)
+    : 0;
+
+  let othersPct = otherItems.length > 0 && otherItems.some((d) => typeof d.percentage === 'number')
+    ? otherItems.reduce((sum, d) => sum + (d.percentage || 0), 0)
+    : effectiveTotal > 0
+    ? Math.max(0, 100 - (desktopPct + mobilePct))
+    : 0;
+
+  // Ensure 100% percentage sum when data exists
+  if (effectiveTotal > 0) {
+    const pSum = desktopPct + mobilePct + othersPct;
+    const diff = 100 - pSum;
+    if (diff !== 0) {
+      if (desktopVisits >= mobileVisits && desktopVisits >= othersVisits) {
+        desktopPct += diff;
+      } else if (mobileVisits >= desktopVisits && mobileVisits >= othersVisits) {
+        mobilePct += diff;
+      } else {
+        othersPct += diff;
+      }
+    }
   }
-
-  // Calculate visits for each category (using raw counts or derived from percentage)
-  const desktopVisits = rawDesktopCount > 0
-    ? rawDesktopCount
-    : Math.round((desktopPct / 100) * effectiveTotal);
-
-  const mobileVisits = rawMobileCount > 0
-    ? rawMobileCount
-    : Math.round((mobilePct / 100) * effectiveTotal);
-
-  const othersVisits = rawOthersCount > 0
-    ? rawOthersCount
-    : Math.max(0, effectiveTotal - (desktopVisits + mobileVisits));
 
   // Determine dominant category for donut center callout
   let dominantName = 'Desktop';
@@ -273,6 +280,22 @@ export const DeviceChart: React.FC<DeviceChartProps> = ({
               />
             ))}
           </div>
+        </div>
+      ) : effectiveTotal === 0 ? (
+        <div
+          style={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            minHeight: '220px',
+            gap: '8px',
+          }}
+        >
+          <span style={{ fontSize: '13px', color: '#64748B', fontWeight: 500 }}>
+            No device analytics available yet.
+          </span>
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '18px', width: '100%' }}>

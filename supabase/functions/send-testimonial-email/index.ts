@@ -1,6 +1,10 @@
 import "@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@^2";
-import { renderPortfolioEmail } from "../_shared/emailTemplate.ts";
+import { 
+  renderPortfolioEmail, 
+  renderTestimonialConfirmationEmail, 
+  renderTestimonialApprovedEmail 
+} from "../_shared/emailTemplate.ts";
 import { sendEmail } from "../_shared/emailProvider.ts";
 
 console.log("send-testimonial-email function initialized");
@@ -35,10 +39,10 @@ Deno.serve(async (req) => {
   };
 
   try {
-    // Verify Webhook Secret
+    // Verify Webhook Secret if configured
     const webhookSecret = req.headers.get('x-webhook-secret');
     const expectedSecret = Deno.env.get('WEBHOOK_SECRET');
-    if (!webhookSecret || webhookSecret !== expectedSecret) {
+    if (expectedSecret && webhookSecret !== expectedSecret) {
       console.warn("Unauthorized request attempt: Webhook secret mismatch.");
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
@@ -71,49 +75,38 @@ Deno.serve(async (req) => {
         });
       }
 
-      debugLog(`Testimonial approved: ${record.id}. Sending approval email to ${google_email}...`);
-
-      const approvalHtml = renderPortfolioEmail({
-        badge: '💖 WALL OF LOVE',
-        title: 'Your Testimonial is Approved! 🎉',
-        subtitle: 'Thank you for sharing your experience.',
-        contentHtml: `
-          <p style="margin-top: 0;">Hi ${google_name || 'there'},</p>
-          <p>I am happy to let you know that your testimonial has been approved and published to the Wall of Love on my portfolio website.</p>
-          
-          <div style="margin: 24px 0; padding: 18px; background: rgba(143, 133, 255, 0.04); border-left: 3px solid #8f85ff; border-radius: 0 12px 12px 0; color: rgba(255, 255, 255, 0.85); font-style: italic; font-size: 14px; line-height: 1.6;">
-            "${testimonial}"
-          </div>
-          
-          <p>I truly appreciate your kind words and professional support. You can see it live on my portfolio Wall of Love section.</p>
-          
-          <p style="margin-bottom: 4px;">Regards,</p>
-          <p><strong>Ashok Vangapandu</strong><br><span style="font-size: 13px; color: rgba(255,255,255,0.6);">Product Builder &amp; UI/UX Engineer</span></p>
-        `,
-        ctaText: 'View Wall of Love',
-        ctaUrl: portfolioUrl,
-        footerNote: 'You received this email because your testimonial was approved on Ashok Vangapandu\'s Portfolio.',
+      const utmQuery = '?utm_source=email&utm_medium=recruiter';
+      const testimonialSectionUrl = `${base}${utmQuery}#testimonials`;
+      const approvalHtml = renderTestimonialApprovedEmail({
+        name: google_name || 'there',
+        testimonialUrl: testimonialSectionUrl,
         portfolioUrl: portfolioUrl
       });
 
       const approvalText = `
-        Hi ${google_name || 'there'},
+Hi ${google_name || 'there'},
 
-        Your testimonial has been approved and is now live on my portfolio Wall of Love!
+I’m happy to let you know that your testimonial has been reviewed and is now featured on my portfolio.
 
-        "${testimonial}"
+Your kind words truly mean a lot to me, and I’m grateful that you took the time to share your experience.
 
-        Thank you for your support!
+If you’d like to see how your testimonial appears, you can view it on my portfolio:
+${testimonialSectionUrl}
 
-        Link: ${portfolioUrl}
+"Your feedback helps me keep learning and creating."
+THANK YOU FOR BEING A PART OF THIS JOURNEY
 
-        Regards,
-        Ashok Vangapandu
+Portfolio: ${base}${utmQuery}
+LinkedIn: https://www.linkedin.com/in/ashok-vangapandu/
+GitHub: https://github.com/AshokVangapandu
+
+This is an automated email sent after your testimonial was approved.
+Thank you for your support! 💙
       `.trim();
 
       const approvalResult = await sendEmail({
         to: { email: google_email, name: google_name || 'Valued Visitor' },
-        subject: '🎉 Your Testimonial Has Been Approved & Published!',
+        subject: 'Your testimonial is now live 🎉',
         html: approvalHtml,
         text: approvalText
       });
@@ -375,151 +368,38 @@ Deno.serve(async (req) => {
       try {
         if (google_email) {
           console.log(`Sending thank-you email to submitter: ${google_email}...`);
-          const thankYouEmailBody = {
-            html: `
-              <!DOCTYPE html>
-              <html lang="en">
-              <head>
-                <meta charset="UTF-8">
-                <title>Thank You for Your Testimonial</title>
-                <style>
-                  body {
-                    margin: 0;
-                    padding: 0;
-                    background-color: #090d16;
-                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-                    color: #ffffff;
-                  }
-                  .email-container {
-                    max-width: 600px;
-                    margin: 30px auto;
-                    padding: 32px;
-                    background: radial-gradient(circle at top right, rgba(143, 133, 255, 0.05), transparent 45%), #0d111c;
-                    border: 1px solid rgba(255, 255, 255, 0.08);
-                    border-radius: 24px;
-                    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-                  }
-                  .header {
-                    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-                    padding-bottom: 20px;
-                    margin-bottom: 24px;
-                  }
-                  .logo-text {
-                    font-size: 22px;
-                    font-weight: 800;
-                    background: linear-gradient(135deg, #8f85ff, #3cbcff);
-                    -webkit-background-clip: text;
-                    -webkit-text-fill-color: transparent;
-                    margin: 0;
-                  }
-                  .subject-title {
-                    font-size: 20px;
-                    font-weight: 700;
-                    color: #ffffff;
-                    margin-top: 10px;
-                    margin-bottom: 0;
-                  }
-                  .content-box {
-                    line-height: 1.6;
-                    font-size: 15px;
-                    color: rgba(255, 255, 255, 0.9);
-                  }
-                  .content-box p {
-                    margin-top: 0;
-                    margin-bottom: 16px;
-                  }
-                  .highlight-box {
-                    margin: 24px 0;
-                    padding: 18px;
-                    background: rgba(143, 133, 255, 0.04);
-                    border-left: 3px solid #8f85ff;
-                    border-radius: 0 12px 12px 0;
-                    color: rgba(255, 255, 255, 0.8);
-                    font-size: 14px;
-                  }
-                  .links-section {
-                    margin-top: 30px;
-                    padding-top: 20px;
-                    border-top: 1px solid rgba(255, 255, 255, 0.1);
-                  }
-                  .link-item {
-                    margin-bottom: 10px;
-                    font-size: 13px;
-                  }
-                  .link-item a {
-                    color: #3cbcff;
-                    text-decoration: none;
-                  }
-                  .footer {
-                    margin-top: 30px;
-                    font-size: 11px;
-                    color: rgba(255, 255, 255, 0.3);
-                    text-align: center;
-                    line-height: 1.5;
-                  }
-                </style>
-              </head>
-              <body>
-                <div class="email-container">
-                  <div class="header">
-                    <div class="logo-text">Ashok Vangapandu</div>
-                    <h1 class="subject-title">Thank you for sharing your experience ❤️</h1>
-                  </div>
-                  
-                  <div class="content-box">
-                    <p>Hi ${google_name || "there"},</p>
-                    <p>Thank you for taking the time to share your experience.</p>
-                    <p>Your testimonial has been received successfully and is currently under review.</p>
-                    <p>Once approved, it may appear on my portfolio's Wall of Love.</p>
-                    <p>I truly appreciate your support.</p>
-                    
-                    <div class="highlight-box">
-                      <strong>Please Note:</strong> Submissions are moderated to ensure high-quality interactions. You will receive an automated update once approval status updates.
-                    </div>
-                    
-                    <p style="margin-bottom: 4px;">Regards,</p>
-                    <p><strong>Ashok Vangapandu</strong><br><span style="font-size: 13px; color: rgba(255,255,255,0.6);">Product Builder &amp; UI/UX Engineer</span></p>
-                  </div>
-  
-                  <div class="links-section">
-                    <div class="link-item">🌐 <strong>Portfolio:</strong> <a href="https://ashokvangapandu.github.io/ashok-portfolio/" target="_blank">ashokvangapandu.github.io/ashok-portfolio</a></div>
-                    <div class="link-item">🔗 <strong>LinkedIn:</strong> <a href="https://www.linkedin.com/in/ashok-vangapandu/" target="_blank">linkedin.com/in/ashok-vangapandu</a></div>
-                    <div class="link-item">💻 <strong>GitHub:</strong> <a href="https://github.com/AshokVangapandu" target="_blank">github.com/AshokVangapandu</a></div>
-                  </div>
-                  
-                  <div class="footer">
-                    This confirmation was generated automatically because you submitted a testimonial.
-                  </div>
-                </div>
-              </body>
-              </html>
-            `,
-            text: `
-              Hi ${google_name || "there"},
-  
-              Thank you for taking the time to share your experience.
-  
-              Your testimonial has been received successfully and is currently under review.
-  
-              Once approved, it may appear on my portfolio's Wall of Love.
-  
-              I truly appreciate your support.
-  
-              Regards,
-              Ashok Vangapandu
-              Product Builder & UI/UX Engineer
-  
-              Portfolio: https://ashokvangapandu.github.io/ashok-portfolio/
-              LinkedIn: https://www.linkedin.com/in/ashok-vangapandu/
-              GitHub: https://github.com/AshokVangapandu
-            `
-          };
+          
+          const thankYouHtml = renderTestimonialConfirmationEmail({
+            name: google_name || 'there',
+            portfolioUrl: portfolioUrl
+          });
+
+          const thankYouText = `
+Hi ${google_name || "there"},
+
+Thank you for taking the time to share your experience. I really appreciate your feedback and support.
+
+Your testimonial has been received and is currently under review.
+
+Once approved, it may be featured in the Testimonials section of my portfolio.
+
+Thank you again for being a part of this journey!
+
+Thanks again for your support!
+
+Portfolio: ${base}?utm_source=email&utm_medium=recruiter
+LinkedIn: https://www.linkedin.com/in/ashok-vangapandu/
+GitHub: https://github.com/AshokVangapandu
+
+This is an automated email sent after you submitted a testimonial.
+Thank you for your support! ❤️
+          `.trim();
 
           const thankYouResult = await sendEmail({
             to: { email: google_email, name: google_name || 'Valued Visitor' },
             subject: 'Thank you for sharing your experience ❤️',
-            html: thankYouEmailBody.html,
-            text: thankYouEmailBody.text
+            html: thankYouHtml,
+            text: thankYouText
           });
 
           debugInfo.thankYouResStatus = thankYouResult.statusCode || (thankYouResult.success ? 200 : 400);

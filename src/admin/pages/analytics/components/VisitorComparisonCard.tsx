@@ -4,7 +4,7 @@ import { VisitorComparison } from '../../../types/analytics';
 
 interface VisitorComparisonCardProps {
   comparison: VisitorComparison | null;
-  totalVisitors?: number;
+  totalVisitors?: number; // Optional: Retained for backward compatibility, not used for count derivation
   loading?: boolean;
   error?: boolean;
   onRetry?: () => void;
@@ -31,7 +31,6 @@ const useAnimatedValue = (target: number, duration: number = 800) => {
 
 export const VisitorComparisonCard: React.FC<VisitorComparisonCardProps> = ({
   comparison,
-  totalVisitors,
   loading = false,
   error = false,
   onRetry,
@@ -48,19 +47,14 @@ export const VisitorComparisonCard: React.FC<VisitorComparisonCardProps> = ({
   const animatedNew = useAnimatedValue(newPct);
   const animatedReturning = useAnimatedValue(returningPct);
 
-  // Derive counts proportionally from totalVisitors if available
-  const newVisitorCount = totalVisitors !== undefined
-    ? Math.round((newPct / 100) * totalVisitors)
-    : (newPct > 0 ? 1 : 0);
-
-  const returningVisitorCount = totalVisitors !== undefined
-    ? Math.round((returningPct / 100) * totalVisitors)
-    : (returningPct > 0 ? 1 : 0);
+  // Exact unique visitor counts directly from backend aggregation
+  const newVisitorCount = comparison?.newVisitors ?? 0;
+  const returningVisitorCount = comparison?.returningVisitors ?? 0;
 
   const parseTrend = (trendStr: string | undefined | null) => {
-    if (!trendStr) {
+    if (!trendStr || trendStr === '—' || trendStr === 'N/A') {
       return {
-        text: '0.0%',
+        text: 'No previous data',
         arrow: '',
         color: '#64748B',
         bg: '#F1F5F9',
@@ -102,7 +96,8 @@ export const VisitorComparisonCard: React.FC<VisitorComparisonCardProps> = ({
     }
   };
 
-  const trendObj = parseTrend(comparison?.returningTrend || comparison?.newTrend);
+  // Only bind Returning Visitors trend to returningTrend (never fall back to newTrend)
+  const trendObj = parseTrend(comparison?.returningTrend);
 
   return (
     <div
@@ -389,7 +384,7 @@ export const VisitorComparisonCard: React.FC<VisitorComparisonCardProps> = ({
               {/* New Visitors segment */}
               <div
                 style={{
-                  width: mounted ? `${newPct}%` : '0%',
+                  width: mounted && (newPct > 0 || returningPct > 0) ? `${newPct}%` : '0%',
                   height: '100%',
                   backgroundColor: '#DDD6FE',
                   transition: 'width 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -398,7 +393,7 @@ export const VisitorComparisonCard: React.FC<VisitorComparisonCardProps> = ({
               {/* Returning Visitors segment */}
               <div
                 style={{
-                  width: mounted ? `${returningPct}%` : '0%',
+                  width: mounted && (newPct > 0 || returningPct > 0) ? `${returningPct}%` : '0%',
                   height: '100%',
                   background: 'linear-gradient(90deg, #9333EA 0%, #7C3AED 100%)',
                   transition: 'width 0.8s cubic-bezier(0.4, 0, 0.2, 1)',

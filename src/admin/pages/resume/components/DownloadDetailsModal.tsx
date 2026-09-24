@@ -124,6 +124,10 @@ export const DownloadDetailsModal: React.FC<DownloadDetailsModalProps> = ({
 
             {[
               { label: 'Visitor Name', value: download.visitorName },
+              ...(download.isKnown && download.visitorEmail
+                ? [{ label: 'Email', value: download.visitorEmail }]
+                : []),
+              { label: 'Visitor Type', value: download.isKnown ? 'Known / Identified' : 'Anonymous Visitor' },
               { label: 'IP Address', value: download.ipAddress || 'Not Available' },
               { label: 'Country', value: download.country },
               { label: 'City', value: download.city }
@@ -144,7 +148,7 @@ export const DownloadDetailsModal: React.FC<DownloadDetailsModalProps> = ({
             {[
               { label: 'Resume Version', value: download.resumeVersion || 'Unknown' },
               { label: 'Downloaded At', value: download.dateTime },
-              { label: 'Downloaded From', value: download.downloadedFrom },
+              { label: 'Duration', value: download.duration },
               { label: 'Traffic Source', value: download.source }
             ].map((item, idx) => (
               <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #F1F5F9', paddingBottom: '8px' }}>
@@ -184,6 +188,13 @@ export const DownloadDetailsModal: React.FC<DownloadDetailsModalProps> = ({
             </span>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              <span style={{ fontSize: '12px', color: '#64748B', fontWeight: 500 }}>Visitor ID</span>
+              <code style={{ fontSize: '12px', color: '#0F172A', backgroundColor: '#F8FAFC', padding: '6px 10px', borderRadius: '6px', border: '1px solid #E2E8F0', fontFamily: 'monospace', wordBreak: 'break-all' }}>
+                {download.visitorId || 'Not Available'}
+              </code>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '6px' }}>
               <span style={{ fontSize: '12px', color: '#64748B', fontWeight: 500 }}>Session ID</span>
               <code style={{ fontSize: '12px', color: '#0F172A', backgroundColor: '#F8FAFC', padding: '6px 10px', borderRadius: '6px', border: '1px solid #E2E8F0', fontFamily: 'monospace', wordBreak: 'break-all' }}>
                 {download.sessionId || 'Not Available'}

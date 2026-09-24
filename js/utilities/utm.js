@@ -14,9 +14,23 @@ export function resolveUTMParameters(searchString, referrerString = '') {
   if (typeof query !== 'string') {
     if (typeof window !== 'undefined' && window.location) {
       query = window.location.search || '';
+      // Support hash-based query strings e.g. /#testimonials?utm_source=email
+      if (!query && window.location.hash && window.location.hash.includes('?')) {
+        query = window.location.hash.substring(window.location.hash.indexOf('?'));
+      }
     } else {
       query = '';
     }
+  }
+
+  // If query starts with # and has ?, extract query part e.g. #testimonials?utm_source=email
+  if (query && query.startsWith('#') && query.includes('?')) {
+    query = query.substring(query.indexOf('?'));
+  }
+
+  // Strip trailing hash fragments from query string e.g. ?utm_source=email#testimonials
+  if (query && query.includes('#')) {
+    query = query.split('#')[0];
   }
 
   // Ensure query starts with ? for URLSearchParams if it's not empty and doesn't have it
@@ -62,7 +76,8 @@ export function resolveUTMParameters(searchString, referrerString = '') {
     'youtube': 'YouTube',
     'email': 'Email',
     'resume': 'Resume',
-    'qr': 'QR Code'
+    'qr': 'QR Code',
+    'stackoverflow': 'Stack Overflow'
   };
 
   let rawCleanSource = rawSource ? rawSource.trim() : '';

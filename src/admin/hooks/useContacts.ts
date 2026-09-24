@@ -1,9 +1,11 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { ContactSubmission } from '../types/contact';
 import { contactService } from '../services/contactService';
 import { supabase } from '../../services/supabase/client';
+import { useAuth } from '../../hooks/useAuth';
 
 export const useContacts = () => {
+  const { user } = useAuth();
   // Parse initial query params from URL
   const getInitialParams = () => {
     if (typeof window === 'undefined') {
@@ -106,10 +108,26 @@ export const useContacts = () => {
     }
   }, [searchQuery, statusFilter, sortBy, currentPage, pageSize]);
 
+  const loadRef = useRef(loadSubmissions);
+  loadRef.current = loadSubmissions;
+
   // Fetch on state variations
   useEffect(() => {
     loadSubmissions();
   }, [loadSubmissions]);
+
+  // Refresh when auth state changes or on user change
+  useEffect(() => {
+    loadRef.current();
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session) {
+        loadRef.current();
+      }
+    });
+    return () => {
+      authListener?.subscription?.unsubscribe();
+    };
+  }, [user]);
 
   // Calculate pages
   const totalPages = useMemo(() => {

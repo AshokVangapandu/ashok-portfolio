@@ -136,26 +136,64 @@ export const BrowserChart: React.FC<BrowserChartProps> = ({
     setMounted(true);
   }, []);
 
-  // Sort browsers descending by percentage / count
-  const sortedBrowsers = [...(browsers || [])]
-    .sort((a, b) => (b.percentage || 0) - (a.percentage || 0))
-    .map((br, index) => ({
-      ...br,
-      rank: index + 1,
-    }));
+  // Sort browsers descending by count/percentage, positioning Others at the end
+  const nonOthers = (browsers || []).filter((b) => b.name?.toLowerCase() !== 'others');
+  const backendOthers = (browsers || []).find((b) => b.name?.toLowerCase() === 'others');
+
+  const sortedBrowsers = [
+    ...nonOthers
+      .sort((a, b) => (b.count || b.percentage || 0) - (a.count || a.percentage || 0))
+      .map((br, index) => ({
+        ...br,
+        rank: index + 1,
+      })),
+    ...(backendOthers ? [{ ...backendOthers, rank: undefined }] : []),
+  ];
 
   const rawSumCounts = sortedBrowsers.reduce(
-    (sum, br) => sum + Number((br as any).count ?? (br as any).visits ?? 0),
+    (sum, br) => sum + Number(br.count ?? br.visits ?? 0),
     0
   );
 
   const effectiveTotal = typeof totalVisitors === 'number' && totalVisitors > 0
     ? totalVisitors
-    : rawSumCounts > 0
-    ? rawSumCounts
-    : 14;
+    : rawSumCounts;
 
-  const topBrowser = sortedBrowsers.length > 0 ? sortedBrowsers[0] : null;
+  // Hare-Niemeyer (Largest Remainder Method) for exact 100% percentage distribution
+  const normalizedBrowsers = (() => {
+    if (sortedBrowsers.length === 0 || effectiveTotal === 0) {
+      return sortedBrowsers.map((br) => ({ ...br, percentage: 0 }));
+    }
+
+    const raw = sortedBrowsers.map((br, index) => {
+      const visits = Number(br.count ?? br.visits ?? 0);
+      const rawPct = (visits / effectiveTotal) * 100;
+      const floor = Math.floor(rawPct);
+      const rem = rawPct - floor;
+      return { index, visits, rawPct, floor, rem };
+    });
+
+    const sumFloor = raw.reduce((sum, r) => sum + r.floor, 0);
+    const diff = Math.max(0, 100 - sumFloor);
+
+    // Sort by remainder descending, then by visits descending
+    const sortedByRem = [...raw].sort((a, b) => {
+      if (b.rem !== a.rem) return b.rem - a.rem;
+      return b.visits - a.visits;
+    });
+
+    const finalPcts = new Array(sortedBrowsers.length).fill(0);
+    sortedByRem.forEach((r, rank) => {
+      finalPcts[r.index] = r.floor + (rank < diff ? 1 : 0);
+    });
+
+    return sortedBrowsers.map((br, idx) => ({
+      ...br,
+      percentage: finalPcts[idx],
+    }));
+  })();
+
+  const topBrowser = normalizedBrowsers.length > 0 ? normalizedBrowsers[0] : null;
 
   return (
     <div
@@ -363,7 +401,7 @@ export const BrowserChart: React.FC<BrowserChartProps> = ({
             </div>
           ))}
         </div>
-      ) : sortedBrowsers.length === 0 ? (
+      ) : normalizedBrowsers.length === 0 || effectiveTotal === 0 ? (
         <div
           style={{
             flex: 1,
@@ -381,12 +419,9 @@ export const BrowserChart: React.FC<BrowserChartProps> = ({
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%' }}>
-          {sortedBrowsers.map((br) => {
+          {normalizedBrowsers.map((br) => {
             const config = getBrowserVisualConfig(br.name);
-            const rawCount = Number((br as any).count ?? (br as any).visits ?? 0);
-            const visits = rawCount > 0
-              ? rawCount
-              : Math.max(1, Math.round(((br.percentage || 0) / 100) * effectiveTotal));
+            const visits = Number(br.count ?? br.visits ?? 0);
 
             return (
               <div
@@ -406,22 +441,41 @@ export const BrowserChart: React.FC<BrowserChartProps> = ({
                 }}
               >
                 {/* 1. Rank Badge */}
-                <span
-                  style={{
-                    fontSize: '11px',
-                    fontWeight: 700,
-                    color: '#7C3AED',
-                    backgroundColor: '#F3E8FF',
-                    padding: '3px 8px',
-                    borderRadius: '6px',
-                    minWidth: '22px',
-                    textAlign: 'center',
-                    lineHeight: 1,
-                    flexShrink: 0,
-                  }}
-                >
-                  #{br.rank}
-                </span>
+                {br.rank ? (
+                  <span
+                    style={{
+                      fontSize: '11px',
+                      fontWeight: 700,
+                      color: '#7C3AED',
+                      backgroundColor: '#F3E8FF',
+                      padding: '3px 8px',
+                      borderRadius: '6px',
+                      minWidth: '22px',
+                      textAlign: 'center',
+                      lineHeight: 1,
+                      flexShrink: 0,
+                    }}
+                  >
+                    #{br.rank}
+                  </span>
+                ) : (
+                  <span
+                    style={{
+                      fontSize: '11px',
+                      fontWeight: 700,
+                      color: '#64748B',
+                      backgroundColor: '#F1F5F9',
+                      padding: '3px 8px',
+                      borderRadius: '6px',
+                      minWidth: '22px',
+                      textAlign: 'center',
+                      lineHeight: 1,
+                      flexShrink: 0,
+                    }}
+                  >
+                    +
+                  </span>
+                )}
 
                 {/* 2. Browser Icon Container */}
                 <div

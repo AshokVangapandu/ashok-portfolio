@@ -127,26 +127,64 @@ export const OperatingSystemChart: React.FC<OperatingSystemChartProps> = ({
     setMounted(true);
   }, []);
 
-  // Sort operating systems descending
-  const sortedOS = [...(operatingSystems || [])]
-    .sort((a, b) => (b.percentage || 0) - (a.percentage || 0))
-    .map((os, index) => ({
-      ...os,
-      rank: index + 1,
-    }));
+  // Sort operating systems descending by count/percentage, positioning Others at the end
+  const nonOthers = (operatingSystems || []).filter((o) => o.name?.toLowerCase() !== 'others');
+  const backendOthers = (operatingSystems || []).find((o) => o.name?.toLowerCase() === 'others');
+
+  const sortedOS = [
+    ...nonOthers
+      .sort((a, b) => (b.count || b.percentage || 0) - (a.count || a.percentage || 0))
+      .map((os, index) => ({
+        ...os,
+        rank: index + 1,
+      })),
+    ...(backendOthers ? [{ ...backendOthers, rank: undefined }] : []),
+  ];
 
   const rawSumCounts = sortedOS.reduce(
-    (sum, os) => sum + Number((os as any).count ?? (os as any).visits ?? 0),
+    (sum, os) => sum + Number(os.count ?? os.visits ?? 0),
     0
   );
 
   const effectiveTotal = typeof totalVisitors === 'number' && totalVisitors > 0
     ? totalVisitors
-    : rawSumCounts > 0
-    ? rawSumCounts
-    : 14;
+    : rawSumCounts;
 
-  const topOS = sortedOS.length > 0 ? sortedOS[0] : null;
+  // Hare-Niemeyer (Largest Remainder Method) for exact 100% percentage distribution
+  const normalizedOS = (() => {
+    if (sortedOS.length === 0 || effectiveTotal === 0) {
+      return sortedOS.map((os) => ({ ...os, percentage: 0 }));
+    }
+
+    const raw = sortedOS.map((os, index) => {
+      const visits = Number(os.count ?? os.visits ?? 0);
+      const rawPct = (visits / effectiveTotal) * 100;
+      const floor = Math.floor(rawPct);
+      const rem = rawPct - floor;
+      return { index, visits, rawPct, floor, rem };
+    });
+
+    const sumFloor = raw.reduce((sum, r) => sum + r.floor, 0);
+    const diff = Math.max(0, 100 - sumFloor);
+
+    // Sort by remainder descending, then by visits descending
+    const sortedByRem = [...raw].sort((a, b) => {
+      if (b.rem !== a.rem) return b.rem - a.rem;
+      return b.visits - a.visits;
+    });
+
+    const finalPcts = new Array(sortedOS.length).fill(0);
+    sortedByRem.forEach((r, rank) => {
+      finalPcts[r.index] = r.floor + (rank < diff ? 1 : 0);
+    });
+
+    return sortedOS.map((os, idx) => ({
+      ...os,
+      percentage: finalPcts[idx],
+    }));
+  })();
+
+  const topOS = normalizedOS.length > 0 ? normalizedOS[0] : null;
 
   // Donut SVG parameters - compact, responsive dimensions
   const radius = 38;
@@ -156,7 +194,7 @@ export const OperatingSystemChart: React.FC<OperatingSystemChartProps> = ({
 
   // Compute chained stroke lengths & offsets for donut
   let accumulatedPercent = 0;
-  const donutSegments = sortedOS.map((os) => {
+  const donutSegments = normalizedOS.map((os) => {
     const pct = os.percentage || 0;
     const strokeLength = (pct / 100) * circumference;
     const offset = -(accumulatedPercent / 100) * circumference;
@@ -294,7 +332,7 @@ export const OperatingSystemChart: React.FC<OperatingSystemChartProps> = ({
             ))}
           </div>
         </div>
-      ) : sortedOS.length === 0 ? (
+      ) : normalizedOS.length === 0 || effectiveTotal === 0 ? (
         <div
           style={{
             flex: 1,
@@ -513,12 +551,9 @@ export const OperatingSystemChart: React.FC<OperatingSystemChartProps> = ({
 
           {/* Lower Section: OS Detail Rows */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%', zIndex: 1 }}>
-            {sortedOS.map((os) => {
+            {normalizedOS.map((os) => {
               const config = getOSVisualConfig(os.name);
-              const rawCount = Number((os as any).count ?? (os as any).visits ?? 0);
-              const visits = rawCount > 0
-                ? rawCount
-                : Math.max(1, Math.round(((os.percentage || 0) / 100) * effectiveTotal));
+              const visits = Number(os.count ?? os.visits ?? 0);
 
               return (
                 <div
@@ -538,22 +573,41 @@ export const OperatingSystemChart: React.FC<OperatingSystemChartProps> = ({
                   }}
                 >
                   {/* 1. Rank Badge */}
-                  <span
-                    style={{
-                      fontSize: '11px',
-                      fontWeight: 700,
-                      color: '#7C3AED',
-                      backgroundColor: '#F3E8FF',
-                      padding: '3px 8px',
-                      borderRadius: '6px',
-                      minWidth: '22px',
-                      textAlign: 'center',
-                      lineHeight: 1,
-                      flexShrink: 0,
-                    }}
-                  >
-                    #{os.rank}
-                  </span>
+                  {os.rank ? (
+                    <span
+                      style={{
+                        fontSize: '11px',
+                        fontWeight: 700,
+                        color: '#7C3AED',
+                        backgroundColor: '#F3E8FF',
+                        padding: '3px 8px',
+                        borderRadius: '6px',
+                        minWidth: '22px',
+                        textAlign: 'center',
+                        lineHeight: 1,
+                        flexShrink: 0,
+                      }}
+                    >
+                      #{os.rank}
+                    </span>
+                  ) : (
+                    <span
+                      style={{
+                        fontSize: '11px',
+                        fontWeight: 700,
+                        color: '#64748B',
+                        backgroundColor: '#F1F5F9',
+                        padding: '3px 8px',
+                        borderRadius: '6px',
+                        minWidth: '22px',
+                        textAlign: 'center',
+                        lineHeight: 1,
+                        flexShrink: 0,
+                      }}
+                    >
+                      +
+                    </span>
+                  )}
 
                   {/* 2. OS Icon Container */}
                   <div

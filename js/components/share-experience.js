@@ -1041,7 +1041,7 @@ class ShareExperienceModal extends HTMLElement {
       });
     });
 
-    form.addEventListener("submit", (event) => {
+    form.addEventListener("submit", async (event) => {
       event.preventDefault();
 
       if (!this.userState.isAuthenticated || !this.userState.userId) {
@@ -1113,6 +1113,28 @@ class ShareExperienceModal extends HTMLElement {
 
       if (hasError) return;
 
+      // Capture visitor location at the time of submission
+      let locationStr = null;
+      try {
+        let geo = (typeof window !== 'undefined' && window.cachedGeoData) ? window.cachedGeoData : null;
+        if (!geo || !geo.country || geo.country === 'Unknown') {
+          if (typeof window !== 'undefined' && typeof window.fetchVisitorGeo === 'function') {
+            geo = await window.fetchVisitorGeo();
+          }
+        }
+        if (geo) {
+          if (geo.city && geo.city !== 'Unknown' && geo.country && geo.country !== 'Unknown') {
+            locationStr = `${geo.city}, ${geo.country}`;
+          } else if (geo.country && geo.country !== 'Unknown') {
+            locationStr = geo.country;
+          } else if (geo.city && geo.city !== 'Unknown') {
+            locationStr = geo.city;
+          }
+        }
+      } catch (err) {
+        console.warn('Could not determine visitor location for testimonial:', err);
+      }
+
       const finalTestimonial = {
         user_id: this.userState.userId,
         google_name: this.userState.name,
@@ -1123,6 +1145,7 @@ class ShareExperienceModal extends HTMLElement {
         company: companyVal || null,
         rating: parseInt(ratingVal),
         testimonial: testimonialVal,
+        country: locationStr,
         consent_public: consentVal,
         source: "portfolio",
         user_agent: navigator.userAgent

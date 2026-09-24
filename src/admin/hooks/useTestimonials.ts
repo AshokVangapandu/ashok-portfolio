@@ -1,10 +1,12 @@
 /* src/admin/hooks/useTestimonials.ts */
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Testimonial } from '../types/testimonial';
 import { testimonialService, TestimonialsQueryOptions } from '../services/testimonialService';
 import { supabase } from '../../services/supabase/client';
+import { useAuth } from '../../hooks/useAuth';
 
 export const useTestimonials = () => {
+  const { user } = useAuth();
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [totalCount, setTotalCount] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
@@ -52,25 +54,53 @@ export const useTestimonials = () => {
     }
   }, [search, status, rating, sortBy, page, pageSize]);
 
+  const fetchRef = useRef(fetchTestimonials);
+  fetchRef.current = fetchTestimonials;
+
+  // 1. Refresh when query parameters change
   useEffect(() => {
     fetchTestimonials();
+  }, [fetchTestimonials]);
 
-    // Subscribe to realtime database updates for automatic refreshes
+  // 2. Refresh when user auth status changes or is verified
+  useEffect(() => {
+    fetchRef.current();
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session) {
+        fetchRef.current();
+      }
+    });
+    return () => {
+      authListener?.subscription?.unsubscribe();
+    };
+  }, [user]);
+
+  // 3. Persistent Realtime subscription & window focus handlers
+  useEffect(() => {
     const channel = supabase
       .channel('admin-testimonials-realtime')
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'testimonials' },
         () => {
-          fetchTestimonials();
+          fetchRef.current();
         }
       )
       .subscribe();
 
+    const handleFocus = () => {
+      fetchRef.current();
+    };
+
+    window.addEventListener('focus', handleFocus);
+    window.addEventListener('visibilitychange', handleFocus);
+
     return () => {
       supabase.removeChannel(channel);
+      window.removeEventListener('focus', handleFocus);
+      window.removeEventListener('visibilitychange', handleFocus);
     };
-  }, [fetchTestimonials]);
+  }, []);
 
   const approveTestimonial = useCallback(async (id: string) => {
     setError(null);

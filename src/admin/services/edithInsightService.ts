@@ -17,7 +17,7 @@ import {
 export const RESUME_STALE_DAYS = 30; // Threshold in days after which resume is flagged as stale
 export const TRAFFIC_INSIGHT_THRESHOLD_PERCENT = 5; // Minimum % change required to generate a traffic insight
 export const FORM_SUBMISSION_INSIGHT_THRESHOLD_PERCENT = 5; // Minimum % change required for form submission trend insight
-export const MAX_EDITH_INSIGHTS = 5; // Maximum insights generated for dashboard presentation
+export const MAX_EDITH_INSIGHTS = 3; // Maximum insights generated for dashboard presentation
 
 /**
  * VERIFIED ADMIN APPLICATION ROUTES
@@ -47,7 +47,7 @@ const PRIORITY_ORDER: Record<InsightPriority, number> = {
 // ==========================================
 
 /**
- * Rule 1: Stale Resume Evaluation
+ * Rule 1: Resume Evaluation (Freshness & Stale Tracking)
  */
 export function evaluateResumeRule(snapshot: EdithDataSnapshot, now: Date = new Date()): EdithInsight | null {
   if (!snapshot.activeResume) return null;
@@ -60,23 +60,27 @@ export function evaluateResumeRule(snapshot: EdithDataSnapshot, now: Date = new 
 
   const diffMs = now.getTime() - updatedDate.getTime();
   const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-  if (days < RESUME_STALE_DAYS) return null;
+  const isStale = days >= RESUME_STALE_DAYS;
 
   return {
-    id: `insight-resume-stale-${snapshot.activeResume.id}`,
+    id: `insight-resume-${snapshot.activeResume.id}`,
     type: 'resume_stale',
-    priority: 'medium',
-    category: 'Resume',
-    title: 'Resume',
-    description: `Your resume hasn't been updated for ${days} days.`,
-    actionText: 'Review Resume →',
+    priority: isStale ? 'medium' : 'informational',
+    category: 'RESUME',
+    title: `Last updated ${days === 0 ? 'today' : `${days} ${days === 1 ? 'day' : 'days'} ago`}`,
+    description: `Last updated ${days === 0 ? 'today' : `${days} ${days === 1 ? 'day' : 'days'} ago`}`,
+    contextText: isStale 
+      ? `Your active resume hasn't been updated in over ${RESUME_STALE_DAYS} days.`
+      : 'Your resume is current and visible to visitors.',
+    badgeText: isStale ? 'Needs Attention' : 'Up to date',
+    badgeType: isStale ? 'needs_attention' : 'positive',
+    actionText: 'Review Resume',
     actionDestination: VERIFIED_ROUTES.RESUME,
     actionType: 'internal-route',
     source: 'resume',
     isCompound: false,
     generatedAt: now.toISOString(),
-    metadata: { daysStale: days, thresholdDays: RESUME_STALE_DAYS }
+    metadata: { daysStale: days, thresholdDays: RESUME_STALE_DAYS, isStale }
   };
 }
 
@@ -85,29 +89,28 @@ export function evaluateResumeRule(snapshot: EdithDataSnapshot, now: Date = new 
  */
 export function evaluateContactRule(snapshot: EdithDataSnapshot, now: Date = new Date()): EdithInsight | null {
   const count = snapshot.openContactsCount;
-  const trend = snapshot.analyticsSummary?.formSubmissionsTrend || 0;
 
-  // If there are open contacts, evaluate if form submission trend adds extra analytical value
-  if (count > 0 && Math.abs(trend) >= FORM_SUBMISSION_INSIGHT_THRESHOLD_PERCENT) {
-    const trendText = trend > 0 ? `increased by ${Math.round(trend)}%` : `decreased by ${Math.abs(Math.round(trend))}%`;
+  if (count > 0) {
     return {
-      id: `insight-contacts-trend-${count}`,
+      id: `insight-contacts-open-${count}`,
       type: 'contacts_attention',
-      priority: trend > 0 ? 'high' : 'medium',
-      category: 'Contacts',
-      title: 'Contacts',
-      description: `Inquiries ${trendText} this period (${count} open).`,
-      actionText: 'View Messages →',
+      priority: 'high',
+      category: 'CONTACTS',
+      title: `${count} ${count === 1 ? 'inquiry' : 'inquiries'} waiting for your response`,
+      description: `${count} ${count === 1 ? 'inquiry' : 'inquiries'} waiting for your response`,
+      contextText: 'New messages have been received and are still open.',
+      badgeText: 'Needs Attention',
+      badgeType: 'needs_attention',
+      actionText: 'View Messages',
       actionDestination: VERIFIED_ROUTES.CONTACTS,
       actionType: 'internal-route',
       source: 'contact',
       isCompound: false,
       generatedAt: now.toISOString(),
-      metadata: { openContactsCount: count, formSubmissionsTrend: trend }
+      metadata: { openContactsCount: count }
     };
   }
 
-  // If no trend context, suppress duplicate count statement to avoid repeating Requests & Approvals card!
   return null;
 }
 
@@ -125,10 +128,13 @@ export function evaluateCertificationRule(snapshot: EdithDataSnapshot, now: Date
     id: `insight-certifications-ready-${count}`,
     type: 'certifications_ready',
     priority: 'medium',
-    category: 'Certifications',
-    title: 'Certifications',
-    description: `${count} ${count === 1 ? 'certification is' : 'certifications are'} ready for review.`,
-    actionText: 'Review Certifications →',
+    category: 'CERTIFICATIONS',
+    title: `${count} ${count === 1 ? 'certification ready' : 'certifications ready'} for review`,
+    description: `${count} ${count === 1 ? 'certification ready' : 'certifications ready'} for review`,
+    contextText: 'Draft or pending certifications awaiting publishing.',
+    badgeText: 'Needs Attention',
+    badgeType: 'needs_attention',
+    actionText: 'Review Certifications',
     actionDestination: VERIFIED_ROUTES.CERTIFICATIONS,
     actionType: 'internal-route',
     source: 'certification',
@@ -145,23 +151,30 @@ export function evaluateTrafficRule(snapshot: EdithDataSnapshot, now: Date = new
   if (!snapshot.analyticsSummary) return null;
 
   const trend = snapshot.analyticsSummary.totalVisitorTrend;
+  const totalVisitors = snapshot.analyticsSummary.totalVisitors || 0;
 
   if (trend >= TRAFFIC_INSIGHT_THRESHOLD_PERCENT) {
     const percent = Math.round(trend);
+    const prevVisitors = Math.max(0, Math.round(totalVisitors / (1 + percent / 100)));
     return {
       id: `insight-traffic-increase-${percent}`,
       type: 'traffic_increase',
       priority: 'informational',
-      category: 'Analytics',
-      title: 'Analytics',
-      description: `Portfolio traffic increased by ${percent}% this period.`,
-      actionText: 'View Analytics →',
+      category: 'ANALYTICS',
+      title: `Traffic increased by ${percent}%`,
+      description: `Traffic increased by ${percent}%`,
+      contextText: totalVisitors > 0 
+        ? `${totalVisitors} visitors this period, compared to ${prevVisitors} previously.`
+        : `Portfolio traffic increased by ${percent}% this period.`,
+      badgeText: 'Positive Trend',
+      badgeType: 'positive',
+      actionText: 'View Analytics',
       actionDestination: VERIFIED_ROUTES.ANALYTICS,
       actionType: 'internal-route',
       source: 'analytics',
       isCompound: false,
       generatedAt: now.toISOString(),
-      metadata: { trendPercent: percent, rawTrend: trend }
+      metadata: { trendPercent: percent, rawTrend: trend, totalVisitors, prevVisitors }
     };
   }
 
@@ -171,16 +184,21 @@ export function evaluateTrafficRule(snapshot: EdithDataSnapshot, now: Date = new
       id: `insight-traffic-decrease-${percent}`,
       type: 'traffic_decrease',
       priority: 'medium',
-      category: 'Analytics',
-      title: 'Analytics',
-      description: `Portfolio traffic decreased by ${percent}% this period.`,
-      actionText: 'View Analytics →',
+      category: 'ANALYTICS',
+      title: `Traffic decreased by ${percent}%`,
+      description: `Traffic decreased by ${percent}%`,
+      contextText: totalVisitors > 0 
+        ? `${totalVisitors} visitors this period, down from previous period.`
+        : `Portfolio traffic decreased by ${percent}% this period.`,
+      badgeText: 'Needs Attention',
+      badgeType: 'needs_attention',
+      actionText: 'View Analytics',
       actionDestination: VERIFIED_ROUTES.ANALYTICS,
       actionType: 'internal-route',
       source: 'analytics',
       isCompound: false,
       generatedAt: now.toISOString(),
-      metadata: { trendPercent: -percent, rawTrend: trend }
+      metadata: { trendPercent: -percent, rawTrend: trend, totalVisitors }
     };
   }
 

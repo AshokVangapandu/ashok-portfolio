@@ -124,12 +124,12 @@ export const testimonialService = {
   },
 
   /**
-   * Deletes a testimonial by ID (Soft delete).
+   * Deletes a testimonial by ID permanently from Supabase.
    */
   async deleteTestimonial(id: string): Promise<boolean> {
     const { error } = await supabase
       .from('testimonials')
-      .update({ deleted_at: new Date().toISOString() })
+      .delete()
       .eq('id', id);
 
     if (error) {

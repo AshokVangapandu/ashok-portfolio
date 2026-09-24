@@ -130,6 +130,9 @@ export const MOCK_OS: AnalyticsOperatingSystem[] = [
 ];
 
 export const MOCK_VISITOR_COMPARISON: VisitorComparison = {
+  totalUniqueVisitors: 18740,
+  newVisitors: 12743,
+  returningVisitors: 5997,
   newPercentage: 68,
   returningPercentage: 32,
   newTrend: '+12.5%',

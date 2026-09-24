@@ -7,11 +7,11 @@ export interface ResumeDownload {
   visitorEmail?: string | null;
   avatarUrl?: string | null;
   isKnown: boolean;
+  visitorId?: string | null;
   country: string;
   city: string;
   device: 'Desktop' | 'Mobile' | 'Tablet';
   source: string; // e.g., LinkedIn, Google Search
-  downloadedFrom: string; // e.g., Hero Section
   duration: string; // e.g., 8m 22s
   browser: string;
   os: string;
@@ -42,7 +42,29 @@ export interface SupabaseResumeDownload {
   ip_address: string | null;
   download_status: string;
   resume_settings?: { version: string } | null;
+  visitor_profiles?: {
+    full_name?: string | null;
+    email?: string | null;
+    avatar_url?: string | null;
+  } | null;
+  visitor_sessions?: {
+    id: string;
+    duration_seconds?: number | null;
+    created_at?: string | null;
+  } | null;
 }
+
+export const formatResumeDuration = (session?: { duration_seconds?: number | null } | null): string => {
+  if (!session) return '—';
+  const sec = typeof session.duration_seconds === 'number' ? session.duration_seconds : 0;
+  if (sec < 15) return '< 15s';
+  const mins = Math.floor(sec / 60);
+  const remSec = sec % 60;
+  if (mins > 0) {
+    return remSec > 0 ? `${mins}m ${remSec}s` : `${mins}m`;
+  }
+  return `${remSec}s`;
+};
 
 export const mapSupabaseToResumeDownload = (db: SupabaseResumeDownload): ResumeDownload => {
   const d = new Date(db.downloaded_at);
@@ -57,7 +79,18 @@ export const mapSupabaseToResumeDownload = (db: SupabaseResumeDownload): ResumeD
     hour12: true
   });
 
-  const visitorShort = db.visitor_id ? `Visitor (${db.visitor_id.substring(0, 6)})` : 'Anonymous Visitor';
+  const profile = db.visitor_profiles || null;
+  const hasName = Boolean(profile?.full_name && profile.full_name.trim());
+  const hasEmail = Boolean(profile?.email && profile.email.trim());
+  const isKnown = hasName || hasEmail;
+
+  const visitorName = hasName
+    ? profile!.full_name!.trim()
+    : hasEmail
+      ? profile!.email!.trim()
+      : 'Anonymous Visitor';
+  const visitorEmail = hasEmail ? profile!.email!.trim() : null;
+  const avatarUrl = (profile?.avatar_url && profile.avatar_url.trim()) || null;
 
   let deviceMapped: 'Desktop' | 'Mobile' | 'Tablet' = 'Desktop';
   if (db.device_type === 'Mobile' || db.device_type === 'Tablet') {
@@ -81,19 +114,22 @@ export const mapSupabaseToResumeDownload = (db: SupabaseResumeDownload): ResumeD
     }
   }
 
+  // Resolve duration from visitor_sessions
+  const cleanDuration = formatResumeDuration(db.visitor_sessions);
+
   return {
     id: db.id,
     dateTime: `${formattedDate}, ${formattedTime}`,
-    visitorName: visitorShort,
-    visitorEmail: null,
-    avatarUrl: null,
-    isKnown: false,
+    visitorName,
+    visitorEmail,
+    avatarUrl,
+    isKnown,
+    visitorId: db.visitor_id,
     country: db.country || 'Unknown',
     city: db.city || 'Unknown',
     device: deviceMapped,
     source: cleanSource,
-    downloadedFrom: db.page_source || 'Homepage',
-    duration: '--',
+    duration: cleanDuration,
     browser: db.browser || 'Unknown',
     os: db.operating_system || 'Unknown',
     submissionTime: formattedTime,

@@ -93,6 +93,7 @@ export const PageLayout: React.FC<PageLayoutProps> = ({
         <Topbar
           onToggleSidebar={handleToggleSidebar}
           pageTitle={pageTitle}
+          onNavigate={onNavigate}
         />
 
         {/* Dynamic Inner Panel View Container */}

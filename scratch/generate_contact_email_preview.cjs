@@ -1,0 +1,298 @@
+const fs = require('fs');
+const path = require('path');
+
+// Extract renderContactConfirmationEmail output
+const emailTemplatePath = path.join(__dirname, '..', 'supabase', 'functions', '_shared', 'emailTemplate.ts');
+const content = fs.readFileSync(emailTemplatePath, 'utf8');
+
+// Use a simple rendering script to generate the HTML
+const EMAIL_ASSETS_BASE = 'https://xpuhbtsgwhgbcvmwzlyd.supabase.co/storage/v1/object/public/email-assets';
+const EMAIL_IMAGE_URLS = {
+  logo: `${EMAIL_ASSETS_BASE}/av-logo.png`,
+  contactReceived: `${EMAIL_ASSETS_BASE}/contact-message-received.png`,
+  check: `${EMAIL_ASSETS_BASE}/email-check.png`,
+  portfolio: `${EMAIL_ASSETS_BASE}/portfolio-icon.png`,
+  linkedin: `${EMAIL_ASSETS_BASE}/linkedin-icon.png`,
+  github: `${EMAIL_ASSETS_BASE}/github-icon.png`,
+};
+
+function renderContactConfirmationEmail(options) {
+  const {
+    name = 'Jarvis',
+    portfolioUrl = 'https://ashokvangapandu.com'
+  } = options || {};
+
+  const base = portfolioUrl.replace(/\/+$/, '');
+  const displayDomain = base.replace(/^https?:\/\/(www\.)?/, '');
+  const displayName = (name || 'there').trim();
+  const utmQuery = '?utm_source=email&utm_medium=recruiter';
+  const portfolioLink = `${base}/${utmQuery}`;
+  const linkedinLink = 'https://www.linkedin.com/in/ashok-vangapandu/';
+  const githubLink = 'https://github.com/AshokVangapandu';
+
+  const logoUrl = EMAIL_IMAGE_URLS.logo;
+  const heroIllustrationUrl = EMAIL_IMAGE_URLS.contactReceived;
+  const iconCheckUrl = EMAIL_IMAGE_URLS.check;
+  const iconPortfolioUrl = EMAIL_IMAGE_URLS.portfolio;
+  const iconLinkedinUrl = EMAIL_IMAGE_URLS.linkedin;
+  const iconGithubUrl = EMAIL_IMAGE_URLS.github;
+
+  const uniqueNonce = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
+
+  return `
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="supported-color-schemes" content="dark" />
+  <title>Thanks for reaching out! 💙</title>
+  <style type="text/css">
+    body, table, td, p, a, li {
+      -webkit-text-size-adjust: 100%;
+      -ms-text-size-adjust: 100%;
+    }
+    table, td {
+      mso-table-lspace: 0pt;
+      mso-table-rspace: 0pt;
+    }
+    img {
+      -ms-interpolation-mode: bicubic;
+      border: 0;
+      height: auto;
+      line-height: 100%;
+      outline: none;
+      text-decoration: none;
+    }
+    body {
+      margin: 0 !important;
+      padding: 0 !important;
+      width: 100% !important;
+      background-color: #070B14;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    }
+    @media only screen and (max-width: 600px) {
+      .email-container {
+        width: 100% !important;
+        max-width: 100% !important;
+        border-radius: 0 !important;
+        border-left: none !important;
+        border-right: none !important;
+      }
+      .mobile-padding {
+        padding-left: 20px !important;
+        padding-right: 20px !important;
+      }
+      .mobile-hero-col {
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        text-align: left !important;
+      }
+      .mobile-hero-img-col {
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        text-align: center !important;
+        padding-top: 16px !important;
+      }
+      .mobile-hero-img {
+        margin: 0 auto !important;
+        width: 170px !important;
+        height: auto !important;
+      }
+      .mobile-footer-col {
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin-bottom: 12px !important;
+      }
+    }
+  </style>
+</head>
+<body style="margin: 0; padding: 0; background-color: #070B14; color: #FFFFFF; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+  <!-- Anti-collapse Preheader -->
+  <div style="display: none; max-height: 0px; overflow: hidden; font-size: 1px; line-height: 1px; opacity: 0; color: #070B14; mso-hide: all;">
+    Thank you for reaching out! I've received your message and will get back to you soon.&#847;&zwnj;&nbsp;&#8199;
+  </div>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #070B14; margin: 0; padding: 36px 12px;">
+    <tr>
+      <td align="center" valign="top">
+        
+        <table role="presentation" class="email-container" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width: 600px; width: 100%; background: #0B0F19 radial-gradient(circle at top right, rgba(56, 189, 248, 0.12) 0%, transparent 60%); background-color: #0B0F19; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; overflow: hidden; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);">
+          
+          <!-- 1. HEADER SECTION (No top navigation) -->
+          <tr>
+            <td class="mobile-padding" style="padding: 28px 32px 24px 32px; border-bottom: 1px solid rgba(255, 255, 255, 0.06);">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td align="left" valign="middle">
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td valign="middle" style="padding-right: 12px;">
+                          <a href="${portfolioLink}" target="_blank" style="text-decoration: none; display: block;">
+                            <img src="${logoUrl}" width="38" height="34" alt="AV Logo" style="display: block; width: 38px; height: 34px; border: 0;" />
+                          </a>
+                        </td>
+                        <td valign="middle">
+                          <div style="font-size: 16px; font-weight: 700; color: #FFFFFF; letter-spacing: -0.01em; line-height: 1.2;">Ashok Vangapandu</div>
+                          <div style="font-size: 9px; font-weight: 700; color: #64748B; letter-spacing: 1.2px; text-transform: uppercase; line-height: 1.2; margin-top: 2px;">TURNING IDEAS INTO IMPACT</div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- 2. STATUS BADGE & HERO SECTION -->
+          <tr>
+            <td class="mobile-padding" style="padding: 32px 32px 24px 32px;">
+              
+              <!-- Badge: MESSAGE RECEIVED -->
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 18px;">
+                <tr>
+                  <td style="background-color: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.35); border-radius: 9999px; padding: 5px 14px;">
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td valign="middle" style="padding-right: 6px;">
+                          <img src="${iconCheckUrl}" width="14" height="14" alt="Check" style="display: block; width: 14px; height: 14px;" />
+                        </td>
+                        <td valign="middle" style="font-size: 11px; font-weight: 700; letter-spacing: 0.8px; color: #34D399; text-transform: uppercase; line-height: 1;">
+                          MESSAGE RECEIVED
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Hero Content: Text on Left, 3D Mail on Right -->
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td class="mobile-hero-col" valign="middle" align="left" style="padding-right: 16px;">
+                    <h1 style="margin: 0 0 10px 0; font-size: 32px; font-weight: 800; color: #FFFFFF; line-height: 1.15; letter-spacing: -0.02em;">
+                      Thank you for<br />
+                      <span style="color: #38BDF8;">reaching out!</span>
+                    </h1>
+                    <p style="margin: 0; font-size: 14px; color: #94A3B8; line-height: 1.55; max-width: 320px;">
+                      I’ve received your message and really appreciate you taking the time to get in touch.
+                    </p>
+                  </td>
+
+                  <td class="mobile-hero-img-col" valign="middle" align="right" width="190" style="width: 190px;">
+                    <img src="${heroIllustrationUrl}" class="mobile-hero-img" width="180" height="155" alt="Message received illustration" style="display: block; width: 180px; height: auto; border: 0;" />
+                  </td>
+                </tr>
+              </table>
+
+            </td>
+          </tr>
+
+          <!-- 3. PERSONAL MESSAGE CONTENT -->
+          <tr>
+            <td class="mobile-padding" style="padding: 0 32px 28px 32px; font-size: 14.5px; color: #CBD5E1; line-height: 1.65;">
+              <p style="margin: 0 0 14px 0; font-size: 16px; font-weight: 700; color: #FFFFFF;">
+                Hi ${displayName},
+              </p>
+              <p style="margin: 0 0 14px 0;">
+                Thank you for reaching out through my portfolio. I’ve received your message and will get back to you as soon as possible.
+              </p>
+              <p style="margin: 0 0 14px 0;">
+                I usually respond within 24–48 hours. If your message is urgent, feel free to connect with me on <a href="${linkedinLink}" target="_blank" style="color: #38BDF8; text-decoration: none; font-weight: 600;">LinkedIn</a>.
+              </p>
+              <p style="margin: 0 0 14px 0;">
+                In the meantime, feel free to explore my work through the links below.
+              </p>
+              <p style="margin: 0 0 10px 0;">
+                Thanks again for your interest! 💙
+              </p>
+
+              <!-- Divider -->
+              <div style="height: 1px; background-color: rgba(255, 255, 255, 0.08); margin: 24px 0 20px 0;"></div>
+
+              <!-- 4. SOCIAL / EXPLORE CARDS (Portfolio, LinkedIn, GitHub) -->
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <!-- Card 1: Portfolio -->
+                  <td class="mobile-footer-col" valign="top" style="padding-right: 6px; width: 33.33%;">
+                    <a href="${portfolioLink}" target="_blank" style="display: block; text-decoration: none; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 12px 10px; box-sizing: border-box;">
+                      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                        <tr>
+                          <td width="26" valign="middle" style="padding-right: 8px;">
+                            <img src="${iconPortfolioUrl}" width="24" height="24" alt="Portfolio" style="display: block; width: 24px; height: 24px;" />
+                          </td>
+                          <td valign="middle">
+                            <div style="font-size: 11px; font-weight: 700; color: #FFFFFF; line-height: 1.2;">Portfolio</div>
+                            <div style="font-size: 9px; color: #38BDF8; line-height: 1.2; text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 105px;">${displayDomain}</div>
+                          </td>
+                        </tr>
+                      </table>
+                    </a>
+                  </td>
+
+                  <!-- Card 2: LinkedIn -->
+                  <td class="mobile-footer-col" valign="top" style="padding: 0 3px; width: 33.33%;">
+                    <a href="${linkedinLink}" target="_blank" style="display: block; text-decoration: none; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 12px 10px; box-sizing: border-box;">
+                      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                        <tr>
+                          <td width="26" valign="middle" style="padding-right: 8px;">
+                            <img src="${iconLinkedinUrl}" width="24" height="24" alt="LinkedIn" style="display: block; width: 24px; height: 24px;" />
+                          </td>
+                          <td valign="middle">
+                            <div style="font-size: 11px; font-weight: 700; color: #FFFFFF; line-height: 1.2;">LinkedIn</div>
+                            <div style="font-size: 9px; color: #38BDF8; line-height: 1.2; text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 105px;">ashok-vangapandu</div>
+                          </td>
+                        </tr>
+                      </table>
+                    </a>
+                  </td>
+
+                  <!-- Card 3: GitHub -->
+                  <td class="mobile-footer-col" valign="top" style="padding-left: 6px; width: 33.33%;">
+                    <a href="${githubLink}" target="_blank" style="display: block; text-decoration: none; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 12px 10px; box-sizing: border-box;">
+                      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                        <tr>
+                          <td width="26" valign="middle" style="padding-right: 8px;">
+                            <img src="${iconGithubUrl}" width="24" height="24" alt="GitHub" style="display: block; width: 24px; height: 24px;" />
+                          </td>
+                          <td valign="middle">
+                            <div style="font-size: 11px; font-weight: 700; color: #FFFFFF; line-height: 1.2;">GitHub</div>
+                            <div style="font-size: 9px; color: #38BDF8; line-height: 1.2; text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 105px;">AshokVangapandu</div>
+                          </td>
+                        </tr>
+                      </table>
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+            </td>
+          </tr>
+
+          <!-- 5. FOOTER SUBTEXT NOTE -->
+          <tr>
+            <td class="mobile-padding" align="center" style="padding: 0 32px 28px 32px; font-size: 11.5px; color: #64748B; line-height: 1.6; text-align: center;">
+              This is an automated email sent after you submitted a message through my portfolio.<br />
+              Thank you for your interest! 💙
+            </td>
+          </tr>
+
+        </table>
+
+      </td>
+    </tr>
+  </table>
+  <!-- Invisible Anti-Collapse Nonce -->
+  <span style="display:none !important; font-size:0; line-height:0; opacity:0; mso-hide:all;">[msg-token:${uniqueNonce}]</span>
+</body>
+</html>
+  `.trim();
+}
+
+const html = renderContactConfirmationEmail({ name: 'Jarvis' });
+fs.writeFileSync(path.join(__dirname, '..', 'public', 'preview_contact_email.html'), html);
+fs.writeFileSync(path.join(__dirname, 'preview_contact_email.html'), html);
+console.log('Preview written to public/preview_contact_email.html');

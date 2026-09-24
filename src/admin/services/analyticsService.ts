@@ -15,8 +15,7 @@ import {
   MOCK_PEAK_HOURS,
   MOCK_ANALYTICS_VISITORS
 } from './analytics.mock';
-import { AnalyticsVisitor, VisitorSession } from '../types/analytics';
-import { PeakHours } from '../types/analytics';
+import { AnalyticsVisitor, VisitorSession, VisitorComparison, PeakHours } from '../types/analytics';
 
 export interface VisitorQueryOptions {
   search?: string;
@@ -138,15 +137,13 @@ export const analyticsService = {
     }
   },
 
-  async getVisitorComparison(timeRange: string = '30days') {
-    try {
-      const { data, error } = await (supabase as any).rpc('get_analytics_visitor_comparison', { range_filter: timeRange });
-      if (error) throw error;
-      return data || MOCK_VISITOR_COMPARISON;
-    } catch (err) {
-      console.warn('[analyticsService.getVisitorComparison] Failed, returning mock data:', err);
-      return MOCK_VISITOR_COMPARISON;
+  async getVisitorComparison(timeRange: string = '30days'): Promise<VisitorComparison | null> {
+    const { data, error } = await (supabase as any).rpc('get_analytics_visitor_comparison', { range_filter: timeRange });
+    if (error) {
+      console.error('[analyticsService.getVisitorComparison] RPC error:', error);
+      throw error;
     }
+    return data || null;
   },
 
   async getPeakHours(timeRange: string = '30days') {

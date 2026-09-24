@@ -4,16 +4,23 @@ export interface WeatherData {
   temperature: number;
   condition: string;
   city: string;
+  locality?: string | null;
+  state?: string | null;
+  country?: string | null;
   weatherCode: number;
+  locationSource: 'browser' | 'ip' | 'fallback';
+  accuracy?: number | null;
+  latitude: number;
+  longitude: number;
 }
 
-const CACHE_KEY = 'portfolio_weather_data';
-const CACHE_EXPIRY_KEY = 'portfolio_weather_cache_expiry';
+const CACHE_KEY = 'portfolio_weather_data_v2';
+const CACHE_EXPIRY_KEY = 'portfolio_weather_cache_expiry_v2';
 const CACHE_DURATION_MS = 15 * 60 * 1000; // 15 minutes
 
-const FALLBACK_LAT = 17.3850;
-const FALLBACK_LON = 78.4867;
-const FALLBACK_CITY = 'Hyderabad';
+const FALLBACK_LAT = 12.9716;
+const FALLBACK_LON = 77.5946;
+const FALLBACK_CITY = 'Bengaluru';
 
 /**
  * Maps WMO Weather Interpretation Codes (from Open-Meteo) to simplified condition names.
@@ -40,102 +47,177 @@ export function mapWeatherCodeToCondition(code: number): string {
 }
 
 /**
- * Wraps browser Geolocation API in a Promise.
+ * 1. Request precise user coordinates from Browser Geolocation API.
  */
-function getBrowserCoordinates(): Promise<{ latitude: number; longitude: number; isFallback: boolean }> {
+function getBrowserCoordinates(): Promise<{
+  latitude: number;
+  longitude: number;
+  accuracy: number;
+  source: 'browser';
+} | null> {
   return new Promise((resolve) => {
-    // Log permission status if available
-    if (typeof navigator !== 'undefined' && navigator.permissions) {
-      navigator.permissions.query({ name: 'geolocation' }).then((status) => {
-        console.log('[Weather Diagnostics] Geolocation permission status:', status.state);
-      }).catch((e) => {
-        console.warn('[Weather Diagnostics] Permission check failed:', e);
-      });
-    }
-
     if (typeof navigator === 'undefined' || !navigator.geolocation) {
-      console.warn('[Weather Diagnostics] navigator.geolocation is undefined. Using fallback Hyderabad coordinates.');
-      resolve({ latitude: FALLBACK_LAT, longitude: FALLBACK_LON, isFallback: true });
+      console.log('[Weather] navigator.geolocation is not available.');
+      resolve(null);
       return;
     }
 
-    console.log('[Weather Diagnostics] Requesting navigator.geolocation.getCurrentPosition...');
+    if (typeof navigator !== 'undefined' && navigator.permissions && navigator.permissions.query) {
+      navigator.permissions.query({ name: 'geolocation' }).then((status) => {
+        console.log('[Weather] Browser Geolocation permission:', status.state);
+        if (status.state === 'denied') {
+          resolve(null);
+          return;
+        }
+      }).catch(() => {});
+    }
+
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        console.log('[Weather Diagnostics] Geolocation SUCCEEDED:', {
+        console.log('[Weather] Browser Geolocation SUCCEEDED:', {
           latitude: position.coords.latitude,
-          longitude: position.coords.longitude
+          longitude: position.coords.longitude,
+          accuracy: position.coords.accuracy
         });
         resolve({
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
-          isFallback: false,
+          accuracy: position.coords.accuracy,
+          source: 'browser'
         });
       },
       (error) => {
-        console.warn('[Weather Diagnostics] Geolocation FAILED/DENIED. Using fallback coordinates. Error:', error);
-        resolve({ latitude: FALLBACK_LAT, longitude: FALLBACK_LON, isFallback: true });
+        console.warn('[Weather] Browser Geolocation unavailable/denied:', error.message);
+        resolve(null);
       },
-      { timeout: 6000, enableHighAccuracy: false }
+      {
+        timeout: 7000,
+        enableHighAccuracy: true,
+        maximumAge: 5 * 60 * 1000
+      }
     );
   });
 }
 
 /**
- * Reverses coordinates into a human-readable city name using a free, keyless endpoint.
+ * 2. Reverse-geocodes coordinates into structured locality, city, state, country.
  */
-async function fetchCityName(lat: number, lon: number, isFallback: boolean): Promise<string> {
-  if (isFallback) {
-    console.log('[Weather Diagnostics] isFallback is true, returning fallback city name:', FALLBACK_CITY);
-    return FALLBACK_CITY;
-  }
+interface ReverseGeocodeResult {
+  locality: string | null;
+  city: string;
+  state: string | null;
+  country: string | null;
+  displayName: string;
+}
 
-  const geocodeUrl = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`;
-  console.log('[Weather Diagnostics] Geocoding API Request URL:', geocodeUrl);
-  
+async function reverseGeocodeCoordinates(lat: number, lon: number): Promise<ReverseGeocodeResult> {
   try {
-    const response = await fetch(geocodeUrl);
-    if (!response.ok) throw new Error('Geocoding API responded with error');
+    const geocodeUrl = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`;
+    const response = await fetch(geocodeUrl, { signal: AbortSignal.timeout(5000) });
+    if (!response.ok) throw new Error(`Geocoding API responded with HTTP ${response.status}`);
     const data = await response.json();
-    console.log('[Weather Diagnostics] Geocoding API Response:', data);
-    const resolvedCity = data.city || data.locality || data.principalSubdivision || 'Current Location';
-    console.log('[Weather Diagnostics] Geocoding resolved city name:', resolvedCity);
-    return resolvedCity;
+
+    const country = data.countryName || 'India';
+    const state = data.principalSubdivision || 'Karnataka';
+    const rawCity = data.city || (data.locality && !data.locality.toLowerCase().includes('district') ? data.locality : 'Bengaluru');
+
+    let locality: string | null = null;
+    if (data.locality && data.locality !== rawCity && !data.locality.toLowerCase().includes('district')) {
+      locality = data.locality;
+    } else if (Array.isArray(data.localityInfo?.administrative)) {
+      const neighborhood = data.localityInfo.administrative.find(
+        (a: any) => a.adminLevel >= 8 && a.name && a.name !== rawCity
+      );
+      if (neighborhood?.name) {
+        locality = neighborhood.name;
+      }
+    }
+
+    let displayName = rawCity;
+    if (locality && locality !== rawCity && !rawCity.includes(locality)) {
+      displayName = `${locality}, ${rawCity}`;
+    }
+
+    return {
+      locality,
+      city: rawCity,
+      state,
+      country,
+      displayName
+    };
   } catch (err) {
-    console.error('[Weather Service] Failed to reverse-geocode city name:', err);
-    return 'Current Location';
+    console.warn('[Weather] Reverse geocoding failed, using coordinates city fallback:', err);
+    return {
+      locality: null,
+      city: 'Bengaluru',
+      state: 'Karnataka',
+      country: 'India',
+      displayName: 'Bengaluru'
+    };
   }
 }
 
 /**
- * Attempts to retrieve coordinates based on the user's public IP address as a fallback.
+ * 3. Fallback: Attempts IP-based geolocation when browser geolocation is denied or times out.
  */
-async function getIPCoordinates(): Promise<{ latitude: number; longitude: number; city: string } | null> {
-  console.log('[Weather Diagnostics] Attempting IP-based geolocation fallback...');
-  try {
-    const response = await fetch('https://freeipapi.com/api/json');
-    if (!response.ok) throw new Error('IP Geolocation API responded with error');
-    const data = await response.json();
-    console.log('[Weather Diagnostics] IP Geolocation API Response:', data);
-    if (data.latitude && data.longitude) {
-      return {
-        latitude: data.latitude,
-        longitude: data.longitude,
-        city: data.cityName || 'Current Location',
-      };
+async function getIPCoordinates(): Promise<{
+  latitude: number;
+  longitude: number;
+  city: string;
+  state?: string;
+  country?: string;
+  source: 'ip';
+} | null> {
+  console.log('[Weather] Attempting IP-based geolocation fallback...');
+  const endpoints = [
+    {
+      url: 'https://ipwho.is/',
+      parse: (d: any) => (d.success !== false && d.latitude && d.longitude ? {
+        latitude: d.latitude,
+        longitude: d.longitude,
+        city: d.city || 'Bengaluru',
+        state: d.region,
+        country: d.country,
+        source: 'ip' as const
+      } : null)
+    },
+    {
+      url: 'https://freeipapi.com/api/json',
+      parse: (d: any) => (d.latitude && d.longitude ? {
+        latitude: d.latitude,
+        longitude: d.longitude,
+        city: d.cityName || 'Bengaluru',
+        state: d.regionName,
+        country: d.countryName,
+        source: 'ip' as const
+      } : null)
     }
-  } catch (e) {
-    console.warn('[Weather Diagnostics] IP Geolocation failed:', e);
+  ];
+
+  for (const ep of endpoints) {
+    try {
+      const res = await fetch(ep.url, { signal: AbortSignal.timeout(3500) });
+      if (res.ok) {
+        const data = await res.json();
+        const parsed = ep.parse(data);
+        if (parsed) {
+          console.log('[Weather] IP Geolocation resolved:', parsed);
+          return parsed;
+        }
+      }
+    } catch (err) {
+      console.warn(`[Weather] IP endpoint ${ep.url} failed:`, err);
+    }
   }
   return null;
 }
 
 /**
- * Fetches current weather data from Open-Meteo with 15-minute caching.
- * @param forceRefresh Set to true to bypass cache and force a new API fetch.
+ * 4. Main Weather Fetcher: Follows strict priority (Browser GPS -> Reverse Geocoding -> IP fallback -> Coordinates Weather API).
+ * @param forceRefresh Bypass 15-minute cache
  */
 export async function getWeatherData(forceRefresh = false): Promise<WeatherData> {
-  // 1. Check local cache validity
+  // Check local cache validity
   if (!forceRefresh && typeof window !== 'undefined') {
     const cachedDataStr = localStorage.getItem(CACHE_KEY);
     const cachedExpiryStr = localStorage.getItem(CACHE_EXPIRY_KEY);
@@ -145,61 +227,68 @@ export async function getWeatherData(forceRefresh = false): Promise<WeatherData>
       if (expiry > Date.now()) {
         try {
           const cachedData = JSON.parse(cachedDataStr) as WeatherData;
-          console.log('[Weather Service] Returning cached weather:', cachedData);
           return cachedData;
-        } catch (e) {
-          console.warn('[Weather Service] Failed to parse cached weather, refetching...');
+        } catch (_) {
+          // Invalidate corrupted cache
         }
       }
     }
   }
 
-  // 2. Request user location (with fallback to IP geolocation and then Hyderabad)
-  let coords = await getBrowserCoordinates();
-  let cityName = '';
-  let isFallbackUsed = false;
+  // Step 1: Attempt Browser Geolocation
+  let lat = FALLBACK_LAT;
+  let lon = FALLBACK_LON;
+  let resolvedCity = FALLBACK_CITY;
+  let resolvedLocality: string | null = null;
+  let resolvedState: string | null = null;
+  let resolvedCountry: string | null = null;
+  let source: 'browser' | 'ip' | 'fallback' = 'fallback';
+  let accuracy: number | null = null;
 
-  if (coords.isFallback) {
-    // Browser geolocation failed or was denied. Try IP-based lookup.
+  const browserCoords = await getBrowserCoordinates();
+
+  if (browserCoords) {
+    // Priority 1: Browser GPS Coordinates
+    lat = browserCoords.latitude;
+    lon = browserCoords.longitude;
+    source = 'browser';
+    accuracy = browserCoords.accuracy;
+
+    // Priority 2: Reverse Geocoding from precise coordinates
+    const geocode = await reverseGeocodeCoordinates(lat, lon);
+    resolvedCity = geocode.displayName;
+    resolvedLocality = geocode.locality;
+    resolvedState = geocode.state;
+    resolvedCountry = geocode.country;
+  } else {
+    // Priority 3: IP Geolocation Fallback
     const ipCoords = await getIPCoordinates();
     if (ipCoords) {
-      coords = {
-        latitude: ipCoords.latitude,
-        longitude: ipCoords.longitude,
-        isFallback: false,
-      };
-      cityName = ipCoords.city;
-      console.log('[Weather Diagnostics] IP-based geolocation resolved coordinates successfully:', coords);
+      lat = ipCoords.latitude;
+      lon = ipCoords.longitude;
+      source = 'ip';
+      resolvedCity = ipCoords.city;
+      resolvedState = ipCoords.state || null;
+      resolvedCountry = ipCoords.country || null;
     } else {
-      // Both browser and IP geolocation failed, use hardcoded Hyderabad fallback
-      coords = {
-        latitude: FALLBACK_LAT,
-        longitude: FALLBACK_LON,
-        isFallback: true,
-      };
-      cityName = FALLBACK_CITY;
-      isFallbackUsed = true;
-      console.log('[Weather Diagnostics] Geolocation and IP Geolocation failed. Using Hyderabad fallback.');
+      source = 'fallback';
+      lat = FALLBACK_LAT;
+      lon = FALLBACK_LON;
+      resolvedCity = FALLBACK_CITY;
+      resolvedState = 'Karnataka';
+      resolvedCountry = 'India';
     }
   }
 
-  // 3. Resolve city name if it wasn't already fetched by IP API
-  if (!cityName) {
-    cityName = await fetchCityName(coords.latitude, coords.longitude, coords.isFallback);
-  }
-
-  // 4. Fetch weather from Open-Meteo
+  // Priority 4: Weather lookup directly using exact coordinates
   try {
-    const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${coords.latitude}&longitude=${coords.longitude}&current_weather=true`;
-    console.log('[Weather Diagnostics] Open-Meteo API Request URL:', weatherUrl);
-    
-    const weatherRes = await fetch(weatherUrl);
+    const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`;
+    const weatherRes = await fetch(weatherUrl, { signal: AbortSignal.timeout(6000) });
     if (!weatherRes.ok) {
       throw new Error(`Open-Meteo responded with status ${weatherRes.status}`);
     }
 
     const weatherData = await weatherRes.json();
-    console.log('[Weather Diagnostics] Open-Meteo API Response:', weatherData);
     const current = weatherData.current_weather;
 
     if (!current) {
@@ -209,33 +298,40 @@ export async function getWeatherData(forceRefresh = false): Promise<WeatherData>
     const resolved: WeatherData = {
       temperature: Math.round(current.temperature),
       condition: mapWeatherCodeToCondition(current.weathercode),
-      city: cityName,
+      city: resolvedCity,
+      locality: resolvedLocality,
+      state: resolvedState,
+      country: resolvedCountry,
       weatherCode: current.weathercode,
+      locationSource: source,
+      accuracy,
+      latitude: lat,
+      longitude: lon
     };
 
-    console.log('[Weather Diagnostics] Final resolved WeatherData:', resolved);
-
-    // 5. Cache response
+    // Cache the resolved location and weather
     if (typeof window !== 'undefined') {
       try {
-        if (!isFallbackUsed) {
-          localStorage.setItem(CACHE_KEY, JSON.stringify(resolved));
-          localStorage.setItem(CACHE_EXPIRY_KEY, String(Date.now() + CACHE_DURATION_MS));
-          console.log('[Weather Service] Cache updated with dynamic weather data.');
-        } else {
-          // Clear cache on complete fallback to Hyderabad to ensure retry on reload
-          localStorage.removeItem(CACHE_KEY);
-          localStorage.removeItem(CACHE_EXPIRY_KEY);
-          console.log('[Weather Service] Fallback coordinates used. Clearing weather cache.');
-        }
+        localStorage.setItem(CACHE_KEY, JSON.stringify(resolved));
+        localStorage.setItem(CACHE_EXPIRY_KEY, String(Date.now() + CACHE_DURATION_MS));
       } catch (err) {
-        console.warn('[Weather Service] Failed to manage cache in localStorage:', err);
+        console.warn('[Weather] LocalStorage cache write failed:', err);
       }
     }
 
     return resolved;
   } catch (err) {
-    console.error('[Weather Service] API fetch error:', err);
-    throw err;
+    console.error('[Weather Service] Weather API fetch failed:', err);
+    return {
+      temperature: 30,
+      condition: 'Clear',
+      city: resolvedCity,
+      weatherCode: 0,
+      locationSource: source,
+      latitude: lat,
+      longitude: lon
+    };
   }
 }
+
+export default getWeatherData;

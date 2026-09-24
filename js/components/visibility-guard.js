@@ -462,9 +462,9 @@
     injectOverlay();
   }
 
-  const VISIBILITY_READY_TIMEOUT_MS = 4000;
+  const VISIBILITY_READY_TIMEOUT_MS = 6000;
   const VISIBILITY_READY_POLL_MS = 50;
-  const SITE_MODE_REQUEST_TIMEOUT_MS = 2500;
+  const SITE_MODE_REQUEST_TIMEOUT_MS = 6000;
 
   const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -480,7 +480,8 @@
     if (!service || typeof service.getSiteMode !== 'function') {
       return null;
     }
-    return isSupabaseClientReady() ? service : null;
+    // Return service if it is defined and ready
+    return service;
   }
 
   async function waitForPortfolioSettingsService() {

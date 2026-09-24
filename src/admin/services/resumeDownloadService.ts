@@ -75,8 +75,7 @@ export const resumeDownloadService = {
           (d.visitorEmail && d.visitorEmail.toLowerCase().includes(q)) ||
           d.country.toLowerCase().includes(q) ||
           d.city.toLowerCase().includes(q) ||
-          d.source.toLowerCase().includes(q) ||
-          d.downloadedFrom.toLowerCase().includes(q)
+          d.source.toLowerCase().includes(q)
       );
     }
 
