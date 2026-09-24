@@ -83,9 +83,36 @@ const showContactToast = (type, title, message) => {
   }
 };
 
+// Helper for UUID / random ID generation
+const generateId = () => {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+};
+
+// Retrieve or generate visitor_id and session_id
+const getVisitorId = () => {
+  let vId = localStorage.getItem('visitor_id');
+  if (!vId) {
+    vId = generateId();
+    localStorage.setItem('visitor_id', vId);
+  }
+  return vId;
+};
+
+const getSessionId = () => {
+  let sId = sessionStorage.getItem('session_id');
+  if (!sId) {
+    sId = generateId();
+    sessionStorage.setItem('session_id', sId);
+  }
+  return sId;
+};
+
 // Initialize Supabase Client
-const supabaseUrl = (window.APP_CONFIG && window.APP_CONFIG.SUPABASE_URL) || "";
-const supabaseKey = (window.APP_CONFIG && window.APP_CONFIG.SUPABASE_ANON_KEY) || "";
+const supabaseUrl = (window.APP_CONFIG && window.APP_CONFIG.SUPABASE_URL) || "https://xpuhbtsgwhgbcvmwzlyd.supabase.co";
+const supabaseKey = (window.APP_CONFIG && window.APP_CONFIG.SUPABASE_ANON_KEY) || "sb_publishable_Rt97581bW4IkOBlUaCNX4Q_Rldchf_z";
 
 const isValidSupabaseConfig = (url, key) => {
   if (!url || !key) return false;
@@ -251,46 +278,21 @@ contactForm?.addEventListener("submit", async (event) => {
     const subjectVal = contactForm.querySelector("#contact-subject").value.trim();
     const messageVal = contactForm.querySelector("#contact-message").value.trim();
 
-    const { data: insertedData, error } = await supabaseClient
+    const recordPayload = {
+      full_name: nameVal,
+      email: emailVal,
+      subject: subjectVal,
+      message: messageVal,
+      submitted_from: "Portfolio Website",
+      status: "New"
+    };
+
+    const { error } = await supabaseClient
       .from("contact_messages")
-      .insert([
-        {
-          full_name: nameVal,
-          email: emailVal,
-          subject: subjectVal,
-          message: messageVal,
-          submitted_from: "Portfolio Website",
-          status: "New"
-        }
-      ])
-      .select()
-      .maybeSingle();
+      .insert([recordPayload]);
 
     if (error) {
       throw error;
-    }
-
-    // Fail-safe direct Edge Function invocation to ensure email delivery
-    try {
-      const edgeUrl = `${supabaseUrl}/functions/v1/send-contact-email`;
-      await fetch(edgeUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Webhook-Secret": "db_webhook_secret_99882244"
-        },
-        body: JSON.stringify({
-          record: insertedData || {
-            full_name: nameVal,
-            email: emailVal,
-            subject: subjectVal,
-            message: messageVal,
-            created_at: new Date().toISOString()
-          }
-        })
-      });
-    } catch (edgeErr) {
-      console.warn('[ContactForm] Direct edge function dispatch fallback warning:', edgeErr);
     }
 
     // Telemetry: Upsert visitor profile and save contact submit details
@@ -1700,9 +1702,33 @@ const loadDynamicProjects = async () => {
   }
 };
 
-// Geolocation caching for resume downloads
+// Geolocation caching for resume downloads & testimonials
 let cachedGeoData = { ip_address: 'Unknown', country: 'Unknown', country_code: 'Unknown', city: 'Unknown' };
-const prefetchGeoData = async () => {
+if (typeof window !== 'undefined') {
+  window.cachedGeoData = cachedGeoData;
+}
+
+const fetchVisitorGeo = async () => {
+  if (cachedGeoData && cachedGeoData.country && cachedGeoData.country !== 'Unknown') {
+    return cachedGeoData;
+  }
+  try {
+    const res = await fetch('https://ipwho.is/');
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.success !== false) {
+        cachedGeoData = {
+          ip_address: data.ip || 'Unknown',
+          country: data.country || 'Unknown',
+          country_code: data.country_code || 'Unknown',
+          city: data.city || 'Unknown'
+        };
+        if (typeof window !== 'undefined') window.cachedGeoData = cachedGeoData;
+        return cachedGeoData;
+      }
+    }
+  } catch (_) {}
+
   try {
     const res = await fetch('https://ipapi.co/json/');
     if (res.ok) {
@@ -1713,9 +1739,22 @@ const prefetchGeoData = async () => {
         country_code: data.country_code || 'Unknown',
         city: data.city || 'Unknown'
       };
+      if (typeof window !== 'undefined') window.cachedGeoData = cachedGeoData;
+      return cachedGeoData;
     }
   } catch (err) {
     console.warn('Geolocation prefetch failed:', err);
+  }
+  return cachedGeoData;
+};
+
+if (typeof window !== 'undefined') {
+  window.fetchVisitorGeo = fetchVisitorGeo;
+}
+
+const prefetchGeoData = async () => {
+  try {
+    await fetchVisitorGeo();
   } finally {
     initTelemetry();
   }
@@ -1735,6 +1774,13 @@ const initTelemetry = async () => {
   const sessionId = getSessionId();
   const visitorId = getVisitorId();
   const device = getDeviceDetails();
+
+  // If user is already authenticated on initial page load, sync their identity
+  if (window.AuthService) {
+    window.AuthService.getCurrentUser().then(user => {
+      if (user) syncAuthenticatedUserVisitorProfile(user);
+    }).catch(() => {});
+  }
 
   const rawReferrer = document.referrer || '';
   const attribution = resolveTrafficSource(rawReferrer, window.location.search);
@@ -1795,31 +1841,31 @@ const initTelemetry = async () => {
 
 prefetchGeoData();
 
-// Helper for UUID / random ID generation
-const generateId = () => {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
-    return v.toString(16);
-  });
-};
+// Telemetry: Synchronize authenticated Supabase session into visitor_profiles
+const syncAuthenticatedUserVisitorProfile = async (user) => {
+  if (!user || !window.AnalyticsService) return false;
+  try {
+    const vId = getVisitorId();
+    if (!vId) return false;
 
-// Retrieve or generate visitor_id and session_id
-const getVisitorId = () => {
-  let vId = localStorage.getItem('visitor_id');
-  if (!vId) {
-    vId = generateId();
-    localStorage.setItem('visitor_id', vId);
-  }
-  return vId;
-};
+    const fullName = user.user_metadata?.full_name || user.user_metadata?.name || user.user_metadata?.user_name || (user.email ? user.email.split('@')[0] : '');
+    const email = user.email || user.user_metadata?.email || '';
+    const avatarUrl = user.user_metadata?.avatar_url || user.user_metadata?.picture || '';
 
-const getSessionId = () => {
-  let sId = sessionStorage.getItem('session_id');
-  if (!sId) {
-    sId = generateId();
-    sessionStorage.setItem('session_id', sId);
+    if (fullName || email) {
+      await window.AnalyticsService.upsertVisitorProfile({
+        visitor_id: vId,
+        full_name: fullName,
+        email: email,
+        avatar_url: avatarUrl,
+        updated_at: new Date().toISOString()
+      });
+      return true;
+    }
+  } catch (err) {
+    console.warn('[Telemetry] Authenticated visitor profile sync warning:', err);
   }
-  return sId;
+  return false;
 };
 
 const getDeviceDetails = () => {
@@ -1828,12 +1874,12 @@ const getDeviceDetails = () => {
   let os = 'Other';
   let deviceType = 'Desktop';
 
-  if (ua.includes('Firefox')) browser = 'Firefox';
+  if (ua.includes('Firefox') || ua.includes('FxiOS')) browser = 'Firefox';
   else if (ua.includes('SamsungBrowser')) browser = 'Samsung Browser';
   else if (ua.includes('Opera') || ua.includes('OPR')) browser = 'Opera';
   else if (ua.includes('Trident')) browser = 'Internet Explorer';
-  else if (ua.includes('Edge') || ua.includes('Edg')) browser = 'Edge';
-  else if (ua.includes('Chrome')) browser = 'Chrome';
+  else if (ua.includes('Edge') || ua.includes('Edg') || ua.includes('EdgiOS')) browser = 'Edge';
+  else if (ua.includes('Chrome') || ua.includes('CriOS')) browser = 'Chrome';
   else if (ua.includes('Safari')) browser = 'Safari';
 
   if (ua.includes('Windows')) os = 'Windows';
@@ -1913,12 +1959,28 @@ const loadDynamicResume = async () => {
           viewOnlineBtn.setAttribute('aria-label', "Open Ashok's active resume preview in a new tab");
 
           const device = getDeviceDetails();
+
+          // Ensure authenticated profile is synced before download logging
+          if (window.AuthService) {
+            try {
+              const currentUser = await window.AuthService.getCurrentUser();
+              if (currentUser) {
+                await syncAuthenticatedUserVisitorProfile(currentUser);
+              }
+            } catch (_) {}
+          }
+
+          const currentPath = window.location.pathname;
+          const capturedPageSource = (!currentPath || currentPath === '/' || currentPath === '/index.html')
+            ? 'Homepage'
+            : currentPath;
+
           // 1. Create a download record in database
           const downloadPayload = {
             resume_id: latestResume.id,
             session_id: getSessionId(),
             visitor_id: getVisitorId(),
-            page_source: window.location.pathname || '/',
+            page_source: capturedPageSource,
             referrer: document.referrer || '',
             user_agent: device.userAgent,
             browser: device.browser,
@@ -1933,6 +1995,10 @@ const loadDynamicResume = async () => {
           const { data, error: logError } = await svc.logResumeDownload(downloadPayload);
           if (logError) throw logError;
           downloadRecord = data;
+
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('resume_downloaded', { detail: data }));
+          }
 
           // 2. Trigger file download
           const response = await fetch(latestResume.public_url);
@@ -2306,6 +2372,7 @@ const setupNavbarAuth = async () => {
   const user = await window.AuthService.getCurrentUser();
   if (user) {
     renderDropdown(user);
+    syncAuthenticatedUserVisitorProfile(user);
   } else {
     renderLoginButton(false);
   }
@@ -2314,6 +2381,7 @@ const setupNavbarAuth = async () => {
   window.AuthService.onAuthStateChange((event, session) => {
     if (session?.user) {
       renderDropdown(session.user);
+      syncAuthenticatedUserVisitorProfile(session.user);
     } else {
       renderLoginButton(false);
     }
@@ -2328,7 +2396,10 @@ const setupNavbarAuth = async () => {
           const { data, error } = await window.AuthService.setSession(event.data.hash);
           if (error) throw error;
           const user = await window.AuthService.getCurrentUser();
-          if (user) renderDropdown(user);
+          if (user) {
+            renderDropdown(user);
+            syncAuthenticatedUserVisitorProfile(user);
+          }
         } catch (e) {
           showToast("error", "Session Error", e.message || "Failed to configure user session.");
           renderLoginButton(false);

@@ -45,8 +45,42 @@ export function resolveReferrer(referrerString) {
   // Remove leading 'www.' if present for uniform parsing
   const cleanHost = hostname.replace(/^www\./, '');
 
-  // Define patterns and their associated sources & mediums
+  // 1. Detect internal / self-referrals and local dev traffic -> treat as Direct
+  const isCurrentHost = typeof window !== 'undefined' && window.location && window.location.hostname
+    ? cleanHost === window.location.hostname.replace(/^www\./, '').toLowerCase()
+    : false;
+
+  if (
+    isCurrentHost ||
+    cleanHost === 'ashokvangapandu.com' ||
+    cleanHost.includes('ashokvangapandu.com') ||
+    cleanHost === 'localhost' ||
+    cleanHost === '127.0.0.1' ||
+    cleanHost.includes('localhost')
+  ) {
+    return {
+      source: 'direct',
+      sourceDisplay: 'Direct',
+      medium: null,
+      campaign: null,
+      content: null,
+      term: null,
+      referrer: ref,
+      hasUTM: false,
+      hasReferrer: false,
+      attributionType: 'direct'
+    };
+  }
+
+  // 2. Define patterns and their associated sources & mediums
   const rules = [
+    {
+      // Gmail Android app / webmail
+      test: (host, rawRef) => host === 'com.google.android.gm' || host === 'mail.google.com' || (rawRef && rawRef.includes('com.google.android.gm')),
+      source: 'email',
+      sourceDisplay: 'Email',
+      medium: 'email'
+    },
     {
       test: (host) => /^(?:.*\.)?linkedin\.[a-z.]+$/.test(host),
       source: 'linkedin',
@@ -60,7 +94,7 @@ export function resolveReferrer(referrerString) {
       medium: 'referral'
     },
     {
-      test: (host) => /^(?:.*\.)?google\.[a-z.]+$/.test(host),
+      test: (host) => /^(?:.*\.)?google\.[a-z.]+$/.test(host) && host !== 'com.google.android.gm' && host !== 'mail.google.com',
       source: 'google',
       sourceDisplay: 'Google Search',
       medium: 'organic'
@@ -116,7 +150,7 @@ export function resolveReferrer(referrerString) {
   ];
 
   for (const rule of rules) {
-    if (rule.test(cleanHost)) {
+    if (rule.test(cleanHost, ref)) {
       return {
         source: rule.source,
         sourceDisplay: rule.sourceDisplay,
